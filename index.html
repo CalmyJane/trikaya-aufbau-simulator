@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Trikaya Aufbau Simulator</title>
+  <link rel="icon" href="assets/ui/logo_notext.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Poiret+One&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="src/ui/style.css" />
+</head>
+<body>
+  <div id="game"></div>
+
+  <!-- Loading -->
+  <div id="loading" class="screen">
+    <img src="assets/ui/logo.png" alt="Trikaya" class="loading-logo" />
+    <div class="loading-bar"><div id="loading-fill"></div></div>
+    <div id="loading-text">…</div>
+    <div class="cj-badge"><img src="assets/ui/calmyjane_text.svg" alt="Calmy Jane" class="cj-text" /></div>
+  </div>
+
+  <!-- Main menu -->
+  <div id="menu" class="screen hidden">
+    <div class="menu-panel">
+      <img src="assets/ui/logo.png" alt="Trikaya Festival" class="menu-logo" />
+      <h1 class="menu-title">AUFBAU<span>SIMULATOR</span></h1>
+      <div class="menu-sub" data-i18n="menu.sub"></div>
+      <div class="menu-buttons">
+        <button id="btn-continue" class="btn hidden" data-i18n="menu.continue"></button>
+        <button id="btn-new" class="btn primary" data-i18n="menu.start"></button>
+        <button id="btn-controls" class="btn" data-i18n="menu.controls"></button>
+        <button id="btn-settings" class="btn" data-i18n="menu.settings"></button>
+        <button id="btn-credits" class="btn" data-i18n="menu.credits"></button>
+        <button id="btn-fullscreen" class="btn" data-i18n="menu.fullscreen"></button>
+      </div>
+      <div class="menu-foot" data-i18n="menu.foot"></div>
+    </div>
+    <div class="cj-badge"><img src="assets/ui/calmyjane_text.svg" alt="Calmy Jane" class="cj-text" /></div>
+  </div>
+
+  <!-- Info modal (controls / credits / quest log) -->
+  <div id="modal" class="screen hidden">
+    <div class="modal-panel">
+      <div id="modal-body"></div>
+      <button id="modal-close" class="btn" data-i18n="close"></button>
+    </div>
+  </div>
+
+  <!-- Pause -->
+  <div id="pause" class="screen hidden">
+    <div class="modal-panel small">
+      <h2 data-i18n="pause.title"></h2>
+      <div class="menu-buttons">
+        <button id="btn-resume" class="btn primary" data-i18n="pause.resume"></button>
+        <button id="btn-log" class="btn" data-i18n="pause.log"></button>
+        <button id="btn-map" class="btn" data-i18n="pause.map"></button>
+        <button id="btn-psettings" class="btn" data-i18n="menu.settings"></button>
+        <button id="btn-pcontrols" class="btn" data-i18n="menu.controls"></button>
+        <button id="btn-quit" class="btn" data-i18n="pause.quit"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud" class="hidden">
+    <div id="stats">
+      <div class="stat-row"><span class="karma-icon">✺</span> <b id="karma">0</b> <span data-i18n="hud.karma"></span></div>
+      <div class="stat-row money-row">💶 <b id="money">0 €</b> · 🎟 <b id="tickets">0</b></div>
+
+      <div class="stat-row small"><span data-i18n="hud.ready"></span> <b id="ready-pct">0%</b></div>
+      <div class="ready-bar"><div id="ready-fill"></div></div>
+      <div class="stat-row tiny" id="day-text"></div>
+      <div id="effects"></div>
+    </div>
+    <div id="tracker"></div>
+    <div id="toasts"></div>
+    <div id="money-floats"></div>
+    <div id="prompt" class="hidden"></div>
+    <div id="progress" class="hidden"><div class="progress-label" id="progress-label">Building…</div><div class="progress-bar"><div id="progress-fill"></div></div></div>
+    <div id="inventory"></div>
+    <div id="stamina"><div id="stamina-fill"></div></div>
+    <canvas id="minimap" width="220" height="220"></canvas>
+    <div id="hint" data-i18n="hud.hint"></div>
+    <button id="btn-fs-hud" title="Fullscreen">⛶</button>
+    <div id="vehicle-hud" class="hidden"></div>
+    <div id="bubbles"></div>
+    <div id="dialog" class="hidden">
+      <div class="dialog-portrait" id="dialog-portrait">☕</div>
+      <div class="dialog-main">
+        <div class="dialog-name"><span id="dialog-name">Bernd</span> <span id="dialog-role" class="dialog-role"></span></div>
+        <div class="dialog-text" id="dialog-text"></div>
+        <div class="dialog-choices" id="dialog-choices"></div>
+        <div class="dialog-hint" id="dialog-hint"></div>
+      </div>
+    </div>
+    <div id="banner" class="hidden"><div class="banner-top" id="banner-top">Quest complete</div><div class="banner-title" id="banner-title"></div><div class="banner-sub" id="banner-sub"></div></div>
+  </div>
+
+  <!-- Big map -->
+  <div id="bigmap" class="screen hidden">
+    <div class="bigmap-panel">
+      <canvas id="bigmap-canvas" width="900" height="900"></canvas>
+      <div class="bigmap-legend" data-i18n="map.legend"></div>
+    </div>
+  </div>
+
+  <div id="fade"></div>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

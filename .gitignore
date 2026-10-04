@@ -1,0 +1,23 @@
+node_modules
+dist
+_cand
+.netlify
+
+# credentials – never commit (GitHub Actions uses repository secrets instead)
+.env
+.env.*
+
+# source audio is big – only the converted MP3s in public/music are committed
+music/*.wav
+music/*.mp3
+music/*.flac
+music/*.ogg
+music/*.m4a
+music/*.aif
+music/*.aiff
+
+# promo videos (50 MB each)
+promo/*.mp4
+
+# local Claude Code settings
+.claude/settings.local.json

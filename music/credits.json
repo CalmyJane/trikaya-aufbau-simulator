@@ -1,0 +1,58 @@
+{
+  "artists": {
+    "astralica": {
+      "name": "Astralica",
+      "hidden": false,
+      "link": "https://soundcloud.com/astralica-psy"
+    },
+    "calmy jane": {
+      "name": "Calmy Jane",
+      "hidden": true,
+      "link": ""
+    },
+    "calmyjane": {
+      "name": "Calmy Jane",
+      "hidden": true,
+      "link": ""
+    },
+    "geist": {
+      "name": "Geist",
+      "hidden": false,
+      "link": ""
+    },
+    "lunecell": {
+      "name": "LuneCell",
+      "hidden": false,
+      "link": "https://soundcloud.com/lunecell"
+    },
+    "mekkanikka": {
+      "name": "Mekkanikka",
+      "hidden": false,
+      "link": "https://soundcloud.com/mekkanikka"
+    },
+    "stillbendana": {
+      "name": "StillBendana",
+      "hidden": false,
+      "link": "https://soundcloud.com/leon-stiller-815944323"
+    },
+    "omikron": {
+      "name": "Omikron",
+      "hidden": false,
+      "link": "https://soundcloud.com/omikron_music"
+    },
+    "dark jochen": {
+      "name": "Dark Jochen",
+      "hidden": false,
+      "link": "https://soundcloud.com/dark-jochen"
+    }
+  },
+  "tracks": {
+    "Omikron Astralica 2026-12-09.wav": {
+      "artists": [
+        "Omikron",
+        "Astralica"
+      ],
+      "title": "Untitled (2026-12-09)"
+    }
+  }
+}

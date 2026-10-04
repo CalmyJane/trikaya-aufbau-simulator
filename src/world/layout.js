@@ -1,0 +1,137 @@
+// World layout, traced from the official site plan (Trikaya_Übersicht) and satellite view.
+// All shapes are authored in "plan pixels" (site plan rendered 1300px wide, north up)
+// and converted to world metres with P(). The world is ~65% of real scale so walking
+// distances stay fun.
+
+export const PLAN_SCALE = 0.3; // world metres per plan pixel
+export const PLAN_ORIGIN = { x: 640, y: 470 };
+
+/** plan pixel -> world {x, z} */
+export function P(px, py) {
+  return { x: (px - PLAN_ORIGIN.x) * PLAN_SCALE, z: (py - PLAN_ORIGIN.y) * PLAN_SCALE };
+}
+export const poly = (pts) => pts.map(([x, y]) => P(x, y));
+export const line = poly;
+
+// Painted ground covers this square (world metres, centred at 0,0)
+export const GROUND_SIZE = 480;
+
+// ---------------------------------------------------------------- areas
+export const AREAS = {
+  festival: poly([[68, 633], [100, 520], [300, 482], [455, 455], [622, 578], [630, 882], [295, 893], [90, 660]]),
+  crewCamp: poly([[452, 318], [900, 263], [904, 300], [466, 402]]),
+  parking: poly([[945, 245], [1120, 230], [1125, 275], [947, 295]]),
+  sportsMeadow: poly([[470, 425], [930, 312], [935, 470], [640, 560]]),
+  westMeadow: poly([[215, 335], [455, 445], [300, 482], [100, 520]]),
+};
+
+// Fields (crop patterns painted on the ground). stripe angle in degrees.
+export const FIELDS = [
+  { pts: poly([[-200, -200], [1085, -200], [1150, 120], [1165, 236], [930, 238], [265, 303], [-200, 340]]), color: '#4d7a33', stripe: '#436c2b', angle: -6, spacing: 14 },
+  { pts: poly([[-200, 340], [265, 303], [215, 335], [100, 520], [68, 633], [-200, 760]]), color: '#557f38', stripe: '#4a7130', angle: 60, spacing: 12 },
+  { pts: poly([[-200, 760], [68, 633], [90, 660], [295, 893], [300, 1100], [-200, 1100]]), color: '#6f8a44', stripe: '#627c3b', angle: -2, spacing: 10 },
+  { pts: poly([[295, 893], [630, 882], [640, 1100], [300, 1100]]), color: '#7a6f58', stripe: '#6d624d', angle: 0, spacing: 9 },
+  { pts: poly([[1160, -200], [1500, -200], [1500, 405], [1255, 412], [1205, 340], [1175, 240]]), color: '#3f6a2c', stripe: '#355d25', angle: -8, spacing: 13 },
+  { pts: poly([[1100, 452], [1255, 412], [1500, 405], [1500, 1100], [1110, 1100]]), color: '#80745c', stripe: '#72674f', angle: 90, spacing: 9 },
+  { pts: poly([[760, 520], [1100, 452], [1110, 1100], [760, 1100]]), color: '#5c8a3a', stripe: '#8a7d62', angle: 90, spacing: 28 },
+];
+
+// Roads & tracks: width in metres
+export const ROADS = [
+  { name: 'Enterstraße', pts: line([[150, 300], [235, 328], [470, 440], [622, 578]]), width: 5, kind: 'gravel' },
+  { name: 'Enterstraße', pts: line([[622, 578], [800, 530], [1100, 452], [1255, 413], [1500, 400]]), width: 6, kind: 'asphalt' },
+  { name: 'Gündinger Weg', pts: line([[1060, -200], [1120, 20], [1150, 120], [1172, 245], [1200, 340], [1255, 413], [1280, 700], [1290, 961]]), width: 6, kind: 'asphalt' }, // ends at Lippweg
+  { name: 'Feldweg', pts: line([[-200, 330], [265, 303], [930, 238], [1172, 238]]), width: 4, kind: 'dirt' },
+  { name: 'Crew-Zufahrt', pts: line([[470, 440], [520, 421], [700, 379], [916, 323], [1000, 306], [1049, 304], [1051, 322]]), width: 4, kind: 'dirt' },
+  { name: 'Base-Einfahrt', pts: line([[1034, 468], [1030, 452]]), width: 6, kind: 'gravel' },
+  { name: 'Parkplatz-Zufahrt', pts: line([[1172, 250], [1122, 255]]), width: 5, kind: 'gravel' },
+];
+
+// Tree rows / clusters (plan coords)
+export const TREE_LINES = [
+  { pts: line([[640, 600], [648, 880]]), spacing: 5, jitter: 1 },                    // hedge east of festival (TSV side)
+  { pts: line([[800, 538], [1100, 460]]), spacing: 16, jitter: 2 },                 // a few trees along Enterstraße east
+  { pts: line([[650, 900], [790, 900]]), spacing: 6, jitter: 1.2 },
+  { pts: line([[387, -30], [300, 140], [223, 297], [120, 470], [15, 640], [-130, 867]]), spacing: 7, jitter: 2 }, // the long hedge along the field track west of the site
+  { pts: line([[1260, 440], [1290, 700]]), spacing: 6, jitter: 2 },
+];
+// Bush hedges (plan coords). The first one separates the camp path from the football meadow.
+export const HEDGES = [
+  { pts: line([[478, 452], [528, 433], [700, 392], [918, 336], [935, 332]]), spacing: 2.2 },
+];
+
+export const TREE_CLUSTERS = [
+  { c: P(200, 628), r: 13, count: 22 }, // Hängemattenwald
+  { c: P(70, 640), r: 7, count: 6 },    // forest edge behind the Forest Dome
+  { c: P(300, 405), r: 10, count: 8 },  // the small group where the field tracks meet (north-west corner)
+];
+
+// Fence (Bauzaun) along the festival boundary; gaps = entrances
+export const FESTIVAL_FENCE = {
+  pts: poly([[68, 633], [100, 520], [300, 482], [455, 455], [622, 578], [630, 882], [295, 893], [90, 660], [68, 633]]),
+  gaps: [P(565, 535), P(622, 600), P(98, 535), P(450, 458)], // last one: corner towards the camping (loader!)
+  gapRadius: 6,
+};
+
+// ---------------------------------------------------------------- crew base
+// The fenced crew base (containers, office, crew lounge) — the former "Privat" area of the plan.
+// Defined as a rotated rectangle; local +z points roughly south (towards Enterstraße).
+export const CREW_BASE = {
+  center: P(1019, 391),
+  rotation: 0.2,
+  halfW: 20.5,   // local x
+  halfD: 22.5,   // local z
+  gates: [{ x: 0, z: 22.5, w: 8 }, { x: 14.5, z: -22.5, w: 7 }], // south (Enterstraße) + north (camp / parking)
+};
+/** crew-base local (x, z) -> world {x, z} */
+export function baseToWorld(x, z) {
+  const c = Math.cos(CREW_BASE.rotation), s = Math.sin(CREW_BASE.rotation);
+  return { x: CREW_BASE.center.x + x * c + z * s, z: CREW_BASE.center.z - x * s + z * c };
+}
+AREAS.crewBase = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([sx, sz]) => baseToWorld(sx * CREW_BASE.halfW, sz * CREW_BASE.halfD));
+
+// ---------------------------------------------------------------- landmarks
+export const LANDMARKS = {
+  dixiRow: P(470, 470),
+  tsvPitch: P(725, 710),
+  hammockForest: P(200, 628),
+  soccerGoalW: P(845, 400),
+  soccerGoalE: P(900, 380),
+  parking: P(1030, 262),
+  kitchen: P(392, 508),       // crew kitchen, on the festival ground
+  dixi_delivery: P(434, 390), // pallets of Dixis are dropped at the front of the crew camp, next to the road
+  wc_container: P(462, 548),   // the toilet trailer is delivered straight onto the festival ground
+  festival_generator: P(600, 560),
+  chill: P(680, 316), // Zdenko & Thompsen's beer bench, middle of the crew & artist camp
+};
+
+// Festival build plots (from the site plan). Quests reference these by id.
+export const PLOTS = {
+  // the main stage (wooden dragon + 6 rigging posts) is already standing; quests rig & decorate it
+  mainstage:    { pos: P(310, 575), size: 30, flatRadius: 24, label: 'Mainstage', prebuilt: true },
+  // the firespace with the wooden Shiva statue is already standing too
+  firespace:    { pos: P(305, 815), size: 18, flatRadius: 13, label: 'Firespace', prebuilt: true }, // behind the Narnia Floor, where the dragon looks
+  hammocks:     { pos: P(212, 700), size: 18, label: 'Hängemattenwald' },
+  chai_lounge:  { pos: P(430, 612), size: 16, label: 'Chai Lounge', prebuilt: true }, // eternal construction site
+  planetarium:  { pos: P(532, 645), size: 18, label: 'Planetarium' },
+  biergarten:   { pos: P(452, 705), size: 18, label: 'Techno Floor' },
+  awareness:    { pos: P(522, 552), size: 12, label: 'Awareness' },
+  // future plots - marked in the dirt until a quest builds them
+  narnia_floor: { pos: P(305, 725), size: 16, label: 'Narnia Floor', prebuilt: true }, // Mia's crew builds it in stages
+  forest_dome:  { pos: P(120, 600), size: 16, label: 'Forest Dome', clearRadius: 19 },
+  shops:        { pos: P(562, 725), size: 14, label: 'Shops' },
+  kuenstlergasse: { pos: P(205, 548), size: 18, label: 'Künstlergasse' }, // Cosma & Mathias
+  entrance:     { pos: P(578, 598), size: 12, label: 'Eingang' },
+};
+
+// Dixi rows (built by the toilet job): stand spot is computed in front of the row
+export const DIXI_ROWS = [
+  { pos: P(352, 480), n: 6, rot: 0.17 }, // along the north fence, clear of the camping gate
+  { pos: P(385, 655), n: 4, rot: 0.1 },
+];
+
+// The festival site. Wander off too far beyond it and the police picks you up.
+export const SITE_BOUNDS = { minX: -185, maxX: 190, minZ: -135, maxZ: 125 };
+export const POLICE_MARGIN = 28; // metres beyond the site before the police arrives
+// Hard limit (edge of the painted ground)
+export const WORLD_BOUNDS = { minX: -232, maxX: 232, minZ: -232, maxZ: 232 };

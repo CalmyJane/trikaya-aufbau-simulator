@@ -1,0 +1,165 @@
+{
+  "tracks": [
+    {
+      "file": "astralica-particles-of-matter.mp3",
+      "artist": "Astralica",
+      "artists": [
+        "Astralica"
+      ],
+      "title": "Particles of Matter",
+      "tags": []
+    },
+    {
+      "file": "astralica-lsd-remake.mp3",
+      "artist": "Astralica",
+      "artists": [
+        "Astralica"
+      ],
+      "title": "LSD remake",
+      "tags": []
+    },
+    {
+      "file": "astralica-universal-spirit-ancient-arts-master-final.mp3",
+      "artist": "Astralica",
+      "artists": [
+        "Astralica"
+      ],
+      "title": "Universal Spirit (Ancient Arts Master)",
+      "tags": []
+    },
+    {
+      "file": "calmy-jane-quantenenergie.mp3",
+      "artist": "Calmy Jane",
+      "artists": [
+        "Calmy Jane"
+      ],
+      "title": "Quantenenergie",
+      "tags": []
+    },
+    {
+      "file": "calmyjane-psytrazz.mp3",
+      "artist": "Calmy Jane",
+      "artists": [
+        "Calmy Jane"
+      ],
+      "title": "PsyTrazz",
+      "tags": []
+    },
+    {
+      "file": "calmyjane-trikaya.mp3",
+      "artist": "Calmy Jane",
+      "artists": [
+        "Calmy Jane"
+      ],
+      "title": "Trikaya",
+      "tags": []
+    },
+    {
+      "file": "geist-praktikum-bei-astro-tv-186.mp3",
+      "artist": "Geist",
+      "artists": [
+        "Geist"
+      ],
+      "title": "Praktikum bei Astro TV (186)",
+      "tags": []
+    },
+    {
+      "file": "lunecell-the-firekeeper-rmx-30sec.mp3",
+      "artist": "LuneCell",
+      "artists": [
+        "LuneCell"
+      ],
+      "title": "The Firekeeper rmx",
+      "tags": [
+        "fire",
+        "clip"
+      ]
+    },
+    {
+      "file": "mekkanikka-we-called-it-techno-16b-m.mp3",
+      "artist": "Mekkanikka",
+      "artists": [
+        "Mekkanikka"
+      ],
+      "title": "We Called It Techno",
+      "tags": [
+        "techno"
+      ]
+    },
+    {
+      "file": "omikron-astralica-2026-12-09.mp3",
+      "artist": "Omikron & Astralica",
+      "artists": [
+        "Omikron",
+        "Astralica"
+      ],
+      "title": "Untitled (2026-12-09)",
+      "tags": []
+    },
+    {
+      "file": "stillbendana-bandana-vibes.mp3",
+      "artist": "StillBendana",
+      "artists": [
+        "StillBendana"
+      ],
+      "title": "Bandana Vibes",
+      "tags": []
+    },
+    {
+      "file": "stillbendana-noch-1-joint-mixed.mp3",
+      "artist": "StillBendana",
+      "artists": [
+        "StillBendana"
+      ],
+      "title": "Noch 1 Joint (Mixed)",
+      "tags": []
+    }
+  ],
+  "artists": {
+    "astralica": {
+      "name": "Astralica",
+      "hidden": false,
+      "link": "https://soundcloud.com/astralica-psy"
+    },
+    "calmy jane": {
+      "name": "Calmy Jane",
+      "hidden": true,
+      "link": ""
+    },
+    "calmyjane": {
+      "name": "Calmy Jane",
+      "hidden": true,
+      "link": ""
+    },
+    "geist": {
+      "name": "Geist",
+      "hidden": false,
+      "link": ""
+    },
+    "lunecell": {
+      "name": "LuneCell",
+      "hidden": false,
+      "link": "https://soundcloud.com/lunecell"
+    },
+    "mekkanikka": {
+      "name": "Mekkanikka",
+      "hidden": false,
+      "link": "https://soundcloud.com/mekkanikka"
+    },
+    "stillbendana": {
+      "name": "StillBendana",
+      "hidden": false,
+      "link": "https://soundcloud.com/leon-stiller-815944323"
+    },
+    "omikron": {
+      "name": "Omikron",
+      "hidden": false,
+      "link": "https://soundcloud.com/omikron_music"
+    },
+    "dark jochen": {
+      "name": "Dark Jochen",
+      "hidden": false,
+      "link": "https://soundcloud.com/dark-jochen"
+    }
+  }
+}

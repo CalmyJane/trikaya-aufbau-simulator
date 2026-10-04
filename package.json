@@ -1,0 +1,21 @@
+{
+  "name": "trikaya-aufbau-simulator",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/music.mjs && vite",
+    "build": "node scripts/music.mjs && vite build",
+    "preview": "vite preview",
+    "deploy": "npm run build && npx --yes netlify-cli deploy --prod --dir=dist",
+    "deploy:ftp": "npm run build && node scripts/deploy-ftp.mjs"
+  },
+  "dependencies": {
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "basic-ftp": "^6.2.1",
+    "ssh2-sftp-client": "^12.1.1",
+    "vite": "^8.3.1"
+  }
+}

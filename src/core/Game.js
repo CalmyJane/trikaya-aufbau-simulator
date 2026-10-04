@@ -331,7 +331,7 @@ export class Game {
       if (document.fullscreenElement) document.exitFullscreen?.();
       else document.documentElement.requestFullscreen?.().catch(() => {});
     };
-    $('btn-fullscreen').onclick = $('btn-pfullscreen').onclick = $('btn-mfullscreen').onclick = fs;
+    $('btn-pfullscreen').onclick = $('btn-mfullscreen').onclick = fs;
     // sound on/off – in the main menu and the pause menu (N in game), remembered
     $('btn-mute').onclick = $('btn-pmute').onclick = () => { unlockAudio(); this.toggleMute(); };
     this.muteLabels();

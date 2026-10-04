@@ -20,11 +20,17 @@
     <div class="loading-bar"><div id="loading-fill"></div></div>
     <div id="loading-text">…</div>
     <div class="sys-icons">
-      <button id="btn-mute" class="icon-btn btn-mute" title="Sound"></button>
       <button id="btn-fullscreen" class="icon-btn" title="Fullscreen">⛶</button>
     </div>
     <div class="cj-badge"><img src="assets/ui/calmyjane_text.svg" alt="Calmy Jane" class="cj-text" /></div>
   </div>
+  <script>
+    // fullscreen works already while loading
+    document.getElementById('btn-fullscreen').onclick = function () {
+      if (document.fullscreenElement) document.exitFullscreen && document.exitFullscreen();
+      else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function () {});
+    };
+  </script>
 
   <!-- Main menu -->
   <div id="menu" class="screen hidden">
@@ -42,6 +48,7 @@
       <div class="menu-foot" data-i18n="menu.foot"></div>
     </div>
     <div class="sys-icons">
+      <button id="btn-mute" class="icon-btn btn-mute" title="Sound"></button>
       <button id="btn-mfullscreen" class="icon-btn" title="Fullscreen">⛶</button>
     </div>
     <div class="cj-badge"><img src="assets/ui/calmyjane_text.svg" alt="Calmy Jane" class="cj-text" /></div>

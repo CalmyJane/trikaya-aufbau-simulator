@@ -331,12 +331,11 @@ export class Game {
       if (document.fullscreenElement) document.exitFullscreen?.();
       else document.documentElement.requestFullscreen?.().catch(() => {});
     };
-    $('btn-fullscreen').onclick = fs;
+    $('btn-fullscreen').onclick = $('btn-pfullscreen').onclick = fs;
     // sound on/off – in the main menu and the pause menu (N in game), remembered
     $('btn-mute').onclick = $('btn-pmute').onclick = () => { unlockAudio(); this.toggleMute(); };
     this.muteLabels();
     onLangChange(() => this.muteLabels());
-    $('btn-fs-hud').onclick = (e) => { e.stopPropagation(); fs(); };
     $('btn-resume').onclick = () => this.resume();
     $('bigmap').addEventListener('pointerdown', () => { if (this.mode === 'map') this.resume(); });
     $('btn-log').onclick = () => this.openQuestLog();
@@ -372,7 +371,7 @@ export class Game {
 
   /** The button shows the current state. */
   muteLabels() {
-    for (const id of ['btn-mute', 'btn-pmute']) document.getElementById(id).textContent = t(this.audio.muted ? 'menu.soundOff' : 'menu.soundOn');
+    for (const id of ['btn-mute', 'btn-pmute']) document.getElementById(id).textContent = this.audio.muted ? '🔇' : '🔊';
   }
 
   toMenu() {

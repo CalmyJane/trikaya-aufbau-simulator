@@ -169,9 +169,6 @@ html, body {
 
 #modal { z-index: 36; }
 
-#btn-fs-hud { position: absolute; bottom: 84px; right: 16px; width: 44px; height: 44px; border-radius: 12px; pointer-events: auto; cursor: pointer;
-  background: var(--panel); color: var(--text); border: 1px solid rgba(232, 163, 58, 0.4); font-size: 22px; }
-#btn-fs-hud:hover { border-color: var(--gold); }
 
 /* ================================================================ touch / mobile */
 html, body { touch-action: none; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
@@ -194,7 +191,7 @@ html, body { touch-action: none; overscroll-behavior: none; -webkit-tap-highligh
   font-size: 18px; color: #fff; touch-action: none; }
 .t-top.on { background: rgba(232, 163, 58, 0.8); }
 
-body.touch #hint, body.touch #btn-fs-hud { display: none; }
+body.touch #hint { display: none; }
 body.touch #stats { top: 8px; left: calc(8px + env(safe-area-inset-left)); padding: 6px 10px; min-width: 0; }
 body.touch #stats .stat-row { font-size: 14px; }
 body.touch #stats .stat-row.tiny { display: none; }
@@ -400,3 +397,10 @@ body.police::after { background: radial-gradient(ellipse at center, transparent 
   #menu .cj-badge { top: calc(12px + env(safe-area-inset-top)); bottom: auto; left: auto; right: 12px; }
   #menu .cj-text { height: 28px; }
 }
+
+/* one button column everywhere; sound + fullscreen are small icons in the corner */
+.menu-buttons, #pause .menu-buttons { grid-template-columns: 1fr !important; }
+.sys-icons { position: absolute; top: calc(12px + env(safe-area-inset-top)); left: 12px; display: flex; gap: 8px; z-index: 5; }
+.icon-btn { width: 40px; height: 40px; border-radius: 12px; cursor: pointer; background: var(--panel); color: var(--text);
+  border: 1px solid rgba(232, 163, 58, 0.4); font-size: 20px; line-height: 1; padding: 0; }
+.icon-btn:hover { border-color: var(--gold); }

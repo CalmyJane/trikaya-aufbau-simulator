@@ -230,7 +230,7 @@ export class Quad extends Vehicle {
     this.seat.position.set(0, 0.5, -0.22);   // character hips sit ~0.45 above the seat anchor
     this.cargo.position.set(0, 0.99, -0.78);
     this.broken = false;
-    this.breakAt = 900 + Math.random() * 700;
+    this.breakAt = 2000 + Math.random() * 1500;
     this.smoke = [];
   }
 
@@ -249,7 +249,7 @@ export class Quad extends Vehicle {
   repair() {
     this.broken = false;
     this.odometer = 0;
-    this.breakAt = 900 + Math.random() * 700;
+    this.breakAt = 2000 + Math.random() * 1500;
   }
 
   puffSmoke(dt, emit = true) {

@@ -446,7 +446,7 @@ export class Game {
   /** Volunteer list: pick one and a purple beam marks them until the player has been close. */
   openVolunteers() {
     const sel = this.volTarget;
-    const list = this.npcs.all.filter((n) => n.def.look && !n.def.hiddenFromList).sort((a, b) => a.def.name.localeCompare(b.def.name));
+    const list = this.npcs.all.filter((n) => n.def.look && !n.def.hiddenFromList).sort((a, b) => a.def.name.localeCompare(b.def.name, 'de', { sensitivity: 'base' }));
     const html = `<h2>${t('vol.title')}</h2>` + list.map((n) => `<div class="qlog-item vol-item" data-id="${n.def.id}" style="cursor:pointer"><div class="t">${n.def.portrait || ''} ${n.def.name}${sel === n.def.id ? ' · ' + t('vol.marked') : ''}</div></div>`).join('');
     this.ui.modal(html);
     document.querySelectorAll('#modal-body .vol-item').forEach((el) => {

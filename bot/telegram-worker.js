@@ -68,7 +68,7 @@ async function fire(env, chatId, text) {
   });
   if (r.ok) {
     const j = await r.json();
-    await tg(env, 'sendMessage', { chat_id: chatId, text: `🚀 Läuft: ${j.claude_code_session_url}`, disable_web_page_preview: true });
+    await tg(env, 'sendMessage', { chat_id: chatId, text: `🚀 Hab's! Ich mach mich dran und sag dir gleich Bescheid, wenn's fertig ist.\n\nLive zuschauen: ${j.claude_code_session_url}`, disable_web_page_preview: true });
   } else {
     await tg(env, 'sendMessage', { chat_id: chatId, text: `⚠️ Start fehlgeschlagen (${r.status}): ${(await r.text()).slice(0, 200)}` });
   }

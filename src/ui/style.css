@@ -404,3 +404,17 @@ body.police::after { background: radial-gradient(ellipse at center, transparent 
 .icon-btn { width: 40px; height: 40px; border-radius: 12px; cursor: pointer; background: var(--panel); color: var(--text);
   border: 1px solid rgba(232, 163, 58, 0.4); font-size: 20px; line-height: 1; padding: 0; }
 .icon-btn:hover { border-color: var(--gold); }
+
+/* main menu: scales with the window height (windowed <-> fullscreen), narrower buttons, more background visible */
+#menu { background: linear-gradient(90deg, rgba(6, 10, 7, 0.6) 0%, rgba(6, 10, 7, 0.22) 20%, transparent 34%); }
+#menu .menu-panel { max-height: 100dvh; overflow-y: auto; scrollbar-width: none; box-sizing: border-box; padding: 2vh 0; justify-content: center; }
+#menu .menu-panel::-webkit-scrollbar { display: none; }
+#menu .menu-logo { width: clamp(36px, 9vh, 72px); }
+#menu .menu-title { font-size: clamp(22px, 5.6vh, 36px); }
+#menu .menu-title span { font-size: clamp(12px, 2.8vh, 18px); letter-spacing: clamp(4px, 1vh, 8px); }
+#menu .menu-sub { font-size: clamp(11px, 1.8vh, 13px); margin-bottom: 1vh; }
+#menu .menu-buttons { width: clamp(150px, 20vw, 190px); gap: clamp(3px, 0.7vh, 5px); margin-top: 0.8vh; }
+#menu .menu-buttons .btn { font-size: clamp(11px, 1.9vh, 14px); padding: clamp(4px, 1vh, 7px) 10px; }
+#menu .menu-foot { margin-top: 1vh; }
+@media (max-height: 640px) { #menu .menu-sub, #menu .menu-foot { display: none; } }
+@media (orientation: portrait) and (max-width: 640px) { #menu .menu-panel { overflow: visible; padding: 0; } #menu .menu-buttons { width: 100%; } }

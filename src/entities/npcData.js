@@ -702,7 +702,7 @@ export const NPCS = [
   },
   {
     id: 'raedschi', name: 'Rädschi', role: { de: 'Natur, Pilze & Steine', en: 'Nature, mushrooms & stones' }, portrait: '🍄',
-    look: { base: 'f_casual', skin: SKIN.tan, hair: '#2a1a10', brows: '#1e120a', hairStyle: 'dreads', hairStyleColor: '#5a3820', dreadLength: 0.85, dreadThick: 1.2, beads: true, headband: '#7a2a24', shirt: '#2e2232', pants: '#4e5a2a', patchwork: true, shirtPatch: ['#2e2232', '#6a2a24', '#3a2a3a'], pantsPatch: ['#4e5a2a', '#5a3e24', '#3e4a2a'], height: 1.82, width: 0.9, extras: ['pendant'] },
+    look: { base: 'f_casual', skin: SKIN.tan, hair: '#2a1a10', brows: '#1e120a', hairStyle: 'dreads', hairStyleColor: '#5a3820', dreadLength: 1.25, dreadThick: 1.2, beads: true, headband: '#7a2a24', shirt: '#2e2232', pants: '#4e5a2a', patchwork: true, shirtPatch: ['#2e2232', '#6a2a24', '#3a2a3a'], pantsPatch: ['#4e5a2a', '#5a3e24', '#3e4a2a'], height: 1.82, width: 0.9, extras: ['pendant'] },
     behavior: 'wander', home: 'plot_forest_dome', radius: 12,
     lines: [
       { de: 'Oh, hallo… Schön, dass du da bist. Wie geht\'s dir? So richtig, meine ich.', en: 'Oh, hi… Nice that you\'re here. How are you? Like, really?' },

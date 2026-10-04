@@ -3,7 +3,7 @@
 Read this first in a new session (plus README.md for structure).
 
 ## How we work
-- User writes in German; answer in German. "push it" / "publishen" = `npm run deploy:ftp` (SFTP to the user's united-domains webspace, folder `/main/trikaya-aufbau-simulator`, credentials in local `.env` – never read or print the password). Netlify (`npm run deploy`) only on explicit request – credits nearly used up. Public URL of the webspace folder: still unknown, ask the user.
+- User writes in German; answer in German. "push it" / "publishen" = commit + `git push` to GitHub (main) → GitHub Actions builds and uploads via SFTP (repository secrets). Fallback from the PC: `npm run deploy:ftp` (SFTP to the user's united-domains webspace, folder `/main/trikaya-aufbau-simulator`, credentials in local `.env` – never read or print the password). Netlify (`npm run deploy`) only on explicit request – credits nearly used up. Public URL of the webspace folder: still unknown, ask the user.
 - Dev server port can differ (autoPort, another chat may use 5173): use the port preview_start reports.
 - Before every upload: full automated test in the browser preview (`?dev`):
   `const T=(await import('/dev/harness.js')).install(game); game.newGame(); T.runJobs(0,30)` – poll `T.log` in short calls (tool timeout 45 s); all jobs must say `done=true`, no `FAIL`.

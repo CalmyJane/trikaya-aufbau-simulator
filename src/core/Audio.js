@@ -115,27 +115,53 @@ export class Audio {
   step() { this.noise(0.05, { vol: 0.05, freq: 400 + Math.random() * 200 }); }
 
   startAmbience() {
-    // soft wind + occasional birds
+    // quiet wind with slow gusts + varied nature sounds (birds, cuckoo, crickets, woodpecker, rustle)
     const ctx = this.ctx;
-    const len = ctx.sampleRate * 4;
+    const len = ctx.sampleRate * 6;
     const buf = ctx.createBuffer(1, len, ctx.sampleRate);
     const d = buf.getChannelData(0);
     let last = 0;
     for (let i = 0; i < len; i++) { last = (last + (Math.random() * 2 - 1) * 0.02) * 0.995; d[i] = last; }
     const src = ctx.createBufferSource();
     src.buffer = buf; src.loop = true;
-    const g = ctx.createGain(); g.gain.value = 0.6;
+    const g = ctx.createGain(); g.gain.value = 0.22;
     src.connect(g).connect(this.master);
     src.start();
-    const bird = () => {
-      if (!this.muted && Math.random() < 0.7) {
-        const base = 2200 + Math.random() * 1500;
-        for (let i = 0; i < 2 + Math.floor(Math.random() * 4); i++) {
-          this.tone(base + Math.random() * 400, 0.07, { vol: 0.025, delay: i * 0.11, slide: 1.3 });
-        }
-      }
-      setTimeout(bird, 2500 + Math.random() * 6000);
+    // slow gusts
+    const lfo = ctx.createOscillator(); lfo.frequency.value = 0.07;
+    const lg = ctx.createGain(); lg.gain.value = 0.12;
+    lfo.connect(lg).connect(g.gain); lfo.start();
+
+    const r = (a, b) => a + Math.random() * (b - a);
+    const tweet = () => {
+      const base = r(2200, 3700);
+      for (let i = 0; i < 2 + Math.floor(Math.random() * 4); i++)
+        this.tone(base + r(0, 400), 0.07, { vol: 0.02, delay: i * 0.11, slide: 1.3 });
     };
-    setTimeout(bird, 3000);
+    const trill = () => {
+      const base = r(3000, 4200);
+      for (let i = 0; i < 8 + Math.floor(Math.random() * 6); i++)
+        this.tone(base + (i % 2) * 300, 0.04, { vol: 0.015, delay: i * 0.05, slide: 1.1 });
+    };
+    const cuckoo = () => {
+      this.tone(700, 0.22, { vol: 0.03, slide: 0.8 });
+      this.tone(560, 0.3, { vol: 0.03, delay: 0.3, slide: 0.9 });
+    };
+    const crickets = () => {
+      for (let i = 0; i < 14; i++) this.tone(4300, 0.025, { vol: 0.008, delay: (i % 3 === 2 ? 0.05 : 0) + i * 0.07 });
+    };
+    const woodpecker = () => {
+      for (let i = 0; i < 6 + Math.floor(Math.random() * 6); i++) this.noise(0.03, { vol: 0.06, freq: 1500, delay: i * 0.09 });
+    };
+    const rustle = () => this.noise(r(0.8, 1.6), { vol: 0.03, freq: r(3000, 5000) });
+    const frog = () => {
+      for (let i = 0; i < 3; i++) this.tone(r(150, 190), 0.12, { type: 'square', vol: 0.01, delay: i * 0.16, slide: 1.2 });
+    };
+    const sounds = [tweet, tweet, tweet, trill, trill, cuckoo, crickets, crickets, woodpecker, rustle, rustle, frog];
+    const next = () => {
+      if (!this.muted) sounds[Math.floor(Math.random() * sounds.length)]();
+      setTimeout(next, r(2000, 6500));
+    };
+    setTimeout(next, 2500);
   }
 }

@@ -247,13 +247,13 @@ export class Game {
       ['👆 rechts', 'Wischen = umschauen · zwei Finger = zoomen'],
       [k('E'), 'Aktion (leuchtet, wenn etwas geht) – oder auf den Hinweis tippen'],
       [k('⤒') + ' ' + k('»'), 'Springen / Sprint an-aus'],
-      ['🗺️ 📋 ⛶ ⏸', 'Karte · Aufgaben · Vollbild · Pause'],
+      ['🗺️ 📋 ☰', 'Karte · Aufgaben · Menü'],
     ] : [
       ['🕹️ left', 'Thumb on the left half = joystick (walk / drive). Push to the edge = sprint.'],
       ['👆 right', 'Swipe = look around · two fingers = zoom'],
       [k('E'), 'Action (glows when something is possible) – or tap the hint'],
       [k('⤒') + ' ' + k('»'), 'Jump / sprint toggle'],
-      ['🗺️ 📋 ⛶ ⏸', 'Map · jobs · fullscreen · pause'],
+      ['🗺️ 📋 ☰', 'Map · jobs · menu'],
     ];
     const table = (r) => `<table>${r.map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table>`;
     if (this.input.touch) return `<h2>${t('menu.controls')}</h2>${table(touchRows)}`;
@@ -1319,7 +1319,8 @@ export class Game {
         }
       }
       // AFK tracking (Zdenko loves AFK people)
-      const active = inp.keys.size > 0 || inp.mouseDX || inp.mouseDY || inp.wheel;
+      const tc = this.touch;
+      const active = inp.keys.size > 0 || inp.mouseDX || inp.mouseDY || inp.wheel || inp.axis.x || inp.axis.y || (tc && (tc.stick || tc.looks.size > 0)) || inp.pressed.size > 0;
       this.afkTime = active || this.ui.dialogOpen ? 0 : this.afkTime + dt;
     }
 

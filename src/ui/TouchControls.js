@@ -3,7 +3,7 @@ import { t } from '../i18n.js';
 // On-screen controls for phones/tablets:
 //  - left half: floating joystick (walk / drive; push to the edge = sprint)
 //  - right half: drag to look, pinch to zoom
-//  - buttons: action (E), jump (Space), sprint toggle; top bar: map, jobs, pause
+//  - buttons: action (E), jump (Space), sprint toggle; top bar: map, jobs, menu
 // Everything is fed into the normal Input object, so game code doesn't care about touch.
 
 export class TouchControls {
@@ -30,8 +30,7 @@ export class TouchControls {
       <div id="t-top">
         <button class="t-top" data-code="KeyM">🗺️</button>
         <button class="t-top" data-code="KeyJ">📋</button>
-        <button class="t-top" id="t-fs">⛶</button>
-        <button class="t-top" data-code="Escape">⏸</button>
+        <button class="t-top" data-code="Escape">☰</button>
       </div>`;
     document.body.appendChild(el);
     this.el = el;
@@ -65,11 +64,6 @@ export class TouchControls {
       e.preventDefault();
       this.input.sprintToggle = !this.input.sprintToggle;
       sprint.classList.toggle('on', this.input.sprintToggle);
-    });
-    el.querySelector('#t-fs').addEventListener('pointerdown', (e) => {
-      e.preventDefault();
-      if (document.fullscreenElement) document.exitFullscreen?.();
-      else document.documentElement.requestFullscreen?.().catch(() => {});
     });
     // the interaction prompt itself is tappable too
     document.getElementById('prompt').addEventListener('pointerdown', (e) => {

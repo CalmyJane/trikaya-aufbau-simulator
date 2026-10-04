@@ -104,7 +104,7 @@ const pick = (a) => a[Math.floor(Math.random() * a.length)];
 // "Got anything?" – you can ask (almost) anyone. These never have anything and never sell.
 export const NO_STASH = ['fabi', 'jan', 'leo', 'franzi', 'isi', 'verena', 'mia', 'daniel'];
 // crew members with a known stash; everyone else is random (most have nothing)
-const STASH_FIXED = { strom_andi: ['beer', 'schnaps'], estenko: ['schnaps'], rocky: ['weed'], mehdi: ['weed'], schwarzhuber: ['schnaps'], lenny: ['speed', 'weed'], mux: ['weed'], leocitas: ['weed'] };
+const STASH_FIXED = { strom_andi: ['beer', 'schnaps'], juli: ['beer'], estenko: ['schnaps'], rocky: ['weed'], mehdi: ['weed'], schwarzhuber: ['schnaps'], lenny: ['speed', 'weed'], mux: ['weed'], leocitas: ['weed'] };
 const STASH_POOL = ['weed', 'weed', 'schnaps', 'speed', 'keta'];
 const STASH_CD = 240; // seconds until someone has something again after selling
 

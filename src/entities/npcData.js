@@ -686,6 +686,20 @@ export const NPCS = [
       { de: 'Wenn\'s dir zu viel wird: Hängemattenwald, Chai, oder ich. Am besten alle drei.', en: 'If it gets too much: hammock forest, chai, or me. Ideally all three.' },
     ],
   },
+  {
+    id: 'leon', name: 'Leon', role: { de: 'DJ Stillbendana – Hype & Beats', en: 'DJ Stillbendana – hype & beats' }, portrait: '🎧',
+    look: { base: 'm_hoodie', skin: SKIN.light, hair: '#8a6a3a', brows: '#6a4e2a', hairCut: [0.95, 0.4, 0.95], shirt: '#c8683a', pants: '#3a3a4a', patchwork: true, shirtPatch: ['#c8683a', '#2a8a7a', '#e0a030'], height: 1.78, width: 0.98 },
+    behavior: 'wander', home: 'festival_random', roam: 'festival_random', radius: 14,
+    lines: [
+      { de: 'Yo! Was geht, Chef? Heut wird das richtig, richtig geil!', en: 'Yo! What\'s up, boss? Today\'s gonna be sick!' },
+      { de: 'Ich leg später auf. Hip-Hop zum Aufwärmen, dann Techno bis die Sonne aufgeht. Du kommst, ne?', en: 'I\'m playing later. Hip-hop to warm up, then techno till sunrise. You\'re coming, right?' },
+      { de: 'Kisten tragen? Ich trag dich moralisch. Das zählt auch! Los, du packst das!', en: 'Carrying crates? I\'m carrying you morally. That counts too! Go, you got this!' },
+      { de: 'Stillbendana, so heiß ich auf dem Plakat. Bandana vibes, du verstehst.', en: 'Stillbendana, that\'s my name on the poster. Bandana vibes, you know.' },
+      { de: 'Boom bap am Morgen, vier-to-the-floor am Abend. Das ist mein Aufbau-Rhythmus.', en: 'Boom bap in the morning, four-to-the-floor at night. That\'s my build-up rhythm.' },
+      { de: 'Hab gerade nen Beat im Kopf. Warte… nee, war nur der Generator. Trotzdem Bass!', en: 'Got a beat in my head. Wait… nah, that was the generator. Still bass!' },
+      { de: 'Alle zusammen, jetzt: Aufbau! Aufbau! Aufbau! …Wo geht\'s zur Soundanlage?', en: 'Everybody now: build-up! Build-up! Build-up! …Where\'s the sound system?' },
+    ],
+  },
 ];
 
 // ------------------------------------------------------------------ random campers
@@ -745,21 +759,7 @@ const HANGOUTS = {
 
 export function makeCamper(i, rng = Math.random) {
   const pick = (a) => a[Math.floor(rng() * a.length)];
-  const persona = VOLUNTEERS[i % VOLUNTEERS.length  {
-    id: 'leon', name: 'Leon', role: { de: 'DJ Stillbendana – Hype & Beats', en: 'DJ Stillbendana – hype & beats' }, portrait: '🎧',
-    look: { base: 'm_hoodie', skin: SKIN.light, hair: '#8a6a3a', brows: '#6a4e2a', hairCut: [0.95, 0.4, 0.95], shirt: '#c8683a', pants: '#3a3a4a', patchwork: true, shirtPatch: ['#c8683a', '#2a8a7a', '#e0a030'], height: 1.78, width: 0.98 },
-    behavior: 'wander', home: 'festival_random', roam: 'festival_random', radius: 14,
-    lines: [
-      { de: 'Yo! Was geht, Chef? Heut wird das richtig, richtig geil!', en: 'Yo! What\'s up, boss? Today\'s gonna be sick!' },
-      { de: 'Ich leg später auf. Hip-Hop zum Aufwärmen, dann Techno bis die Sonne aufgeht. Du kommst, ne?', en: 'I\'m playing later. Hip-hop to warm up, then techno till sunrise. You\'re coming, right?' },
-      { de: 'Kisten tragen? Ich trag dich moralisch. Das zählt auch! Los, du packst das!', en: 'Carrying crates? I\'m carrying you morally. That counts too! Go, you got this!' },
-      { de: 'Stillbendana, so heiß ich auf dem Plakat. Bandana vibes, du verstehst.', en: 'Stillbendana, that\'s my name on the poster. Bandana vibes, you know.' },
-      { de: 'Boom bap am Morgen, vier-to-the-floor am Abend. Das ist mein Aufbau-Rhythmus.', en: 'Boom bap in the morning, four-to-the-floor at night. That\'s my build-up rhythm.' },
-      { de: 'Hab gerade nen Beat im Kopf. Warte… nee, war nur der Generator. Trotzdem Bass!', en: 'Got a beat in my head. Wait… nah, that was the generator. Still bass!' },
-      { de: 'Alle zusammen, jetzt: Aufbau! Aufbau! Aufbau! …Wo geht\'s zur Soundanlage?', en: 'Everybody now: build-up! Build-up! Build-up! …Where\'s the sound system?' },
-    ],
-  },
-];
+  const persona = VOLUNTEERS[i % VOLUNTEERS.length];
   const female = persona.f;
   const skin = pick([SKIN.light, SKIN.fair, SKIN.tan, SKIN.tan, SKIN.dark]);
   const hairCol = pick(['#1a120c', '#5a3a1e', '#a8864a', '#e3c46a', '#b0402a', '#2a8a7a', '#8a3a9a']);

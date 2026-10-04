@@ -634,6 +634,33 @@ export class QuestSystem {
       const f = b.userData.follow;
       if (f) b.position.set(f.x, heightAt(f.x, f.z), f.z);
     }
+    this.updateStartBeacon(time);
+  }
+
+  /** Yellow beam over Jan until you have taken the very first job (wristband / registration). */
+  updateStartBeacon(time) {
+    const jan = this.offeredBy('jan').some((q) => q.id === 'q0_leo') ? this.game.npcs?.get('jan') : null;
+    if (!jan || jan.hidden) { if (this.startBeacon) this.startBeacon.visible = false; return; }
+    if (!this.startBeacon) {
+      const g = new THREE.Group();
+      const beam = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.4, 0.4, 80, 12, 1, true),
+        new THREE.MeshBasicMaterial({ color: '#ffd84a', transparent: true, opacity: 0.35, depthWrite: false, side: THREE.DoubleSide, fog: false }),
+      );
+      beam.position.y = 40;
+      g.add(beam);
+      const arrow = new THREE.Mesh(new THREE.ConeGeometry(0.6, 1.2, 4), new THREE.MeshBasicMaterial({ color: '#ffd84a' }));
+      arrow.rotation.x = Math.PI;
+      g.add(arrow);
+      g.userData.arrow = arrow;
+      this.markerGroup.add(g);
+      this.startBeacon = g;
+    }
+    const b = this.startBeacon;
+    b.visible = true;
+    b.position.set(jan.position.x, heightAt(jan.position.x, jan.position.z), jan.position.z);
+    b.userData.arrow.position.y = 3.6 + Math.sin(time * 3) * 0.3;
+    b.userData.arrow.rotation.y = time * 2;
   }
 
   // ------------------------------------------------------------ save / load

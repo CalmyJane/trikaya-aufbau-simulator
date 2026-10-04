@@ -394,13 +394,13 @@ body.police::after { background: radial-gradient(ellipse at center, transparent 
   #menu .btn, #pause .btn { font-size: 14px; padding: 9px 10px; }
   #pause .modal-panel.small { padding: 12px 14px; gap: 6px; }
   #pause .modal-panel h2 { font-size: 22px; text-align: center; }
-  #menu .cj-badge { top: calc(12px + env(safe-area-inset-top)); bottom: auto; left: auto; right: 12px; }
+  #menu .cj-badge { top: auto; bottom: 10px; left: auto; right: 12px; }
   #menu .cj-text { height: 28px; }
 }
 
 /* one button column everywhere; sound + fullscreen are small icons in the corner */
 .menu-buttons, #pause .menu-buttons { grid-template-columns: 1fr !important; }
-.sys-icons { position: absolute; top: calc(12px + env(safe-area-inset-top)); left: 12px; display: flex; gap: 8px; z-index: 5; }
+.sys-icons { position: absolute; top: calc(12px + env(safe-area-inset-top)); right: calc(12px + env(safe-area-inset-right)); display: flex; gap: 8px; z-index: 5; }
 .icon-btn { width: 40px; height: 40px; border-radius: 12px; cursor: pointer; background: var(--panel); color: var(--text);
   border: 1px solid rgba(232, 163, 58, 0.4); font-size: 20px; line-height: 1; padding: 0; }
 .icon-btn:hover { border-color: var(--gold); }

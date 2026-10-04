@@ -350,7 +350,7 @@ export const NPCS = [
     ],
   },
   {
-    id: 'mehdi', name: 'Mehdi', role: { de: 'Hängt bei Corni ab', en: 'Hangs out at Corni\'s' }, portrait: '🎧',
+    id: 'mehdi', name: 'Mahdi', role: { de: 'Hängt bei Corni ab', en: 'Hangs out at Corni\'s' }, portrait: '🎧',
     look: { base: 'm_hoodie', skin: '#b07a52', hair: '#0e0a08', brows: '#0e0a08', hairCut: [0.95, 0.6, 0.95], shirt: '#5a6a3a', pants: '#2a2a3a', patchwork: true, height: 1.78 },
     behavior: 'sitter', home: 'corni_seat', face: 'corni_desk',
     lines: [

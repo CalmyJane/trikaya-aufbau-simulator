@@ -109,7 +109,7 @@ export class Game {
     this.music.add({ id: 'menu', pos: () => (this.mode === 'menu' ? this.camera.position : null), range: 10, vol: 0.4 });
     this.music.add({ id: 'mainstage', pos: () => (this.mode === 'menu' ? null : this.world.structures.mainstage?.object.position), range: 175, vol: 0.5, start: 0 });
     this.music.add({ id: 'forest_dome', pos: () => (this.mode === 'menu' ? null : this.world.structures.forest_dome?.object.position || null), range: 120, vol: 0.42, start: 1 });
-    // radios: Mehdi in Corni's cabin, Zdenko in the workshop
+    // radios: Mahdi in Corni's cabin, Zdenko in the workshop
     const spots = this.world.spots;
     this.music.add({ id: 'corni_radio', range: 16, vol: 0.2, tinny: true, start: 2, pos: () => {
       const m = this.npcs.get('mehdi');

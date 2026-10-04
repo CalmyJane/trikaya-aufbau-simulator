@@ -47,7 +47,7 @@ npm run build      # static build in dist/
 | Fabbe | Forest Dome | builds his dome himself (with Niklas) – you bring the material and tools |
 | Schwarzhuber | farmer, owns the field | curly red-blond hair & beard; strolls by, hangs out with Zdenko & Thompsen, finds everything *dilettantisch* – but loves the hippies |
 | Thomas | power & light, helps everyone | tall, short black beard, super friendly; helps Felix and now and then takes over one of your work targets |
-| Mehdi | hangs out in Corni's cabin | always a bit confused, listens to music |
+| Mahdi | hangs out in Corni's cabin | always a bit confused, listens to music |
 | Mia | Narnia Floor | always friendly, sometimes annoyed; her crew Bruno, Daniel & Lenny build the floor in stages |
 | Aphi, Mux, Dennis | fire island | practise with contact staff, poi & hoop in front of Shiva (LEDs by day, fire at night) |
 | Harry | deco & 3D mapping | wooden sculpture behind the Forest Dome, mapped at night |
@@ -208,4 +208,4 @@ See `CREDITS.md` for asset licences.
 
 ## Crew camp
 
-White site cabins like on the real crew camp: the walk-in **office** (Jan), **Matze's cabin** (volunteers hang out on the sofa), **Corni's cabin** (Mehdi listens to music), the walk-in **Werkstatt** (tools; things you need are often in here; Zdenko sometimes listens to the radio there), the closed storage cabins **Künstlergasse** and **Hühnercontainer** (items lie in front of them – and chickens), and the green **Aufenthaltszelt** with beer benches. The ground is meadow with dirt paths between the cabins.
+White site cabins like on the real crew camp: the walk-in **office** (Jan), **Matze's cabin** (volunteers hang out on the sofa), **Corni's cabin** (Mahdi listens to music), the walk-in **Werkstatt** (tools; things you need are often in here; Zdenko sometimes listens to the radio there), the closed storage cabins **Künstlergasse** and **Hühnercontainer** (items lie in front of them – and chickens), and the green **Aufenthaltszelt** with beer benches. The ground is meadow with dirt paths between the cabins.

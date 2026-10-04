@@ -104,7 +104,7 @@ export function buildCrewBase(world) {
     ch.rotation.y += Math.sin(t * 0.4 + i) * 0.004;
   }));
 
-  // walk-in cabins: Matze's (volunteers hang out), Corni's (Mehdi listens to music), the workshop
+  // walk-in cabins: Matze's (volunteers hang out), Corni's (Mahdi listens to music), the workshop
   buildCabin(base, world, addBoxCollider, addSpot, {
     id: 'matze', x: -9, z: -4, rot: Math.PI / 2, label: 'MATZE', frame: '#7a3aa8',
     furnish: (g, add, col, spot) => {

@@ -62,6 +62,11 @@ const STRINGS = {
   'pause.title': { de: 'Kaffeepause', en: 'Coffee break' },
   'pause.resume': { de: 'Weiterarbeiten', en: 'Back to work' },
   'pause.log': { de: 'Aufgaben', en: 'Quest log' },
+  'pause.vol': { de: 'Volunteers', en: 'Volunteers' },
+  'vol.title': { de: 'Volunteers', en: 'Volunteers' },
+  'vol.sub': { de: 'Tippen: Person wird im Spiel markiert (lila Stab), bis du sie getroffen hast.', en: 'Tap one: they get marked in the game (purple beam) until you\'ve met them.' },
+  'vol.marked': { de: 'Markiert', en: 'Marked' },
+  'vol.met': { de: 'Getroffen: {name}', en: 'Met: {name}' },
   'pause.map': { de: 'Lageplan', en: 'Site map' },
   'pause.quit': { de: 'Speichern & Hauptmenü', en: 'Save & main menu' },
   // hud

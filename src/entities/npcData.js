@@ -658,6 +658,21 @@ export const NPCS = [
     ],
   },
   {
+    id: 'leocitas', name: 'Leocitas', role: { de: 'Kreativ, Kunst & Bodypainting', en: 'Creative, art & body painting' }, portrait: '🛹',
+    look: { base: 'm_hoodie', skin: SKIN.light, hair: '#e6cc7a', brows: '#c8a85a', hairStyle: 'long', hairStyleColor: '#e6cc7a', hairLength: 0.62, beard: 'short', beardColor: '#dcbc68', shirt: '#9b3d8a', pants: '#2e6b5e', patchwork: true, shirtPatch: ['#9b3d8a', '#2a8a7a', '#e0a030'], height: 2.02, width: 0.86, extras: ['pennyboard'] },
+    behavior: 'wander', home: 'festival_random', roam: 'festival_random', radius: 14,
+    lines: [
+      { de: 'Moin moin. Man selbst hilft gern mal beim Aufbau, ganz in Ruhe.', en: 'Hey hey. One helps with the build-up now and then, nice and easy.' },
+      { de: 'Könnte man schon machen. Muss man aber nicht. Wobei… könnte man schon.', en: 'One could do that. One doesn\'t have to. Though… one could.' },
+      { de: 'Man selbst hat da noch Farbe. Für Körper. Oder Wände. Oder Körperwände.', en: 'One still has paint. For bodies. Or walls. Or body walls.' },
+      { de: 'Schönes Gesicht, das. Da ginge man selbst direkt mit dem Pinsel ran.', en: 'Nice face, that. One would go right at it with a brush.' },
+      { de: 'Man kennt da jemanden, der jemanden kennt. Meistens kennt man den selbst.', en: 'One knows someone who knows someone. Usually that\'s oneself.' },
+      { de: 'Das Brett rollt, die Welt rollt mit. Man selbst muss nur aufpassen, nicht runterzufallen.', en: 'The board rolls, the world rolls along. One only has to avoid falling off.' },
+      { de: 'Hier ein Kreativprojekt, da ein Kreativprojekt. Man selbst ist im Grunde ein Kreativprojekt.', en: 'A creative project here, a creative project there. One is basically a creative project oneself.' },
+      { de: 'Entspannt bleiben, würd man sagen. Hat man selbst auch noch nie bereut.', en: 'Stay relaxed, one would say. One has never regretted it.' },
+    ],
+  },
+  {
     id: 'aylien', name: 'Aylien', role: { de: 'Gute Laune & Seelsorge', en: 'Good vibes & moral support' }, portrait: '🫶',
     look: { base: 'f_casual', skin: '#dcac80', hair: '#0a0808', brows: '#0a0808', hairStyle: 'curly', hairStyleColor: '#0a0808', hairLength: 0.52, shirt: '#e0a030', pants: '#7a4a8a', patchwork: true, shirtPatch: ['#e0a030', '#b8483a', '#2a8a7a'], height: 1.68 },
     behavior: 'patrol', route: ['chill', 'plot_mainstage', 'kitchen', 'plot_hammocks', 'plot_chai_lounge', 'base_yard', 'plot_narnia_floor', 'plot_firespace', 'plot_awareness', 'plot_biergarten', 'plot_entrance'], speed: 2.3,

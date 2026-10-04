@@ -499,6 +499,21 @@ export class Character {
       this.bubbleWand = this.attachToBone('WristR', w, new THREE.Vector3(0, -0.02, 0.04));
       this.bubbleTip = ring;
     }
+    if (extras.includes('pennyboard')) {
+      // pennyboard carried under the arm
+      const bd = new THREE.Group();
+      const deck = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.025, 0.7), new THREE.MeshStandardMaterial({ color: '#e0457b', flatShading: true }));
+      bd.add(deck);
+      const wm = new THREE.MeshStandardMaterial({ color: '#f2e6c0', flatShading: true });
+      for (const [x, z] of [[-0.08, -0.26], [0.08, -0.26], [-0.08, 0.26], [0.08, 0.26]]) {
+        const w = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.03, 8), wm);
+        w.rotation.z = Math.PI / 2;
+        w.position.set(x, -0.04, z);
+        bd.add(w);
+      }
+      bd.rotation.set(0.15, 0, 1.3);
+      this.attachToBone('WristL', bd, new THREE.Vector3(0, -0.1, 0.03));
+    }
     if (extras.includes('bottle')) {
       const b = Assets.model('bottle', { height: 0.24 });
       b.position.set(0, -0.05, 0.02);

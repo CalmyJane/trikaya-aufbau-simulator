@@ -339,6 +339,7 @@ export class Game {
     $('btn-resume').onclick = () => this.resume();
     $('bigmap').addEventListener('pointerdown', () => { if (this.mode === 'map') this.resume(); });
     $('btn-log').onclick = () => this.openQuestLog();
+    $('btn-vol').onclick = () => this.openVolunteers();
     $('btn-map').onclick = () => { this.ui.showPause(false); this.openMap(); };
     $('btn-psettings').onclick = () => this.openSettings();
     $('btn-pcontrols').onclick = () => this.ui.modal(this.controlsHtml());
@@ -388,6 +389,7 @@ export class Game {
   }
 
   newGame() {
+    this.clearVolTarget?.();
     try { localStorage.removeItem(SAVE_KEY); } catch { /* ignore */ }
     this.world.clearStructures();
     this.quests.reset();
@@ -439,6 +441,59 @@ export class Game {
     this.mode = 'play';
     this.input.enabled = true;
     this.input.lock();
+  }
+
+  /** Volunteer list: pick one and a purple beam marks them until the player has been close. */
+  openVolunteers() {
+    const sel = this.volTarget;
+    const list = this.npcs.all.filter((n) => n.def.look && !n.def.hiddenFromList).sort((a, b) => a.def.name.localeCompare(b.def.name));
+    const html = `<h2>${t('vol.title')}</h2><div class="s" style="opacity:.7;margin-bottom:8px">${t('vol.sub')}</div>` + list.map((n) => `<div class="qlog-item vol-item" data-id="${n.def.id}" style="cursor:pointer"><div class="t">${n.def.portrait || ''} ${n.def.name}${sel === n.def.id ? ' · ' + t('vol.marked') : ''}</div><div class="s">${L(n.def.role)}</div></div>`).join('');
+    this.ui.modal(html);
+    document.querySelectorAll('#modal-body .vol-item').forEach((el) => {
+      el.onclick = () => { this.audio.click(); this.setVolTarget(el.dataset.id); if (this.mode === 'pause') this.resume(); else this.ui.closeModal(); };
+    });
+  }
+
+  setVolTarget(id) {
+    this.clearVolTarget();
+    const n = this.npcs.get(id);
+    if (!n) return;
+    this.volTarget = id;
+    const g = new THREE.Group();
+    const col = '#c64bff';
+    const beam = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.45, 0.45, 160, 12, 1, true),
+      new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.3, depthWrite: false, side: THREE.DoubleSide, fog: false }),
+    );
+    beam.position.y = 80;
+    g.add(beam);
+    const arrow = new THREE.Mesh(new THREE.ConeGeometry(0.6, 1.2, 4), new THREE.MeshBasicMaterial({ color: col }));
+    arrow.rotation.x = Math.PI;
+    g.add(arrow);
+    g.userData.arrow = arrow;
+    this.world.scene.add(g);
+    this.volBeacon = g;
+  }
+
+  clearVolTarget() {
+    if (this.volBeacon) this.world.scene.remove(this.volBeacon);
+    this.volBeacon = null;
+    this.volTarget = null;
+  }
+
+  updateVolTarget(time) {
+    const n = this.volTarget && this.npcs.get(this.volTarget);
+    if (!n) { if (this.volBeacon) this.clearVolTarget(); return; }
+    const p = this.player.position;
+    if (Math.hypot(n.position.x - p.x, n.position.z - p.z) < 4) {
+      this.ui.toast(t('vol.met', { name: n.def.name }));
+      this.clearVolTarget();
+      return;
+    }
+    const b = this.volBeacon;
+    b.position.set(n.position.x, heightAt(n.position.x, n.position.z), n.position.z);
+    b.userData.arrow.position.y = 3.6 + Math.sin(time * 3) * 0.3;
+    b.userData.arrow.rotation.y = time * 2;
   }
 
   openQuestLog() {
@@ -1303,6 +1358,7 @@ export class Game {
         this._unstickT = 1;
         for (const v of Object.values(this.vehicles)) if (Math.abs(v.speed) < 0.5) v.unstick(null, 0.6);
       }
+      this.updateVolTarget(this.time);
       this._markerT = (this._markerT || 0) - dt;
       if (this._markerT <= 0) { this._markerT = 0.5; this.updateMarkers(); }
     }

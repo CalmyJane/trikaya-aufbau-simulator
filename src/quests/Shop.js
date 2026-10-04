@@ -184,11 +184,11 @@ export class Effects {
     return SHOP.filter((it) => [].concat(it.vendor || []).includes(npcId) && (!it.needs || qs.isDone(it.needs)));
   }
 
-  buy(id) {
+  buy(id, free = false) {
     const g = this.game;
     const it = this.item(id);
-    if (!it || g.quests.state.karma < it.cost || this.collapsed) return false;
-    g.quests.state.karma -= it.cost;
+    if (!it || (!free && g.quests.state.karma < it.cost) || this.collapsed) return false;
+    if (!free) g.quests.state.karma -= it.cost;
     const de = getLang() === 'de';
     if (id === 'mate') this.mateT = 90;
     if (id === 'chai') { this.chaiT = 90; g.player.stamina = 1; }
@@ -299,7 +299,7 @@ export class Effects {
     if (this.dealerCD > 0) return;
     this.dealerCD = 80 + Math.random() * 80;
     const pp = g.player.position;
-    const pool = [...g.npcs.campers, g.npcs.get('rocky')].filter((n) => n && !NO_STASH.includes(n.def.id) && !n.hidden && !n.incident && !n.task && !n.talking);
+    const pool = [...g.npcs.campers, g.npcs.get('rocky')].filter((n) => n && !NO_STASH.includes(n.def.id) && n.def.id !== 'leocitas' && !n.hidden && !n.incident && !n.task && !n.talking);
     const cands = pool.filter((n) => { const d = n.position.distanceTo(pp); return d > 10 && d < 70; });
     if (!cands.length) { this.dealerCD = 15; return; }
     const npc = cands[Math.floor(Math.random() * cands.length)];
@@ -376,7 +376,8 @@ export class Effects {
     );
     const it = items[choice];
     if (!it) { await g.reply(npc, de ? 'Auch gut. Bleib sauber!' : 'Fair enough. Stay clean!'); return; }
-    if (this.buy(it.id)) {
+    // Leocitas gives a little weed away even without karma
+    if (this.buy(it.id) || (id === 'leocitas' && this.buy(it.id, true))) {
       npc._stashT = g.time;
       await g.reply(npc, de ? 'Viel Spaß. Von mir hast du das nicht.' : 'Have fun. You didn\'t get that from me.');
     } else await g.reply(npc, de ? 'Kein Karma, kein Stoff. So ist das Universum.' : 'No karma, no stuff. That\'s the universe.');

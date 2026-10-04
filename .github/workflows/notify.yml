@@ -1,5 +1,7 @@
 # Sends a short Telegram message. Not triggered by pushes: Claude starts it explicitly
 # (workflow_dispatch) at the end of a job or when it needs an answer.
+# Optional answer buttons: input `buttons` = options separated by "|" (e.g. "✅ Ja|❌ Nein");
+# a "✍️ Sonstiges" button is added automatically. Clicks are handled by the bot worker (bot/telegram-worker.js).
 # Needs repository secrets TELEGRAM_BOT_TOKEN (from @BotFather) and TELEGRAM_CHAT_ID.
 name: Notify
 
@@ -9,6 +11,10 @@ on:
       message:
         description: Text for the Telegram message
         required: true
+      buttons:
+        description: 'Optional answer buttons, separated by "|"'
+        required: false
+        default: ''
 
 jobs:
   telegram:
@@ -19,6 +25,15 @@ jobs:
           TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
           TEXT: ${{ inputs.message }}
+          BUTTONS: ${{ inputs.buttons }}
         run: |
-          curl -sS --fail -X POST "https://api.telegram.org/bot${TOKEN}/sendMessage" \
-            --data-urlencode "chat_id=${CHAT}" --data-urlencode "text=${TEXT}" > /dev/null
+          MARKUP=null
+          if [ -n "$BUTTONS" ]; then
+            # one button per row; callback data is just the index, the worker reads the label from the message
+            MARKUP=$(jq -cn --arg b "$BUTTONS" '{inline_keyboard: (
+              [$b | split("|") | map(gsub("^\\s+|\\s+$"; "")) | map(select(length > 0)) | to_entries[] | [{text: .value, callback_data: ("o:" + (.key | tostring))}]]
+              + [[{text: "✍️ Sonstiges", callback_data: "other"}]])}')
+          fi
+          jq -cn --arg chat "$CHAT" --arg text "$TEXT" --argjson markup "$MARKUP" \
+            '{chat_id: $chat, text: $text, disable_web_page_preview: true} + (if $markup then {reply_markup: $markup} else {} end)' \
+            | curl -sS --fail -X POST "https://api.telegram.org/bot${TOKEN}/sendMessage" -H 'content-type: application/json' -d @- > /dev/null

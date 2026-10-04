@@ -2,7 +2,8 @@
 
 Du schreibst deinem Telegram-Bot einen Auftrag → eine neue Claude-Code-Cloud-Sitzung (Routine, läuft über dein Abo)
 baut ihn nach `CLAUDE.md`, pusht live und meldet sich per `Notify`-Workflow wieder in Telegram.
-Rückfragen kommen als ❓ – antworte darauf mit **Antworten** (Reply) in Telegram, dann bekommt die neue Sitzung die Frage mitgeliefert.
+Rückfragen kommen als ❓, oft mit Antwort-Buttons (+ „✍️ Sonstiges“ für eine eigene Antwort). Statt Buttons geht auch immer
+**Antworten** (Reply) auf die Frage – die neue Sitzung bekommt die Frage jeweils mitgeliefert.
 
 ```
 Telegram ──► Cloudflare Worker (bot/telegram-worker.js) ──► Routine /fire ──► Cloud-Sitzung

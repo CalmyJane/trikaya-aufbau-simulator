@@ -22,8 +22,10 @@ Update `HANDOFF.md` with one line only when a new system or notable character is
 ## Telegram notification (always at the end)
 Start the `Notify` workflow (`.github/workflows/notify.yml`, workflow_dispatch on `main`, input `message`) via the GitHub tools:
 - done: `✅ <what was built, 1–2 short sentences, German> · live in ~2 min`
-- question you need answered before continuing: `❓ <one-line summary of the task> – <the question>` (self-contained: the answer
-  may arrive in a NEW session as a Telegram reply starting with „Antwort auf:“ that quotes this message) – then stop
+- question you need answered before continuing: `❓ <one-line summary of the task> – <the question>` – then stop.
+  Self-contained, because the answer arrives in a NEW session as a payload starting with „Antwort auf:“ that quotes this message,
+  followed by the answer. When the answer is a choice, pass input `buttons` with the options separated by `|`
+  (e.g. `✅ Ja|❌ Nein` or `Crew Camp|Festivalgelände`, short labels); a „✍️ Sonstiges“ button for a free answer is added automatically.
 - failed / blocked: `⚠️ <what and why>`
 Keep it under ~300 characters, no markdown.
 

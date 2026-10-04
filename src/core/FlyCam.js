@@ -4,7 +4,7 @@ import { P } from '../world/layout.js';
 
 // Free "drone" camera for the main menu and the pause screen.
 // Desktop: WASD / arrows fly, E / Q up & down, Shift fast, drag with the mouse to look, wheel = forward/back.
-// Touch: one finger drags the map, two fingers pinch (height) and twist (turn).
+// Touch: one finger drags the map, two fingers pinch (zoom), twist (turn) and move up/down together (tilt).
 // In the main menu it orbits the festival on its own until you touch something (and drifts back when left alone).
 
 const LIMIT = 420;     // metres from the centre you may fly
@@ -26,7 +26,7 @@ export class FlyCam {
     this.active = false; // takes pointer input only while true (menu / pause, no modal)
     this.idle = 0;
     this.lookDX = 0; this.lookDY = 0; this.wheel = 0;
-    this.panX = 0; this.panY = 0; this.pinch = 0; this.twist = 0;
+    this.glide = new THREE.Vector3(); this.glideIn = new THREE.Vector3(); // touch swipe inertia (m/s)
     this.tween = null;
     this._v = new THREE.Vector3();
     this._q = new THREE.Quaternion();
@@ -34,40 +34,58 @@ export class FlyCam {
   }
 
   // ------------------------------------------------------------------ pointer (mouse drag + touch gestures)
+  // Touch works like a map app: the ground sticks to your finger (and glides on when you let go),
+  // pinch zooms towards the point between your fingers, twist turns, two fingers up/down tilt the view.
   bindPointer() {
     const pts = new Map();
-    let last = null; // previous two-finger state {d, a}
+    let last = null; // previous two-finger state
+    let lastMove = 0;
     const blocked = (e) => !this.active || e.target.closest?.('button, a, input, select, .menu-panel, .modal-panel, #modal, #hud');
     const two = () => {
       const [a, b] = [...pts.values()];
-      return { d: Math.hypot(a.x - b.x, a.y - b.y), a: Math.atan2(b.y - a.y, b.x - a.x) };
+      return { d: Math.hypot(a.x - b.x, a.y - b.y), a: Math.atan2(b.y - a.y, b.x - a.x), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2 };
     };
     window.addEventListener('pointerdown', (e) => {
       if (blocked(e)) return;
       pts.set(e.pointerId, { x: e.clientX, y: e.clientY, touch: e.pointerType === 'touch' });
       if (pts.size === 2) last = two();
+      this.glide.set(0, 0, 0);
       this.idle = 0;
     });
     window.addEventListener('pointermove', (e) => {
       const p = pts.get(e.pointerId);
       if (!p) return;
-      const dx = e.clientX - p.x, dy = e.clientY - p.y;
+      const px = p.x, py = p.y;
       p.x = e.clientX; p.y = e.clientY;
       if (!this.active) return;
+      this.idle = 0;
+      if (!p.touch) { this.lookDX += p.x - px; this.lookDY += p.y - py; return; }
+      this.grab();
       if (pts.size >= 2) {
         const now = two();
-        if (last) {
-          this.pinch += now.d - last.d;
-          let da = now.a - last.a;
-          da = Math.atan2(Math.sin(da), Math.cos(da));
-          this.twist += da;
-        }
+        if (last) this.gesture(last, now);
         last = now;
-      } else if (p.touch) { this.panX += dx; this.panY += dy; }
-      else { this.lookDX += dx; this.lookDY += dy; }
-      this.idle = 0;
+      } else {
+        const t = performance.now();
+        const moved = this.panScreen(px, py, p.x, p.y);
+        if (moved) {
+          // remember the finger speed for the glide after release
+          const dt = Math.max(8, t - lastMove) / 1000;
+          this.glideIn.lerp(moved.divideScalar(dt), 0.5);
+        }
+        lastMove = t;
+      }
+      this.place();
     });
-    const up = (e) => { pts.delete(e.pointerId); if (pts.size < 2) last = null; };
+    const up = (e) => {
+      const p = pts.get(e.pointerId);
+      if (!p) return;
+      pts.delete(e.pointerId);
+      if (pts.size < 2) last = null;
+      // one finger let go after a swipe → keep gliding; a finger that rested first doesn't glide
+      if (p.touch && pts.size === 0 && performance.now() - lastMove < 90) this.glide.copy(this.glideIn);
+      this.glideIn.set(0, 0, 0);
+    };
     window.addEventListener('pointerup', up);
     window.addEventListener('pointercancel', up);
     window.addEventListener('wheel', (e) => {
@@ -75,6 +93,89 @@ export class FlyCam {
       this.wheel += Math.sign(e.deltaY);
       this.idle = 0;
     }, { passive: true });
+  }
+
+  /** A touch takes over: stop the orbit / a running camera flight right where the camera is now. */
+  grab() {
+    if (this.orbiting || this.tween) {
+      this.orbiting = false;
+      this.tween = null;
+      this.syncFromCamera();
+    }
+  }
+
+  /** Put the real camera where the fly cam is (so the next touch event in this frame sees the new pose). */
+  place() {
+    this.clampPos();
+    this.camera.position.copy(this.pos);
+    this.camera.rotation.set(this.pitch, this.yaw, 0, 'YXZ');
+    this.camera.updateMatrixWorld();
+  }
+
+  clampPos() {
+    const r = Math.hypot(this.pos.x, this.pos.z);
+    if (r > LIMIT) { this.pos.x *= LIMIT / r; this.pos.z *= LIMIT / r; }
+    this.pos.y = THREE.MathUtils.clamp(this.pos.y, heightAt(this.pos.x, this.pos.z) + 1.5, MAX_Y);
+  }
+
+  /** The ground point under a screen position (null when looking at the sky / horizon). */
+  groundAt(sx, sy, out = new THREE.Vector3()) {
+    const cam = this.camera;
+    out.set((sx / window.innerWidth) * 2 - 1, -(sy / window.innerHeight) * 2 + 1, 0.5).unproject(cam).sub(cam.position).normalize();
+    if (out.y > -0.04) return null;
+    const t = Math.min(500, (0 - cam.position.y) / out.y);
+    return out.multiplyScalar(t).add(cam.position);
+  }
+
+  /** One-finger drag: move so the ground point under the finger stays under the finger. Returns the move. */
+  panScreen(x0, y0, x1, y1) {
+    const a = this.groundAt(x0, y0, this._a ||= new THREE.Vector3());
+    const b = this.groundAt(x1, y1, this._b ||= new THREE.Vector3());
+    let mx, mz;
+    if (a && b) { mx = a.x - b.x; mz = a.z - b.z; }
+    else { // looking at the horizon: fall back to a height-scaled drag
+      const m = 0.04 + Math.max(0, this.pos.y) * 0.0022;
+      const sy = Math.sin(this.yaw), cy = Math.cos(this.yaw);
+      const dx = x1 - x0, dy = y1 - y0;
+      mx = (-cy * dx - sy * dy) * m; mz = (sy * dx - cy * dy) * m;
+    }
+    this.pos.x += mx; this.pos.z += mz;
+    return new THREE.Vector3(mx, 0, mz);
+  }
+
+  /** Two fingers: pinch = zoom towards the point between them, twist = turn around it, both up/down = tilt. */
+  gesture(last, now) {
+    const pivot = this.groundAt(now.mx, now.my, this._p ||= new THREE.Vector3())
+      || this._p.copy(this.pos).addScaledVector(this.camera.getWorldDirection(this._v), 60).setY(0);
+    // zoom
+    const f = THREE.MathUtils.clamp(last.d / Math.max(1, now.d), 0.75, 1.33);
+    const off = this._v.copy(this.pos).sub(pivot);
+    if (f < 1 && this.pos.y - heightAt(this.pos.x, this.pos.z) < 3) off.y = Math.max(off.y, off.y * f); // don't dig into the ground
+    else off.y *= f;
+    off.x *= f; off.z *= f;
+    // twist
+    let da = now.a - last.a;
+    da = Math.atan2(Math.sin(da), Math.cos(da));
+    const c = Math.cos(da), s = Math.sin(da);
+    const ox = off.x;
+    off.x = ox * c + off.z * s; off.z = -ox * s + off.z * c;
+    this.yaw += da;
+    this.pos.copy(pivot).add(off);
+    // tilt around the point in the middle of the screen
+    const dy = now.my - last.my;
+    if (dy) {
+      this.place();
+      const centre = this.groundAt(window.innerWidth / 2, window.innerHeight / 2, this._c ||= new THREE.Vector3());
+      if (centre) {
+        const v = this._v.copy(this.pos).sub(centre);
+        const dist = v.length();
+        const elev = THREE.MathUtils.clamp(Math.asin(v.y / dist) + dy * 0.006, 0.12, 1.5);
+        const h = Math.hypot(v.x, v.z) || 1e-6;
+        const k = Math.cos(elev) * dist / h;
+        this.pos.set(centre.x + v.x * k, centre.y + Math.sin(elev) * dist, centre.z + v.z * k);
+        this.pitch = -elev;
+      } else this.pitch = THREE.MathUtils.clamp(this.pitch - dy * 0.006, -1.45, 0.6);
+    }
   }
 
   // ------------------------------------------------------------------ poses
@@ -129,8 +230,8 @@ export class FlyCam {
     const fwd = (k('KeyW', 'ArrowUp') ? 1 : 0) - (k('KeyS', 'ArrowDown') ? 1 : 0);
     const side = (k('KeyD', 'ArrowRight') ? 1 : 0) - (k('KeyA', 'ArrowLeft') ? 1 : 0);
     const lift = (k('KeyE', 'PageUp') ? 1 : 0) - (k('KeyQ', 'PageDown') ? 1 : 0);
-    if (!controls) { this.lookDX = this.lookDY = this.wheel = this.panX = this.panY = this.pinch = this.twist = 0; }
-    const touched = fwd || side || lift || this.lookDX || this.lookDY || this.wheel || this.panX || this.panY || this.pinch || this.twist;
+    if (!controls) { this.lookDX = this.lookDY = this.wheel = 0; this.glide.set(0, 0, 0); }
+    const touched = fwd || side || lift || this.lookDX || this.lookDY || this.wheel;
 
     if (touched) {
       this.idle = 0;
@@ -150,7 +251,6 @@ export class FlyCam {
       const sens = 0.0042;
       this.yaw -= this.lookDX * sens;
       this.pitch = THREE.MathUtils.clamp(this.pitch - this.lookDY * sens, -1.45, 0.6);
-      this.yaw += this.twist;
       // speed grows with height so you can cross the site quickly from up high
       const ground = heightAt(this.pos.x, this.pos.z);
       const alt = Math.max(0, this.pos.y - ground);
@@ -168,19 +268,16 @@ export class FlyCam {
         const d = this.camera.getWorldDirection(this._v);
         this.pos.addScaledVector(d, -this.wheel * (4 + alt * 0.12));
       }
-      // touch: drag the map under the finger, pinch for height
-      if (this.panX || this.panY) {
-        const m = (0.04 + alt * 0.0022);
-        this.pos.x += (-cy * this.panX - sy * this.panY) * m;
-        this.pos.z += (sy * this.panX - cy * this.panY) * m;
-      }
-      if (this.pinch) this.pos.y -= this.pinch * (0.05 + alt * 0.004);
+      // touch: glide on after a swipe, slowing down
+      if (this.glide.lengthSq() > 0.01) {
+        this.pos.addScaledVector(this.glide, dt);
+        this.glide.multiplyScalar(Math.exp(-dt * 3.2));
+        this.idle = 0;
+      } else this.glide.set(0, 0, 0);
       // stay above the ground, below the clouds, near the festival
-      const r = Math.hypot(this.pos.x, this.pos.z);
-      if (r > LIMIT) { this.pos.x *= LIMIT / r; this.pos.z *= LIMIT / r; }
-      this.pos.y = THREE.MathUtils.clamp(this.pos.y, heightAt(this.pos.x, this.pos.z) + 1.5, MAX_Y);
+      this.clampPos();
     }
-    this.lookDX = this.lookDY = this.wheel = this.panX = this.panY = this.pinch = this.twist = 0;
+    this.lookDX = this.lookDY = this.wheel = 0;
 
     this.camera.position.copy(this.pos);
     this.camera.rotation.set(this.pitch, this.yaw, 0, 'YXZ');

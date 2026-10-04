@@ -6,6 +6,7 @@ import { heightAt } from '../world/Height.js';
 import { World } from '../world/World.js';
 import { Player, CameraRig } from '../entities/Player.js';
 import { FlyCam } from './FlyCam.js';
+import { Trigel } from '../world/Trigel.js';
 import { NPCManager } from '../entities/NPC.js';
 import { Quad, Radlader } from '../entities/Vehicles.js';
 import { QuestSystem } from '../quests/QuestSystem.js';
@@ -56,6 +57,7 @@ export class Game {
     this.audio = new Audio();
     this.ui = new UI();
     this.settings = this.loadSettings();
+    this.audio.muted = !!this.settings.muted;
     this.mode = 'loading'; // loading | menu | play | pause | map
     this.time = 0;
     this.afkTime = 0;
@@ -75,7 +77,7 @@ export class Game {
 
   // ------------------------------------------------------------------ settings
   loadSettings() {
-    const def = { sensitivity: 1, invertY: false, autoFollow: true, volume: 0.5 };
+    const def = { sensitivity: 1, invertY: false, autoFollow: true, volume: 0.5, muted: false };
     try { return { ...def, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}') }; } catch { return def; }
   }
 
@@ -93,6 +95,7 @@ export class Game {
     this.cam = new CameraRig(this.camera, this.input, this.settings);
     this.fly = new FlyCam(this.camera, this.input);
     this.npcs = new NPCManager(this.world);
+    this.trigel = new Trigel(this.world);
     this.npcs.game = this;
     this.vehicles = { quad: new Quad(this.world), radlader: new Radlader(this.world) };
     this.quests = new QuestSystem(this);
@@ -163,6 +166,7 @@ export class Game {
     this.vehicles.radlader.place(vs.radlader.pos, vs.radlader.heading);
     this.vehicles.radlader.fuel = 0;
     this.drama?.clearAll();
+    this.trigel?.reset();
     this.effects?.reset();
     this.soundbox?.reset();
     this.finaleSys?.reset();
@@ -328,6 +332,10 @@ export class Game {
       else document.documentElement.requestFullscreen?.().catch(() => {});
     };
     $('btn-fullscreen').onclick = fs;
+    // sound on/off – in the main menu and the pause menu (N in game), remembered
+    $('btn-mute').onclick = $('btn-pmute').onclick = () => { unlockAudio(); this.toggleMute(); };
+    this.muteLabels();
+    onLangChange(() => this.muteLabels());
     $('btn-fs-hud').onclick = (e) => { e.stopPropagation(); fs(); };
     $('btn-resume').onclick = () => this.resume();
     $('bigmap').addEventListener('pointerdown', () => { if (this.mode === 'map') this.resume(); });
@@ -351,6 +359,20 @@ export class Game {
       // Esc while pointer-locked releases the lock without a keydown event → pause
       if (!this.input.locked && this.mode === 'play' && !this.ui.dialogOpen && !this.ignoreUnlock) this.pause();
     });
+  }
+
+  toggleMute() {
+    const m = this.audio.toggleMute();
+    this.settings.muted = m;
+    this.saveSettings();
+    this.muteLabels();
+    if (!m) this.audio.click();
+    return m;
+  }
+
+  /** The button shows the current state. */
+  muteLabels() {
+    for (const id of ['btn-mute', 'btn-pmute']) document.getElementById(id).textContent = t(this.audio.muted ? 'menu.soundOff' : 'menu.soundOn');
   }
 
   toMenu() {
@@ -1091,6 +1113,13 @@ export class Game {
           list.push({ d: d + (relevant || blue ? -1 : 1.8), label: `${t('p.talk', { name: n.def.name })}${red ? ' <b style="color:#ff3b30">!</b>' : blue ? ' <b style="color:#3aa0ff">!</b>' : mk ? ` <b style="color:${mk === '!' ? '#ffd21f' : '#7fe0ff'}">${mk}</b>` : ''}`, action: () => this.talkTo(n) });
         }
       }
+      // the Trigel (hedgehog) looking for crumbs in the Aufenthaltszelt
+      if (this.trigel.near(p)) {
+        list.push({ d: this.trigel.position.distanceTo(p) + 1.5, label: getLang() === 'de' ? '🦔 Trigel begrüßen' : '🦔 Say hi to the Trigel', action: () => {
+          this.ui.toast(this.trigel.pet());
+          if (!this.trigel.petted) { this.trigel.petted = true; this.quests.state.karma += 1; this.refreshHUD(); }
+        } });
+      }
       for (const v of [quad, radlader]) {
         const d = v.position.distanceTo(p);
         if (d > v.o.radius + 1.6) continue;
@@ -1226,7 +1255,7 @@ export class Game {
       if (this.minigame.open) inp.pressed.clear();
       if (inp.hit('KeyM')) { this._mapKeyReady = false; this.openMap(); }
       if (inp.hit('KeyJ')) this.openQuestLog();
-      if (inp.hit('KeyN')) this.ui.toast(this.audio.toggleMute() ? t('t.mute') : t('t.unmute'));
+      if (inp.hit('KeyN')) this.ui.toast(this.toggleMute() ? t('t.mute') : t('t.unmute'));
       if (inp.hit('KeyF') && !this.player.vehicle) this.player.wave();
       if (inp.hit('KeyT')) {
         const ids = Object.keys(this.quests.state.active);
@@ -1253,6 +1282,7 @@ export class Game {
     if (playing && veh) this.checkRunOver(veh);
     this.quests.update(time, dt, this.player.position);
     this.world.update(time, dt, this.player.position);
+    this.trigel.update(dt, time, this.player.vehicle ? this.player.vehicle.position : this.player.position, this.world.night);
     this.updateBuilding(dt);
     if (playing) {
       this.checkKitchen(dt);

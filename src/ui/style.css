@@ -351,3 +351,51 @@ body.police::after { background: radial-gradient(ellipse at center, transparent 
 #minigame .mg-cancel { position: absolute; top: 6px; right: 8px; width: 34px; height: 34px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, 0.12); color: #fff; font-size: 16px; cursor: pointer; }
 /* phones in landscape: the logo goes to the bottom right, away from the menu buttons */
 @media (max-height: 500px) { .fly-hint { display: none; } .cj-badge { left: auto; right: calc(14px + env(safe-area-inset-right)); bottom: 10px; } .cj-text { height: 28px; } }
+
+/* ---------------------------------------------------------------- compact menus: leave room for the fly-around view */
+#menu { background: linear-gradient(90deg, rgba(6, 10, 7, 0.82) 0%, rgba(6, 10, 7, 0.45) 28%, transparent 48%); }
+.menu-panel { margin-left: clamp(16px, 5vw, 80px); gap: 4px; max-width: 340px; }
+.menu-logo { width: 104px; }
+.menu-title { font-size: 44px; }
+.menu-title span { font-size: 22px; letter-spacing: 9px; }
+.menu-sub { font-size: 14px; max-width: 300px; margin-bottom: 12px; }
+.menu-buttons { width: 250px; gap: 7px; }
+#menu .btn, #pause .btn { font-size: 16px; padding: 8px 14px; }
+.menu-foot { margin-top: 14px; font-size: 12px; }
+#pause { background: linear-gradient(90deg, rgba(6, 10, 7, 0.6) 0%, rgba(6, 10, 7, 0.25) 24%, transparent 42%); }
+#pause .modal-panel.small { width: 270px; padding: 18px 20px; gap: 12px; }
+#pause .modal-panel h2 { font-size: 28px; }
+#pause .menu-buttons { width: 100%; }
+
+/* phones in landscape: two button columns, no subtitle */
+@media (max-height: 520px) {
+  #menu { background: linear-gradient(90deg, rgba(6, 10, 7, 0.85) 0%, rgba(6, 10, 7, 0.5) 32%, transparent 55%); }
+  .menu-sub { display: none; }
+  .menu-logo { width: 44px; }
+  .menu-title { font-size: 26px; }
+  .menu-title span { font-size: 14px; letter-spacing: 6px; }
+  .menu-buttons { width: min(330px, 44vw); margin-top: 6px; }
+  #menu .btn, #pause .btn { font-size: 13px; padding: 7px 9px; }
+  #pause .modal-panel.small { width: min(340px, 46vw); padding: 12px 14px; gap: 8px; }
+  #pause .modal-panel h2 { font-size: 22px; }
+  #pause .menu-buttons { grid-template-columns: 1fr 1fr; }
+  #pause .menu-buttons .btn.primary { grid-column: 1 / -1; }
+}
+
+/* phones upright: the menu becomes a bar at the bottom, the map stays visible above */
+@media (orientation: portrait) and (max-width: 640px) {
+  #menu, #pause { align-items: flex-end; justify-content: center;
+    background: linear-gradient(0deg, rgba(6, 10, 7, 0.85) 0%, rgba(6, 10, 7, 0.45) 32%, transparent 50%); }
+  .menu-panel, #pause .modal-panel.small { margin: 0 12px calc(14px + env(safe-area-inset-bottom)); width: calc(100% - 24px); max-width: 420px; align-items: stretch; }
+  .menu-panel { gap: 2px; }
+  .menu-logo, .menu-sub, .menu-foot, .fly-hint { display: none; }
+  .menu-title { font-size: 26px; text-align: center; }
+  .menu-title span { font-size: 14px; letter-spacing: 6px; }
+  .menu-buttons, #pause .menu-buttons { display: grid; grid-template-columns: 1fr 1fr; width: 100%; gap: 6px; margin-top: 8px; }
+  .menu-buttons .btn.primary { grid-column: 1 / -1; }
+  #menu .btn, #pause .btn { font-size: 14px; padding: 9px 10px; }
+  #pause .modal-panel.small { padding: 12px 14px; gap: 6px; }
+  #pause .modal-panel h2 { font-size: 22px; text-align: center; }
+  #menu .cj-badge { top: calc(12px + env(safe-area-inset-top)); bottom: auto; left: auto; right: 12px; }
+  #menu .cj-text { height: 28px; }
+}

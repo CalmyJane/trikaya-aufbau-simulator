@@ -42,6 +42,8 @@ export function applyDom() {
 const STRINGS = {
   // menu
   'menu.sub': { de: 'Das Festival baut sich nicht von selbst auf. (Wirklich nicht. Wir haben\'s probiert.)', en: 'The festival won\'t build itself. (It really won\'t. We checked.)' },
+  'menu.soundOn': { de: '🔊 Ton an', en: '🔊 Sound on' },
+  'menu.soundOff': { de: '🔇 Ton aus', en: '🔇 Sound off' },
   'fly.hint': { de: '🛸 Rumfliegen: WASD · E/Q hoch/runter · Maus ziehen = umschauen · Mausrad · Shift = schnell', en: '🛸 Fly around: WASD · E/Q up/down · drag the mouse = look · wheel · Shift = fast' },
   'fly.hintTouch': { de: '🛸 Rumfliegen: wischen = verschieben · zwei Finger = Höhe & drehen', en: '🛸 Fly around: swipe = pan · two fingers = height & turn' },
   'menu.start': { de: 'Aufbau starten', en: 'Start Aufbau' },

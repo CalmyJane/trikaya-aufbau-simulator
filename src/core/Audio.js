@@ -12,7 +12,7 @@ export class Audio {
     if (!AC) return;
     this.ctx = new AC();
     this.master = this.ctx.createGain();
-    this.master.gain.value = this.volume ?? 0.5;
+    this.master.gain.value = this.muted ? 0 : (this.volume ?? 0.5);
     this.master.connect(this.ctx.destination);
     this.startAmbience();
   }

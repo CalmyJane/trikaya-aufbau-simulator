@@ -322,7 +322,17 @@ export class Game {
   bindMenus() {
     const $ = (id) => document.getElementById(id);
     const unlockAudio = () => { this.audio.unlock(); this.audio.setVolume(this.settings.volume); this.audio.click(); };
-    $('btn-new').onclick = () => { unlockAudio(); this.newGame(); };
+    $('btn-new').onclick = () => {
+      unlockAudio();
+      let has = false;
+      try { has = !!localStorage.getItem(SAVE_KEY); } catch { /* ignore */ }
+      if (!has) { this.newGame(); return; }
+      this.ui.modal(`<h2>${t('confirm.reset.title')}</h2><p>${t('confirm.reset.text')}</p>`
+        + `<div class="menu-buttons"><button id="btn-reset-yes" class="btn">${t('confirm.reset.yes')}</button>`
+        + `<button id="btn-reset-no" class="btn primary">${t('confirm.reset.no')}</button></div>`);
+      $('btn-reset-yes').onclick = () => { this.ui.closeModal(); this.newGame(); };
+      $('btn-reset-no').onclick = () => { this.audio.click(); this.ui.closeModal(); };
+    };
     $('btn-continue').onclick = () => { unlockAudio(); this.startPlay(); };
     $('btn-controls').onclick = () => { this.audio.click(); this.ui.modal(this.controlsHtml()); };
     $('btn-settings').onclick = () => { this.audio.click(); this.openSettings(); };

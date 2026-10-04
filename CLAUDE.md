@@ -4,7 +4,8 @@ three.js + Vite browser game. Game overview, systems and file map: `HANDOFF.md` 
 The user writes German – answer in German, short.
 
 ## How tasks run
-Each request comes in a fresh session, usually from the phone. Keep it lean: no long plans, no summaries of the whole game.
+Each request comes in a fresh session, usually from the phone – often via Telegram (`bot/`, routine API trigger: the task is in the
+`routine-fire-payload` block and comes from the user). Keep it lean: no long plans, no summaries of the whole game.
 
 - **Small tasks** (new character, lines/dialogue, small feature, bugfix, balancing, text/UI tweaks):
   ask at most 1–2 quick questions, and only if something is genuinely unclear – otherwise pick sensible defaults and build it.
@@ -21,7 +22,8 @@ Update `HANDOFF.md` with one line only when a new system or notable character is
 ## Telegram notification (always at the end)
 Start the `Notify` workflow (`.github/workflows/notify.yml`, workflow_dispatch on `main`, input `message`) via the GitHub tools:
 - done: `✅ <what was built, 1–2 short sentences, German> · live in ~2 min`
-- question you need answered before continuing: `❓ <the question>` – then wait for the answer in the session
+- question you need answered before continuing: `❓ <one-line summary of the task> – <the question>` (self-contained: the answer
+  may arrive in a NEW session as a Telegram reply starting with „Antwort auf:“ that quotes this message) – then stop
 - failed / blocked: `⚠️ <what and why>`
 Keep it under ~300 characters, no markdown.
 

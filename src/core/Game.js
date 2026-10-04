@@ -447,11 +447,38 @@ export class Game {
   openVolunteers() {
     const sel = this.volTarget;
     const list = this.npcs.all.filter((n) => n.def.look && !n.def.hiddenFromList).sort((a, b) => a.def.name.localeCompare(b.def.name));
-    const html = `<h2>${t('vol.title')}</h2><div class="s" style="opacity:.7;margin-bottom:8px">${t('vol.sub')}</div>` + list.map((n) => `<div class="qlog-item vol-item" data-id="${n.def.id}" style="cursor:pointer"><div class="t">${n.def.portrait || ''} ${n.def.name}${sel === n.def.id ? ' · ' + t('vol.marked') : ''}</div><div class="s">${L(n.def.role)}</div></div>`).join('');
+    const html = `<h2>${t('vol.title')}</h2>` + list.map((n) => `<div class="qlog-item vol-item" data-id="${n.def.id}" style="cursor:pointer"><div class="t">${n.def.portrait || ''} ${n.def.name}${sel === n.def.id ? ' · ' + t('vol.marked') : ''}</div></div>`).join('');
     this.ui.modal(html);
     document.querySelectorAll('#modal-body .vol-item').forEach((el) => {
-      el.onclick = () => { this.audio.click(); this.setVolTarget(el.dataset.id); if (this.mode === 'pause') this.resume(); else this.ui.closeModal(); };
+      el.onclick = () => { this.audio.click(); this.setVolTarget(el.dataset.id); if (this.mode === 'pause') this.resume(); else this.ui.closeModal(); this.startVolCine(el.dataset.id); };
     });
+  }
+
+  /** Short camera trip: fly to the picked volunteer, hold a moment, then back to the player. */
+  startVolCine(id) {
+    const n = this.npcs.get(id);
+    if (!n) return;
+    this.fly.tween = null;
+    const look0 = new THREE.Vector3(0, 0, -1).applyQuaternion(this.camera.quaternion).multiplyScalar(10).add(this.camera.position);
+    this.volCine = { t: 0, n, p0: this.camera.position.clone(), l0: look0 };
+  }
+
+  updateVolCine(dt) {
+    const c = this.volCine;
+    c.t += dt;
+    const k = Math.min(1, c.t / 1.3), e = k * k * (3 - 2 * k);
+    const np = c.n.position, gy = heightAt(np.x, np.z);
+    const dir = new THREE.Vector3(np.x - this.player.position.x, 0, np.z - this.player.position.z);
+    if (dir.lengthSq() < 0.01) dir.set(0, 0, -1);
+    dir.normalize();
+    const pos1 = new THREE.Vector3(np.x - dir.x * 7, gy + 4.5, np.z - dir.z * 7);
+    const look1 = new THREE.Vector3(np.x, gy + 1.2, np.z);
+    this.sceneCam = { pos: c.p0.clone().lerp(pos1, e), look: c.l0.clone().lerp(look1, e) };
+    if (c.t > 2.4) {
+      this.sceneCam = null;
+      this.volCine = null;
+      this.fly.startTween(this.camera, 1.2);
+    }
   }
 
   setVolTarget(id) {
@@ -1379,6 +1406,7 @@ export class Game {
 
     const indoor = this.world.isInside(this.player.position);
     const moving = veh ? Math.min(1, Math.abs(veh.speed) / 4) : Math.min(1, Math.hypot(this.player.vel.x, this.player.vel.z) / 4);
+    if (this.volCine) this.updateVolCine(dt);
     if (this.sceneCam) { // cut scene camera (finale)
       this.camera.position.copy(this.sceneCam.pos);
       this.camera.lookAt(this.sceneCam.look);

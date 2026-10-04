@@ -49,7 +49,15 @@ html, body {
 .btn.primary:hover { background: linear-gradient(90deg, #d88b27, var(--gold-2)); }
 
 /* ---------------------------------------------------------------- modal */
-#modal, #pause, #bigmap { background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(3px); z-index: 30; }
+#modal, #bigmap { background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(3px); z-index: 30; }
+/* pause: the panel sits on the left, the rest of the screen is a free drone view over the site */
+#pause { z-index: 30; justify-content: flex-start; background: linear-gradient(90deg, rgba(6, 10, 7, 0.7) 0%, rgba(6, 10, 7, 0.3) 30%, transparent 55%); }
+#pause .modal-panel.small { margin-left: clamp(16px, 6vw, 110px); }
+#menu, #pause { touch-action: none; cursor: grab; }
+#menu:active, #pause:active { cursor: grabbing; }
+#menu .menu-panel, #pause .modal-panel { cursor: auto; }
+.fly-hint { position: absolute; right: clamp(14px, 3vw, 36px); bottom: clamp(14px, 3vh, 30px); max-width: min(520px, 60vw); text-align: right;
+  font-size: 14px; color: var(--text); opacity: 0.75; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8); pointer-events: none; }
 .modal-panel { background: var(--panel); border: 2px solid rgba(232, 163, 58, 0.4); border-radius: 18px; padding: 26px 30px; width: min(640px, 92vw); max-height: 86vh; overflow: auto; display: flex; flex-direction: column; gap: 16px; }
 .modal-panel.small { width: 370px; overflow-x: hidden; }
 .modal-panel h2 { margin: 0; color: var(--gold); font-family: 'Poiret One', sans-serif; font-size: 34px; }
@@ -342,4 +350,4 @@ body.police::after { background: radial-gradient(ellipse at center, transparent 
 #minigame .mg-panel { position: relative; }
 #minigame .mg-cancel { position: absolute; top: 6px; right: 8px; width: 34px; height: 34px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, 0.12); color: #fff; font-size: 16px; cursor: pointer; }
 /* phones in landscape: the logo goes to the bottom right, away from the menu buttons */
-@media (max-height: 500px) { .cj-badge { left: auto; right: calc(14px + env(safe-area-inset-right)); bottom: 10px; } .cj-text { height: 28px; } }
+@media (max-height: 500px) { .fly-hint { display: none; } .cj-badge { left: auto; right: calc(14px + env(safe-area-inset-right)); bottom: 10px; } .cj-text { height: 28px; } }

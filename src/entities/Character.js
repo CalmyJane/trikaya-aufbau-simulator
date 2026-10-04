@@ -213,16 +213,32 @@ export class Character {
     if (style === 'dreads') {
       if (!dreadGeo) { dreadGeo = new THREE.CylinderGeometry(0.015, 0.011, 1, 5); dreadGeo.translate(0, -0.5, 0); }
       const n = 22;
+      const thick = look.dreadThick || 1;
       for (let i = 0; i < n; i++) {
         const a = Math.PI * 0.3 + (i / (n - 1)) * Math.PI * 1.4; // around sides & back, open at the face
-        const dl = (look.dreadLength || 0.34) * (0.75 + Math.random() * 0.5);
+        // matted dreads: uneven lengths, some grown together into fat clumps
+        const clump = look.matted && Math.random() < 0.3 ? 1.8 : 1;
+        const dl = (look.dreadLength || 0.34) * (look.matted ? 0.7 + Math.random() * 0.55 : 0.75 + Math.random() * 0.5);
         const d = new THREE.Mesh(dreadGeo, hm);
-        d.scale.set(1, dl, 1);
+        const w = thick * clump * (look.matted ? 0.8 + Math.random() * 0.5 : 1);
+        d.scale.set(w, dl, w);
         const sx = Math.sin(a), sz = Math.cos(a);
         d.position.set(sx * r * 1.0, len * (0.55 + 0.12 * Math.abs(sz)), sz * r * 1.0);
-        d.rotation.set(sz * 0.28, 0, -sx * 0.28); // hang slightly outwards
+        const mess = look.matted ? (Math.random() - 0.5) * 0.3 : 0;
+        d.rotation.set(sz * 0.28 + mess, 0, -sx * 0.28 + mess); // hang slightly outwards
         d.castShadow = true;
         g.add(d);
+      }
+      // a few short stubborn ones sticking up on top of the head
+      if (look.matted) {
+        for (let i = 0; i < 4; i++) {
+          const a = Math.random() * Math.PI * 2;
+          const d = new THREE.Mesh(dreadGeo, hm);
+          d.scale.set(thick, 0.05 + Math.random() * 0.04, thick);
+          d.position.set(Math.sin(a) * r * 0.45, len * 0.95, Math.cos(a) * r * 0.45 - r * 0.15);
+          d.rotation.set(Math.PI - Math.cos(a) * 1.3, 0, Math.sin(a) * 1.3); // sticking out sideways
+          g.add(d);
+        }
       }
       // wrap / beads
       if (look.beads) {

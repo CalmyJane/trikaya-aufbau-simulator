@@ -5,6 +5,7 @@ import { Assets } from './Assets.js';
 import { heightAt } from '../world/Height.js';
 import { World } from '../world/World.js';
 import { Player, CameraRig } from '../entities/Player.js';
+import { FlyCam } from './FlyCam.js';
 import { NPCManager } from '../entities/NPC.js';
 import { Quad, Radlader } from '../entities/Vehicles.js';
 import { QuestSystem } from '../quests/QuestSystem.js';
@@ -29,7 +30,7 @@ import { AfterimagePass } from 'three/addons/postprocessing/AfterimagePass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { createItemMesh, isHeavy } from '../items/itemData.js';
 import { UI } from '../ui/UI.js';
-import { PLOTS, P } from '../world/layout.js';
+import { PLOTS } from '../world/layout.js';
 import { L, t, getLang, setLang, onLangChange, applyDom } from '../i18n.js';
 import { TouchControls, portraitHint } from '../ui/TouchControls.js';
 
@@ -90,6 +91,7 @@ export class Game {
     if (this.input.touch) this.world.sun.shadow.mapSize.set(1024, 1024);
     this.player = new Player(this.world, this.input);
     this.cam = new CameraRig(this.camera, this.input, this.settings);
+    this.fly = new FlyCam(this.camera, this.input);
     this.npcs = new NPCManager(this.world);
     this.npcs.game = this;
     this.vehicles = { quad: new Quad(this.world), radlader: new Radlader(this.world) };
@@ -335,6 +337,11 @@ export class Game {
     $('btn-pcontrols').onclick = () => this.ui.modal(this.controlsHtml());
     $('btn-quit').onclick = () => { this.save(); this.ui.showPause(false); this.toMenu(); };
 
+    // menu & pause: how to fly the free camera
+    const flyHint = () => document.querySelectorAll('.fly-hint').forEach((el) => { el.textContent = t(this.input.touch ? 'fly.hintTouch' : 'fly.hint'); });
+    flyHint();
+    onLangChange(flyHint);
+
     // browsers only allow sound after a user gesture: the first click/key anywhere starts the music
     const firstGesture = () => { this.audio.unlock(); this.audio.setVolume(this.settings.volume); };
     window.addEventListener('pointerdown', firstGesture, { once: true, capture: true });
@@ -347,9 +354,13 @@ export class Game {
   }
 
   toMenu() {
+    const from = this.mode;
     this.mode = 'menu';
     this.input.enabled = false;
     this.input.unlock();
+    this.ui.showHUD(false);
+    // back from a game: float up into the cinematic orbit (first boot starts right in it)
+    if (from !== 'loading') { this.fly.startTween(this.camera, 3.5, 25); this.fly.startOrbit(); }
     let has = false;
     try { has = !!localStorage.getItem(SAVE_KEY); } catch { /* ignore */ }
     this.ui.showMenu(has);
@@ -370,6 +381,10 @@ export class Game {
     this.mode = 'play';
     this.input.enabled = true;
     this.cam.target.copy(this.player.position);
+    this.cam.dist = this.cam.targetDist;
+    // fly in from wherever the menu camera is to the player
+    const d = this.camera.position.distanceTo(this.player.position);
+    this.fly.startTween(this.camera, THREE.MathUtils.clamp(d / 45, 1.4, 3.4), Math.min(18, d * 0.12));
     this.input.lock();
     this.afkTime = 0;
     this.refreshHUD();
@@ -384,13 +399,22 @@ export class Game {
     this.mode = 'pause';
     this.input.enabled = false;
     this.ui.showPause(true);
+    this.ui.showHUD(false);
+    // rise up into a drone view above the player – from there you can fly around freely
+    this.fly.startTween(this.camera, 1.6);
+    this.fly.birdPose(this.player.position, this.cam.yaw);
     this.save();
   }
 
   resume() {
+    const from = this.mode;
     this.ui.showPause(false);
     this.ui.closeModal();
     this.ui.showBigMap(false);
+    this.ui.showHUD(true);
+    // dive back down to the player when coming out of the drone view
+    if (from === 'pause' || (from === 'map' && this.fly.flown)) this.fly.startTween(this.camera, 1.4);
+    this.fly.flown = false;
     this.mode = 'play';
     this.input.enabled = true;
     this.input.lock();
@@ -1172,16 +1196,16 @@ export class Game {
     const ctx = { player: this.player, game: this };
 
     if (this.mode === 'menu' || this.mode === 'loading') {
-      // cinematic orbit around the festival ground & dragon
-      const c = P(360, 545);
-      const a = time * 0.04 + 2.2;
-      this.camera.position.set(c.x + Math.cos(a) * 90, 36, c.z + Math.sin(a) * 90);
-      this.camera.lookAt(c.x, 4, c.z);
+      // cinematic orbit around the festival ground & dragon – until you grab the controls and fly yourself
+      this.fly.active = this.mode === 'menu' && !this.ui.modalOpen;
+      this.fly.update(dt, time, { controls: this.fly.active, menu: true });
+      this.fly.apply(this.camera, dt);
       this.world.update(time, dt, this.player.position);
       this.npcs.update(time, dt, ctx);
-      this.world.followSun(new THREE.Vector3(c.x, 0, c.z));
+      this.world.followSun(this.fly.focus(this._sunFocus ||= new THREE.Vector3()));
       this.music.update(this.camera.position, this.camera);
       this.renderer.render(this.scene, this.camera);
+      inp.endFrame();
       return;
     }
 
@@ -1194,6 +1218,9 @@ export class Game {
     }
 
     const playing = this.mode === 'play';
+    const paused = this.mode === 'pause';
+    this.fly.active = paused && !this.ui.modalOpen;
+    if (paused && !this.ui.modalOpen && inp.hit('Escape')) this.resume();
     if (playing) {
       if (inp.hit('Escape')) this.pause();
       if (this.minigame.open) inp.pressed.clear();
@@ -1269,10 +1296,14 @@ export class Game {
     if (this.sceneCam) { // cut scene camera (finale)
       this.camera.position.copy(this.sceneCam.pos);
       this.camera.lookAt(this.sceneCam.look);
-    } else if (this.mode !== 'pause') {
+    } else if (paused) {
+      this.fly.update(dt, time, { controls: this.fly.active });
+      this.fly.flown = true;
+    } else {
       this.cam.update(dt, this.player.position, { indoor, blockers: veh ? null : this.world.cameraBlockers, heading: this.headingOf(), moving, vehicle: !!veh });
     }
-    this.world.followSun(this.player.position);
+    this.fly.apply(this.camera, dt);
+    this.world.followSun(paused ? this.fly.focus(this._sunFocus ||= new THREE.Vector3()) : this.player.position);
 
     // HUD
     this.ui.tracker(this.quests, this.player.position, this.drama);
@@ -1280,7 +1311,7 @@ export class Game {
     this.ui.vehicleHud(veh);
     this.ui.drawMinimap(this.player.position, this.headingOf(), this.cam.yaw, [...this.quests.trackedObjectives(), ...this.drama.objectives(), ...this.soundbox.objectives()], this.npcs.all.filter((n) => !n.hidden), this.quests, this.vehicles);
     this.ui.overlays(this.npcs.all.filter((n) => !n.hidden), this.camera, this.player.position);
-    this.music.update(this.player.position, this.camera);
+    this.music.update(paused ? this.camera.position : this.player.position, this.camera);
 
     this.renderMain();
     inp.endFrame();

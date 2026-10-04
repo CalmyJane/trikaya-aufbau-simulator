@@ -111,6 +111,15 @@ export const CHATS = {
       { text: C('Immer, Rocky. Immer.', 'Always, Rocky. Always.'), karma: 2, reply: C('Woah. Danke. Das hat mein Leben verändert.', 'Whoa. Thanks. That changed my life.') },
       { text: C('Rocky, trag doch mal was.', 'Rocky, carry something.'), karma: 1, reply: C('…Gleich. Nach dem Sonnenuntergang.', '…Soon. After sunset.') },
     ] },
+    { line: C('Duuude… bist du eher Hi-Tech oder eher Punk? Falsche Antwort gibt\'s nicht. Außer Schlager.', 'Duuude… are you more hi-tech or more punk? There\'s no wrong answer. Except schlager.'), options: [
+      { text: C('Beides. Gleichzeitig.', 'Both. At the same time.'), karma: 3, reply: C('…Du hast gerade mein nächstes Set beschrieben. Geist dankt dir.', '…You just described my next set. Geist thanks you.') },
+      { text: C('Ehrlich gesagt eher Schlager.', 'Honestly? More schlager.'), karma: -2, reply: C('*starrt dich lange an* …Ich bete für dich. Auf 190 BPM.', '*stares at you for a long time* …I\'ll pray for you. At 190 BPM.') },
+      { text: C('Hauptsache laut.', 'As long as it\'s loud.'), karma: 2, reply: C('JA. Bruder. Genau das. *Pogo-Ansatz, verliert das Gleichgewicht*', 'YES. Brother. Exactly. *starts to mosh, loses balance*') },
+    ] },
+    { line: C('Psst. Ich hab nen neuen Track. Hi-Tech mit Punk-Gitarre. Willst du mal hören? *hält dir ein Handy mit kaputtem Lautsprecher hin*', 'Psst. New track. Hi-tech with punk guitar. Wanna hear it? *holds out a phone with a broken speaker*'), options: [
+      { text: C('Klingt wie ein Föhn im Schleudergang. Geil.', 'Sounds like a hairdryer in a spin cycle. Sick.'), karma: 3, reply: C('DAS ist das Feedback, das ich brauche. Der Track heißt jetzt „Föhn im Schleudergang".', 'THAT\'s the feedback I need. The track is now called "Hairdryer Spin Cycle".') },
+      { text: C('Rocky, wir müssen echt was aufbauen.', 'Rocky, we really need to build something.'), karma: 1, reply: C('Aufbau ist auch nur Punk mit Kabelbindern. Ich komm gleich. Nach dem Drop.', 'Building is just punk with cable ties. I\'m coming. After the drop.') },
+    ] },
   ],
   isi: [
     { line: C('Ich hab heute schon zwölf Kisten getragen! Und du?', 'I\'ve carried twelve crates already today! And you?'), options: [

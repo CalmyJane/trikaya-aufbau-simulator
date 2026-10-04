@@ -353,18 +353,19 @@ body.police::after { background: radial-gradient(ellipse at center, transparent 
 @media (max-height: 500px) { .fly-hint { display: none; } .cj-badge { left: auto; right: calc(14px + env(safe-area-inset-right)); bottom: 10px; } .cj-text { height: 28px; } }
 
 /* ---------------------------------------------------------------- compact menus: leave room for the fly-around view */
-#menu { background: linear-gradient(90deg, rgba(6, 10, 7, 0.82) 0%, rgba(6, 10, 7, 0.45) 28%, transparent 48%); }
-.menu-panel { margin-left: clamp(16px, 5vw, 80px); gap: 4px; max-width: 340px; }
-.menu-logo { width: 104px; }
-.menu-title { font-size: 44px; }
-.menu-title span { font-size: 22px; letter-spacing: 9px; }
-.menu-sub { font-size: 14px; max-width: 300px; margin-bottom: 12px; }
-.menu-buttons { width: 250px; gap: 7px; }
-#menu .btn, #pause .btn { font-size: 16px; padding: 8px 14px; }
-.menu-foot { margin-top: 14px; font-size: 12px; }
-#pause { background: linear-gradient(90deg, rgba(6, 10, 7, 0.6) 0%, rgba(6, 10, 7, 0.25) 24%, transparent 42%); }
-#pause .modal-panel.small { width: 270px; padding: 18px 20px; gap: 12px; }
-#pause .modal-panel h2 { font-size: 28px; }
+#menu { background: linear-gradient(90deg, rgba(6, 10, 7, 0.8) 0%, rgba(6, 10, 7, 0.4) 24%, transparent 42%); }
+.menu-panel { margin-left: clamp(16px, 4vw, 64px); gap: 2px; max-width: 300px; }
+.menu-logo { width: 72px; }
+.menu-title { font-size: 36px; margin-top: 4px; }
+.menu-title span { font-size: 18px; letter-spacing: 8px; }
+.menu-sub { font-size: 13px; max-width: 270px; margin-bottom: 8px; }
+.menu-buttons { display: grid; grid-template-columns: 1fr 1fr; width: 250px; gap: 5px; }
+.menu-buttons .btn.primary, .menu-buttons .btn:first-child:not(.hidden) { grid-column: 1 / -1; }
+#menu .btn, #pause .btn { font-size: 14px; padding: 6px 10px; }
+.menu-foot { margin-top: 8px; font-size: 11px; }
+#pause { background: linear-gradient(90deg, rgba(6, 10, 7, 0.6) 0%, rgba(6, 10, 7, 0.25) 22%, transparent 38%); }
+#pause .modal-panel.small { width: 250px; padding: 12px 14px; gap: 8px; }
+#pause .modal-panel h2 { font-size: 22px; }
 #pause .menu-buttons { width: 100%; }
 
 /* phones in landscape: two button columns, no subtitle */

@@ -539,6 +539,20 @@ export class Character {
       sc.rotation.x = Math.PI / 2;
       this.attachToBone('Neck', sc, new THREE.Vector3(0, 0.02, 0.01));
     }
+    if (extras.includes('pendant')) {
+      // spiritual jewellery: thin cord around the neck + wooden hexagon pendant with a moonstone
+      const cord = new THREE.Mesh(new THREE.TorusGeometry(0.07, 0.006, 4, 14), new THREE.MeshStandardMaterial({ color: '#2a1a12' }));
+      cord.rotation.x = Math.PI / 2 - 0.5;
+      this.attachToBone('Neck', cord, new THREE.Vector3(0, -0.02, 0.03));
+      const p = new THREE.Group();
+      const disc = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.012, 6), new THREE.MeshStandardMaterial({ color: '#6a3a1e', flatShading: true }));
+      disc.rotation.x = Math.PI / 2;
+      p.add(disc);
+      const stone = new THREE.Mesh(new THREE.OctahedronGeometry(0.02), new THREE.MeshStandardMaterial({ color: look.stoneColor || '#bfe6ff', emissive: look.stoneColor || '#5a9ad0', emissiveIntensity: 0.4, roughness: 0.2 }));
+      stone.position.z = 0.01;
+      p.add(stone);
+      this.attachToBone('Chest', p, new THREE.Vector3(0, look.pendantY ?? 0.08, look.pendantZ ?? 0.15));
+    }
   }
 
   /** Text print on the shirt (front small, back big) — e.g. SECURITY. */

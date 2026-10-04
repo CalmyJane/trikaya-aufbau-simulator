@@ -700,6 +700,21 @@ export const NPCS = [
       { de: 'Alle zusammen, jetzt: Aufbau! Aufbau! Aufbau! …Wo geht\'s zur Soundanlage?', en: 'Everybody now: build-up! Build-up! Build-up! …Where\'s the sound system?' },
     ],
   },
+  {
+    id: 'raedschi', name: 'Rädschi', role: { de: 'Natur, Pilze & Steine', en: 'Nature, mushrooms & stones' }, portrait: '🍄',
+    look: { base: 'f_casual', skin: SKIN.tan, hair: '#2a1a10', brows: '#1e120a', hairStyle: 'dreads', hairStyleColor: '#5a3820', dreadLength: 0.85, dreadThick: 1.2, beads: true, headband: '#7a2a24', shirt: '#2e2232', pants: '#4e5a2a', patchwork: true, shirtPatch: ['#2e2232', '#6a2a24', '#3a2a3a'], pantsPatch: ['#4e5a2a', '#5a3e24', '#3e4a2a'], height: 1.82, width: 0.9, extras: ['pendant'] },
+    behavior: 'wander', home: 'plot_forest_dome', radius: 12,
+    lines: [
+      { de: 'Oh, hallo… Schön, dass du da bist. Wie geht\'s dir? So richtig, meine ich.', en: 'Oh, hi… Nice that you\'re here. How are you? Like, really?' },
+      { de: 'Schau mal, da unterm Baum. Ein Schwefelporling. Nicht essen, nur bewundern.', en: 'Look, under that tree. A chicken-of-the-woods. Don\'t eat it, just admire it.' },
+      { de: 'Den Stein hab ich heute früh am Bach gefunden. Ich glaub, er wollte mit.', en: 'Found this stone by the stream this morning. I think it wanted to come along.' },
+      { de: 'Mondstein. Der hilft beim Ankommen. Und du siehst aus, als bräuchtest du das gerade.', en: 'Moonstone. It helps you arrive. And you look like you could use that right now.' },
+      { de: 'Pilze sind unterirdisch alle verbunden. Eigentlich wie wir hier beim Aufbau. Nur leiser.', en: 'Mushrooms are all connected underground. A bit like us at the build. Just quieter.' },
+      { de: 'Du wirkst müde. Setz dich kurz zu mir, der Wald hält das aus.', en: 'You look tired. Sit with me for a bit, the forest can take it.' },
+      { de: 'Ich red nicht so viel. Aber ich hör gern zu.', en: 'I don\'t talk that much. But I like to listen.' },
+      { de: 'Bitte nicht auf das Moos treten. Das wächst da schon länger als wir alle hier sind.', en: 'Please don\'t step on the moss. It\'s been growing there longer than any of us have been here.' },
+    ],
+  },
 ];
 
 // ------------------------------------------------------------------ random campers

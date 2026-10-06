@@ -1466,11 +1466,14 @@ export class Game {
     const flags = this.quests.state.flags;
     flags.chats ||= [];
     let chat = null, key = null;
+    // needs: only after that job is done · unless: only before
+    const fits = (c) => (!c.needs || this.quests.isDone(c.needs)) && (!c.unless || !this.quests.isDone(c.unless));
     const own = CHATS[id] || [];
-    const i = own.findIndex((_, k) => !flags.chats.includes(`${id}#${k}`));
+    const i = own.findIndex((c, k) => !flags.chats.includes(`${id}#${k}`) && fits(c));
     if (i >= 0) { chat = own[i]; key = `${id}#${i}`; }
     else if (id.startsWith('camper_') && !npc._chatted && Math.random() < 0.7) {
       chat = CAMPER_CHATS[(npc._chatIdx ??= Math.floor(Math.random() * CAMPER_CHATS.length))];
+      if (!fits(chat)) chat = null;
     }
     if (!chat) return false;
     const choice = await this.runDialog([{ who: id, text: chat.line }], chat.options.map((o) => o.text), npc);

@@ -32,10 +32,10 @@ const TEMPLATES = [
   { giver: 'mark', item: ['err_cardamom', C('Sack Kardamom', 'Sack of cardamom'), '🌿', () => crate('#7fb040')], at: 'huehner_front',
     ask: C('Der Kardamom ist alle! ALLE! Am Hühnercontainer steht noch ein Sack. Hoffentlich.', 'The cardamom is gone! GONE! There\'s another sack at the chicken container. Hopefully.'),
     thanks: C('Gerettet. Der Chai ist gerettet. Du kriegst den ersten.', 'Saved. The chai is saved. You get the first one.') },
-  { giver: 'fabbe', item: ['err_rope', C('Seilrolle', 'Coil of rope'), '🧵', () => crate('#c9a27a')], at: 'werkstatt_inside',
+  { giver: 'fabbe', needs: 'q8_forestdome', item: ['err_rope', C('Seilrolle', 'Coil of rope'), '🧵', () => crate('#c9a27a')], at: 'werkstatt_inside',
     ask: C('Mir fehlt eine Seilrolle für den Dome. Werkstatt, ganz hinten. Danke dir schon mal!', 'I\'m missing a coil of rope for the dome. Workshop, at the very back. Thanks in advance!'),
     thanks: C('Super! Jetzt hält er. Also… noch mehr als vorher.', 'Great! Now it holds. Well… even more than before.') },
-  { giver: 'mia', item: ['err_lights', C('Lichterketten', 'Fairy lights'), '✨', () => crate('#ff6ab4')], at: 'kuenstler_front',
+  { giver: 'mia', needs: 'n2_narnia', item: ['err_lights', C('Lichterketten', 'Fairy lights'), '✨', () => crate('#ff6ab4')], at: 'kuenstler_front',
     ask: C('Ich brauch noch Lichterketten für den Elefanten! Die sind am Künstlergasse-Container. 💛', 'I need more fairy lights for the elephant! They\'re at the Künstlergasse container. 💛'),
     thanks: C('Der Elefant wird LEUCHTEN! Danke! 💛', 'The elephant is going to SHINE! Thanks! 💛') },
   { giver: 'jan', item: ['err_bands', C('Bändchen-Nachschub', 'More wristbands'), '🎫', () => crate('#e74c3c')], at: 'C4_front',
@@ -106,12 +106,13 @@ const BEER_ASKS = {
 
 // favour: pick up rubbish somewhere on the site
 const TRASH_GIVERS = {
-  franzi: [C('Am {place} liegt überall Müll rum. Sammelst du drei Säcke ein? Für die Umwelt. Und für mich.', 'There\'s rubbish all over the {place}. Could you collect three bags? For the planet. And for me.'), C('Danke! Die Wiese sagt danke. Schwarzhuber auch, glaub ich.', 'Thanks! The meadow says thanks. Schwarzhuber too, I think.')],
-  isi: [C('Wer lässt seinen Müll am {place} liegen?! Hilfst du mir beim Einsammeln? Drei Säcke!', 'Who leaves their rubbish at the {place}?! Help me collect it? Three bags!'), C('Super! Weißt du, was jetzt fehlt? Ein Wettrennen zum Müllcontainer!', 'Great! You know what\'s missing now? A race to the bin!')],
-  annika: [C('Bevor die Gäste kommen, muss der Müll am {place} weg. Drei Säcke, schaffst du das?', 'Before the guests arrive, the rubbish at the {place} has to go. Three bags, can you do it?'), C('Perfekt. Jetzt sieht\'s fast aus wie geplant.', 'Perfect. Now it almost looks like it was planned.')],
-  schwarzhuber: [C('Auf mei Wiesn am {place} liegt Müll. Dilettantisch! Klaub des zamm, drei Säck!', 'There\'s rubbish on my meadow at the {place}. Amateurs! Pick it up, three bags!'), C('Na also. Geht doch, wennst willst.', 'There you go. You can if you want.')],
+  franzi: [C('{Place} liegt überall Müll rum. Sammelst du drei Säcke ein? Für die Umwelt. Und für mich.', 'There\'s rubbish everywhere {place}. Could you collect three bags? For the planet. And for me.'), C('Danke! Die Wiese sagt danke. Schwarzhuber auch, glaub ich.', 'Thanks! The meadow says thanks. Schwarzhuber too, I think.')],
+  isi: [C('Wer lässt seinen Müll {place} liegen?! Hilfst du mir beim Einsammeln? Drei Säcke!', 'Who leaves their rubbish {place}?! Help me collect it? Three bags!'), C('Super! Weißt du, was jetzt fehlt? Ein Wettrennen zum Müllcontainer!', 'Great! You know what\'s missing now? A race to the bin!')],
+  annika: [C('Bevor die Gäste kommen, muss der Müll {place} weg. Drei Säcke, schaffst du das?', 'Before the guests arrive, the rubbish {place} has to go. Three bags, can you do it?'), C('Perfekt. Jetzt sieht\'s fast aus wie geplant.', 'Perfect. Now it almost looks like it was planned.')],
+  schwarzhuber: [C('Auf mei Wiesn {place} liegt Müll. Dilettantisch! Klaub des zamm, drei Säck!', 'There\'s rubbish on my meadow {place}. Amateurs! Pick it up, three bags!'), C('Na also. Geht doch, wennst willst.', 'There you go. You can if you want.')],
 };
-const TRASH_PLACES = [['plot_mainstage', C('Mainstage', 'mainstage')], ['plot_narnia_floor', C('Narnia Floor', 'Narnia Floor')], ['plot_firespace', C('Firespace', 'Firespace')], ['plot_hammocks', C('Hängemattenwald', 'hammock forest')], ['chill', C('Bierbank', 'beer bench')], ['plot_entrance', C('Eingang', 'entrance')]];
+// place names come with their preposition: "Müll {place}" → "Müll an der Bierbank"
+const TRASH_PLACES = [['plot_mainstage', C('an der Mainstage', 'at the mainstage')], ['plot_narnia_floor', C('am Narnia Floor', 'at the Narnia Floor')], ['plot_firespace', C('am Firespace', 'at the Firespace')], ['plot_hammocks', C('im Hängemattenwald', 'in the hammock forest')], ['chill', C('an der Bierbank', 'at the beer bench')], ['plot_entrance', C('am Eingang', 'at the entrance')]];
 
 function trashBag() {
   const g = new THREE.Group();
@@ -234,7 +235,7 @@ export class Errands {
 
   make_fetch() {
     const g = this.game;
-    const ok = TEMPLATES.filter((t) => this.free(t.giver) && t.giver !== this.lastGiver && g.world.spots[t.at]);
+    const ok = TEMPLATES.filter((t) => this.free(t.giver) && t.giver !== this.lastGiver && g.world.spots[t.at] && (!t.needs || g.quests.isDone(t.needs)));
     if (!ok.length) return null;
     const t = ok[Math.floor(Math.random() * ok.length)];
     const urgent = Math.random() < 0.3;
@@ -308,9 +309,10 @@ export class Errands {
     if (!g.world.spots[placeSpot]) return null;
     const [ask, thanks] = TRASH_GIVERS[id];
     const name = g.npcs.get(id).def.name;
-    const fill = (t) => C(t.de.replace('{place}', placeName.de), t.en.replace('{place}', placeName.en));
-    return this.base(this.newId('trash'), id, C(`Müll am ${placeName.de}`, `Rubbish at the ${placeName.en}`), fill(ask), [
-      { type: 'pickup', text: fill(C('Sammel drei Müllsäcke am {place} ein', 'Collect three bin bags at the {place}')), items: ['a', 'b', 'c'].map((k) => ({ item: `err_trash_${k}`, at: placeSpot, search: 14 })) },
+    const cap = (s) => s[0].toUpperCase() + s.slice(1);
+    const fill = (t) => C(t.de.replace('{Place}', cap(placeName.de)).replace('{place}', placeName.de), t.en.replace('{place}', placeName.en));
+    return this.base(this.newId('trash'), id, C(`Müll ${placeName.de}`, `Rubbish ${placeName.en}`), fill(ask), [
+      { type: 'pickup', text: fill(C('Sammel drei Müllsäcke {place} ein', 'Collect three bin bags {place}')), items: ['a', 'b', 'c'].map((k) => ({ item: `err_trash_${k}`, at: placeSpot, search: 14 })) },
       { type: 'talk', npc: id, text: C(`Bring die Säcke zu ${name}`, `Bring the bags to ${name}`), consumes: ['err_trash_a', 'err_trash_b', 'err_trash_c'], dialog: [{ who: id, text: thanks }] },
     ], 10);
   }

@@ -436,9 +436,10 @@ export const NPCS = [
   {
     id: 'verena', name: 'Verena', role: { de: 'Bar-Chefin (organisiert die Barcrew)', en: 'Bar boss (runs the bar crew)' }, portrait: '🍹',
     look: { base: 'f_formal', skin: SKIN.light, hair: '#5a2a1a', shirt: '#1f6fc9', pants: '#1f6fc9', patchwork: true, shirtPatch: ['#1f6fc9', '#ffffff', '#1f4f99'] },
-    behavior: 'wander', home: 'plot_biergarten', offset: [7.6, 2], radius: 1.5, appearAfter: 'q9_festzelt', // behind her bar at the Techno Floor
+    behavior: 'wander', home: 'base_yard', offset: [3, -3], radius: 6,
+    homeAfter: { quest: 'q9_festzelt', spot: 'plot_biergarten', offset: [7.6, 2], radius: 1.5 }, // behind her bar at the Techno Floor once it stands
     lines: [
-      { de: 'So, ich bin da. Wo ist meine Bar? Ah, da. Und wo sind meine Leute?', en: 'Right, I\'m here. Where\'s my bar? Ah, there. And where are my people?' },
+      { de: 'Meine Bar steht noch nicht. Meine Barcrew schon. Ist ja auch was.', en: 'My bar isn\'t up yet. My bar crew is. That\'s something.' },
       { de: 'Ich steh nicht hinter der Bar. Ich sorg dafür, dass da immer wer steht.', en: 'I don\'t stand behind the bar. I make sure someone always does.' },
       { de: 'Schichtplan für die Bar: acht Leute, drei Schichten, null Ausreden.', en: 'Bar rota: eight people, three shifts, zero excuses.' },
       { de: 'Wer zu spät zur Barschicht kommt, macht die nächste gleich mit. So einfach.', en: 'Whoever is late for their bar shift does the next one too. Simple.' },
@@ -508,7 +509,7 @@ export const NPCS = [
       { de: 'Rocky sagt, Full-On ist zu langsam. Rocky blinzelt auch nicht mehr. Ich bleib bei Full-On. 🌕', en: 'Rocky says full-on is too slow. Rocky also doesn\'t blink anymore. I\'m sticking with full-on. 🌕' },
       { de: 'Sonnenaufgang, Full-On-Set, alle Arme oben. Dafür machen wir das hier.', en: 'Sunrise, full-on set, everyone\'s arms up. That\'s what we do all this for.' },
       { de: 'Wenn ein Artist fragt, ob es hier Full-On gibt: JA. Dafür sorg ich persönlich.', en: 'If an artist asks whether there\'s full-on here: YES. I\'ll personally make sure of it.' },
-      { de: 'Die Artists kommen erst übermorgen. Ich hab trotzdem schon die Backstage-Kissen aufgeschüttelt.', en: 'The artists only arrive the day after tomorrow. I\'ve already fluffed the backstage cushions anyway.' },
+      { de: 'Die Artists kommen erst zum Festival. Ich hab trotzdem schon die Backstage-Kissen aufgeschüttelt.', en: 'The artists only arrive for the festival. I\'ve already fluffed the backstage cushions anyway.' },
     ],
   },
   {

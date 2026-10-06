@@ -12,7 +12,7 @@ export const CHATS = {
       { text: C('Nö. Nie im Leben.', 'Nope. Not a chance.'), karma: -2, reply: C('…Danke. Sehr motivierend.', '…Thanks. Very motivating.') },
     ] },
     // running gag: the rigging material
-    { line: C('Sag mal… hast du eigentlich das Rigging-Material? Die Stahlseile für die Mainstage?', 'Say… have you actually got the rigging material? The steel wires for the mainstage?'), options: [
+    { needs: 'q1_rigging', line: C('Sag mal… hast du eigentlich das Rigging-Material? Die Stahlseile für die Mainstage?', 'Say… have you actually got the rigging material? The steel wires for the mainstage?'), options: [
       { text: C('Die hängen doch schon seit Montag!', 'They\'ve been up since Monday!'), karma: 1, reply: C('Ach ja. …Und die ANDEREN Stahlseile?', 'Oh right. …And the OTHER steel wires?') },
       { text: C('Ich schau gleich nochmal nach.', 'I\'ll check again in a sec.'), karma: 2, reply: C('Super. Das brauchen wir DRINGEND.', 'Great. We need that URGENTLY.') },
       { text: C('Frag doch Leo.', 'Ask Leo.'), karma: -1, reply: C('Hab ich. Leo meinte, ich soll dich fragen.', 'I did. Leo said to ask you.') },
@@ -88,7 +88,7 @@ export const CHATS = {
     ] },
   ],
   mia: [
-    { line: C('Wie findest du den Narnia Floor bis jetzt? Ehrlich!', 'What do you think of the Narnia Floor so far? Honestly!'), options: [
+    { needs: 'n2_narnia', line: C('Wie findest du den Narnia Floor bis jetzt? Ehrlich!', 'What do you think of the Narnia Floor so far? Honestly!'), options: [
       { text: C('Magisch. Der Elefant ist der Hammer.', 'Magical. The elephant is amazing.'), karma: 3, reply: C('JAAA! Ich wusste es! 💛', 'YESSS! I knew it! 💛') },
       { text: C('Wird schon. Fehlt halt noch viel.', 'Getting there. Still a lot missing.'), karma: 0, reply: C('Ich weiß… Bruno! Weiterschrauben!', 'I know… Bruno! Keep screwing!') },
     ] },
@@ -146,7 +146,7 @@ export const CAMPER_CHATS = [
     { text: C('Reiß dich zusammen, morgen ist Festival!', 'Pull yourself together, the festival is tomorrow!'), karma: -2, reply: C('…Wow. Okay.', '…Wow. Okay.') },
     { text: C('Ich auch. Wir schaffen das.', 'Me too. We\'ll make it.'), karma: 2, reply: C('Zusammen. Ja.', 'Together. Yes.') },
   ] },
-  { line: C('Hast du die Spezial-Nuss für die Bauzäune gesehen?', 'Have you seen the special nut for the construction fences?'), options: [
+  { unless: 'x1_nuss', line: C('Hast du die Spezial-Nuss für die Bauzäune gesehen?', 'Have you seen the special nut for the construction fences?'), options: [
     { text: C('Nein, aber ich halt die Augen offen.', 'No, but I\'ll keep an eye out.'), karma: 2, reply: C('Danke! Die Nuss ist unsere letzte Hoffnung.', 'Thanks! The nut is our last hope.') },
     { text: C('Gibt\'s die überhaupt?', 'Does it even exist?'), karma: 1, reply: C('…Jetzt hast du mich verunsichert.', '…Now you\'ve made me unsure.') },
   ] },

@@ -102,7 +102,7 @@ const DEALER_LINES = {
 const pick = (a) => a[Math.floor(Math.random() * a.length)];
 
 // "Got anything?" – you can ask (almost) anyone. These never have anything and never sell.
-export const NO_STASH = ['fabi', 'jan', 'leo', 'franzi', 'isi', 'verena', 'mia', 'daniel'];
+export const NO_STASH = ['fabi', 'jan', 'leo', 'franzi', 'isi', 'verena', 'mia', 'daniel', 'delsin', 'aylien', 'sabse'];
 // crew members with a known stash; everyone else is random (most have nothing)
 const STASH_FIXED = { strom_andi: ['beer', 'schnaps'], juli: ['beer'], estenko: ['schnaps'], rocky: ['weed'], mehdi: ['weed'], schwarzhuber: ['schnaps'], lenny: ['speed', 'weed'], mux: ['weed'], leocitas: ['weed'] };
 const STASH_POOL = ['weed', 'weed', 'schnaps', 'speed', 'keta'];
@@ -117,6 +117,9 @@ const NO_STASH_LINES = {
   mia: { de: 'Ich hab Schrauben. Viele Schrauben. Die richtigen sogar. Sonst nichts. 💛', en: 'I have screws. Lots of screws. Even the right ones. Nothing else. 💛' },
   daniel: { de: 'Ich hab ein Pausenbrot. Das geb ich aber nicht her.', en: 'I have a sandwich. But I\'m not giving that away.' },
   leo: { de: 'Später! Später!', en: 'Later! Later!' },
+  delsin: { de: 'Ich bin vom Awareness-Team. Ich hab Wasser, Zeit und ein offenes Ohr. Das andere such dir bitte woanders. Oder besser gar nicht.', en: 'I\'m on the awareness team. I have water, time and an open ear. Look for the other stuff elsewhere. Or better not at all.' },
+  aylien: { de: 'Ich hab nur Umarmungen dabei. Die sind gratis und machen nicht abhängig. Na gut, ein bisschen.', en: 'All I have is hugs. They\'re free and not addictive. Okay, a little.' },
+  sabse: { de: 'In MEINER Küche? Ich hab Zwiebeln. Willst du Zwiebeln? Nein? Dann raus.', en: 'In MY kitchen? I have onions. Want onions? No? Then out.' },
 };
 const NOTHING_LINES = [
   { de: 'Nee, sorry. Hab nix dabei.', en: 'Nah, sorry. Got nothing on me.' },

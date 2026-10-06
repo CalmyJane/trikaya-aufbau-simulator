@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { Character } from './Character.js';
 import { NPCS, makeCamper, TOKEN_LINES, NUT_LINES } from './npcData.js';
-import { EXTRA_LINES, PROGRESS_LINES } from './moreLines.js';
+import { EXTRA_LINES, PROGRESS_LINES, OWN_VOICE } from './moreLines.js';
 import { heightAt } from '../world/Height.js';
 import { L } from '../i18n.js';
 import { STATE_LINES } from '../quests/Events.js';
@@ -114,7 +114,8 @@ export class NPC {
     if (this.def.id.startsWith('camper_') && r > 0.9 && !this.manager?.nutFound) return L(pick(NUT_LINES));
     // talk about what has just been built (once that job is done)
     if (g && r > 0.72) {
-      const prog = PROGRESS_LINES.filter(([q, who]) => g.quests.isDone(q) && (who ? who === this.def.id : true));
+      const me = this.def.id;
+      const prog = PROGRESS_LINES.filter(([q, who, , not]) => g.quests.isDone(q) && (who ? who === me : !OWN_VOICE.includes(me) && !not?.includes(me)));
       if (prog.length) { const own = prog.filter(([, who]) => who === this.def.id); return L(pick(own.length && Math.random() < 0.6 ? own : prog)[2]); }
     }
     // own lines, never the same one twice in a row (or among the last few)

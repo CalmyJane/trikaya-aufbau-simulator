@@ -41,8 +41,8 @@ export const QUESTS = [
     requires: [],
     summary: { de: 'Anmelden bei Jan, dann Leo finden. Leo hat deine Aufgaben. Theoretisch.', en: 'Register with Jan, then find Leo. Leo has your tasks. Theoretically.' },
     offer: [
-      { who: 'jan', text: { de: 'Ah, frisches Blut! Anmeldung. Name? …Ich schreib einfach „Neue*r“. Tätigkeit? „Alles“. Lieblings-Dixi? Überspringen wir.', en: 'Ah, fresh blood! Registration. Name? …I\'ll just write "new one". Job? "Everything". Favourite portaloo? Let\'s skip that.' } },
-      { who: 'jan', text: { de: 'Hier dein Bändchen. Und 25 Karma Startguthaben – gib nicht alles für Bier aus. Wasserdicht, feuerfest, Leo-sicher. Deine Aufgaben kriegst du von Leo, der leitet den Aufbau.', en: 'Here\'s your wristband. Waterproof, fireproof, Leo-proof. Leo gives you your tasks, he runs the build.' } },
+      { who: 'jan', text: { de: 'Ah, frisches Blut! Anmeldung. Name? …Ich schreib einfach „Neuer“. Tätigkeit? „Alles“. Lieblings-Dixi? Überspringen wir.', en: 'Ah, fresh blood! Registration. Name? …I\'ll just write "new one". Job? "Everything". Favourite portaloo? Let\'s skip that.' } },
+      { who: 'jan', text: { de: 'Hier dein Bändchen. Wasserdicht, feuerfest, Leo-sicher. Und 25 Karma Startguthaben – gib nicht alles für Bier aus. Deine Aufgaben kriegst du von Leo, der leitet den Aufbau.', en: 'Here\'s your wristband. Waterproof, fireproof, Leo-proof. And 25 karma to start with – don\'t spend it all on beer. Leo gives you your tasks, he runs the build.' } },
       { who: 'jan', text: { de: 'Leo war grad noch vorne am Einlass. Oder in der Küche. Oder an der Mainstage. Oder… naja. Viel Glück.', en: 'Leo was just at the front gate. Or in the kitchen. Or at the mainstage. Or… well. Good luck.' } },
     ],
     accept: { de: 'Ich find ihn schon!', en: 'I\'ll find him!' },
@@ -457,8 +457,8 @@ export const QUESTS = [
       {
         type: 'talk', npc: 'corni', text: { de: 'Melde dich bei Corni', en: 'Report to Corni' },
         dialog: [
-          { who: 'corni', text: { de: 'Steht! Mainstage, Klos, Licht, Chai, Awareness, Dome, Forest Dome, Techno Floor. Mehr als letztes Jahr an Tag drei.', en: 'It stands! Mainstage, toilets, lights, chai, awareness, dome, Forest Dome, Techno Floor. More than last year by day three.' } },
-          { who: 'corni', text: { de: 'Ach ja: Verena ist angekommen. Die Bar am Techno Floor ist ab jetzt ihr Revier. Und Harry sucht dich wegen der Deko.', en: 'Oh right: Verena has arrived. The bar at the Techno Floor is her territory now. And Harry is looking for you about the deco.' } },
+          { who: 'corni', text: { de: 'Steht! Mainstage, Klos, Licht, Chai, Awareness, Dome, Forest Dome, Techno Floor. Mehr als letztes Jahr an Tag vier.', en: 'It stands! Mainstage, toilets, lights, chai, awareness, dome, Forest Dome, Techno Floor. More than last year by day four.' } },
+          { who: 'corni', text: { de: 'Ach ja: Die Bar am Techno Floor steht – ab jetzt ist das Verenas Revier. Und Harry sucht dich wegen der Deko.', en: 'Oh right: the bar at the Techno Floor is up – from now on it\'s Verena\'s territory. And Harry is looking for you about the deco.' } },
         ],
       },
     ],

@@ -60,7 +60,7 @@ const STRINGS = {
   'hud.dayN': { de: 'Aufbau-Tag {day} · noch {left} Tage', en: 'Build day {day} · {left} days left' },
   'hud.dayLast': { de: 'Aufbau-Tag {day} · morgen ist Festival!', en: 'Build day {day} · festival tomorrow!' },
   'menu.fullscreen': { de: 'Vollbild', en: 'Fullscreen' },
-  'menu.foot': { de: 'Aufbau-Tag 1 · noch 5 Tage bis Festival · München-Allach', en: 'Build day 1 · 5 days until the festival · Munich-Allach' },
+  'menu.foot': { de: 'Aufbau-Tag 1 · noch 4 Tage bis Festival · München-Allach', en: 'Build day 1 · 4 days until the festival · Munich-Allach' },
   'close': { de: 'Schließen', en: 'Close' },
   // pause
   'pause.title': { de: 'Kaffeepause', en: 'Coffee break' },
@@ -76,7 +76,7 @@ const STRINGS = {
   // hud
   'hud.karma': { de: 'Karma', en: 'Karma' },
   'hud.ready': { de: 'Festival bereit', en: 'Festival ready' },
-  'hud.day': { de: 'Aufbau-Tag 1 · noch 5 Tage', en: 'Build day 1 · 5 days left' },
+  'hud.day': { de: 'Aufbau-Tag 1 · noch 4 Tage', en: 'Build day 1 · 4 days left' },
   'hud.hint': { de: 'Klick = Maus fangen · WASD laufen · Shift sprinten · E interagieren · J Aufgaben · M Karte · Esc Pause', en: 'Click to capture mouse · WASD move · Shift sprint · E interact · J quests · M map · Esc pause' },
   'hud.hintDrive': { de: 'W/S Gas/Bremse · A/D lenken · Leertaste Handbremse · E aussteigen', en: 'W/S throttle/brake · A/D steer · Space handbrake · E exit' },
   'hud.newJob': { de: 'Neuer Job', en: 'New job' },

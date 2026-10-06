@@ -89,7 +89,7 @@ export const BUSY_MODES = ['lying', 'drunk', 'high', 'keta', 'follow', 'care'];
 export const STATE_LINES = {
   drunk: {
     follow: [
-      { de: 'Franzi… du bist meine beste Freundin. Seit… wann kennen wir uns?', en: 'Franzi… you\'re my best friend. Since… when do we know each other?' },
+      { de: 'Franzi… du bist mein Lieblingsmensch. Seit… wann kennen wir uns?', en: 'Franzi… you\'re my favourite person. Since… when do we know each other?' },
       { de: 'Ich bin nicht betrunken. Ich bin… horizontal motiviert.', en: 'I\'m not drunk. I\'m… horizontally motivated.' },
       { de: 'Warum laufen die Zelte weg?', en: 'Why are the tents running away?' },
       { de: 'Noch ein Bier und ich bau die Mainstage alleine auf!', en: 'One more beer and I\'ll build the mainstage alone!' },
@@ -112,7 +112,7 @@ export const STATE_LINES = {
     ],
     care: [
       { de: 'Die Kissen sind so weich… ich wohn jetzt hier.', en: 'The cushions are so soft… I live here now.' },
-      { de: 'Kekse! Es gibt wirklich Kekse! Franzi, du bist die Beste.', en: 'Cookies! There really are cookies! Franzi, you\'re the best.' },
+      { de: 'Kekse! Es gibt wirklich Kekse! Franzi, du bist ein Schatz.', en: 'Cookies! There really are cookies! Franzi, you\'re a treasure.' },
     ],
   },
   keta: {
@@ -175,8 +175,8 @@ export const EVENT_TYPES = {
     title: { de: 'Zu betrunken zum Arbeiten', en: 'Too drunk to work' },
     task: { de: '{victim} ist sturzbetrunken – hol Franzi', en: '{victim} is blind drunk – get Franzi' },
     victimLine: { de: 'Hicks! Ich arbeite… hicks… ganz normal. Wo ist oben?', en: 'Hic! I\'m working… hic… totally normal. Where is up?' },
-    helperDialog: { de: 'Oh je. Ich hol ihn und nehm ihn mit ins Awareness-Zelt. Wasser, Brot, Ruhe.', en: 'Oh dear. I\'ll fetch them and take them to the awareness tent. Water, bread, rest.' },
-    doneLine: { de: 'Der schläft jetzt erstmal seinen Rausch aus. Bei mir.', en: 'Sleeping it off now. With me.' },
+    helperDialog: { de: 'Oh je. Ab ins Awareness-Zelt, ich kümmer mich. Wasser, Brot, Ruhe.', en: 'Oh dear. I\'ll fetch them and take them to the awareness tent. Water, bread, rest.' },
+    doneLine: { de: 'Wird jetzt erstmal ausgeschlafen. Bei mir im Zelt.', en: 'Sleeping it off now. With me.' },
     mode: 'drunk',
   },
   high: {
@@ -184,7 +184,7 @@ export const EVENT_TYPES = {
     title: { de: 'Zu drauf zum Arbeiten', en: 'Too high to work' },
     task: { de: '{victim} ist zu drauf – hol Franzi', en: '{victim} is way too high – get Franzi' },
     victimLine: { de: 'Duuude… der Boden… der atmet… ich kann heute nicht tragen. Oder stehen.', en: 'Dudeee… the ground… it\'s breathing… I can\'t carry today. Or stand.' },
-    helperDialog: { de: 'Alles klar, ich nehm sie mit ins Awareness-Zelt. Tee, Kekse, keine Musik.', en: 'Alright, I\'ll take them to the awareness tent. Tea, cookies, no music.' },
+    helperDialog: { de: 'Alles klar, ab ins Awareness-Zelt. Tee, Kekse, keine Musik.', en: 'Alright, I\'ll take them to the awareness tent. Tea, cookies, no music.' },
     doneLine: { de: 'Liegt jetzt bei den Kissen und erklärt den Kissen das Universum.', en: 'Lying with the cushions now, explaining the universe to them.' },
     mode: 'high',
   },
@@ -193,7 +193,7 @@ export const EVENT_TYPES = {
     title: { de: 'Im K-Hole', en: 'In a k-hole' },
     task: { de: '{victim} ist voll auf Keta – hol Franzi', en: '{victim} is deep on keta – get Franzi' },
     victimLine: { de: '…… …hm? …… Ich bin grad… nicht hier. Ruf später an.', en: '…… …hm? …… I\'m not… here right now. Call later.' },
-    helperDialog: { de: 'Keta? Mitten beim Aufbau? …Okay. Ich hol sie ganz langsam ins Awareness-Zelt.', en: 'Keta? In the middle of the build? …Okay. I\'ll bring them very slowly to the awareness tent.' },
+    helperDialog: { de: 'Keta? Mitten beim Aufbau? …Okay. Ganz langsam rüber ins Awareness-Zelt.', en: 'Keta? In the middle of the build? …Okay. I\'ll bring them very slowly to the awareness tent.' },
     doneLine: { de: 'Sitzt jetzt ganz ruhig im Zelt und findet langsam den Weg zurück.', en: 'Sitting quietly in the tent now, slowly finding the way back.' },
     mode: 'keta',
   },
@@ -218,7 +218,7 @@ export const EVENT_TYPES = {
   generator: {
     weight: 2, helpers: ['felix', 'thomas', 'andi', 'strom_andi', 'juli'], victims: 0, cost: 150, penalty: 1500, karma: 15,
     title: { de: 'Generator kaputt!', en: 'Generator broke!' },
-    task: { de: 'Hol Felix, Thompsen, Strom Andi, Wasser Andi oder Juli – sonst neuer Generator (1.500 €)', en: 'Get Felix, Thompsen, Strom Andi, Wasser Andi or Juli – or buy a new generator (€1,500)' },
+    task: { de: 'Hol Felix, Thompsen (Strom & Licht), Strom Andi, Wasser Andi oder Juli – sonst neuer Generator (1.500 €)', en: 'Get Felix, Thompsen (power & light), Strom Andi, Wasser Andi or Juli – or buy a new generator (€1,500)' },
     helperDialog: { de: 'Der Generator? *seufz* Hab ich doch gesagt, dass der raucht. Ich schau\'s mir an.', en: 'The generator? *sigh* Told you it was smoking. I\'ll look at it.' },
     doneLine: { de: 'Läuft wieder. Neue Dichtung, bisschen Gaffa, gutes Zureden.', en: 'Running again. New seal, some gaffa, kind words.' },
     costReason: { de: 'Generator-Ersatzteile', en: 'Generator spare parts' },

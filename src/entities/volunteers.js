@@ -2,7 +2,7 @@
 // model, a short role/quirk and their own lines). They appear in this order as the camp fills up.
 
 export const VOLUNTEERS = [
-  { name: 'Luna', f: true, role: { de: 'Astrologin', en: 'Astrologer' }, lines: [
+  { name: 'Stella', f: true, role: { de: 'Astrologin', en: 'Astrologer' }, lines: [
     { de: 'Du bist eindeutig Skorpion. Das erklärt, wie du Kabel aufrollst.', en: 'You\'re definitely a Scorpio. That explains how you coil cables.' },
     { de: 'Merkur ist rückläufig. Deshalb ist der Akkuschrauber leer.', en: 'Mercury is in retrograde. That\'s why the drill is flat.' },
     { de: 'Heute ist ein guter Tag für Zelte. Morgen eher für Dixis.', en: 'Today is a good day for tents. Tomorrow more for portaloos.' },
@@ -87,7 +87,7 @@ export const VOLUNTEERS = [
     { de: 'Ich arbeite effizienter nach einem Nickerchen. Oder zwei.', en: 'I work more efficiently after a nap. Or two.' },
     { de: 'Weckt mich, wenn der Drache Feuer spuckt.', en: 'Wake me when the dragon breathes fire.' },
   ] },
-  { name: 'Fee', f: true, role: { de: 'Blumenkinder', en: 'Flower child' }, lines: [
+  { name: 'Fee', f: true, role: { de: 'Blumenkind', en: 'Flower child' }, lines: [
     { de: 'Ich hab Blumen um jeden Bauzaun geflochten. Jeden.', en: 'I braided flowers around every fence panel. Every one.' },
     { de: 'Die Dixis riechen jetzt nach Lavendel. Bitte.', en: 'The portaloos smell of lavender now. You\'re welcome.' },
     { de: 'Möchtest du einen Blumenkranz? Du brauchst einen Blumenkranz.', en: 'Want a flower crown? You need a flower crown.' },
@@ -110,14 +110,14 @@ export const VOLUNTEERS = [
   { name: 'Kiki', f: true, role: { de: 'Schminkt alle', en: 'Face painter' }, lines: [
     { de: 'Du wärst ein super Tiger. Oder ein Mandala. Setz dich.', en: 'You\'d make a great tiger. Or a mandala. Sit down.' },
     { de: 'UV-Farbe hält drei Tage. Ungefähr. Auf der Haut länger.', en: 'UV paint lasts three days. Roughly. Longer on skin.' },
-    { de: 'Zdenko wollte einen Drachen im Gesicht. Er hat eingeschlafen.', en: 'Zdenko wanted a dragon on his face. He fell asleep.' },
+    { de: 'Zdenko wollte einen Drachen im Gesicht. Er ist eingeschlafen.', en: 'Zdenko wanted a dragon on his face. He fell asleep.' },
   ] },
   { name: 'Yogi', f: false, role: { de: 'Barfuß-Philosoph', en: 'Barefoot philosopher' }, lines: [
-    { de: 'Schuhe trennen uns von der Erde. Und vor Nägeln. Egal.', en: 'Shoes separate us from the earth. And from nails. Whatever.' },
+    { de: 'Schuhe trennen uns von der Erde. Und schützen vor Nägeln. Egal.', en: 'Shoes separate us from the earth. And protect us from nails. Whatever.' },
     { de: 'Wenn ein Zelt im Wald aufgebaut wird und keiner hilft – steht es dann?', en: 'If a tent is pitched in the forest and nobody helps – does it stand?' },
     { de: 'Der Weg ist das Ziel. Der Weg zum Dixi auch.', en: 'The journey is the destination. The journey to the portaloo too.' },
   ] },
-  { name: 'Anni', f: true, role: { de: 'Organisiert Schichten', en: 'Organises shifts' }, lines: [
+  { name: 'Frieda', f: true, role: { de: 'Organisiert Schichten', en: 'Organises shifts' }, lines: [
     { de: 'Du bist morgen für die Frühschicht eingetragen. Das war nicht verhandelbar.', en: 'You\'re down for the early shift tomorrow. That wasn\'t negotiable.' },
     { de: 'Wer macht die Müllrunde? Niemand? Dann du.', en: 'Who does the trash round? Nobody? Then you.' },
     { de: 'Ohne Plan kein Festival. Ohne Kaffee kein Plan.', en: 'No plan, no festival. No coffee, no plan.' },
@@ -132,7 +132,7 @@ export const VOLUNTEERS = [
     { de: 'Feuerlöscher steht bereit. Also, irgendwo steht einer.', en: 'Fire extinguisher is ready. Well, there\'s one somewhere.' },
     { de: 'Ich jongliere auch mit Kabeltrommeln. Nicht empfohlen.', en: 'I juggle cable drums too. Not recommended.' },
   ] },
-  { name: 'Paule', f: false, role: { de: 'Hat immer Snacks', en: 'Always has snacks' }, lines: [
+  { name: 'Kalle', f: false, role: { de: 'Hat immer Snacks', en: 'Always has snacks' }, lines: [
     { de: 'Nüsse? Rosinen? Rosinen mit Nüssen? Ich hab alles.', en: 'Nuts? Raisins? Raisins with nuts? I have everything.' },
     { de: 'Meine Hosentaschen sind ein Supermarkt.', en: 'My pockets are a supermarket.' },
     { de: 'Sabse hat meine Snacks konfisziert. Ich hab noch mehr.', en: 'Sabse confiscated my snacks. I have more.' },

@@ -627,7 +627,7 @@ export class Character {
   }
 
   // ------------------------------------------------------------------ flow toys (fire space crew)
-  /** 'staff' (contact staff), 'poi', 'hoop' or null. */
+  /** 'staff' (contact staff), 'spear' (fire spear: staff with one torch end), 'poi', 'hoop' or null. */
   setFlow(type) {
     if (type === (this.flowToy?.type || null)) return;
     if (this.flowToy) { this.root.remove(this.flowToy.group); this.flowToy = null; }
@@ -674,8 +674,8 @@ export class Character {
     const root = this.root;
     root.updateMatrixWorld(true);
     const W = (x, y, z) => root.localToWorld(_b1.set(x, y, z));
-    if (toy.type === 'staff') {
-      // contact staff: windmill spins in front of the body, rolling from side to side
+    if (toy.type === 'staff' || toy.type === 'spear') {
+      // contact staff / fire spear: windmill spins in front of the body, rolling from side to side
       const cx = Math.sin(t * 0.9) * 0.22, cy = 1.28 * k + Math.sin(t * 1.7) * 0.08, cz = 0.5;
       const a = t * 4.6;
       toy.rig.position.set(cx, cy, cz);
@@ -795,6 +795,16 @@ function buildFlowToy(type) {
       rig.add(tape);
     }
     wick(rig, -0.76, 0, 0); wick(rig, 0.76, 0, 0);
+  } else if (type === 'spear') {
+    // fire spear: like a contact staff, but only one end carries a (bigger) torch
+    const st = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 1.6, 6), dark);
+    st.rotation.z = Math.PI / 2;
+    rig.add(st);
+    const tape = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.3, 6), new THREE.MeshStandardMaterial({ color: '#c0392b' }));
+    tape.rotation.z = Math.PI / 2;
+    rig.add(tape);
+    wick(rig, 0.82, 0, 0);
+    wicks[0].scale.setScalar(1.6);
   } else if (type === 'poi') {
     for (let i = 0; i < 2; i++) {
       const head = new THREE.Group();

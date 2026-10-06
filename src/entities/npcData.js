@@ -295,6 +295,9 @@ export const NPCS = [
       { de: 'Welche Schraube? Die hier? …Die andere? Okay.', en: 'Which screw? This one? …The other one? Okay.' },
       { de: 'Mia sagt, ich soll weniger reden und mehr schrauben. Ich rede beim Schrauben.', en: 'Mia says I should talk less and screw more. I talk while I screw.' },
       { de: 'Holz riecht so gut. Riech mal. RIECH MAL.', en: 'Wood smells so good. Smell it. SMELL IT.' },
+      { de: 'Eigentlich bin ich Baumpfleger. Mit Lenny zusammen. Sonst hängen wir in Eichen rum, hier halt auf Paletten.', en: 'I\'m actually a tree surgeon. Together with Lenny. Usually we hang around in oaks, here it\'s pallets.' },
+      { de: 'Die Weide da hinten bräuchte mal einen Kronenschnitt. Sag\'s nicht Schwarzhuber.', en: 'That willow back there needs a crown trim. Don\'t tell Schwarzhuber.' },
+      { de: 'Klettergurt und Seil hab ich im Auto. Falls Corni mal was ganz oben braucht.', en: 'I\'ve got a harness and rope in the car. In case Corni needs something way up high.' },
     ],
   },
   {
@@ -309,12 +312,15 @@ export const NPCS = [
   },
   {
     id: 'lenny', name: 'Lenny', role: { de: 'Narnia-Crew', en: 'Narnia crew' }, portrait: '🎧',
-    look: { base: 'm_adventurer', backpack: false, skin: SKIN.light, hair: '#b0925a', brows: '#8a6a3a', hairStyle: 'long', hairStyleColor: '#b0925a', hairLength: 0.24, shirt: '#8a3a9a', pants: '#2e6b5e', patchwork: true, height: 1.78 },
+    look: { base: 'f_casual', skin: SKIN.light, hair: '#b0925a', brows: '#8a6a3a', hairStyle: 'long', hairStyleColor: '#b0925a', hairLength: 0.4, shirt: '#8a3a9a', pants: '#2e6b5e', patchwork: true, height: 1.72 },
     behavior: 'builder', home: 'plot_narnia_floor', offset: [-1, 4], radius: 5,
     lines: [
       { de: 'Ich teste nur, ob der Boden tanzbar ist. Er ist tanzbar.', en: 'I\'m just testing if the floor is danceable. It is danceable.' },
       { de: 'Mia ist die Beste. Sag ihr nicht, dass ich das gesagt hab.', en: 'Mia is the best. Don\'t tell her I said that.' },
       { de: 'Hast du die Bassline heute Nacht gehört? Ich auch nicht, ich hab geschlafen.', en: 'Did you hear the bassline last night? Me neither, I was asleep.' },
+      { de: 'Bruno und ich sind Baumpfleger. Ich klettere, er hält das Seil. Meistens.', en: 'Bruno and I are tree surgeons. I climb, he holds the rope. Mostly.' },
+      { de: 'Im Baum bin ich schneller als auf der Leiter. Leitern sind komisch.', en: 'I\'m faster up a tree than on a ladder. Ladders are weird.' },
+      { de: 'Lebendes Holz mag ich lieber als Paletten. Aber die hier sind auch ganz okay.', en: 'I prefer living wood to pallets. But these ones are alright too.' },
     ],
   },
   // ------------------------------------------------------------------ the fire island (firespace)
@@ -332,11 +338,14 @@ export const NPCS = [
   {
     id: 'mux', name: 'Mux', role: { de: 'Feuerinsel', en: 'Fire island' }, portrait: '🔥',
     look: { base: 'm_hoodie', skin: SKIN.light, hair: '#0a0a0a', brows: '#0a0a0a', hairStyle: 'long', hairStyleColor: '#0a0a0a', hairLength: 0.5, shirt: '#6a3d9a', pants: '#2a2a2a', patchwork: true, height: 1.76 },
-    behavior: 'flow', toy: 'poi', home: 'fire_slot_2',
+    behavior: 'flow', toy: 'spear', home: 'fire_slot_2',
     lines: [
-      { de: 'Poi, Bruder. Links, rechts, Unendlichkeit.', en: 'Poi, brother. Left, right, infinity.' },
-      { de: 'Wenn du mich suchst: Ich bin der mit den Haaren und den Kreisen.', en: 'If you\'re looking for me: I\'m the one with the hair and the circles.' },
+      { de: 'Feuerspeer, Bruder. Wie ein Kontaktstab, nur mit einer Fackel an einem Ende.', en: 'Fire spear, brother. Like a contact staff, just with a torch on one end.' },
+      { de: 'Wenn du mich suchst: Ich bin der mit den Haaren und der Fackel.', en: 'If you\'re looking for me: I\'m the one with the hair and the torch.' },
       { de: 'Den Platz vor Shiva halten wir frei. Heilig und so. Und feuerfest.', en: 'We keep the space in front of Shiva clear. Sacred and all. And fireproof.' },
+      { de: 'Hast du schon was gegessen? Ich hab noch Bananen. Nimm zwei.', en: 'Have you eaten yet? I\'ve still got bananas. Take two.' },
+      { de: 'Du machst das echt super hier. Sagt dir das sonst keiner? Dann sag ich\'s halt.', en: 'You\'re doing really great here. Nobody tells you that? Then I will.' },
+      { de: 'Wenn du magst, zeig ich dir nachher ein paar Moves. Erst ohne Feuer. Versprochen.', en: 'If you like, I\'ll show you a few moves later. Without fire first. Promise.' },
     ],
   },
   {
@@ -371,6 +380,10 @@ export const NPCS = [
       { de: 'Feuer ist wie Wasser, nur heißer. Und gefährlicher. Und schöner.', en: 'Fire is like water, just hotter. And more dangerous. And prettier.' },
       { de: 'Wenn Shiva zuschaut, dreh ich immer eine Runde mehr.', en: 'When Shiva is watching, I always spin one more round.' },
       { de: 'Hast du Lust, mal den Stab zu halten? …Mit LEDs. Erstmal.', en: 'Want to hold the staff? …With LEDs. For now.' },
+      { de: 'OH MEIN GOTT, hast du den Sonnenuntergang gesehen?! Ich hab geweint. Zweimal!', en: 'OH MY GOD, did you see the sunset?! I cried. Twice!' },
+      { de: 'Ich hab geträumt, die Feuerinsel schwebt. Und wir alle mit. Und Shiva hat gewunken!', en: 'I dreamt the fire island was floating. And all of us with it. And Shiva waved!' },
+      { de: 'Warte… was wollte ich… ach egal, ALLES IST SO SCHÖN HIER!', en: 'Wait… what was I… oh whatever, EVERYTHING IS SO BEAUTIFUL HERE!' },
+      { de: 'Manchmal schau ich nur ins Feuer und vergess, dass ich den Stab drehen soll. Hihi.', en: 'Sometimes I just stare into the fire and forget I\'m supposed to spin the staff. Hehe.' },
     ],
   },
   {
@@ -421,12 +434,17 @@ export const NPCS = [
     ],
   },
   {
-    id: 'verena', name: 'Verena', role: { de: 'Bar', en: 'Bar' }, portrait: '🍹',
+    id: 'verena', name: 'Verena', role: { de: 'Bar-Chefin (organisiert die Barcrew)', en: 'Bar boss (runs the bar crew)' }, portrait: '🍹',
     look: { base: 'f_formal', skin: SKIN.light, hair: '#5a2a1a', shirt: '#1f6fc9', pants: '#1f6fc9', patchwork: true, shirtPatch: ['#1f6fc9', '#ffffff', '#1f4f99'] },
     behavior: 'wander', home: 'plot_biergarten', offset: [7.6, 2], radius: 1.5, appearAfter: 'q9_festzelt', // behind her bar at the Techno Floor
     lines: [
-      { de: 'So, ich bin da. Wo ist meine Bar? Ah, da. Schön. Wo sind die Gläser?', en: 'Right, I\'m here. Where\'s my bar? Ah. Nice. Where are the glasses?' },
-      { de: 'Ich komm immer erst kurz vorher. Dann ist alles fertig. Theoretisch.', en: 'I always arrive just before. Then everything is done. In theory.' },
+      { de: 'So, ich bin da. Wo ist meine Bar? Ah, da. Und wo sind meine Leute?', en: 'Right, I\'m here. Where\'s my bar? Ah, there. And where are my people?' },
+      { de: 'Ich steh nicht hinter der Bar. Ich sorg dafür, dass da immer wer steht.', en: 'I don\'t stand behind the bar. I make sure someone always does.' },
+      { de: 'Schichtplan für die Bar: acht Leute, drei Schichten, null Ausreden.', en: 'Bar rota: eight people, three shifts, zero excuses.' },
+      { de: 'Wer zu spät zur Barschicht kommt, macht die nächste gleich mit. So einfach.', en: 'Whoever is late for their bar shift does the next one too. Simple.' },
+      { de: 'Fabi ist mein Freund. Wenn er sagt, er weiß, wo alles ist – glaub ihm die Hälfte.', en: 'Fabi is my boyfriend. When he says he knows where everything is – believe half of it.' },
+      { de: 'Den Kratzer? Vom Kühlschrank-Schleppen. Halb so wild.', en: 'The scratch? From hauling the fridge. No big deal.' },
+      { de: 'Ich hab schon Bars ohne Strom gemanagt. Eine Bar ohne Gläser ist da gar nix.', en: 'I\'ve run bars without power. A bar without glasses is nothing.' },
     ],
   },
   {

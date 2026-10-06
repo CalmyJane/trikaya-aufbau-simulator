@@ -914,7 +914,7 @@ export const QUESTS = [
       {
         type: 'talk', npc: 'mia', text: { de: 'Sag Mia Bescheid', en: 'Tell Mia' },
         dialog: [
-          { who: 'mia', text: { de: 'Du bist der Beste! Jungs, SCHRAUBEN! …Lenny, nicht in den Mund. Danke. 💛', en: 'You\'re the best! Guys, SCREWS! …Lenny, not in your mouth. Thanks. 💛' } },
+          { who: 'mia', text: { de: 'Du bist der Beste! Leute, SCHRAUBEN! …Lenny, nicht in den Mund. Danke. 💛', en: 'You\'re the best! Guys, SCREWS! …Lenny, not in your mouth. Thanks. 💛' } },
           { who: 'mia', text: { de: 'Jetzt machen wir den Boden fertig – und dann kommt der Elefant! Unser DJ-Pult. Schau später nochmal vorbei!', en: 'Now we finish the floor – and then comes the elephant! Our DJ booth. Come back later!' } },
         ],
       },

@@ -113,7 +113,7 @@ const NO_STASH_LINES = {
   jan: { de: 'Ich hab Bändchen, Listen und kalten Kaffee. Willst du ein zweites Bändchen?', en: 'I have wristbands, lists and cold coffee. Want a second wristband?' },
   franzi: { de: 'Ich hab Wasser, Kekse und ein offenes Ohr. Mehr gibt\'s bei mir nicht. Und das ist gut so.', en: 'I have water, cookies and an open ear. That\'s all you get from me. And that\'s a good thing.' },
   isi: { de: 'Ich?! Ich bleib nüchtern, einer muss ja fahren! Willst du ein Wasser?', en: 'Me?! I\'m staying sober, someone has to drive! Want a water?' },
-  verena: { de: 'Ich hab eine Bar. Die hat Gläser. Irgendwann. Sonst nix.', en: 'I have a bar. It has glasses. Eventually. Nothing else.' },
+  verena: { de: 'Ich hab eine Bar und einen Schichtplan. Sonst nix.', en: 'I have a bar and a rota. Nothing else.' },
   mia: { de: 'Ich hab Schrauben. Viele Schrauben. Die richtigen sogar. Sonst nichts. 💛', en: 'I have screws. Lots of screws. Even the right ones. Nothing else. 💛' },
   daniel: { de: 'Ich hab ein Pausenbrot. Das geb ich aber nicht her.', en: 'I have a sandwich. But I\'m not giving that away.' },
   leo: { de: 'Später! Später!', en: 'Later! Later!' },

@@ -71,8 +71,15 @@ export class Soundboxes {
       if (b.t > 220 && !b.mission) this.stop(); // they got bored (or the battery died)
       return;
     }
+    // the soundbox mission needs a box – keep trying until there is one
+    const q = g.quests;
+    if (Object.keys(q.state.active).some((id) => q.currentStep(id)?.type === 'soundbox')) {
+      this.missionCD = (this.missionCD || 0) - dt;
+      if (this.missionCD <= 0) { this.missionCD = 3; this.spawn(true); }
+      return;
+    }
     // random boxes only once you've done the soundbox mission
-    if (!g.quests.isDone('s0_soundbox') || g.quests.timer || g.finale) return;
+    if (!q.isDone('s0_soundbox') || q.timer || g.finale) return;
     this.cd -= dt;
     if (this.cd > 0) return;
     this.cd = 110 + Math.random() * 110;
@@ -87,10 +94,9 @@ export class Soundboxes {
     const cands = g.npcs.campers.filter((n) => !n.hidden && !n.incident && !n.task && !n.talking && !n.party && !n.knocked);
     const far = spots.filter((s) => s.distanceTo(pp) > 25);
     const spot = far[Math.floor(Math.random() * far.length)] || spots[Math.floor(Math.random() * spots.length)];
-    if (!spot || cands.length < 2) return;
-    // the nearest campers throw the party (whoever's far away just "was already there")
+    if (!spot || cands.length < (forMission ? 1 : 2)) return;
+    // the nearest campers throw the party – they're standing right at the box from the start
     const npcs = cands.sort((a, b) => a.position.distanceTo(spot) - b.position.distanceTo(spot)).slice(0, 1 + Math.floor(Math.random() * 2));
-    for (const n of npcs) if (n.position.distanceTo(spot) > 20 && n.toPlayer > 30) n.root.position.set(spot.x + 3, 0, spot.z + 2);
     const pos = spot.clone();
     this.mesh.position.set(pos.x, heightAt(pos.x, pos.z), pos.z);
     this.mesh.rotation.y = Math.random() * 6.28;
@@ -98,6 +104,8 @@ export class Soundboxes {
     npcs.forEach((n, i) => {
       const a = (i / npcs.length) * Math.PI * 2 + 0.5;
       n.party = { pos: new THREE.Vector3(pos.x + Math.cos(a) * 1.6, 0, pos.z + Math.sin(a) * 1.6), box: pos, lineT: 2 + i * 3 };
+      if (n.char.sitting) n.standUp?.();
+      if (!(n.toPlayer < 15)) { n.root.position.copy(n.party.pos); n.target = null; } // no walking over from the other end of the camp
     });
     this.box = { pos, npcs, t: 0, mission: forMission };
     g.music.shuffle(this.source);

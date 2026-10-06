@@ -73,7 +73,7 @@ export class NPC {
     this.stateT = 0;
     this.task = null;         // external task: { pos, then(), arriveDist }
 
-    if (!MARKERS['!']) { MARKERS['!'] = markerTexture('!', '#ffd21f'); MARKERS['?'] = markerTexture('?', '#7fe0ff'); MARKERS.red = markerTexture('!', '#ff3b30'); MARKERS.blue = markerTexture('!', '#3aa0ff'); }
+    if (!MARKERS['!']) { MARKERS['!'] = markerTexture('!', '#ffd21f'); MARKERS['?'] = markerTexture('?', '#7fe0ff'); MARKERS.red = markerTexture('!', '#ff3b30'); MARKERS.blue = markerTexture('!', '#3aa0ff'); MARKERS.fav = markerTexture('!', '#6fdc6a'); }
     this.marker = new THREE.Sprite(new THREE.SpriteMaterial({ map: MARKERS['!'], depthTest: false, fog: false }));
     this.marker.scale.set(0.9, 0.9, 0.9);
     this.marker.position.y = (def.look?.height || 1.8) + 0.75;

@@ -91,6 +91,17 @@ export class Parking {
     const onMark = Math.hypot(dx, dz) < POS_TOL && Math.abs(dh) < HEAD_TOL;
     if (onMark && !a.hinted && Math.abs(L.speed) > 0.2) { a.hinted = true; g.ui.toast(de ? '🅿️ Gut so – jetzt anhalten!' : '🅿️ That\'s it – now stop!'); }
     if (onMark && Math.abs(L.speed) < 0.3) a.hold += dt; else a.hold = 0;
+    // right spot, wrong direction: tell them instead of silently waiting
+    if (!onMark && Math.hypot(dx, dz) < POS_TOL && Math.abs(L.speed) < 0.3) {
+      a.wrongT = (a.wrongT || 0) + dt;
+      if (a.wrongT > 1.2 && !(a.wrongHintCD > 0)) {
+        a.wrongHintCD = 8;
+        g.ui.toast(Math.abs(dh) > 2.2
+          ? (de ? '🅿️ Falsch herum! Dreh den Radlader um und fahr vorwärts rein.' : '🅿️ Wrong way round! Turn the loader around and drive in forwards.')
+          : (de ? '🅿️ Fast! Aber schief – stell ihn gerade auf die Markierung.' : '🅿️ Almost! But crooked – line it up straight on the mark.'));
+      }
+    } else a.wrongT = 0;
+    if (a.wrongHintCD > 0) a.wrongHintCD -= dt;
     if (a.hold >= HOLD) {
       const qid = a.qid;
       this.stop();

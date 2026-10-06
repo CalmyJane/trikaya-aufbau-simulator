@@ -80,7 +80,19 @@ export class UI {
     let dramaDone = false;
     const flushDrama = () => { if (!dramaDone) { html += dramaCards.join(''); dramaDone = true; } };
     if (!timedQid) flushDrama();
-    const avail = qs.available();
+    const allAvail = qs.available();
+    const avail = allAvail.filter((q) => !q.errand);
+    const favs = allAvail.filter((q) => q.errand);
+    // how many main jobs are still between you and the evening / bedtime
+    const days = qs.game.days;
+    if (days) {
+      const left = days.jobs(days.day, days.isNight).filter((q) => !qs.isDone(q.id)).length;
+      if (left) html += `<div class="track hint dim"><div class="ts">${days.isNight ? L({ de: `🌙 Noch <b>${left}</b> Nacht-Job${left > 1 ? 's' : ''} bis zum Schlafen`, en: `🌙 <b>${left}</b> night job${left > 1 ? 's' : ''} left before bed` }) : L({ de: `☀️ Noch <b>${left}</b> Job${left > 1 ? 's' : ''} bis Feierabend`, en: `☀️ <b>${left}</b> job${left > 1 ? 's' : ''} left until evening` })}</div></div>`;
+    }
+    if (favs.length) {
+      const fn = [...new Set(favs.map((q) => q.giver))].map((g) => qs.game.npcs.get(g)).filter(Boolean);
+      if (fn.length) html += `<div class="track hint dim"><div class="ts"><b style="color:#6fdc6a">!</b> ${L({ de: 'Gefallen (freiwillig) bei', en: 'Favours (optional) from' })}: ${fn.map((n) => n.def.name).join(', ')}</div></div>`;
+    }
     if (avail.length) {
       const names = [...new Set(avail.map((q) => q.giver))].map((g) => qs.game.npcs.get(g)).filter(Boolean);
       const list = names.map((n) => `<b>${n.def.name}</b>${avail.some((q) => q.giver === n.def.id && q.timeLimit) ? ' ⏱' : ''}`).join(', ');
@@ -88,7 +100,7 @@ export class UI {
         html += `<div class="track hint ${active.length ? 'dim' : ''}"><div class="tt">${t('hud.jobAvail')}</div><div class="ts">${names.length === 1 ? t('hud.talkTo', { name: names[0].def.name, role: L(names[0].def.role) }) : `${L({ de: 'Jobs bei', en: 'Jobs from' })}: ${list}`}</div></div>`;
       }
     }
-    if (!active.length && !avail.length) {
+    if (!active.length && !allAvail.length) {
       if (qs.state.completed.length) {
         html += `<div class="track hint"><div class="tt">${t('hud.allDone')}</div><div class="ts">${t('hud.allDoneSub')}</div></div>`;
       }
@@ -360,9 +372,9 @@ export class UI {
       const [x, y] = toM(n.position);
       if (Math.hypot(x, y) > R) continue;
       const mk = qs.npcMarker(n.def.id);
-      ctx.fillStyle = mk === '!' ? '#ffd21f' : mk === '?' ? '#7fe0ff' : '#f4ecd8';
+      ctx.fillStyle = mk === '!' ? '#ffd21f' : mk === '?' ? '#7fe0ff' : mk === 'fav' ? '#6fdc6a' : '#f4ecd8';
       ctx.beginPath(); ctx.arc(x, y, mk ? 5 : 3, 0, 7); ctx.fill();
-      if (mk) { ctx.save(); ctx.rotate(-camYaw); ctx.fillStyle = '#1b1206'; ctx.font = 'bold 9px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; const rx = x * Math.cos(camYaw) - y * Math.sin(camYaw); const ry = x * Math.sin(camYaw) + y * Math.cos(camYaw); ctx.fillText(mk, rx, ry + 0.5); ctx.restore(); }
+      if (mk) { ctx.save(); ctx.rotate(-camYaw); ctx.fillStyle = '#1b1206'; ctx.font = 'bold 9px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; const rx = x * Math.cos(camYaw) - y * Math.sin(camYaw); const ry = x * Math.sin(camYaw) + y * Math.cos(camYaw); ctx.fillText(mk === 'fav' ? '!' : mk, rx, ry + 0.5); ctx.restore(); }
     }
     // vehicles
     for (const v of Object.values(vehicles || {})) {
@@ -449,9 +461,9 @@ export class UI {
     for (const n of npcs) {
       const mk = qs.npcMarker(n.def.id);
       const [x, y] = toC(n.position);
-      ctx.fillStyle = mk === '!' ? '#ffd21f' : mk === '?' ? '#7fe0ff' : 'rgba(255,255,255,0.8)';
+      ctx.fillStyle = mk === '!' ? '#ffd21f' : mk === '?' ? '#7fe0ff' : mk === 'fav' ? '#6fdc6a' : 'rgba(255,255,255,0.8)';
       ctx.beginPath(); ctx.arc(x, y, mk ? 8 : 4, 0, 7); ctx.fill();
-      if (mk) { ctx.fillStyle = '#1b1206'; ctx.font = 'bold 12px sans-serif'; ctx.fillText(mk, x, y + 1); }
+      if (mk) { ctx.fillStyle = '#1b1206'; ctx.font = 'bold 12px sans-serif'; ctx.fillText(mk === 'fav' ? '!' : mk, x, y + 1); }
     }
     for (const v of Object.values(vehicles || {})) {
       if (v.driver) continue;

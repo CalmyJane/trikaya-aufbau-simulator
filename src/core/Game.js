@@ -620,8 +620,13 @@ export class Game {
             this.player.frozen = false;
             const giver = this.npcs.get(data.quest?.giver);
             const de = getLang() === 'de';
+            const qid = data.timer.qid, scope = data.timer.scope;
             this.quests.failTimed();
-            if (giver) this.ui.toast(de ? `⏱ Nicht geschafft. Sprich nochmal mit ${giver.def.name}, wenn du es nochmal versuchen willst.` : `⏱ Didn't make it. Talk to ${giver.def.name} again if you want another go.`);
+            // main jobs restart right away: back to the start, clock runs again (favours just drop)
+            if (giver && !data.quest?.errand) {
+              this.retryFromStart(qid, scope, giver);
+              this.ui.toast(de ? '⏱ Neuer Versuch – die Uhr läuft wieder!' : '⏱ New attempt – the clock is running again!');
+            } else if (giver) this.ui.toast(de ? `⏱ Nicht geschafft. Sprich nochmal mit ${giver.def.name}, wenn du es nochmal versuchen willst.` : `⏱ Didn't make it. Talk to ${giver.def.name} again if you want another go.`);
           }, 600);
           break;
         case 'delivery':
@@ -631,11 +636,18 @@ export class Game {
           this.parking.start(data.qid, data.step);
           if (!data.step._hinted) { data.step._hinted = true; this.ui.toast(getLang() === 'de' ? '🅿️ Fahr den Radlader in die Hütchengasse und bleib auf der gelben Markierung stehen.' : '🅿️ Drive the loader into the cone lane and stop on the yellow mark.'); }
           break;
-        case 'waitStart': // someone drives off to the DIY store (with the crew pickup)
+        case 'waitStart': { // someone drives off to the DIY store (with the crew pickup)
+          const driver = this.npcs.get(data.step.away?.[0]);
+          if (driver && !data.step._hinted) {
+            data.step._hinted = true;
+            const de = getLang() === 'de';
+            this.ui.toast(de ? `🚗 ${driver.def.name}: „Bin in ${data.step.seconds} Sekunden zurück. Mach solange einfach was anderes!“` : `🚗 ${driver.def.name}: "Back in ${data.step.seconds} seconds. Just do something else meanwhile!"`);
+          }
           for (const id of data.step.away || []) { const n = this.npcs.get(id); if (n) { n.away = true; n.task = null; } }
           if (this.world.crewPickup) this.world.crewPickup.visible = false;
           this.npcs.refreshAppear(this.quests);
           break;
+        }
         case 'waitDone': {
           const back = this.world.spots.pickup_bed;
           (data.step.away || []).forEach((id, i) => {
@@ -747,6 +759,24 @@ export class Game {
   }
 
   /** Quad express: the quad works and lots of people stroll around between base and Firespace. */
+  /** Failed timed job: put the player back where it started and run the clock again. */
+  retryFromStart(qid, scope, giver) {
+    const q = this.quests.quests[qid];
+    if (this.player.vehicle) this.exitVehicle();
+    const p = this.player.root.position;
+    if (q?.noRunOver) {
+      // quad express: back at the quad in the base, next to it
+      const vs = this.world.vehicleSpots.quad;
+      p.set(vs.pos.x + 2.2, 0, vs.pos.z + 1.2);
+    } else {
+      p.set(giver.position.x + 1.8, 0, giver.position.z + 1.8);
+    }
+    this.world.colliders.resolve(p, 0.4);
+    if (scope === 'quest') this.quests.accept(qid);
+    else this.quests.restartTimed(qid);
+    this.refreshHUD();
+  }
+
   prepareQuadExpress() {
     const q = this.vehicles.quad;
     if (q.broken) q.repair();
@@ -935,11 +965,13 @@ export class Game {
       const own = Object.keys(qs.state.active).find((qid) => qs.quests[qid].giver === id && !(qs.currentStep(qid)?.type === 'talk' && qs.currentStep(qid)?.npc === id));
       if (own) {
         const de = getLang() === 'de';
-        await this.runDialog([{ who: id, text: de ? `Oh… du bist voll auf Keta, oder? Keine Sorge, ich mach das schon: „${L(qs.currentStep(own).text)}“.` : `Oh… you\'re totally on keta, right? Don\'t worry, I\'ll do it: "${L(qs.currentStep(own).text)}".` }], null, npc);
-        this.effects.ketaCharges--;
-        qs.ketaSkip(own);
-        this.refreshHUD();
-        return;
+        const stepText = L(qs.currentStep(own).text);
+        if (qs.ketaSkip(own)) { // some steps (e.g. collecting karma) can't be taken over – then nothing is used up
+          await this.runDialog([{ who: id, text: de ? `Oh… du bist voll auf Keta, oder? Keine Sorge, ich mach das schon: „${stepText}“.` : `Oh… you\'re totally on keta, right? Don\'t worry, I\'ll do it: "${stepText}".` }], null, npc);
+          this.effects.ketaCharges--;
+          this.refreshHUD();
+          return;
+        }
       }
     }
     // 0b2) a job that needs karma
@@ -1127,7 +1159,8 @@ export class Game {
 
   startWork(qid, idx, step) {
     if (this.building || this.minigame.open) return;
-    if (step.minigame) {
+    const doneN = this.quests.state.active[qid]?.done?.length || 0, total = step.targets?.length || 1;
+    if (step.minigame && (doneN === 0 || doneN >= total - 1)) {
       const de = getLang() === 'de';
       const title = L(step.minigameTitle) || L(step.label);
       this.player.frozen = true;

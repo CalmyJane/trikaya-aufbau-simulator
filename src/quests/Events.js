@@ -295,9 +295,12 @@ export class DramaSystem {
     if (def.victims) {
       const busy = new Set(this.events.flatMap((x) => x.victims.map((v) => v.def.id)));
       const free = (n) => n.root.visible && !n.hidden && !busy.has(n.def.id) && !n.task && !n.incident && !n.talking &&
-        !NEVER.includes(n.def.id) && !(def.exclude || []).includes(n.def.id);
+        !NEVER.includes(n.def.id) && !(def.exclude || []).includes(n.def.id) &&
+        !g.quests.npcMarker(n.def.id); // never someone you currently need for a job
+      // without the awareness tent Franzi can't care for story people – they'd be stuck forever
+      const noTentCare = AWARENESS_MODES.includes(def.mode) && !this.tent;
       const campers = g.npcs.all.filter((n) => free(n) && n.def.id.startsWith('camper_'));
-      const story = g.npcs.all.filter((n) => free(n) && STORY.includes(n.def.id) && !def.campersOnly);
+      const story = g.npcs.all.filter((n) => free(n) && STORY.includes(n.def.id) && !def.campersOnly && !noTentCare);
       const preferred = [...campers, ...story].filter((n) => def.prefer?.includes(n.def.id));
       let nVictims = def.victims;
       if (def.juli) {

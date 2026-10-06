@@ -113,7 +113,9 @@ export class QuestSystem {
   npcMarker(npcId) {
     if (this.restartFor(npcId)) return '!';
     if (this.talkStepsFor(npcId).length || this.karmaReady(npcId)) return '?';
-    if (this.offeredBy(npcId).length) return '!';
+    const offers = this.offeredBy(npcId);
+    if (offers.some((q) => !q.errand)) return '!';
+    if (offers.length) return 'fav'; // favours: optional, green
     return null;
   }
 

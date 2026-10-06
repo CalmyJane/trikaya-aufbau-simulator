@@ -99,9 +99,9 @@ export const QUESTS = [
       {
         type: 'wait', seconds: 25, away: ['corni'], cost: 690, costReason: { de: 'Neuer Erdbohrer (Baumarkt)', en: 'New earth auger (DIY store)' },
         text: { de: 'Corni ist beim Baumarkt…', en: 'Corni is at the DIY store…' },
-        doneText: { de: '🚗 Corni ist zurück – der neue Erdbohrer liegt hinten am Pickup. (−690 €)', en: '🚗 Corni is back – the new auger is behind the pickup. (−€690)' },
+        doneText: { de: '🚗 Corni ist zurück und hat den neuen Erdbohrer gleich an die Mainstage gelegt. (−690 €)', en: '🚗 Corni is back and dropped the new auger right at the mainstage. (−€690)' },
       },
-      { type: 'pickup', text: { de: 'Hol den neuen Erdbohrer vom Pickup', en: 'Get the new auger from the pickup' }, items: [{ item: 'auger_new', at: 'pickup_bed' }] },
+      { type: 'pickup', text: { de: 'Hol den neuen Erdbohrer an der Mainstage', en: 'Get the new auger at the mainstage' }, items: [{ item: 'auger_new', at: 'stage_front' }] },
       {
         type: 'work', text: { de: 'Bohr die Löcher und stell alle 6 Pfosten', en: 'Drill the holes and set all 6 posts' },
         targets: ['post_1', 'post_2', 'post_3', 'post_4', 'post_5', 'post_6'], workTime: 3, progress: 'posts', costEach: 120,
@@ -137,13 +137,13 @@ export const QUESTS = [
       {
         type: 'talk', npc: 'fabi', text: { de: 'Frag Fabi nach Stahlseilen', en: 'Ask Fabi about steel wires' },
         dialog: [
-          { who: 'fabi', text: { de: 'Stahlseile? Künstlergasse-Container, unter den Kabeltrommeln. Die Schäkel und Spanngurte sind in der Werkstatt, rote Kiste. Wahrscheinlich.', en: 'Steel wires? Künstlergasse container, under the cable drums. Shackles and ratchet straps are in the workshop, red box. Probably.' } },
+          { who: 'fabi', text: { de: 'Stahlseile? Künstlergasse-Container, unter den Kabeltrommeln. Die Schäkel hat sich Mathias ausgeliehen – liegen gleich daneben. Wahrscheinlich.', en: 'Steel wires? Künstlergasse container, under the cable drums. Mathias borrowed the shackles – they\'re right next to it. Probably.' } },
           { who: 'fabi', text: { de: 'Die Seile sind vom letzten Jahr. Oder vorletzten. Die sind bestimmt noch gut.', en: 'The wires are from last year. Or the year before. I\'m sure they\'re still fine.' } },
         ],
       },
       {
-        type: 'pickup', text: { de: 'Hol die Stahlseile (Künstlergasse) und die Schäkel (Werkstatt)', en: 'Get the steel wires (Künstlergasse) and the shackles (workshop)' },
-        items: [{ item: 'steel_wire_rusty', at: 'kuenstler_front' }, { item: 'shackles', at: 'werkstatt_inside' }],
+        type: 'pickup', text: { de: 'Hol die Stahlseile und die Schäkel am Künstlergasse-Container', en: 'Get the steel wires and the shackles at the Künstlergasse container' },
+        items: [{ item: 'steel_wire_rusty', at: 'kuenstler_front' }, { item: 'shackles', at: 'kuenstler_front' }],
       },
       {
         type: 'talk', npc: 'corni', text: { de: 'Zeig Corni die Stahlseile', en: 'Show Corni the steel wires' }, consumes: ['steel_wire_rusty'],
@@ -156,9 +156,9 @@ export const QUESTS = [
       {
         type: 'wait', seconds: 30, away: ['corni', 'leo'], cost: 1480, costReason: { de: 'Neue Stahlseile (Baumarkt)', en: 'New steel wires (DIY store)' },
         text: { de: 'Leo und Corni sind beim Baumarkt…', en: 'Leo and Corni are at the DIY store…' },
-        doneText: { de: '🚗 Corni ist zurück (Leo ist schon wieder weg). Neue Stahlseile liegen am Pickup. (−1.480 €)', en: '🚗 Corni is back (Leo is already gone again). New steel wires are at the pickup. (−€1,480)' },
+        doneText: { de: '🚗 Corni ist zurück (Leo ist schon wieder weg). Die neuen Stahlseile liegen an der Mainstage. (−1.480 €)', en: '🚗 Corni is back (Leo is already gone again). The new steel wires are at the mainstage. (−€1,480)' },
       },
-      { type: 'pickup', text: { de: 'Hol die neuen Stahlseile vom Pickup', en: 'Get the new steel wires from the pickup' }, items: [{ item: 'steel_wire', at: 'pickup_bed' }] },
+      { type: 'pickup', text: { de: 'Hol die neuen Stahlseile an der Mainstage', en: 'Get the new steel wires at the mainstage' }, items: [{ item: 'steel_wire', at: 'stage_front' }] },
       {
         type: 'work', text: { de: 'Spann die Stahlseile an allen 6 Pfosten', en: 'Rig the steel wires on all 6 posts' },
         targets: ['post_1', 'post_2', 'post_3', 'post_4', 'post_5', 'post_6'], workTime: 2.5, progress: 'rig',
@@ -285,7 +285,7 @@ export const QUESTS = [
     title: { de: 'Es werde Licht', en: 'Let There Be Light' },
     giver: 'felix',
     day: 1,
-    requires: ['q2_sails', 'n1_narnia', 's0_soundbox'], // last job of day 1: dusk falls
+    requires: ['q2_sails', 's0_soundbox'], // last job of day 1: dusk falls
     summary: { de: 'Es wird dunkel! Alle Lichtmasten aufstellen, bevor man nichts mehr sieht.', en: 'It\'s getting dark! Put up all light masts before you can\'t see anything anymore.' },
     offer: [
       { who: 'felix', text: { de: 'Felix, Strom und Licht. Du hast bestimmt schon gemerkt: Die Sonne geht bald unter. Das ist normal. Das passiert jeden Tag.', en: 'Felix, power and light. You\'ve probably noticed: the sun is setting soon. That\'s normal. It happens every day.' } },
@@ -648,14 +648,7 @@ export const QUESTS = [
         dialog: [{ who: 'you', text: { de: '*leuchtet mit der Stirnlampe* Kabeltrommeln. Ein Einhorn-Kostüm. Drei Hängematten. Ein Zettel: „NUSS?? – Corni“. …Keine Nuss.', en: '*shines the headlamp* Cable drums. A unicorn costume. Three hammocks. A note: "NUT?? – Corni". …No nut.' } }],
       },
       {
-        type: 'talk', npc: 'estenko', text: { de: 'Zdenko sitzt noch an der Bierbank – vielleicht weiß er was', en: 'Zdenko is still at the beer bench – maybe he knows something' },
-        dialog: [
-          { who: 'estenko', text: { de: 'Nuss? *hicks* Ich hab ne Erdnuss. Willst du die? …Ich hab sie gegessen. Respekt an die Erdnuss.', en: 'Nut? *hic* I\'ve got a peanut. Want it? …I ate it. Respect to the peanut.' } },
-          { who: 'estenko', text: { de: 'Frag den Bauern. Der Bauer hat alles. Auch Nüsse. Bauern-Nüsse.', en: 'Ask the farmer. The farmer has everything. Nuts too. Farmer nuts.' } },
-        ],
-      },
-      {
-        type: 'talk', npc: 'schwarzhuber', text: { de: 'Frag Schwarzhuber', en: 'Ask Schwarzhuber' },
+        type: 'talk', npc: 'schwarzhuber', text: { de: 'Frag Schwarzhuber – der Bauer hat angeblich alles', en: 'Ask Schwarzhuber – the farmer supposedly has everything' },
         dialog: [
           { who: 'schwarzhuber', text: { de: 'A Spezial-Nuss? Für eure Bauzäun? I hab dahoam a ganze Kistn. Aber des san Zwölfer. Ihr brauchts an Dreizehner. Dilettantisch.', en: 'A special nut? For your fences? I\'ve got a whole box at home. But they\'re twelves. You need a thirteen. Amateurs.' } },
           { who: 'schwarzhuber', text: { de: 'Habts ihr scho amoi in eurer eigenen Werkstatt gschaut? Na? Hab i ma denkt.', en: 'Have you ever looked in your own workshop? No? Thought so.' } },
@@ -895,7 +888,7 @@ export const QUESTS = [
     id: 'n1_narnia',
     title: { de: 'Narnia braucht Schrauben', en: 'Narnia Needs Screws' },
     giver: 'mia',
-    day: 1,
+    day: 2,
     requires: ['q0_leo'],
     summary: { de: 'Mia und ihre Crew bauen den Narnia Floor. Ihnen gehen die Schrauben aus – und der DJ braucht Strom.', en: 'Mia and her crew are building the Narnia Floor. They\'re out of screws – and the DJ needs power.' },
     offer: [
@@ -926,7 +919,7 @@ export const QUESTS = [
     id: 'n2_narnia',
     title: { de: 'Der Weg nach Narnia', en: 'The Way to Narnia' },
     giver: 'mia',
-    day: 2,
+    day: 3,
     requires: ['n1_narnia', 'q2_sails'],
     summary: { de: 'Der Eingang zum Narnia Floor ist ein alter Kleiderschrank. Er steht am Parkplatz und ist schwer.', en: 'The entrance to the Narnia Floor is an old wardrobe. It\'s at the parking and it\'s heavy.' },
     offer: [
@@ -957,7 +950,7 @@ export const QUESTS = [
     id: 'n3_narnia',
     title: { de: 'Ewiger Winter', en: 'Eternal Winter' },
     giver: 'mia',
-    day: 3,
+    day: 4,
     requires: ['n2_narnia', 'q4_lights'],
     summary: { de: 'Für das Königszelt (Chill-out) braucht Mia Kunstschnee aus dem Hühnercontainer und die Laterne aus dem Büro.', en: 'For the royal tent (chill-out) Mia needs fake snow from the chicken container and the lantern from the office.' },
     offer: [
@@ -1032,7 +1025,7 @@ export const QUESTS = [
     decline: { de: 'Reis ist auch gut…', en: 'Rice is fine too…' },
     failDialog: [
       { who: 'sabse', text: { de: 'ZU SPÄT! Alle essen Reis. Alle schauen mich an. Ich schau DICH an.', en: 'TOO LATE! Everyone\'s eating rice. Everyone\'s looking at me. I\'m looking at YOU.' } },
-      { who: 'sabse', text: { de: 'Morgen gleiche Lieferung. Gleiche Zeit. Diesmal schneller. Das Quad steht in der Base.', en: 'Same delivery tomorrow. Same time. Faster this time. The quad is in the base.' } },
+      { who: 'sabse', text: { de: 'Der Lieferant hat nochmal drei Kisten am Parkplatz abgeladen. Nochmal. Diesmal schneller. Nimm das Quad!', en: 'The supplier dropped another three crates at the parking. Again. Faster this time. Take the quad!' } },
     ],
     steps: [
       {

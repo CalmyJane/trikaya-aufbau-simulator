@@ -526,6 +526,20 @@ export const NPCS = [
     ],
   },
   {
+    id: 'shifa', name: 'Shifa', role: { de: 'Neu dabei, überfordert', en: 'New here, overwhelmed' }, portrait: '🤓',
+    look: { base: 'f_casual', skin: SKIN.fair, hair: '#b0402a', brows: '#8a3220', hairStyle: 'long', hairStyleColor: '#b0402a', hairLength: 0.3, glasses: '#3a2a22', shirt: '#e0e0d0', pants: '#7a4a8a', patchwork: true, shirtPatch: ['#e0e0d0', '#2a8a7a', '#c9b24a'], height: 1.62 },
+    behavior: 'wander', home: 'camp_random', roam: 'camp_random', radius: 8,
+    lines: [
+      { de: 'Oh! Hi. Ähm. Entschuldigung, ich stand im Weg, oder? Sorry. Sorry!', en: 'Oh! Hi. Um. Sorry, I was in the way, right? Sorry. Sorry!' },
+      { de: 'Ich weiß nicht, wo ich anfangen soll. Alle rennen, alle rufen, und ich… hab einen Hammer? Wofür?', en: 'I don\'t know where to start. Everyone\'s running, everyone\'s shouting, and I… have a hammer? What for?' },
+      { de: 'Du kennst dich hier aus, oder? Ich trau mich nicht, jemanden zu fragen. Ich frag dich auch nicht. Vergiss es. …Doch, wo ist das Klo?', en: 'You know your way around, right? I\'m too shy to ask anyone. I\'m not asking you either. Forget it. …Okay, where\'s the toilet?' },
+      { de: 'Sabse hat mich angeschaut. Nur angeschaut. Ich glaub, ich hab was falsch gemacht.', en: 'Sabse looked at me. Just looked. I think I did something wrong.' },
+      { de: '*schiebt die Brille hoch* Ich wollte nur kurz helfen. Jetzt hab ich drei Aufgaben und keine Ahnung.', en: '*pushes up glasses* I only wanted to help for a minute. Now I have three tasks and no idea.' },
+      { de: 'Die Leute hier sind so… laut. Und nett! Aber laut. Und nett. Ich brauch kurz eine Pause. Schon wieder.', en: 'People here are so… loud. And nice! But loud. And nice. I need a quick break. Again.' },
+      { de: 'Hi. Ich bin Shifa. Ich glaub. Ja. Shifa.', en: 'Hi. I\'m Shifa. I think. Yes. Shifa.' },
+    ],
+  },
+  {
     id: 'georg', name: 'Georg', role: { de: 'Firespace', en: 'Firespace' }, portrait: '🕉️',
     look: { base: 'm_adventurer', backpack: false, skin: SKIN.light, hair: '#0c0a0a', brows: '#0c0a0a', hairStyle: 'dreads', hairStyleColor: '#0c0a0a', dreadLength: 0.66, beads: true, tattoos: true, shirt: '#1a1a1a', pants: '#5a3a2a', patchwork: true, shirtPatch: ['#1a1a1a', '#6a2a1a', '#2a2a2a'], height: 1.92 },
     behavior: 'wander', home: 'plot_firespace', offset: [-6, 4], radius: 5,

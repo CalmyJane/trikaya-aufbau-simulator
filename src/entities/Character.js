@@ -199,7 +199,7 @@ export class Character {
     if (!look.hairStyle && Array.isArray(look.hairCut) && !look.halfBald) look = { ...look, hairStyle: 'short', hairStyleColor: look.hair };
     if (look.beard && this.bones.Head) this.addBeard(look);
     if (look.elfEars && this.bones.Head) this.addElfEars(look);
-    if (look.sunglasses && this.bones.Head) this.addSunglasses(look);
+    if ((look.sunglasses || look.glasses) && this.bones.Head) this.addSunglasses(look);
     if (look.vikingHat && this.bones.Head) this.addVikingHat(look);
     if (look.tattoos) this.addTattoos(look);
     if (!look.hairStyle || !this.bones.Head) return;
@@ -406,12 +406,20 @@ export class Character {
     const { len } = this.headInfo();
     const r = len * 0.42;
     const g = new THREE.Group();
-    const lm = new THREE.MeshStandardMaterial({ color: look.sunglasses === true ? '#0c0c10' : look.sunglasses, roughness: 0.15, metalness: 0.6 });
+    const lm = look.sunglasses
+      ? new THREE.MeshStandardMaterial({ color: look.sunglasses === true ? '#0c0c10' : look.sunglasses, roughness: 0.15, metalness: 0.6 })
+      : new THREE.MeshStandardMaterial({ color: look.glasses === true ? '#3a2a22' : look.glasses, roughness: 0.4, metalness: 0.3 });
+    const clear = !look.sunglasses; // normal glasses: thin frame around see-through lenses
+    const gm = clear ? new THREE.MeshStandardMaterial({ color: '#bfe6ff', roughness: 0.1, transparent: true, opacity: 0.25 }) : lm;
     const y = len * (look.glassesY ?? 0.42), z = r * (look.glassesZ ?? 1.2);
     for (const s of [-1, 1]) {
-      const lens = new THREE.Mesh(new THREE.BoxGeometry(r * 0.5, r * 0.3, r * 0.06), lm);
+      const lens = new THREE.Mesh(new THREE.BoxGeometry(r * 0.5, r * 0.3, r * 0.06), gm);
       lens.position.set(s * r * 0.3, y, z);
       g.add(lens);
+      if (clear) {
+        const fr = (w, h, x, yy) => { const f = new THREE.Mesh(new THREE.BoxGeometry(w, h, r * 0.07), lm); f.position.set(s * r * 0.3 + x, y + yy, z); g.add(f); };
+        fr(r * 0.56, r * 0.05, 0, r * 0.16); fr(r * 0.56, r * 0.05, 0, -r * 0.16); fr(r * 0.05, r * 0.32, r * 0.27, 0); fr(r * 0.05, r * 0.32, -r * 0.27, 0);
+      }
       const arm = new THREE.Mesh(new THREE.BoxGeometry(r * 0.04, r * 0.06, r * 0.9), lm);
       arm.position.set(s * r * 0.56, y + r * 0.05, z - r * 0.45);
       g.add(arm);

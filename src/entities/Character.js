@@ -412,6 +412,22 @@ export class Character {
     const clear = !look.sunglasses; // normal glasses: thin frame around see-through lenses
     const gm = clear ? new THREE.MeshStandardMaterial({ color: '#bfe6ff', roughness: 0.1, transparent: true, opacity: 0.25 }) : lm;
     const y = len * (look.glassesY ?? 0.42), z = r * (look.glassesZ ?? 1.2);
+    if (look.glassesSpecial) { // big round glowing rainbow-tinted specs
+      const fm = new THREE.MeshStandardMaterial({ color: look.glassesSpecial, emissive: look.glassesSpecial, emissiveIntensity: 0.7, roughness: 0.3 });
+      const lensM = new THREE.MeshStandardMaterial({ color: '#ff9be8', emissive: '#7a3cff', emissiveIntensity: 0.35, roughness: 0.1, transparent: true, opacity: 0.4 });
+      for (const s of [-1, 1]) {
+        const lens = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.34, r * 0.34, r * 0.05, 16), lensM);
+        lens.rotation.x = Math.PI / 2; lens.position.set(s * r * 0.36, y, z); g.add(lens);
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(r * 0.34, r * 0.045, 6, 18), fm);
+        ring.position.set(s * r * 0.36, y, z); g.add(ring);
+        const arm = new THREE.Mesh(new THREE.BoxGeometry(r * 0.04, r * 0.06, r * 0.9), fm);
+        arm.position.set(s * r * 0.72, y + r * 0.02, z - r * 0.45); g.add(arm);
+      }
+      const br = new THREE.Mesh(new THREE.BoxGeometry(r * 0.12, r * 0.05, r * 0.05), fm);
+      br.position.set(0, y + r * 0.05, z); g.add(br);
+      this.attachToBone('Head', g);
+      return;
+    }
     for (const s of [-1, 1]) {
       const lens = new THREE.Mesh(new THREE.BoxGeometry(r * 0.5, r * 0.3, r * 0.06), gm);
       lens.position.set(s * r * 0.3, y, z);

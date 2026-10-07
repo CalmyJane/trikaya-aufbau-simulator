@@ -527,7 +527,7 @@ export const NPCS = [
   },
   {
     id: 'shifa', name: 'Shifa', role: { de: 'Neu dabei, überfordert', en: 'New here, overwhelmed' }, portrait: '🤓',
-    look: { base: 'f_casual', skin: SKIN.fair, hair: '#b0402a', brows: '#8a3220', hairStyle: 'long', hairStyleColor: '#b0402a', hairLength: 0.3, glasses: '#3a2a22', shirt: '#e0e0d0', pants: '#7a4a8a', patchwork: true, shirtPatch: ['#e0e0d0', '#2a8a7a', '#c9b24a'], height: 1.62 },
+    look: { base: 'f_casual', skin: SKIN.fair, hair: '#b0402a', brows: '#8a3220', hairStyle: 'long', hairStyleColor: '#b0402a', hairLength: 0.3, glasses: '#3a2a22', glassesSpecial: '#2affd0', shirt: '#e0e0d0', pants: '#7a4a8a', patchwork: true, shirtPatch: ['#e0e0d0', '#2a8a7a', '#c9b24a'], height: 1.62 },
     behavior: 'wander', home: 'camp_random', roam: 'camp_random', radius: 8,
     lines: [
       { de: 'Oh! Hi. Ähm. Entschuldigung, ich stand im Weg, oder? Sorry. Sorry!', en: 'Oh! Hi. Um. Sorry, I was in the way, right? Sorry. Sorry!' },
@@ -536,6 +536,7 @@ export const NPCS = [
       { de: 'Sabse hat mich angeschaut. Nur angeschaut. Ich glaub, ich hab was falsch gemacht.', en: 'Sabse looked at me. Just looked. I think I did something wrong.' },
       { de: '*schiebt die Brille hoch* Ich wollte nur kurz helfen. Jetzt hab ich drei Aufgaben und keine Ahnung.', en: '*pushes up glasses* I only wanted to help for a minute. Now I have three tasks and no idea.' },
       { de: 'Die Leute hier sind so… laut. Und nett! Aber laut. Und nett. Ich brauch kurz eine Pause. Schon wieder.', en: 'People here are so… loud. And nice! But loud. And nice. I need a quick break. Again.' },
+      { de: 'Meine Brille? Die leuchtet. Ist keine normale. Ich hab sie… geerbt? Gefunden? Sie war einfach da. Schau nicht zu lang rein.', en: 'My glasses? They glow. Not normal ones. I… inherited them? Found them? They were just there. Don\'t look too long.' },
       { de: 'Hi. Ich bin Shifa. Ich glaub. Ja. Shifa.', en: 'Hi. I\'m Shifa. I think. Yes. Shifa.' },
     ],
   },

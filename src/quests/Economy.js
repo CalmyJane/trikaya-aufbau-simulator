@@ -20,13 +20,6 @@ const BILLS = [
   { de: 'Mate. Sehr viel Mate.', en: 'Mate. A lot of mate.', min: 300, max: 700 },
 ];
 
-export const FORECASTS = [
-  { de: 'Break-even: nächstes Jahr. Wie jedes Jahr.', en: 'Break-even: next year. Like every year.' },
-  { de: 'Prognose: Minus. Aber mit Liebe.', en: 'Forecast: minus. But with love.' },
-  { de: 'Der Steuerberater weint leise.', en: 'The accountant is quietly crying.' },
-  { de: 'Gewinn ist ein kapitalistisches Konstrukt.', en: 'Profit is a capitalist construct.' },
-  { de: 'Wir machen das nicht wegen dem Geld. Offensichtlich.', en: 'We don\'t do this for the money. Obviously.' },
-];
 
 export class Economy {
   constructor(game) {

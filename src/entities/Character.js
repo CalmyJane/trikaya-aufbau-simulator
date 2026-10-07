@@ -534,6 +534,19 @@ export class Character {
       this.attachToBone('Chest', g);
     }
     if (look.shirtPrint) this.addShirtPrint(look.shirtPrint, look.printColor || '#ffd21f');
+    if (extras.includes('glitter') && this.bones.Head) {
+      // glitter on the cheeks (Annika's styling): a few tiny sparkly bits
+      const g = new THREE.Group();
+      const gm = new THREE.MeshStandardMaterial({ color: '#ffffff', emissive: look.glitter || '#ff7ad9', emissiveIntensity: 0.9, metalness: 0.8, roughness: 0.2 });
+      const geo = new THREE.OctahedronGeometry(0.008);
+      for (let i = 0; i < 14; i++) {
+        const s = i % 2 ? 1 : -1;
+        const m = new THREE.Mesh(geo, gm);
+        m.position.set(s * (0.035 + Math.random() * 0.03), 0.04 + Math.random() * 0.04, 0.085 + Math.random() * 0.01);
+        g.add(m);
+      }
+      this.attachToBone('Head', g);
+    }
     if (extras.includes('scarf')) {
       const sc = new THREE.Mesh(new THREE.TorusGeometry(0.075, 0.03, 5, 10), new THREE.MeshStandardMaterial({ color: look.scarf || '#b03060', flatShading: true }));
       sc.rotation.x = Math.PI / 2;

@@ -159,7 +159,10 @@ export class NPC {
       if (this.stuck > 2) { this.stuck = 0; this.nav = null; return 'stuck'; }
     } else this.stuck = 0;
     this.char.turnTo(Math.atan2(dx, dz), dt, 8);
-    this.char.play(anim, 0.2, { timeScale: anim === 'walk' ? speed / 1.6 * 0.9 : 1 });
+    if (this.ridingBike) {
+      // on the bike: sitting pose, raised onto the saddle
+      if (!this.char.sitting) { this.char.setSitting(true); this.char.sitBaseY = this.char.standY + 0.1; }
+    } else this.char.play(anim, 0.2, { timeScale: anim === 'walk' ? speed / 1.6 * 0.9 : 1 });
     return false;
   }
 
@@ -486,7 +489,7 @@ export class NPC {
 
   runTask(dt) {
     const tk = this.task;
-    if (this.char.sitting) this.standUp();
+    if (this.char.sitting && !this.ridingBike) this.standUp();
     if (tk.phase === 'go') {
       const goal = tk.detour && tk.detourT > 0 ? tk.detour : tk.pos();
       if (tk.detourT > 0) tk.detourT -= dt;
@@ -907,11 +910,12 @@ export class NPCManager {
   refreshAppear(qs) {
     for (const n of this.map.values()) {
       const h = n.def.homeAfter;
-      if (h && qs.isDone(h.quest) && !n.movedHome) {
+      const hDone = h && [].concat(h.quest).every((q) => qs.isDone(q));
+      if (h && hDone && !n.movedHome) {
         n.movedHome = true;
         const sp = this.world.spots[h.spot];
         if (sp) { n.home = new THREE.Vector3(sp.x + (h.offset?.[0] || 0), 0, sp.z + (h.offset?.[1] || 0)); n.def = { ...n.def, radius: h.radius }; n.target = null; }
-      } else if (h && !qs.isDone(h.quest) && n.movedHome) {
+      } else if (h && !hDone && n.movedHome) {
         n.movedHome = false; // new game
         const sp = this.world.spots[n.def.home];
         if (sp) n.home = new THREE.Vector3(sp.x + (n.def.offset?.[0] || 0), 0, sp.z + (n.def.offset?.[1] || 0));

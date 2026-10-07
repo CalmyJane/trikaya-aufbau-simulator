@@ -636,9 +636,10 @@ export const NPCS = [
     ],
   },
   {
-    id: 'annika', name: 'Annika', role: { de: 'Shops', en: 'Shops' }, portrait: '🛍️',
+    id: 'annika', name: 'Annika', role: { de: 'Shops & Styling', en: 'Shops & styling' }, portrait: '🛍️',
     look: { base: 'f_casual', skin: SKIN.fair, hair: '#6a4424', brows: '#5a3a1e', hairStyle: 'long', hairStyleColor: '#6a4424', hairLength: 0.3, shirt: '#2a8a7a', pants: '#8a3a3a', patchwork: true, shirtPatch: ['#2a8a7a', '#e0a030', '#b8483a'], height: 1.7 },
     behavior: 'wander', home: 'plot_shops', offset: [3, 4], radius: 6,
+    homeAfter: { quest: ['q7_dome', 'm1_shops'], spot: 'plot_planetarium', offset: [4, 3], radius: 4 }, // styles people in the planetarium
     lines: [
       { de: 'Jeder Stand braucht Lichterketten. Und Räucherstäbchen. Und noch mehr Lichterketten.', en: 'Every stall needs fairy lights. And incense. And more fairy lights.' },
       { de: 'Ich hab zwölf Händler, drei Stromkabel und null Ahnung, wie das passt. Wird schon!', en: 'I\'ve got twelve vendors, three power cables and zero idea how that fits. It\'ll work out!' },

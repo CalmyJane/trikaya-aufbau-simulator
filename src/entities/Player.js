@@ -26,6 +26,21 @@ export class Player {
   }
 
   get position() { return this.vehicle ? this.vehicle.position : this.root.position; }
+
+  /** New look (styling in the planetarium): swap the character model, keep position & heading. */
+  setLook(look) {
+    if (this.vehicle) return false;
+    const old = this.char;
+    const parent = old.root.parent;
+    const c = new Character(look);
+    c.root.position.copy(old.root.position);
+    c.root.rotation.y = old.root.rotation.y;
+    if (parent) { parent.remove(old.root); parent.add(c.root); }
+    this.char = c;
+    this.root = c.root;
+    this.carried = [];
+    return true;
+  }
   get sprinting() { return this._sprint; }
 
   // ----------------------------------------------------------------- vehicles
@@ -88,7 +103,7 @@ export class Player {
     } else {
       this.vel.multiplyScalar(Math.max(0, 1 - dt * 14));
     }
-    this.stamina = THREE.MathUtils.clamp(this.stamina + (sprint && !this.staminaFree ? -dt * 0.12 : dt * 0.2), 0, 1);
+    this.stamina = THREE.MathUtils.clamp(this.stamina + (sprint && !this.staminaFree ? -dt * 0.12 : dt * 0.2), 0, this.staminaMax || 1);
 
     const p = this.root.position;
     const ground = heightAt(p.x, p.z);

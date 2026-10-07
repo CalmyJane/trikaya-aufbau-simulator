@@ -5,6 +5,10 @@ import { L, t } from '../i18n.js';
 
 const $ = (id) => document.getElementById(id);
 
+// vehicles on the maps
+const VEH_ICON = { quad: '🏍️', radlader: '🚜', bike: '🚲' };
+const VEH_COL = (v) => (v.id === 'quad' ? (v.broken ? '#ff5a4a' : '#ff9a4a') : v.id === 'bike' ? '#7fd0d0' : '#f2b319');
+
 export class UI {
   constructor() {
     this.dialogOpen = false;
@@ -48,13 +52,12 @@ export class UI {
   showPause(v) { $('pause').classList.toggle('hidden', !v); }
 
   // ------------------------------------------------------------ HUD pieces
-  stats(karma, pct, money = 0, tickets = 0, forecast = '') {
+  stats(karma, pct, money = 0, tickets = 0) {
     $('karma').textContent = karma;
     const m = $('money');
     m.textContent = `${money < 0 ? '−' : ''}${Math.abs(Math.round(money)).toLocaleString('de-DE')} €`;
     m.classList.toggle('neg', money < 0);
     $('tickets').textContent = tickets.toLocaleString('de-DE');
-    if (forecast && $('forecast') && $('forecast').textContent !== forecast) $('forecast').textContent = forecast;
     $('ready-pct').textContent = `${Math.round(pct * 100)}%`;
     $('ready-fill').style.width = `${pct * 100}%`;
   }
@@ -192,9 +195,12 @@ export class UI {
     $('inventory').innerHTML = html;
   }
 
-  stamina(v) {
-    $('stamina-fill').style.width = `${v * 100}%`;
-    $('stamina').style.opacity = v > 0.98 ? 0 : 1;
+  stamina(v, max = 1) {
+    // a banana makes the bar itself longer
+    const w = `${Math.round(160 * max)}px`;
+    if ($('stamina').style.width !== w) { $('stamina').style.width = w; $('stamina-fill').style.background = max > 1 ? '#f5d142' : ''; }
+    $('stamina-fill').style.width = `${(v / max) * 100}%`;
+    $('stamina').style.opacity = v / max > 0.98 ? 0 : 1;
   }
 
   vehicleHud(v) {
@@ -380,9 +386,12 @@ export class UI {
     for (const v of Object.values(vehicles || {})) {
       const [x, y] = toM(v.position);
       if (Math.hypot(x, y) > R || v.driver) continue;
-      ctx.fillStyle = v.id === 'quad' ? (v.broken ? '#ff5a4a' : '#ff9a4a') : '#f2b319';
+      ctx.fillStyle = VEH_COL(v);
       ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5;
-      ctx.fillRect(x - 4, y - 4, 8, 8); ctx.strokeRect(x - 4, y - 4, 8, 8);
+      ctx.beginPath(); ctx.arc(x, y, 7, 0, 7); ctx.fill(); ctx.stroke();
+      ctx.save(); ctx.rotate(-camYaw); ctx.font = '9px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      const rx = x * Math.cos(camYaw) - y * Math.sin(camYaw), ry = x * Math.sin(camYaw) + y * Math.cos(camYaw);
+      ctx.fillText(VEH_ICON[v.id] || '🚗', rx, ry + 0.5); ctx.restore();
     }
     // objectives
     for (const o of objectives) {
@@ -468,9 +477,10 @@ export class UI {
     for (const v of Object.values(vehicles || {})) {
       if (v.driver) continue;
       const [x, y] = toC(v.position);
-      ctx.fillStyle = v.id === 'quad' ? (v.broken ? '#ff5a4a' : '#ff9a4a') : '#f2b319';
+      ctx.fillStyle = VEH_COL(v);
       ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
-      ctx.fillRect(x - 6, y - 6, 12, 12); ctx.strokeRect(x - 6, y - 6, 12, 12);
+      ctx.beginPath(); ctx.arc(x, y, 10, 0, 7); ctx.fill(); ctx.stroke();
+      ctx.font = '12px sans-serif'; ctx.fillText(VEH_ICON[v.id] || '🚗', x, y + 1);
       ctx.fillStyle = '#fff'; ctx.font = 'bold 12px "Baloo 2", sans-serif';
       ctx.strokeStyle = '#000'; ctx.lineWidth = 3;
       ctx.strokeText(L(v.name), x, y - 14); ctx.fillText(L(v.name), x, y - 14);

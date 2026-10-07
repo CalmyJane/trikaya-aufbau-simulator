@@ -349,3 +349,69 @@ export class Radlader extends Vehicle {
     setTimeout(() => { this.armTarget = -0.35; then?.(); }, 700);
   }
 }
+
+// ------------------------------------------------------------------ Franzi's bike (with a witch's broom strapped on)
+export class Bike extends Vehicle {
+  constructor(world) {
+    super(world, { maxSpeed: 9, accel: 6, brake: 12, drag: 1.1, maxSteer: 1, turnRate: 2.4, radius: 0.7, bodyRadius: 0.32, bodyOffset: 0.4, length: 1.7, width: 0.55, boost: 1.25 });
+    this.id = 'bike';
+    this.name = { de: 'Franzis Hexenrad', en: 'Franzi\'s witch bike' };
+    const b = this.body;
+    const frame = mat('#3aa0a0', { roughness: 0.5 });
+    const dark = mat('#222');
+    // frame: top tube, down tube, seat tube, forks
+    const tube = (len, x, y, z, rx, m = frame) => { const c = cyl(0.025, 0.025, len, m, 6, x, y, z); c.rotation.x = rx; b.add(c); return c; };
+    tube(0.75, 0, 0.78, 0.05, Math.PI / 2);          // top tube
+    tube(0.8, 0, 0.58, 0.22, Math.PI / 2 + 0.75);     // down tube
+    tube(0.5, 0, 0.6, -0.2, 0.25);                     // seat tube
+    tube(0.6, 0, 0.55, 0.5, -0.3, dark);               // fork
+    tube(0.45, 0, 0.42, -0.38, Math.PI / 2 - 0.9, dark); // chain stay
+    b.add(box(0.14, 0.05, 0.24, dark, 0, 0.86, -0.25)); // saddle
+    const bar = cyl(0.02, 0.02, 0.55, dark, 6, 0, 0.98, 0.42);
+    bar.rotation.z = Math.PI / 2;
+    b.add(bar);
+    b.add(cyl(0.02, 0.02, 0.2, dark, 6, 0, 0.9, 0.44));
+    // basket in front
+    b.add(box(0.32, 0.18, 0.24, mat('#b08a4a', { roughness: 1 }), 0, 0.92, 0.66));
+    // the witch's broom, strapped on horizontally along the bike
+    const broom = new THREE.Group();
+    const stick = cyl(0.025, 0.03, 1.7, mat('#7a5230', { roughness: 1 }), 6);
+    stick.rotation.x = Math.PI / 2;
+    broom.add(stick);
+    const bristles = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.5, 8), mat('#c8a050', { roughness: 1 }));
+    bristles.rotation.x = Math.PI / 2;
+    bristles.position.z = -1.0;
+    broom.add(bristles);
+    const strap = cyl(0.17, 0.17, 0.05, mat('#5a2a6a'), 8, 0, 0, -0.78);
+    strap.rotation.x = Math.PI / 2;
+    broom.add(strap);
+    broom.position.set(0.16, 0.74, 0.05);
+    b.add(broom);
+    for (const z of [0.55, -0.55]) this.spokeWheel(0.34, 0, 0.34, z);
+    this.seat.position.set(0, 0.5, -0.3);
+    this.cargo.position.set(0, 1.02, 0.66);
+    this.ghost = false; // true while Franzi rides it (no collider in her way)
+  }
+
+  /** Thin bicycle wheel: tyre ring + spokes (spins like the others). */
+  spokeWheel(r, x, y, z) {
+    const g = new THREE.Group();
+    const tyre = new THREE.Mesh(new THREE.TorusGeometry(r, 0.028, 6, 20), mat('#1d1d1d'));
+    tyre.rotation.y = Math.PI / 2;
+    g.add(tyre);
+    const sm = mat('#b0b0b0', { metalness: 0.6 });
+    for (let i = 0; i < 6; i++) {
+      const s = cyl(0.006, 0.006, r * 2, sm, 4);
+      s.rotation.x = (i / 6) * Math.PI;
+      g.add(s);
+    }
+    g.position.set(x, y, z);
+    this.body.add(g);
+    this.wheels.push({ g, r, front: z > 0 });
+  }
+
+  syncCollider() {
+    if (this.ghost) { for (const pt of this.parts) pt.c.x = 1e6; return; }
+    super.syncCollider();
+  }
+}

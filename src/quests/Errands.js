@@ -180,7 +180,7 @@ export class Errands {
         { type: 'pickup', text: C('Hol den Dieselkanister beim blauen Bauwagen', 'Get the diesel canister by the blue site trailer'), items: [{ item: 'diesel_can', at: 'diesel_spot' }] },
         { type: 'fuel', vehicle: 'radlader', items: ['diesel_can'], text: C('Tank den Radlader auf', 'Fuel the wheel loader') },
       ],
-      reward: { karma: 5 },
+      reward: { karma: 10 },
     };
     qs.quests[qid] = q;
     qs.accept(qid);
@@ -245,7 +245,7 @@ export class Errands {
     return this.base(this.newId('fetch'), t.giver, urgent ? C(`Schnell: ${name.de}`, `Quick: ${name.en}`) : C(`Gefallen: ${name.de}`, `Favour: ${name.en}`), ask, [
       { type: 'pickup', text: C(`Hol: ${name.de}`, `Get: ${name.en}`), items: [{ item: itemId, at: t.at }] },
       { type: 'talk', npc: t.giver, text: C(`Bring es zu ${giverName}`, `Bring it to ${giverName}`), consumes: [itemId], dialog: [{ who: t.giver, text: t.thanks }] },
-    ], urgent ? 15 : 8, {
+    ], urgent ? 25 : 15, {
       timeLimit: urgent ? 75 : undefined,
       failDialog: [{ who: t.giver, text: C('Zu spät… Na gut. Frag mich nochmal, wenn du Zeit hast.', 'Too late… Fine. Ask me again when you have time.') }],
     });
@@ -272,7 +272,7 @@ export class Errands {
         minigameFail: C('Der Hering ist krumm. Neuer Hering, neues Glück.', 'The peg is bent. New peg, new luck.'),
       },
       { type: 'talk', npc: n.def.id, text: C(`Sag ${n.def.name} Bescheid`, `Tell ${n.def.name}`), dialog: [{ who: n.def.id, text: thanks }] },
-    ], 8, { tentAt: spotName });
+    ], 18, { tentAt: spotName });
   }
 
   make_message() {
@@ -284,7 +284,7 @@ export class Errands {
     return this.base(this.newId('msg'), m.from, C(`Nachricht an ${toName}`, `Message for ${toName}`), m.ask, [
       { type: 'talk', npc: m.to, text: C(`Richte ${toName} die Nachricht aus`, `Pass the message on to ${toName}`), dialog: [{ who: 'you', text: m.msg }, { who: m.to, text: m.reply }] },
       { type: 'talk', npc: m.from, text: C(`Bring ${fromName} die Antwort`, `Bring ${fromName} the answer`), dialog: [{ who: 'you', text: m.reply }, { who: m.from, text: m.back }] },
-    ], 6);
+    ], 15);
   }
 
   make_beer() {
@@ -297,7 +297,7 @@ export class Errands {
     return this.base(this.newId('beer'), id, C(`Ein Bier mit ${name}`, `A beer with ${name}`), ask, [
       { type: 'pickup', text: C('Hol zwei Bier aus dem Kühlschrank im Aufenthaltszelt', 'Get two beers from the fridge in the crew tent'), items: [{ item: 'err_beer', at: 'aufenthalt' }] },
       { type: 'talk', npc: id, text: C(`Stoß mit ${name} an`, `Clink glasses with ${name}`), consumes: ['err_beer'], dialog: [{ who: id, text: cheers }] },
-    ], 10, { beer: true });
+    ], 15, { beer: true });
   }
 
   make_trash() {
@@ -314,6 +314,6 @@ export class Errands {
     return this.base(this.newId('trash'), id, C(`Müll ${placeName.de}`, `Rubbish ${placeName.en}`), fill(ask), [
       { type: 'pickup', text: fill(C('Sammel drei Müllsäcke {place} ein', 'Collect three bin bags {place}')), items: ['a', 'b', 'c'].map((k) => ({ item: `err_trash_${k}`, at: placeSpot, search: 14 })) },
       { type: 'talk', npc: id, text: C(`Bring die Säcke zu ${name}`, `Bring the bags to ${name}`), consumes: ['err_trash_a', 'err_trash_b', 'err_trash_c'], dialog: [{ who: id, text: thanks }] },
-    ], 10);
+    ], 20);
   }
 }

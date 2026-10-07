@@ -339,37 +339,6 @@ export class QuestSystem {
     }
   }
 
-  /** Keta: the NPC takes pity and finishes the current step of this quest for you. */
-  ketaSkip(qid) {
-    const step = this.currentStep(qid);
-    const a = this.state.active[qid];
-    if (!step || !a) return false;
-    const ensure = (ids) => { for (const id of ids) if (!this.has(id)) this.state.inventory.push(id); };
-    switch (step.type) {
-      case 'talk': case 'reach': case 'night': this.advance(qid); break;
-      case 'park': ensure([step.item]); this.parkDone(qid); break;
-      case 'delivery': this.deliveryDone(qid); break;
-      case 'soundbox': this.game.soundbox?.stop(); this.advance(qid); break;
-      case 'wait': this.state.active[qid].waitLeft = 0; break;
-      case 'pickup':
-        for (const it of step.items) {
-          this.removeWorldItem(it.item);
-          if (!this.has(it.item)) this.state.inventory.push(it.item);
-          if (!a.picked.includes(it.item)) a.picked.push(it.item);
-        }
-        this.game.updateCarried();
-        this.checkPickupDone(qid);
-        break;
-      case 'deliver': ensure(step.items); this.build(qid); break;
-      case 'work': step.targets.forEach((_, i) => this.workDone(qid, i)); break;
-      case 'fuel': ensure(step.items); this.fuel(qid); break;
-      default: return false;
-    }
-    this.refreshMarkers();
-    this.emit('changed');
-    return true;
-  }
-
   /**
    * Timed job failed: it does NOT restart by itself – you have to go back to the person who gave it.
    * Whole-job timers: the job is dropped and offered again. Step timers (lights): the step waits for a restart talk.

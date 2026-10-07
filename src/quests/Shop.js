@@ -3,7 +3,8 @@ import { L, getLang } from '../i18n.js';
 // Karma economy on the site: people sell you things for karma.
 //  - Mark (once the chai tent stands): cheap mate, chai
 //  - Fabi: pro gaffa
-//  - random volunteers with a blue "!": speed or keta – buy it or say no.
+//  - random volunteers with a blue "!": weed or energy drinks – buy it or say no.
+//  - Mux: bananas (free) · Sabse & Verena's bar: drinks for drink tokens
 
 export const SHOP = [
   {
@@ -19,7 +20,7 @@ export const SHOP = [
   {
     id: 'gaffa', icon: '🩹', cost: 25, vendor: 'fabi',
     name: { de: 'Profi-Gaffa', en: 'Pro gaffa' },
-    desc: { de: 'Die nächsten 3 Bau- und Arbeitsschritte gehen doppelt so schnell.', en: 'The next 3 build/work steps go twice as fast.' },
+    desc: { de: 'Die nächsten 3 Bau- und Arbeitsschritte gehen doppelt so schnell. Und: Generator oder Kackepumpe kaputt? Damit flickst du sie selbst.', en: 'The next 3 build/work steps go twice as fast. And: generator or poo pump broken? With this you patch it yourself.' },
   },
   {
     id: 'beer', icon: '🍺', cost: 5, vendor: ['thompsen', 'jonas'],
@@ -37,14 +38,14 @@ export const SHOP = [
     desc: { de: 'Zählt wie zwei Bier: gesellig, aber Fahren wird SEHR wackelig.', en: 'Counts as two beers: sociable, but driving gets VERY wobbly.' },
   },
   {
-    id: 'speed', icon: '⚡', cost: 25, dealer: true,
-    name: { de: 'Speed', en: 'Speed' },
-    desc: { de: '60 Sekunden rennen wie der Radlader. Zu viel davon, und dein Herz macht Techno.', en: 'Run like the wheel loader for 60 seconds. Too much and your heart goes techno.' },
+    id: 'energy', icon: '🥤', cost: 10, dealer: true,
+    name: { de: 'Energydrink', en: 'Energy drink' },
+    desc: { de: '60 Sekunden rennen wie der Radlader. Zu viele, und dein Herz macht Techno.', en: 'Run like the wheel loader for 60 seconds. Too many and your heart goes techno.' },
   },
   {
-    id: 'keta', icon: '🌀', cost: 20, dealer: true,
-    name: { de: 'Keta', en: 'Keta' },
-    desc: { de: 'Der nächste Auftraggeber sieht, dass du voll drauf bist, und erledigt einen Schritt für dich.', en: 'The next quest giver sees you\'re wasted and does one step for you.' },
+    id: 'banana', icon: '🍌', cost: 0, vendor: 'mux',
+    name: { de: 'Banane', en: 'Banana' },
+    desc: { de: '3 Minuten lang längere Ausdauer (der Balken wird 1,5× so lang).', en: 'Longer stamina for 3 minutes (the bar gets 1.5× as long).' },
   },
 ];
 
@@ -52,15 +53,6 @@ const OD_LIMIT = 3;       // doses (within the decay window) that knock you out
 const OD_DECAY = 120;     // seconds for one dose to wear off
 
 const COMMENTS = {
-  keta: [
-    { de: 'Alles okay bei dir? Du guckst so… durch mich durch.', en: 'You okay? You\'re looking… right through me.' },
-    { de: 'Oha. Du bist ja komplett verballert.', en: 'Whoa. You\'re completely wasted.' },
-    { de: 'Du läufst, als wär der Boden aus Wackelpudding.', en: 'You walk like the ground is made of jelly.' },
-    { de: 'Hallo? Erde an dich? …Okay, später.', en: 'Hello? Earth to you? …Okay, later.' },
-    { de: 'Brauchst du Franzi? Du siehst aus, als bräuchtest du Franzi.', en: 'Need Franzi? You look like you need Franzi.' },
-    { de: 'Du hast gerade fünf Minuten einen Hering angestarrt.', en: 'You just stared at a tent peg for five minutes.' },
-    { de: 'Bist du im K-Hole oder suchst du nur deine Schuhe?', en: 'Are you in a k-hole or just looking for your shoes?' },
-  ],
   weed: [
     { de: 'Hihi, du hast ja ganz rote Augen.', en: 'Hehe, your eyes are all red.' },
     { de: 'Riechst du das auch? …Ach, das bist du.', en: 'Do you smell that too? …Oh, that\'s you.' },
@@ -74,10 +66,10 @@ const COMMENTS = {
     { de: 'Du lallst ein bisschen. Nur ein bisschen.', en: 'You\'re slurring a bit. Just a bit.' },
     { de: 'Fahr bloß nicht Radlader so. …Du fährst Radlader so, oder?', en: 'Don\'t drive the wheel loader like that. …You drive the wheel loader like that, don\'t you?' },
   ],
-  speed: [
-    { de: 'Wow, du bist ja ganz schön drauf!', en: 'Wow, you\'re pretty wired!' },
+  energy: [
+    { de: 'Wow, du bist ja ganz schön aufgedreht!', en: 'Wow, you\'re pretty wired!' },
     { de: 'Warum redest du so schnell? Ich hab gar nix gefragt.', en: 'Why are you talking so fast? I didn\'t even ask anything.' },
-    { de: 'Dein Kiefer mahlt lauter als der Generator.', en: 'Your jaw is grinding louder than the generator.' },
+    { de: 'Wie viele Energydrinks waren das? Du vibrierst.', en: 'How many energy drinks was that? You\'re vibrating.' },
     { de: 'Chill mal. Es ist ein Festival, kein Formel-1-Rennen.', en: 'Chill. It\'s a festival, not a Formula 1 race.' },
     { de: 'Du blinzelst gar nicht mehr. Ist das Absicht?', en: 'You stopped blinking. On purpose?' },
     { de: 'Du hast gerade drei Leuten gleichzeitig deine Lebensgeschichte erzählt.', en: 'You just told three people your life story at the same time.' },
@@ -85,27 +77,35 @@ const COMMENTS = {
 };
 
 const DEALER_LINES = {
-  keta: [
-    { de: 'Psst. Hey. Du siehst gestresst aus. Ich hab Keta. Macht alles… weicher.', en: 'Psst. Hey. You look stressed. I\'ve got keta. Makes everything… softer.' },
-    { de: 'Na? Lust, kurz den Planeten zu verlassen? Hab Keta. Fair Trade. Glaub ich.', en: 'Hey. Fancy leaving the planet for a bit? Got keta. Fair trade. I think.' },
-  ],
   weed: [
     { de: 'Psst. Willst du was Grünes? Dann springst du über jeden Bauzaun. Fast.', en: 'Psst. Want something green? You\'ll jump over every fence. Almost.' },
     { de: 'Hey, entspann mal. Ich hab Weed. Bio. Selbst gezogen. Im Zelt.', en: 'Hey, relax. I\'ve got weed. Organic. Home-grown. In my tent.' },
   ],
-  speed: [
-    { de: 'Ey, du willst schneller aufbauen? Ich hab Speed. Dann rennst du wie der Radlader.', en: 'Hey, want to build faster? I\'ve got speed. You\'ll run like the wheel loader.' },
-    { de: 'Psst! Speed? Dann bist du mit dem Aufbau fertig, bevor Leo überhaupt aufwacht.', en: 'Psst! Speed? You\'ll finish the build before Leo even wakes up.' },
+  energy: [
+    { de: 'Psst. Energydrink? Hab noch welche aus dem Kofferraum. Warm, aber wirkt.', en: 'Psst. Energy drink? Got some left in my car boot. Warm, but it works.' },
+    { de: 'Ey, du willst schneller aufbauen? Energydrink! Dann rennst du wie der Radlader.', en: 'Hey, want to build faster? Energy drink! You\'ll run like the wheel loader.' },
   ],
 };
 
 const pick = (a) => a[Math.floor(Math.random() * a.length)];
 
+// what you get for a drink token at Sabse's kitchen and Verena's bar
+export const TOKEN_DRINKS = ['beer', 'schnaps', 'energy', 'mate'];
+export const TOKEN_TRADERS = ['sabse', 'verena'];
+// someone who's been asking about tokens for days finally gets one
+const TOKEN_THANKS = [
+  { de: 'Eine… eine echte Getränkemarke?! Ich dachte, die sind ein Mythos! Ich rahm sie ein. Nein, ich trink sie. Nein, ich rahm sie ein!', en: 'A… a real drink token?! I thought they were a myth! I\'ll frame it. No, I\'ll drink it. No, I\'ll frame it!' },
+  { de: 'Ich möchte meinen Eltern danken. Und Leo, der sie angeblich verteilt. Und vor allem DIR. *schnieft*', en: 'I\'d like to thank my parents. And Leo, who supposedly hands them out. And above all YOU. *sniffs*' },
+  { de: 'Drei Tage hab ich gefragt. DREI TAGE. Und jetzt halt ich sie in der Hand. Sie ist… so leicht. So schön.', en: 'Three days I\'ve been asking. THREE DAYS. And now I\'m holding it. It\'s… so light. So beautiful.' },
+  { de: 'Wenn ich mal Kinder hab, erzähl ich ihnen von diesem Moment. Und von dir. Vor allem von der Marke.', en: 'When I have kids one day I\'ll tell them about this moment. And about you. Mostly about the token.' },
+  { de: 'Ich hab die Chai-Crew gefragt, Jan gefragt, sogar Sabse gefragt. Und dann kommst DU. Einfach so. Legende.', en: 'I asked the chai crew, asked Jan, even asked Sabse. And then YOU come along. Just like that. Legend.' },
+];
+
 // "Got anything?" – you can ask (almost) anyone. These never have anything and never sell.
 export const NO_STASH = ['fabi', 'jan', 'leo', 'franzi', 'isi', 'verena', 'mia', 'daniel', 'delsin', 'aylien', 'sabse'];
 // crew members with a known stash; everyone else is random (most have nothing)
-const STASH_FIXED = { strom_andi: ['beer', 'schnaps'], juli: ['beer'], estenko: ['schnaps'], rocky: ['weed'], mehdi: ['weed'], schwarzhuber: ['schnaps'], lenny: ['speed', 'weed'], mux: ['weed'], leocitas: ['weed'] };
-const STASH_POOL = ['weed', 'weed', 'schnaps', 'speed', 'keta'];
+const STASH_FIXED = { strom_andi: ['beer', 'schnaps'], juli: ['beer'], estenko: ['schnaps'], rocky: ['weed'], mehdi: ['weed'], schwarzhuber: ['schnaps'], lenny: ['energy', 'weed'], mux: ['weed'], leocitas: ['weed'] };
+const STASH_POOL = ['weed', 'weed', 'schnaps', 'energy', 'energy', 'beer'];
 const STASH_CD = 240; // seconds until someone has something again after selling
 
 const NO_STASH_LINES = {
@@ -162,10 +162,8 @@ export class Effects {
     this.mateT = 0;
     this.chaiT = 0;
     this.gaffa = 0;
-    this.ketaCharges = 0;
-    this.ketaLevel = 0;
-    this.ketaDecay = 0;
-    this.ketaT = 0;
+    this.bananaT = 0;
+    this.ketaT = 0; // (keta is gone – kept so the render trails stay off)
     this.speedT = 0;
     this.speedLevel = 0;
     this.speedDecay = 0;
@@ -176,7 +174,7 @@ export class Effects {
     this.commentT = 3;
     this.clearDealer();
     this.dealerCD = 60;
-    document.body.classList.remove('keta', 'keta2', 'weed');
+    document.body.classList.remove('weed');
   }
 
   item(id) { return SHOP.find((x) => x.id === id); }
@@ -196,14 +194,7 @@ export class Effects {
     if (id === 'mate') this.mateT = 90;
     if (id === 'chai') { this.chaiT = 90; g.player.stamina = 1; }
     if (id === 'gaffa') this.gaffa += 3;
-    if (id === 'keta') {
-      this.ketaCharges += 1;
-      this.ketaLevel += 1;
-      this.ketaDecay = 0;
-      this.ketaT = 60;
-      if (this.ketaLevel >= OD_LIMIT) setTimeout(() => this.collapse('keta'), 600);
-      else if (this.ketaLevel === OD_LIMIT - 1) g.ui.toast(de ? '🌀 Uff. Noch eine Dosis und du liegst.' : '🌀 Whoa. One more dose and you\'re down.');
-    }
+    if (id === 'banana') this.bananaT = 180;
     if (id === 'weed') this.weedT = 90;
     if (id === 'beer' || id === 'schnaps') {
       this.beerLevel += id === 'schnaps' ? 2 : 1;
@@ -211,15 +202,15 @@ export class Effects {
       if (this.beerLevel >= 5) setTimeout(() => this.collapse('beer'), 600);
       else if (this.beerLevel >= 3) g.ui.toast(de ? '🍺 Du schwankst schon ordentlich. Noch mehr wäre eine schlechte Idee.' : '🍺 You\'re swaying quite a bit. More would be a bad idea.');
     }
-    if (id === 'speed') {
+    if (id === 'energy') {
       this.speedT = 60;
       this.speedLevel += 1;
       this.speedDecay = 0;
-      if (this.speedLevel >= OD_LIMIT) setTimeout(() => this.collapse('speed'), 600);
-      else if (this.speedLevel === OD_LIMIT - 1) g.ui.toast(de ? '⚡ Dein Herz macht 180 BPM. Noch eine und es macht gar nix mehr.' : '⚡ Your heart is at 180 BPM. One more and it stops doing anything.');
+      if (this.speedLevel >= OD_LIMIT) setTimeout(() => this.collapse('energy'), 600);
+      else if (this.speedLevel === OD_LIMIT - 1) g.ui.toast(de ? '🥤 Dein Herz macht 180 BPM. Noch eine Dose und es macht gar nix mehr.' : '🥤 Your heart is at 180 BPM. One more can and it stops doing anything.');
     }
     g.audio.pickup();
-    g.ui.toast(`${it.icon} <b>${L(it.name)}</b> −${it.cost} ✺`);
+    g.ui.toast(free || !it.cost ? `${it.icon} <b>${L(it.name)}</b>` : `${it.icon} <b>${L(it.name)}</b> −${it.cost} ✺`);
     g.refreshHUD();
     return true;
   }
@@ -230,7 +221,7 @@ export class Effects {
     return 1;
   }
 
-  get high() { return this.ketaT > 0 ? 'keta' : this.speedT > 0 ? 'speed' : this.weedT > 0 ? 'weed' : this.beerLevel >= 2 ? 'beer' : null; }
+  get high() { return this.speedT > 0 ? 'energy' : this.weedT > 0 ? 'weed' : this.beerLevel >= 2 ? 'beer' : null; }
   get tipsy() { return this.beerLevel > 0; }
 
   /** Something people say when you're obviously on something. */
@@ -240,27 +231,23 @@ export class Effects {
     const g = this.game;
     this.mateT = Math.max(0, this.mateT - dt);
     this.chaiT = Math.max(0, this.chaiT - dt);
-    this.ketaT = Math.max(0, this.ketaT - dt);
+    this.bananaT = Math.max(0, this.bananaT - dt);
     this.speedT = Math.max(0, this.speedT - dt);
     this.weedT = Math.max(0, this.weedT - dt);
     if (this.beerLevel > 0 && (this.beerDecay += dt) > 150) { this.beerDecay = 0; this.beerLevel--; }
-    if (this.ketaLevel > 0 && (this.ketaDecay += dt) > OD_DECAY) { this.ketaDecay = 0; this.ketaLevel--; }
     if (this.speedLevel > 0 && (this.speedDecay += dt) > OD_DECAY) { this.speedDecay = 0; this.speedLevel--; }
     const p = g.player;
-    p.speedMul = (this.speedT > 0 ? 1.6 : this.mateT > 0 ? 1.25 : 1) * (this.ketaT > 0 ? 0.8 : 1);
+    p.speedMul = this.speedT > 0 ? 1.6 : this.mateT > 0 ? 1.25 : 1;
+    p.staminaMax = this.bananaT > 0 ? 1.5 : 1;
     p.staminaFree = this.speedT > 0 || this.chaiT > 0;
     p.jumpMul = this.weedT > 0 ? 1.55 : 1;
     // drunk driving: the more beer, the more slalom
     for (const v of Object.values(g.vehicles)) v.wobble = this.beerLevel * 0.28;
-    // keta: wobbly world · speed: tunnel vision
-    const k = this.ketaT > 0;
-    document.body.classList.toggle('keta', k);
-    document.body.classList.toggle('keta2', k && this.ketaLevel >= 2);
-    document.body.classList.toggle('weed', !k && this.weedT > 0);
+    // energy: tunnel vision · weed: warm and soft
+    document.body.classList.toggle('weed', this.weedT > 0);
     const cam = g.camera;
     let fov = 60;
-    if (k) fov = 60 + Math.sin(g.time * 0.9) * (this.ketaLevel >= 2 ? 9 : 5);
-    else if (this.speedT > 0) fov = 68 + Math.sin(g.time * 11) * 0.6;
+    if (this.speedT > 0) fov = 68 + Math.sin(g.time * 11) * 0.6;
     else if (this.weedT > 0) fov = 62 + Math.sin(g.time * 0.5) * 2.5;
     if (Math.abs(cam.fov - fov) > 0.01) { cam.fov = fov; cam.updateProjectionMatrix(); }
     this.updateComments(dt);
@@ -306,7 +293,7 @@ export class Effects {
     const cands = pool.filter((n) => { const d = n.position.distanceTo(pp); return d > 10 && d < 70; });
     if (!cands.length) { this.dealerCD = 15; return; }
     const npc = cands[Math.floor(Math.random() * cands.length)];
-    this.dealer = { npc, item: pick(['keta', 'speed', 'weed', 'weed']), t: 0 };
+    this.dealer = { npc, item: pick(['energy', 'weed', 'weed']), t: 0 };
     if (!this.dealerHinted) {
       this.dealerHinted = true;
       g.ui.toast(L({ de: '🔵 Blaues ! – da will dir jemand was anbieten. Nein sagen ist auch okay.', en: '🔵 Blue ! – someone wants to offer you something. Saying no is fine too.' }));
@@ -396,6 +383,7 @@ export class Effects {
       mark: de ? 'Das Zelt? Wird. Irgendwann. Der Chai kocht trotzdem – auf dem Campingkocher! Mate hab ich auch, macht schnelle Beine.' : 'The tent? It\'ll happen. Someday. The chai is brewing anyway – on the camping stove! Got mate too, gives you quick legs.',
       fabi: de ? 'Du brauchst was? Profi-Gaffa hab ich. Das gute. Nicht das aus dem Hühnercontainer.' : 'Need something? I\'ve got pro gaffa. The good stuff. Not the one from the chicken container.',
       thompsen: de ? 'HAHAHA! Bier? Bier! Fünf Karma, Kasten steht unterm Tisch. Hehehe.' : 'HAHAHA! Beer? Beer! Five karma, the crate is under the table. Hehehe.',
+      mux: de ? 'Hey du! Hast du heute schon was gegessen? Nimm eine Banane. Geht aufs Haus. Also, auf meinen Rucksack.' : 'Hey you! Have you eaten today? Take a banana. On the house. Well, on my backpack.',
       jonas: de ? 'SKÅL! Ein Bier für die Strohwand-Wikinger? Fünf Karma. Der Kasten ist immer kalt. Fast immer.' : 'SKÅL! A beer for the straw-wall vikings? Five karma. The crate is always cold. Almost always.',
     }[npc.def.id];
     const karma = g.quests.state.karma;
@@ -406,9 +394,45 @@ export class Effects {
     );
     const it = items[choice];
     if (!it) { await g.reply(npc, npc.line()); return true; }
-    if (this.buy(it.id)) await g.reply(npc, de ? 'Bitteschön! Karma ist die einzige Währung, die hier noch was wert ist.' : 'There you go! Karma is the only currency still worth anything here.');
+    if (this.buy(it.id)) await g.reply(npc, it.id === 'banana' ? (de ? 'Gern! Pass auf dich auf, ja? 💛' : 'Sure! Take care of yourself, yeah? 💛') : (de ? 'Bitteschön! Karma ist die einzige Währung, die hier noch was wert ist.' : 'There you go! Karma is the only currency still worth anything here.'));
     else await g.reply(npc, de ? 'Zu wenig Karma. Hilf mal jemandem, dann reden wir weiter.' : 'Not enough karma. Go help someone, then we\'ll talk.');
     return true;
+  }
+
+  // ------------------------------------------------------------ drink tokens (Leo, favours)
+  get tokens() { const f = this.game.quests.state.flags; return (f.drinkTokens || 0) - (f.tokensSpent || 0); }
+
+  spendToken() { const f = this.game.quests.state.flags; f.tokensSpent = (f.tokensSpent || 0) + 1; }
+
+  /** Someone keeps asking for tokens – give them one: karma and a speech. */
+  async giftToken(npc) {
+    const g = this.game, de = getLang() === 'de';
+    this.spendToken();
+    npc.gotToken = true;
+    npc.def = { ...npc.def, tokenAsker: false };
+    g.quests.state.karma += 12;
+    g.audio.accept();
+    await g.runDialog([{ who: npc.def.id, text: pick(TOKEN_THANKS) }], null, npc);
+    g.ui.toast(de ? `🎟️ Getränkemarke verschenkt. +12 ✺ (noch ${this.tokens})` : `🎟️ Drink token given away. +12 ✺ (${this.tokens} left)`);
+    g.refreshHUD();
+  }
+
+  /** Sabse's kitchen & Verena's bar: a drink for a token. */
+  async tokenShop(npc) {
+    const g = this.game, de = getLang() === 'de';
+    const items = TOKEN_DRINKS.map((id) => this.item(id));
+    const choice = await g.runDialog(
+      [{ who: npc.def.id, text: npc.def.id === 'sabse'
+        ? (de ? `Eine Marke? Eine ECHTE Marke? …Gut. Was willst du? (Du hast 🎟️ ${this.tokens})` : `A token? A REAL token? …Fine. What do you want? (You have 🎟️ ${this.tokens})`)
+        : (de ? `Marke gegen Getränk, so läuft das an meiner Bar. Was darf\'s sein? (Du hast 🎟️ ${this.tokens})` : `Token for a drink, that\'s how my bar works. What\'ll it be? (You have 🎟️ ${this.tokens})`) }],
+      [...items.map((it) => `${it.icon} ${L(it.name)} – ${L(it.desc)}`), de ? 'Doch nicht.' : 'Never mind.'],
+      npc,
+    );
+    const it = items[choice];
+    if (!it) return;
+    this.spendToken();
+    this.buy(it.id, true);
+    await g.reply(npc, npc.def.id === 'sabse' ? (de ? 'Hier. Und jetzt raus aus meiner Küche.' : 'Here. And now out of my kitchen.') : (de ? 'Bitte. Nächste Schicht übernimmst du, ja? Spaß.' : 'There. You take the next shift, yeah? Kidding.'));
   }
 
   list() {
@@ -418,13 +442,13 @@ export class Effects {
     if (this.gaffa > 0) out.push(`🩹 ×${this.gaffa}`);
     if (this.weedT > 0) out.push(`🌿 ${Math.ceil(this.weedT)}s`);
     if (this.beerLevel > 0) out.push(`🍺 ${'●'.repeat(this.beerLevel)}`);
-    if (this.speedT > 0 || this.speedLevel > 0) out.push(`⚡${this.speedT > 0 ? ' ' + Math.ceil(this.speedT) + 's' : ''}${this.speedLevel ? ' ' + '●'.repeat(this.speedLevel) : ''}`);
-    if (this.ketaCharges > 0 || this.ketaT > 0) out.push(`🌀 ${this.ketaCharges > 0 ? '×' + this.ketaCharges : ''}${this.ketaLevel ? ' ' + '●'.repeat(this.ketaLevel) : ''}`);
+    if (this.bananaT > 0) out.push(`🍌 ${Math.ceil(this.bananaT)}s`);
+    if (this.speedT > 0 || this.speedLevel > 0) out.push(`🥤${this.speedT > 0 ? ' ' + Math.ceil(this.speedT) + 's' : ''}${this.speedLevel ? ' ' + '●'.repeat(this.speedLevel) : ''}`);
     return out;
   }
 
   /** Too much: fall over, wake up in the awareness tent, karma gone. */
-  async collapse(kind = 'keta') {
+  async collapse(kind = 'beer') {
     const g = this.game;
     if (this.collapsed) return;
     this.collapsed = true;
@@ -450,9 +474,9 @@ export class Effects {
     const de = getLang() === 'de';
     const first = kind === 'beer'
       ? (de ? 'Na du… Aufgewacht? Fünf Bier in der Mittagssonne. Beim Aufbau. Respekt. Und: nein.' : 'Hey you… awake? Five beers in the midday sun. During the build. Respect. And: no.')
-      : kind === 'speed'
-      ? (de ? 'Na du… Aufgewacht? Dein Herz ist gerade schneller gelaufen als du. Zu viel Speed, hm?' : 'Hey you… awake? Your heart was running faster than you. Too much speed, huh?')
-      : (de ? 'Na du… Aufgewacht? Du bist einfach umgekippt. Zu viel Keta, hm?' : 'Hey you… awake? You just collapsed. Too much keta, huh?');
+      : kind === 'energy'
+      ? (de ? 'Na du… Aufgewacht? Dein Herz ist gerade schneller gelaufen als du. Zu viele Energydrinks, hm?' : 'Hey you… awake? Your heart was running faster than you. Too many energy drinks, huh?')
+      : (de ? 'Na du… Aufgewacht? Du bist einfach umgekippt. Zu viel von allem, hm?' : 'Hey you… awake? You just collapsed. Too much of everything, huh?');
     await g.runDialog([
       { who: 'franzi', text: first },
       { who: 'franzi', text: tent

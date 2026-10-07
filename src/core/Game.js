@@ -8,7 +8,11 @@ import { Player, CameraRig } from '../entities/Player.js';
 import { FlyCam } from './FlyCam.js';
 import { Trigel } from '../world/Trigel.js';
 import { NPCManager } from '../entities/NPC.js';
-import { Quad, Radlader } from '../entities/Vehicles.js';
+import { Quad, Radlader, Bike } from '../entities/Vehicles.js';
+import { FranziBike } from '../quests/Bike.js';
+import { Services, HIRE_COST } from '../quests/Services.js';
+import { TOKEN_TRADERS } from '../quests/Shop.js';
+import { PLAYER_LOOK } from '../entities/npcData.js';
 import { QuestSystem } from '../quests/QuestSystem.js';
 import { Economy } from '../quests/Economy.js';
 import { DramaSystem, BUSY_MODES } from '../quests/Events.js';
@@ -97,7 +101,9 @@ export class Game {
     this.npcs = new NPCManager(this.world);
     this.trigel = new Trigel(this.world);
     this.npcs.game = this;
-    this.vehicles = { quad: new Quad(this.world), radlader: new Radlader(this.world) };
+    this.vehicles = { quad: new Quad(this.world), radlader: new Radlader(this.world), bike: new Bike(this.world) };
+    this.bikeSys = new FranziBike(this, this.vehicles.bike);
+    this.services = new Services(this);
     this.quests = new QuestSystem(this);
     this.economy = new Economy(this);
     this.drama = new DramaSystem(this);
@@ -132,6 +138,8 @@ export class Game {
     this.police.car.visible = false;
     this.headlamp = new THREE.PointLight('#ffe6c0', 0, 16, 1.4);
     this.scene.add(this.headlamp);
+    this.headBeam = new THREE.SpotLight('#fff3dc', 0, 48, 0.55, 0.55, 1.1);
+    this.scene.add(this.headBeam, this.headBeam.target);
     this.ui.setMapSource(this.world.groundCanvas);
     this.ui.onDialogBlip = () => this.audio.blip();
     // a structure appeared where a vehicle is standing → park it next to the structure
@@ -165,6 +173,8 @@ export class Game {
     this.vehicles.quad.repair();
     this.vehicles.radlader.place(vs.radlader.pos, vs.radlader.heading);
     this.vehicles.radlader.fuel = 0;
+    this.bikeSys?.reset();
+    if (this.player.char.look !== PLAYER_LOOK) { this.player.setLook(PLAYER_LOOK); this.updateCarried(); }
     this.drama?.clearAll();
     this.trigel?.reset();
     this.effects?.reset();
@@ -673,6 +683,12 @@ export class Game {
         case 'completed':
           this.audio.complete();
           if (data.noRunOver) this.clearRouteWalkers();
+          if (data.id === 'q4_lights') setTimeout(() => this.ui.toast(getLang() === 'de' ? '🔦 Fabi drückt dir eine Stirnlampe in die Hand: „Damit du nachts nicht in die Dixis läufst.“' : '🔦 Fabi hands you a headlamp: "So you don\'t walk into the portaloos at night."'), 4500);
+          if (data.errand && Math.random() < 0.3) {
+            const f = this.quests.state.flags;
+            f.drinkTokens = (f.drinkTokens || 0) + 1;
+            setTimeout(() => this.ui.toast(getLang() === 'de' ? `🎟️ Als Dankeschön gibt\'s eine Getränkemarke! (${this.effects.tokens} dabei)` : `🎟️ A drink token as a thank-you! (${this.effects.tokens} on you)`), 3600);
+          }
           setTimeout(() => this.ui.banner(t('t.jobDone'), L(data.title), `+${data.reward?.karma || 0} Karma`), 300);
           if (data.outro) setTimeout(() => this.runDialog(data.outro), 3200);
           if (!data.errand && !data.id.startsWith('err_')) this.checkFinale(data); // the festival opens… and drowns
@@ -899,6 +915,7 @@ export class Game {
     this.player.char.carrying = !veh && this.player.carried.length > 0;
     this.vehicles.quad.setCargo(veh === this.vehicles.quad ? light() : []);
     this.vehicles.radlader.setCargo(veh === this.vehicles.radlader ? light() : []);
+    this.vehicles.bike.setCargo(veh === this.vehicles.bike ? light() : []);
     this.vehicles.radlader.setLoad(inv.filter(isHeavy).map((id) => createItemMesh(id)));
   }
 
@@ -954,26 +971,12 @@ export class Game {
       this.ui.toast(getLang() === 'de' ? '🍺 Gesellig! +2 ✺' : '🍺 Sociable! +2 ✺');
       this.refreshHUD();
     }
-    // 0) too drunk / high / on keta / being looked after → no business with them
+    // 0) too drunk / high / being looked after → no business with them
     if (this.drama.victimTalk(npc)) return;
     // 0a) illegal soundbox → tell them off
     if (this.soundbox.isOwner(npc)) { await this.soundbox.scold(npc); return; }
     // 0a) blue "!": someone wants to sell you something
     if (this.effects.isDealer(npc)) { await this.effects.dealerTalk(npc); return; }
-    // 0b) player is on keta: the quest giver takes over the current step
-    if (this.effects.ketaCharges > 0) {
-      const own = Object.keys(qs.state.active).find((qid) => qs.quests[qid].giver === id && !(qs.currentStep(qid)?.type === 'talk' && qs.currentStep(qid)?.npc === id));
-      if (own) {
-        const de = getLang() === 'de';
-        const stepText = L(qs.currentStep(own).text);
-        if (qs.ketaSkip(own)) { // some steps (e.g. collecting karma) can't be taken over – then nothing is used up
-          await this.runDialog([{ who: id, text: de ? `Oh… du bist voll auf Keta, oder? Keine Sorge, ich mach das schon: „${stepText}“.` : `Oh… you\'re totally on keta, right? Don\'t worry, I\'ll do it: "${stepText}".` }], null, npc);
-          this.effects.ketaCharges--;
-          this.refreshHUD();
-          return;
-        }
-      }
-    }
     // 0b2) a job that needs karma
     const kq = Object.keys(qs.state.active).find((qid) => qs.currentStep(qid)?.type === 'karma' && qs.quests[qid].giver === id);
     if (kq) {
@@ -1091,9 +1094,19 @@ export class Game {
       this.ui.toast(de ? '🤗 Jules hilft dir – Ausdauer voll, +2 ✺' : '🤗 Jules helps you out – stamina full, +2 ✺');
       this.refreshHUD();
     }
-    const ask = this.effects.canAsk(npc);
-    const choice = await this.runDialog([{ who: id, text: line }], ask ? [de ? 'Bis später!' : 'See you!', de ? '👀 Hast du was dabei?' : '👀 Got anything on you?'] : null, npc);
-    if (ask && choice === 1) await this.effects.stashTalk(npc);
+    // extra things you can ask for (last option: "got anything?")
+    const fx = this.effects;
+    const extra = [];
+    if (fx.tokens > 0 && npc.def.tokenAsker && !npc.gotToken) extra.push([de ? `🎟️ Getränkemarke schenken (du hast ${fx.tokens})` : `🎟️ Give a drink token (you have ${fx.tokens})`, () => fx.giftToken(npc)]);
+    if (fx.tokens > 0 && TOKEN_TRADERS.includes(id) && (id !== 'verena' || qs.isDone('q9_festzelt'))) extra.push([de ? `🎟️ Getränk gegen Marke (du hast ${fx.tokens})` : `🎟️ A drink for a token (you have ${fx.tokens})`, () => fx.tokenShop(npc)]);
+    if (this.services.canHire(npc)) extra.push([de ? `🤝 Kannst du mir was holen? (✺ ${HIRE_COST})` : `🤝 Could you fetch something for me? (✺ ${HIRE_COST})`, () => this.services.hire(npc)]);
+    if (id === 'franzi' && this.bikeSys.canRent()) extra.push([de ? `🚲 Hexenrad leihen (✺ ${this.bikeSys.cost})` : `🚲 Borrow the witch bike (✺ ${this.bikeSys.cost})`, async () => { if (this.bikeSys.rent()) await this.reply(npc, de ? 'Aber bring\'s heil zurück! Der Besen ist handgebunden.' : 'Bring it back in one piece! The broom is hand-tied.'); else await this.reply(npc, de ? 'Ein bisschen Karma brauch ich schon. Für die Kette. Und den Besen.' : 'I do need a little karma. For the chain. And the broom.'); }]);
+    if (this.services.canStyle(npc)) extra.push([de ? '💇 Stylen lassen' : '💇 Get styled', () => this.services.styling(npc)]);
+    const ask = fx.canAsk(npc);
+    const opts = [de ? 'Bis später!' : 'See you!', ...extra.map((x) => x[0]), ...(ask ? [de ? '👀 Hast du was dabei?' : '👀 Got anything on you?'] : [])];
+    const choice = await this.runDialog([{ who: id, text: line }], opts.length > 1 ? opts : null, npc);
+    if (choice >= 1 && choice <= extra.length) await extra[choice - 1][1]();
+    else if (ask && choice === extra.length + 1) await fx.stashTalk(npc);
   }
 
   /** The festival only opens once every job is done (errands don't count). */
@@ -1234,7 +1247,7 @@ export class Game {
           const relevant = mk || this.drama.events.some((e) => e.victims.includes(n) || (e.discovered && !e.helping && e.def.helpers.includes(n.def.id)));
           const red = this.drama.isRedMarked(n);
           const blue = this.effects.isDealer(n);
-          list.push({ d: d + (relevant || blue ? -1 : 1.8), label: `${t('p.talk', { name: n.def.name })}${red ? ' <b style="color:#ff3b30">!</b>' : blue ? ' <b style="color:#3aa0ff">!</b>' : mk ? ` <b style="color:${mk === '!' ? '#ffd21f' : '#7fe0ff'}">${mk}</b>` : ''}`, action: () => this.talkTo(n) });
+          list.push({ d: d + (relevant || blue ? -1 : 1.8), label: `${t('p.talk', { name: n.def.name })}${red ? ' <b style="color:#ff3b30">!</b>' : blue ? ' <b style="color:#3aa0ff">!</b>' : mk ? ` <b style="color:${mk === '!' ? '#ffd21f' : mk === 'fav' ? '#6fdc6a' : '#7fe0ff'}">${mk === 'fav' ? '!' : mk}</b>` : ''}`, action: () => this.talkTo(n) });
         }
       }
       // the Trigel (hedgehog) looking for crumbs in the Aufenthaltszelt
@@ -1243,6 +1256,22 @@ export class Game {
           this.ui.toast(this.trigel.pet());
           if (!this.trigel.petted) { this.trigel.petted = true; this.quests.state.karma += 1; this.refreshHUD(); }
         } });
+      }
+      // Franzi's bike: only if you borrowed it
+      const bike = this.vehicles.bike;
+      const bd = bike.position.distanceTo(p);
+      if (bd < 2.2 && !this.bikeSys.rider) {
+        const de = getLang() === 'de';
+        if (this.bikeSys.canRide()) list.push({ d: bd + 0.5, label: de ? '🚲 Hexenrad fahren' : '🚲 Ride the witch bike', action: () => this.enterVehicle(bike) });
+        else list.push({ d: bd + 2, label: de ? `🚲 Franzis Hexenrad – bei Franzi leihen (✺ ${this.bikeSys.cost})` : `🚲 Franzi's witch bike – borrow it from Franzi (✺ ${this.bikeSys.cost})`, disabled: true });
+      }
+      // broken generator / poo pump: pro gaffa lets you patch it yourself
+      if (this.effects.gaffa > 0) {
+        for (const e of this.drama.events) {
+          if (!['generator', 'pump'].includes(e.type) || !e.pos?.()) continue;
+          const d = e.pos().distanceTo(p);
+          if (d < 4.5) list.push({ d: d - 0.5, label: getLang() === 'de' ? `🩹 Selbst mit Gaffa flicken (×${this.effects.gaffa})` : `🩹 Patch it yourself with gaffa (×${this.effects.gaffa})`, action: () => this.drama.gaffaFix(e) });
+        }
       }
       for (const v of [quad, radlader]) {
         const d = v.position.distanceTo(p);
@@ -1333,6 +1362,8 @@ export class Game {
       }
       this.introShown = data.introShown;
       this.applyProgressLevel();
+      if (this.quests.state.flags.look) { this.player.setLook(this.quests.state.flags.look); this.updateCarried(); }
+      this.bikeSys.reset();
       return true;
     } catch (e) {
       console.warn('Save broken, starting fresh', e);
@@ -1401,10 +1432,12 @@ export class Game {
     else this.player.char.update(dt);
 
     if (!veh && this.player.moved - (this._lastStep || 0) > 1.4) { this._lastStep = this.player.moved; this.audio.step(); }
-    this.audio.engine(veh ? veh.kmh / 50 : 0, !!veh && veh.canDrive());
+    const motor = veh && veh.id !== 'bike';
+    this.audio.engine(motor ? veh.kmh / 50 : 0, !!motor && veh.canDrive());
 
     this.npcs.update(time, dt, ctx);
-    if (playing && veh) this.checkRunOver(veh);
+    if (playing && veh && veh.id !== 'bike') this.checkRunOver(veh);
+    if (playing) this.bikeSys.update(dt);
     this.quests.update(time, dt, this.player.position);
     this.world.update(time, dt, this.player.position);
     this.trigel.update(dt, time, this.player.vehicle ? this.player.vehicle.position : this.player.position, this.world.night);
@@ -1464,7 +1497,7 @@ export class Game {
 
     // HUD
     this.ui.tracker(this.quests, this.player.position, this.drama);
-    this.ui.stamina(veh ? 1 : this.player.stamina);
+    this.ui.stamina(veh ? 1 : this.player.stamina, veh ? 1 : this.player.staminaMax || 1);
     this.ui.vehicleHud(veh);
     this.ui.drawMinimap(this.player.position, this.headingOf(), this.cam.yaw, [...this.quests.trackedObjectives(), ...this.drama.objectives(), ...this.soundbox.objectives()], this.npcs.all.filter((n) => !n.hidden), this.quests, this.vehicles);
     this.ui.overlays(this.npcs.all.filter((n) => !n.hidden), this.camera, this.player.position);
@@ -1536,7 +1569,7 @@ export class Game {
     } else if (choice === 1) {
       if (this.player.vehicle) this.exitVehicle();
       const vs = this.world.vehicleSpots;
-      for (const [id, v] of Object.entries(this.vehicles)) { v.place(vs[id].pos, vs[id].heading); v.speed = 0; }
+      for (const [id, v] of Object.entries(this.vehicles)) if (vs[id]) { v.place(vs[id].pos, vs[id].heading); v.speed = 0; }
       await this.reply(npc, de ? 'Zdenko und ich schieben das! …Zdenko schiebt. Ich lach. HAHAHA!' : 'Zdenko and I will push it! …Zdenko pushes. I laugh. HAHAHA!');
       this.ui.toast(de ? '🚜 Quad und Radlader stehen wieder in der Crew-Base.' : '🚜 Quad and wheel loader are back at the crew base.');
     } else await this.reply(npc, npc.line());
@@ -1628,8 +1661,19 @@ export class Game {
       if (this.sunriseT <= 0) { this.world.setNight(0, 25); this.world.visibility = 220; }
     }
     const n = this.world.night;
-    this.headlamp.intensity = n > 0.3 ? 18 * n : 0;
-    this.headlamp.position.set(this.player.position.x, this.player.position.y + 2.2, this.player.position.z);
+    const lamp = this.quests.isDone('q4_lights'); // Fabi hands you a headlamp after the lights job
+    const pp = this.player.position;
+    this.headlamp.intensity = n > 0.3 ? (lamp ? 22 : 12) * n : 0;
+    this.headlamp.distance = lamp ? 22 : 13;
+    this.headlamp.position.set(pp.x, pp.y + 2.2, pp.z);
+    // the beam: points where you look (or drive)
+    const on = lamp && n > 0.3;
+    this.headBeam.intensity = on ? 70 * n : 0;
+    if (on) {
+      const h = this.player.vehicle ? this.player.vehicle.heading : this.player.char.root.rotation.y;
+      this.headBeam.position.set(pp.x, pp.y + 1.9, pp.z);
+      this.headBeam.target.position.set(pp.x + Math.sin(h) * 12, pp.y, pp.z + Math.cos(h) * 12);
+    }
   }
 
   shoutWristband(dt) {

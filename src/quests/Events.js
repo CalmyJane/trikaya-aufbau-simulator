@@ -6,7 +6,7 @@ import { L, getLang } from '../i18n.js';
 // Types:
 //   nail         – someone stepped into a nail                → Franzi treats on the spot
 //   passedout    – someone passed out                         → Franzi wakes them & takes them to awareness
-//   drunk/high/keta – too drunk / too high / too much keta    → Franzi takes them to the awareness tent
+//   drunk/high/keta – too drunk / too high / completely wasted → Franzi takes them to the awareness tent
 //   kitchenfight – fight in the kitchen                       → Fabi or Jan (Leo, good luck)
 //   generator    – power generator broke                      → Felix, Thompsen, Wasser Andi, Strom Andi, Juli (or buy a new one)
 //   julifight    – Juli gets into it with a volunteer          → Jan or Fabi (Leo, good luck)
@@ -190,10 +190,10 @@ export const EVENT_TYPES = {
   },
   keta: {
     weight: 2, helpers: ['franzi', 'delsin'], victims: 1, cost: 0, penalty: 0, karma: 25, prefer: ['rocky', 'estenko'], exclude: ['isi'], storyChance: 0.4,
-    title: { de: 'Im K-Hole', en: 'In a k-hole' },
-    task: { de: '{victim} ist voll auf Keta – hol Franzi', en: '{victim} is deep on keta – get Franzi' },
+    title: { de: 'Völlig verballert', en: 'Completely wasted' },
+    task: { de: '{victim} ist völlig verballert – hol Franzi', en: '{victim} is completely wasted – get Franzi' },
     victimLine: { de: '…… …hm? …… Ich bin grad… nicht hier. Ruf später an.', en: '…… …hm? …… I\'m not… here right now. Call later.' },
-    helperDialog: { de: 'Keta? Mitten beim Aufbau? …Okay. Ganz langsam rüber ins Awareness-Zelt.', en: 'Keta? In the middle of the build? …Okay. I\'ll bring them very slowly to the awareness tent.' },
+    helperDialog: { de: 'Mitten beim Aufbau? …Okay. Ganz langsam rüber ins Awareness-Zelt.', en: 'In the middle of the build? …Okay. Very slowly over to the awareness tent.' },
     doneLine: { de: 'Sitzt jetzt ganz ruhig im Zelt und findet langsam den Weg zurück.', en: 'Sitting quietly in the tent now, slowly finding the way back.' },
     mode: 'keta',
   },
@@ -537,6 +537,20 @@ export class DramaSystem {
     this.cleanup(e, keepVictims);
     g.ui.toast(L({ de: `✔ Geholfen! (+${k} Karma)`, en: `✔ Helped out! (+${k} karma)` }));
     g.audio.accept();
+  }
+
+  /** Pro gaffa: you patch the generator / poo pump yourself, right now. */
+  gaffaFix(e) {
+    const g = this.game, de = getLang() === 'de';
+    if (!this.events.includes(e)) return;
+    g.effects.gaffa = Math.max(0, g.effects.gaffa - 1);
+    if (e.helping) { e.helping.task = null; e.helping.say(de ? 'Oh. Hast du schon gemacht? Mit Gaffa? …Respekt.' : 'Oh. You did it already? With gaffa? …Respect.', 4); }
+    g.player.work?.(1.2);
+    const k = e.def.karma || 15;
+    g.quests.state.karma += k;
+    this.cleanup(e);
+    g.audio.accept();
+    g.ui.toast(de ? `🩹 Mit Gaffa geflickt! Hält. Bestimmt. (+${k} ✺)` : `🩹 Patched with gaffa! It holds. Surely. (+${k} ✺)`);
   }
 
   expire(e) {

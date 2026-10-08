@@ -423,8 +423,58 @@ export function buildFirespace() {
   spots.fire_slot_3 = [2.5, -1.9];
   spots.fire_slot_4 = [-0.4, -3.2];
 
+  // ---- home-made wooden grandstands (left & right, from last year) – reinforced in Georg's job
+  const old = mat('#8f7a62'), oldDark = mat('#6e5c48'), fresh = woodMat('#e2c18a');
+  const fixParts = []; // [index] → objects that appear once that target is reinforced
+  const TRIB = [-62, -108, 62, 108].map((deg) => {
+    const a = (deg * Math.PI) / 180, R = 8.3;
+    return { x: Math.sin(a) * R, z: STAGE.z + Math.cos(a) * R, rot: a + Math.PI };
+  });
+  TRIB.forEach((t, i) => {
+    const tg = new THREE.Group();
+    tg.position.set(t.x, 0, t.z);
+    tg.rotation.y = t.rot;
+    g.add(tg);
+    const W = 4.6;
+    // three tiers rising to the back (-z), seat boards + foot boards
+    for (let k = 0; k < 3; k++) {
+      const y = 0.45 + k * 0.45, z = 0.6 - k * 0.75;
+      const seat = box(W, 0.06, 0.32, old, 0, y, z);
+      seat.rotation.z = (i % 2 ? 1 : -1) * 0.012 * (k + 1); // last year's sag
+      tg.add(seat);
+      tg.add(box(W, 0.04, 0.3, oldDark, 0, y - 0.28, z + 0.36));
+      for (const x of [-W / 2 + 0.2, 0, W / 2 - 0.2]) tg.add(box(0.1, y, 0.1, oldDark, x, y / 2, z)); // posts
+    }
+    for (const s of [-1, 1]) { // side stringers
+      const st = box(0.08, 0.18, 2.5, oldDark, s * (W / 2 - 0.05), 0.95, -0.15);
+      st.rotation.x = 0.55;
+      tg.add(st);
+    }
+    const loose = box(1.6, 0.05, 0.25, old, 1.3, 1.36, -0.85); // a loose board
+    loose.rotation.set(0.25, 0.3, 0.08);
+    tg.add(loose);
+    // reinforcement: fresh diagonal braces, extra posts, a new back rail
+    const fix = new THREE.Group();
+    for (const s of [-1, 1]) {
+      fix.add(strut(new THREE.Vector3(s * (W / 2 - 0.25), 0.05, 0.7), new THREE.Vector3(s * (W / 2 - 0.25), 1.3, -0.9), 0.05, fresh));
+      fix.add(strut(new THREE.Vector3(s * 0.3, 0.05, -0.9), new THREE.Vector3(s * (W / 2 - 0.4), 1.25, -0.9), 0.045, fresh));
+    }
+    for (const x of [-1.1, 1.1]) for (let k = 0; k < 3; k++) { const y = 0.45 + k * 0.45; fix.add(box(0.12, y, 0.12, fresh, x, y / 2, 0.6 - k * 0.75 - 0.12)); }
+    fix.add(box(W, 0.12, 0.1, fresh, 0, 2.2, -1.0));
+    for (const s of [-1, 1]) fix.add(box(0.1, 2.2, 0.1, fresh, s * (W / 2 - 0.05), 1.1, -1.0));
+    fix.visible = false;
+    tg.add(fix);
+    fixParts[i + 1] = [fix];
+    loose.userData.hideWhenFixed = i + 1;
+    fixParts[i + 1].push(loose);
+    // collider (whole stand) – world rot = local rot + structure rotation, like every other box collider
+    colliders.push({ type: 'box', x: t.x - Math.sin(t.rot) * 0.3, z: t.z - Math.cos(t.rot) * 0.3, hw: W / 2, hd: 1.35, rot: t.rot });
+    // work spot in front of the stand (stage side)
+    spots[`fire_fix_${i + 2}`] = [t.x + Math.sin(t.rot) * 1.9, t.z + Math.cos(t.rot) * 1.9];
+  });
+
   // ---- the real fire pit, off to the side, with log benches
-  const PIT = { x: 10.5, z: 3 };
+  const PIT = { x: 3.5, z: 10 }; // in front, so the grandstands get the sides
   const stone = mat('#7a7a72');
   for (let i = 0; i < 14; i++) {
     const a = (i / 14) * Math.PI * 2;
@@ -463,7 +513,7 @@ export function buildFirespace() {
   spots.fire_pit = [PIT.x - 2.6, PIT.z - 2.2];
 
   // ---- the fire island's corner: toy rack, dip station, safety gear
-  const RACK = { x: -8, z: -1.5 };
+  const RACK = { x: -6.5, z: 9.5 };
   const rackWood = mat('#8a6a42');
   for (const dx of [-0.9, 0.9]) {
     const leg = cyl(0.05, 0.05, 1.9, rackWood, 5, RACK.x + dx, 0.95, RACK.z);
@@ -504,6 +554,22 @@ export function buildFirespace() {
   plaque.rotation.set(-0.25, -0.35, 0.08);
   shiva.add(plaque);
   colliders.push({ type: 'circle', x: 0, z: -8.6, r: 3.6 });
+  // reinforcement of last year's statue: props against the back & shoulders, ratchet straps round the mound
+  const sfix = new THREE.Group();
+  const beam = woodMat('#e2c18a');
+  for (const s of [-1, 1]) sfix.add(strut(new THREE.Vector3(s * 2.9, 0.1, -2.6), new THREE.Vector3(s * 1.1, 4.3, -0.45), 0.12, beam));
+  sfix.add(strut(new THREE.Vector3(0, 0.1, -3.9), new THREE.Vector3(0, 3.9, -0.55), 0.13, beam));
+  const strap = mat('#f0b020');
+  for (const [r, y] of [[3.3, 0.45], [2.4, 0.95]]) {
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(r, 0.05, 5, 40), strap);
+    ring.rotation.x = Math.PI / 2;
+    ring.position.y = y;
+    sfix.add(ring);
+  }
+  sfix.visible = false;
+  shiva.add(sfix);
+  fixParts[0] = [sfix];
+  spots.fire_fix_1 = [1.6, -4.3];
 
   const sign = signPost('FIRESPACE', { width: 3.0, height: 1.0, bg: '#3a1a0a', fg: '#ffb060' });
   sign.position.set(-5, 0, 6.8);
@@ -515,7 +581,13 @@ export function buildFirespace() {
     fireLight.intensity = 7 + Math.sin(t * 13) * 1.5 + Math.sin(t * 7.3) * 1.2;
     ringLeds.forEach((l, i) => l.material.color.setHSL((0.05 + Math.sin(t * 0.7 + i * 0.4) * 0.05 + 1) % 1, 1, 0.5 + 0.1 * Math.sin(t * 3 + i)));
   };
-  return { object: g, colliders };
+  const api = {
+    /** reinforced targets: 0 = statue, 1–4 = grandstands */
+    setFix(done) {
+      fixParts.forEach((parts, i) => parts.forEach((o) => { o.visible = o.userData.hideWhenFixed === undefined ? done.includes(i) : !done.includes(i); }));
+    },
+  };
+  return { object: g, colliders, api };
 }
 
 // ------------------------------------------------------------------ Mia's Narnia Floor (built in stages by her crew)

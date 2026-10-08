@@ -28,7 +28,7 @@ export function install(g) {
     T.L.root.position.set(p.x - Math.sin(h) * 4.0, 0, p.z - Math.cos(h) * 4.0);
     T.L.syncCollider(); T.step(2);
   };
-  const heavy = (id) => ['dixi_pallet_1', 'dixi_pallet_2', 'sail_crate', 'tent_chai', 'festzelt_bag', 'wc_container_item', 'dome_wood', 'wood_panels', 'wardrobe', 'hammock_posts', 'straw_bales', 'entrance_tent_bag', 'market_stalls', 'water_tank'].includes(id);
+  const heavy = (id) => ['dixi_pallet_1', 'dixi_pallet_2', 'sail_crate', 'tent_chai', 'festzelt_bag', 'wc_container_item', 'dome_wood', 'wood_panels', 'wardrobe', 'hammock_posts', 'straw_bales', 'entrance_tent_bag', 'market_stalls', 'water_tank', 'fs_beams'].includes(id);
   T.run = async (qid, failOnce) => {
     const log = T.log;
     let guard = 0;
@@ -95,7 +95,7 @@ export function install(g) {
     ['jan', 'q0_leo'], ['jan', 's0_soundbox'], ['corni', 'q1a_posts'], ['corni', 'q1_rigging'], ['matze', 'q2_sails'], ['felix', 'q4_lights'],
     ['corni', 'x1_nuss'],
     // day 2 · night 2
-    ['corni', 'q3_toilets'], ['sabse', 's1_veggies'], ['franzi', 'q6_awareness'], ['mia', 'n1_narnia'], ['wiesel', 'h1_hammocks'], ['cosma', 'k1_kuenstlergasse'], ['flo', 's3_quad'], ['krygo', 'kr1_sauna'],
+    ['corni', 'q3_toilets'], ['sabse', 's1_veggies'], ['franzi', 'q6_awareness'], ['mia', 'n1_narnia'], ['wiesel', 'h1_hammocks'], ['cosma', 'k1_kuenstlergasse'], ['flo', 's3_quad'], ['krygo', 'kr1_sauna'], ['georg', 'fs1_tribuenen'],
     ['corni', 's2_storm'],
     // day 3 · night 3
     ['jan', 'e1_entrance'], ['annika', 'm1_shops'], ['matze', 'q7_dome'], ['mia', 'n2_narnia'], ['cosma', 'k2_kunst'], ['andi', 'r1_wassertank'], ['fabbe', 'q8_forestdome'],

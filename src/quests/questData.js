@@ -624,6 +624,45 @@ export const QUESTS = [
     reward: { karma: 25 },
   },
 
+  // ------------------------------------------------------------------ FS1 — Firespace: last year's statue & grandstands need reinforcing (Georg)
+  {
+    id: 'fs1_tribuenen',
+    title: { de: 'Wackelige Tribünen', en: 'Wobbly Grandstands' },
+    giver: 'georg',
+    day: 2,
+    requires: ['q0_leo'],
+    summary: { de: 'Die Statue und die vier selbstgebauten Holztribünen am Firespace stehen noch vom Vorjahr – und wackeln. Alles muss verstärkt werden.', en: 'The statue and the four home-made wooden grandstands at the Firespace are still standing from last year – and wobbling. Everything needs reinforcing.' },
+    offer: [
+      { who: 'georg', text: { de: 'Schön, dass du da bist! Die Statue und die Tribünen stehen noch vom letzten Jahr. Wunderschön. …Und ein bisschen wackelig. Also, sehr wackelig.', en: 'Lovely that you\'re here! The statue and the grandstands are still standing from last year. Beautiful. …And a little wobbly. Well, very wobbly.' } },
+      { who: 'georg', text: { de: 'Dennis hat sich gestern auf die zweite Tribüne gesetzt. Sie hat geknarzt. Dennis auch. Wir brauchen Kanthölzer vom Parkplatz – nimm den Radlader – und die Schraubenkiste aus der Werkstatt.', en: 'Dennis sat on the second grandstand yesterday. It creaked. So did Dennis. We need timber beams from the parking – take the loader – and the screw box from the workshop.' } },
+    ],
+    accept: { de: 'Ich verstärk das!', en: 'I\'ll reinforce it!' },
+    decline: { de: 'Später, Georg.', en: 'Later, Georg.' },
+    steps: [
+      { type: 'pickup', text: { de: 'Hol die Kanthölzer (Parkplatz, Radlader) und die Schraubenkiste (Werkstatt)', en: 'Get the timber beams (parking, loader) and the screw box (workshop)' }, items: [{ item: 'fs_beams', at: 'parking' }, { item: 'fs_screws', at: 'werkstatt_inside' }] },
+      {
+        type: 'deliver', text: { de: 'Bring alles zum Firespace', en: 'Bring everything to the Firespace' },
+        items: ['fs_beams', 'fs_screws'], plot: 'firespace', buildTime: 1.5,
+        buildLabel: { de: 'Material abladen', en: 'Unload material' },
+      },
+      {
+        type: 'work', text: { de: 'Verstärk die Statue und alle 4 Tribünen', en: 'Reinforce the statue and all 4 grandstands' },
+        targets: ['fire_fix_1', 'fire_fix_2', 'fire_fix_3', 'fire_fix_4', 'fire_fix_5'], workTime: 3, progress: 'fire_fix', costEach: 60,
+        label: { de: 'Verstreben & verschrauben', en: 'Brace & screw' },
+        minigame: 'mash', minigameTitle: { de: 'Schrauben! Schrauben! SCHRAUBEN!', en: 'Screw! Screw! SCREW!' }, minigameOpts: { need: 10, time: 4.5 },
+        minigameFail: { de: 'Die Schraube dreht durch. Nochmal, mit Gefühl.', en: 'The screw is spinning freely. Again, gently.' },
+      },
+      {
+        type: 'talk', npc: 'georg', text: { de: 'Sag Georg Bescheid', en: 'Tell Georg' },
+        dialog: [
+          { who: 'georg', text: { de: 'Steht! Statue und alle vier Tribünen. Ich will ja nichts sagen, aber die hintere links ist ein bisschen… Nein. Schön. Wirklich schön.', en: 'Solid! The statue and all four grandstands. I don\'t want to say anything, but the back left one is a little… No. Lovely. Really lovely.' } },
+          { who: 'dennis', text: { de: 'Kein Knarzen mehr. Also, nur noch von mir.', en: 'No more creaking. Well, only from me.' } },
+        ],
+      },
+    ],
+    reward: { karma: 25 },
+  },
+
   // ------------------------------------------------------------------ KR1 — Krygo's sauna (never gets finished)
   {
     id: 'kr1_sauna',

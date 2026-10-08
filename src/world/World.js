@@ -310,6 +310,7 @@ export class World {
       }
     };
     this.progressHandlers.pump = () => {};
+    this.progressHandlers.fire_fix = (done) => this.structures.firespace?.api?.setFix(done);
     // crew kitchen (Sabse's kingdom)
     const k = this.placeStructure('kitchen', 'kitchen', null, { animate: false, at: LANDMARKS.kitchen, rotation: 0 });
     this.placeStructure('firespace', 'firespace', 'firespace', { animate: false, rotation: Math.PI });

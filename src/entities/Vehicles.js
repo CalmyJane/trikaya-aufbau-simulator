@@ -371,8 +371,6 @@ export class Bike extends Vehicle {
     bar.rotation.z = Math.PI / 2;
     b.add(bar);
     b.add(cyl(0.02, 0.02, 0.2, dark, 6, 0, 0.9, 0.44));
-    // basket in front
-    b.add(box(0.32, 0.18, 0.24, mat('#b08a4a', { roughness: 1 }), 0, 0.92, 0.66));
     // the witch's broom, strapped on horizontally along the bike
     const broom = new THREE.Group();
     const stick = cyl(0.025, 0.03, 1.7, mat('#7a5230', { roughness: 1 }), 6);
@@ -382,9 +380,6 @@ export class Bike extends Vehicle {
     bristles.rotation.x = Math.PI / 2;
     bristles.position.z = -1.0;
     broom.add(bristles);
-    const strap = cyl(0.17, 0.17, 0.05, mat('#5a2a6a'), 8, 0, 0, -0.78);
-    strap.rotation.x = Math.PI / 2;
-    broom.add(strap);
     broom.position.set(0.16, 0.74, 0.05);
     b.add(broom);
     for (const z of [0.55, -0.55]) this.spokeWheel(0.34, 0, 0.34, z);

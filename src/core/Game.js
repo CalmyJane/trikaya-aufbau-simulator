@@ -343,7 +343,8 @@ export class Game {
       $('btn-reset-yes').onclick = () => { this.ui.closeModal(); this.newGame(); };
       $('btn-reset-no').onclick = () => { this.audio.click(); this.ui.closeModal(); };
     };
-    $('btn-continue').onclick = () => { unlockAudio(); this.startPlay(); };
+    $('btn-continue').onclick = () => { unlockAudio(); this.exitPreview(); this.startPlay(); };
+    $('btn-preview').onclick = () => { unlockAudio(); this.togglePreview(); };
     $('btn-controls').onclick = () => { this.audio.click(); this.ui.modal(this.controlsHtml()); };
     $('btn-settings').onclick = () => { this.audio.click(); this.openSettings(); };
     $('btn-credits').onclick = () => { this.audio.click(); this.ui.modal(this.creditsHtml()); };
@@ -395,6 +396,45 @@ export class Game {
     for (const id of ['btn-mute', 'btn-pmute']) document.getElementById(id).textContent = this.audio.muted ? '🔇' : '🔊';
   }
 
+  /**
+   * Main menu: show the finished festival with everything built (all jobs done) behind the menu.
+   * Your real progress is kept aside and comes back as soon as you play.
+   */
+  togglePreview() {
+    if (this.previewState) this.exitPreview();
+    else {
+      this.previewState = this.quests.serialize();
+      const all = this.quests.constructor.freshState();
+      for (const q of Object.values(this.quests.quests)) {
+        all.completed.push(q.id);
+        for (const st of q.steps) {
+          if (st.build) all.built.push({ ...st.build });
+          if (st.type === 'work' && st.progress) all.progress[st.progress] = st.targets.map((_, i) => i);
+        }
+      }
+      this.world.clearStructures();
+      this.quests.restore(all);
+      this.applyProgressLevel();
+    }
+    this.previewLabel();
+  }
+
+  exitPreview() {
+    if (!this.previewState) return;
+    const real = this.previewState;
+    this.previewState = null;
+    this.world.clearStructures();
+    this.quests.restore(real);
+    this.applyProgressLevel();
+    this.previewLabel();
+  }
+
+  previewLabel() {
+    const b = document.getElementById('btn-preview');
+    b.dataset.i18n = this.previewState ? 'menu.previewOff' : 'menu.preview';
+    b.textContent = t(b.dataset.i18n);
+  }
+
   toMenu() {
     const from = this.mode;
     this.mode = 'menu';
@@ -409,6 +449,7 @@ export class Game {
   }
 
   newGame() {
+    this.exitPreview();
     this.clearVolTarget?.();
     try { localStorage.removeItem(SAVE_KEY); } catch { /* ignore */ }
     this.world.clearStructures();
@@ -1327,7 +1368,7 @@ export class Game {
 
   // ------------------------------------------------------------------ save / load
   save() {
-    if (!this.quests) return;
+    if (!this.quests || this.previewState) return; // never save the menu preview
     const { quad, radlader } = this.vehicles;
     const vs = (v) => ({ x: v.position.x, z: v.position.z, h: v.heading });
     const data = {

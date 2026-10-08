@@ -77,7 +77,7 @@ export class Parking {
         a.hits++;
         g.audio.tone?.(320, 0.08, { type: 'square', vol: 0.08 });
         if (a.hits >= MAX_HITS) {
-          g.ui.toast(de ? `🚧 ${a.hits} Hütchen umgefahren! Juli stellt sie seufzend wieder auf. Nochmal – langsam.` : `🚧 ${a.hits} cones knocked over! Juli sighs and puts them back. Again – slowly.`);
+          g.ui.toast(de ? `🚧 ${a.hits} Hütchen umgefahren! Juli stellt sie seufzend wieder auf. Nochmal, langsam.` : `🚧 ${a.hits} cones knocked over! Juli sighs and puts them back. Again, slowly.`);
           g.npcs.get('juli')?.say({ de: 'Langsam. LANGSAM. Das ist ein Radlader, kein Autoscooter.', en: 'Slowly. SLOWLY. It\'s a wheel loader, not a bumper car.' }, 4);
           for (const k of a.cones) { k.down = false; k.obj.rotation.set(0, 0, 0); }
           a.hits = 0;
@@ -89,7 +89,7 @@ export class Parking {
     const dx = lp.x - a.spot.x, dz = lp.z - a.spot.z;
     let dh = L.heading - a.h; dh = Math.atan2(Math.sin(dh), Math.cos(dh));
     const onMark = Math.hypot(dx, dz) < POS_TOL && Math.abs(dh) < HEAD_TOL;
-    if (onMark && !a.hinted && Math.abs(L.speed) > 0.2) { a.hinted = true; g.ui.toast(de ? '🅿️ Gut so – jetzt anhalten!' : '🅿️ That\'s it – now stop!'); }
+    if (onMark && !a.hinted && Math.abs(L.speed) > 0.2) { a.hinted = true; g.ui.toast(de ? '🅿️ Gut so, jetzt anhalten!' : '🅿️ That\'s it, now stop!'); }
     if (onMark && Math.abs(L.speed) < 0.3) a.hold += dt; else a.hold = 0;
     // right spot, wrong direction: tell them instead of silently waiting
     if (!onMark && Math.hypot(dx, dz) < POS_TOL && Math.abs(L.speed) < 0.3) {
@@ -98,7 +98,7 @@ export class Parking {
         a.wrongHintCD = 8;
         g.ui.toast(Math.abs(dh) > 2.2
           ? (de ? '🅿️ Falsch herum! Dreh den Radlader um und fahr vorwärts rein.' : '🅿️ Wrong way round! Turn the loader around and drive in forwards.')
-          : (de ? '🅿️ Fast! Aber schief – stell ihn gerade auf die Markierung.' : '🅿️ Almost! But crooked – line it up straight on the mark.'));
+          : (de ? '🅿️ Fast! Aber schief, stell ihn gerade auf die Markierung.' : '🅿️ Almost! But crooked, line it up straight on the mark.'));
       }
     } else a.wrongT = 0;
     if (a.wrongHintCD > 0) a.wrongHintCD -= dt;

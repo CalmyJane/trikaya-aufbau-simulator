@@ -339,6 +339,37 @@ body.police::after { background: radial-gradient(ellipse at center, transparent 
 #minigame.fail .mg-panel { border-color: #ff5a4a; box-shadow: 0 0 24px rgba(255, 90, 74, 0.5); }
 #minigame.done { opacity: 0; transition: opacity 0.3s; }
 #minigame .mg-panel { position: relative; }
+#minigame .mg-panel { max-height: calc(100vh - 24px); overflow-y: auto; }
+@media (max-height: 520px) { #minigame { padding-bottom: 12px; align-items: center; } #minigame .mg-title { font-size: 17px; margin: 0 30px 6px; } }
+#minigame .mg-sub { margin-top: 6px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
+#minigame .mg-subfill { height: 100%; width: 0; background: #5adc6e; }
+#minigame .mg-bubble { width: 18px; margin-left: -9px; top: 3px; bottom: 3px; border-radius: 50%; background: #ffd21f; box-shadow: 0 0 10px #ffd21f; }
+#minigame .mg-bubble.in { background: #8dff9e; box-shadow: 0 0 12px #8dff9e; }
+#minigame .mg-btn { font: inherit; color: #fff; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 10px; cursor: pointer; touch-action: none; }
+#minigame .mg-btn:disabled { cursor: default; }
+#minigame .mg-btn.good { background: rgba(90, 220, 110, 0.35); border-color: #5adc6e; }
+#minigame .mg-btn.shake { animation: mgShake 0.3s; background: rgba(255, 90, 74, 0.35); }
+@keyframes mgShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+#minigame .mg-seq { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; }
+#minigame .mg-slot { width: 38px; height: 38px; line-height: 38px; border-radius: 8px; background: rgba(255, 255, 255, 0.08); font-size: 22px; font-weight: 800; }
+#minigame .mg-slot.shown { background: rgba(255, 210, 31, 0.3); }
+#minigame .mg-slot.good { background: rgba(90, 220, 110, 0.35); }
+#minigame .mg-slot.bad { background: rgba(255, 90, 74, 0.45); }
+#minigame .mg-pad { display: flex; justify-content: center; gap: 10px; }
+#minigame .mg-arrow { width: 58px; height: 52px; font-size: 26px; font-weight: 800; }
+#minigame .mg-arrow.lit { background: rgba(255, 210, 31, 0.6); border-color: #ffd21f; }
+#minigame .mg-list { display: flex; flex-direction: column; gap: 6px; }
+#minigame .mg-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; text-align: left; font-size: 15px; min-height: 40px; }
+#minigame .mg-num { flex: 0 0 22px; height: 22px; line-height: 22px; border-radius: 50%; background: rgba(255, 255, 255, 0.15); text-align: center; font-size: 12px; font-weight: 800; }
+#minigame .mg-match { display: flex; gap: 10px; }
+#minigame .mg-col { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+#minigame .mg-left { padding: 8px 10px; min-height: 40px; display: flex; align-items: center; border-radius: 10px; background: rgba(255, 255, 255, 0.05); font-size: 15px; text-align: left; opacity: 0.55; }
+#minigame .mg-left.cur { opacity: 1; background: rgba(255, 210, 31, 0.3); box-shadow: 0 0 10px rgba(255, 210, 31, 0.5); }
+#minigame .mg-left.good { opacity: 0.8; background: rgba(90, 220, 110, 0.25); box-shadow: none; }
+#minigame .mg-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 260px; margin: 0 auto; }
+#minigame .mg-tile { height: 58px; font-size: 30px; }
+#minigame .mg-tile.wobble { animation: mgWobble 0.5s ease-in-out infinite; }
+@keyframes mgWobble { 0%, 100% { transform: rotate(5deg); } 50% { transform: rotate(16deg); } } /* crooked AND wobbly, visible in a still frame too */
 #minigame .mg-cancel { position: absolute; top: 6px; right: 8px; width: 34px; height: 34px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, 0.12); color: #fff; font-size: 16px; cursor: pointer; }
 /* phones in landscape: the logo goes to the bottom right, away from the menu buttons */
 @media (max-height: 500px) { .fly-hint { display: none; } .cj-badge { left: auto; right: calc(14px + env(safe-area-inset-right)); bottom: 10px; } .cj-text { height: 28px; } }

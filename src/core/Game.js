@@ -150,7 +150,7 @@ export class Game {
       const s = obj.scale.y; obj.scale.y = 1; obj.updateMatrixWorld(true); // growing structures start flat
       const area = new THREE.Box3().setFromObject(obj);
       obj.scale.y = s; obj.updateMatrixWorld(true);
-      for (const v of Object.values(this.vehicles)) if (v.unstick(obj.position, 0.35, area)) this.ui.toast(getLang() === 'de' ? `🚜 ${L(v.name)} umgeparkt – stand im Weg.` : `🚜 ${L(v.name)} moved – it was in the way.`); };
+      for (const v of Object.values(this.vehicles)) if (v.unstick(obj.position, 0.35, area)) this.ui.toast(getLang() === 'de' ? `🚜 ${L(v.name)} umgeparkt, stand im Weg.` : `🚜 ${L(v.name)} moved, it was in the way.`); };
     this.vehicles.quad.onBreak = () => {
       this.mechanicNearby();
       this.audio.sputter();
@@ -243,7 +243,7 @@ export class Game {
       [k('W') + k('A') + k('S') + k('D'), 'Laufen / Fahren'],
       [k('Shift'), 'Sprinten (Ausdauer!)'],
       [k('Leertaste'), 'Springen / Handbremse'],
-      ['Maus', 'Ins Spiel klicken, um die Maus zu fangen – dann umschauen. Rechte Maustaste ziehen geht auch. Die Kamera folgt beim Laufen automatisch.'],
+      ['Maus', 'Ins Spiel klicken, um die Maus zu fangen, dann umschauen. Rechte Maustaste ziehen geht auch. Die Kamera folgt beim Laufen automatisch.'],
       ['Mausrad', 'Zoom'],
       [`${k('Q')} / ${k('R')}`, 'Kamera drehen (Tastatur)'],
       [k('E'), 'Reden / Aufheben / Bauen / Ein- & Aussteigen'],
@@ -269,13 +269,13 @@ export class Game {
     const touchRows = de ? [
       ['🕹️ links', 'Daumen auf die linke Bildschirmhälfte = Joystick (laufen / fahren). Ganz raus = sprinten.'],
       ['👆 rechts', 'Wischen = umschauen · zwei Finger = zoomen'],
-      [k('E'), 'Aktion (leuchtet, wenn etwas geht) – oder auf den Hinweis tippen'],
+      [k('E'), 'Aktion (leuchtet, wenn etwas geht), oder auf den Hinweis tippen'],
       [k('⤒') + ' ' + k('»'), 'Springen / Sprint an-aus'],
       ['🗺️ 📋 ☰', 'Karte · Aufgaben · Menü'],
     ] : [
       ['🕹️ left', 'Thumb on the left half = joystick (walk / drive). Push to the edge = sprint.'],
       ['👆 right', 'Swipe = look around · two fingers = zoom'],
-      [k('E'), 'Action (glows when something is possible) – or tap the hint'],
+      [k('E'), 'Action (glows when something is possible), or tap the hint'],
       [k('⤒') + ' ' + k('»'), 'Jump / sprint toggle'],
       ['🗺️ 📋 ☰', 'Map · jobs · menu'],
     ];
@@ -291,7 +291,7 @@ export class Game {
       <p>${de ? 'Eine liebevolle Parodie auf jeden Festival-Aufbau ever. Gebaut mit' : 'A loving parody of every festival build ever. Built with'} <a href="https://threejs.org" target="_blank">three.js</a> + Vite.</p>
       <h3>${de ? '3D-Modelle (CC0)' : '3D models (CC0)'}</h3>
       <table>
-        <tr><td>Quaternius</td><td>${de ? 'Charaktere, Container, Bäume, Pickup, Palette, Kiste, Hütchen, Zelt, Flasche' : 'Characters, containers, trees, pickup, pallet, crate, cone, tent, bottle'} — via <a href="https://poly.pizza" target="_blank">poly.pizza</a></td></tr>
+        <tr><td>Quaternius</td><td>${de ? 'Charaktere, Container, Bäume, Pickup, Palette, Kiste, Hütchen, Zelt, Flasche' : 'Characters, containers, trees, pickup, pallet, crate, cone, tent, bottle'}, via <a href="https://poly.pizza" target="_blank">poly.pizza</a></td></tr>
         <tr><td>iPoly3D</td><td>Speaker</td></tr>
         <tr><td>CreativeTrio</td><td>Toolbox, ladder</td></tr>
       </table>
@@ -610,7 +610,7 @@ export class Game {
       return `<div class="qlog-item ${done ? 'done' : ''}"><div class="t">${done ? '✔ ' : active ? '▶ ' : '! '}${L(q.title)}</div>
         <div class="s">${L(q.summary)}</div>
         <div class="s">${done ? t('q.done') : active ? `${t('q.current')}: <b>${active ? this.quests.stepText(q.id) : L(step?.text)}</b>` : t('q.talkTo', { name: giver })} · ${t('q.reward')}: ${q.reward?.karma || 0} Karma</div></div>`;
-    }).join('') + `<div class="qlog-item locked"><div class="t">${t('q.more')}</div><div class="s">${t('q.moreSub')}</div></div>`;
+    }).join('') + (qs.state.day < 4 ? `<div class="qlog-item locked"><div class="t">${t('q.more')}</div></div>` : '');
     if (this.mode === 'play') {
       this.ignoreUnlock = true; this.input.unlock(); setTimeout(() => (this.ignoreUnlock = false), 100);
       this.input.enabled = false;
@@ -670,7 +670,7 @@ export class Game {
           if (data.timer?.dusk) {
             this.world.visibility = 190;
             this.world.setNight(1, 6); // let the night fall fully so you can enjoy your lights
-            this.ui.banner(getLang() === 'de' ? 'Licht an!' : 'Lights on!', getLang() === 'de' ? 'Geschafft – das Gelände leuchtet' : 'Made it – the site is glowing', '', 4000);
+            this.ui.banner(getLang() === 'de' ? 'Licht an!' : 'Lights on!', getLang() === 'de' ? 'Geschafft: das Gelände leuchtet' : 'Made it: the site is glowing', '', 4000);
           }
           if (data.timer?.weather === 'rain') setTimeout(() => this.world.setRain(false), 6000);
           break;
@@ -690,7 +690,7 @@ export class Game {
             // main jobs restart right away: back to the start, clock runs again (favours just drop)
             if (giver && !data.quest?.errand) {
               this.retryFromStart(qid, scope, giver);
-              this.ui.toast(de ? '⏱ Neuer Versuch – die Uhr läuft wieder!' : '⏱ New attempt – the clock is running again!');
+              this.ui.toast(de ? '⏱ Neuer Versuch, die Uhr läuft wieder!' : '⏱ New attempt, the clock is running again!');
             } else if (giver) this.ui.toast(de ? `⏱ Nicht geschafft. Sprich nochmal mit ${giver.def.name}, wenn du es nochmal versuchen willst.` : `⏱ Didn't make it. Talk to ${giver.def.name} again if you want another go.`);
           }, 600);
           break;
@@ -900,7 +900,7 @@ export class Game {
       const spot = this.world.spots[st.targets[idx]];
       const de = getLang() === 'de';
       th.say(de ? 'Warte, ich helf dir! Ich übernehm den da hinten!' : "Hold on, I will help! I will take the one over there!", 3.5);
-      this.ui.toast(de ? `🤝 Thompsen hilft dir: „${L(st.label)}“ – einen übernimmt er.` : `🤝 Thompsen is helping: "${L(st.label)}" – he takes one.`);
+      this.ui.toast(de ? `🤝 Thompsen hilft dir: „${L(st.label)}“, einen übernimmt er.` : `🤝 Thompsen is helping: "${L(st.label)}", he takes one.`);
       // far away and out of sight? then he "was already over there anyway"
       if (th.position.distanceTo(spot) > 60 && th.toPlayer > 40) {
         const d = new THREE.Vector3().subVectors(th.position, spot).setY(0).normalize();
@@ -926,7 +926,7 @@ export class Game {
     const plot = PLOTS[b.plot];
     const de = getLang() === 'de';
     const names = b.crew.npcs.map((id) => this.npcs.get(id)?.def.name).filter(Boolean);
-    this.ui.banner(de ? 'Die Crew baut!' : 'The crew is building!', `${names.join(' & ')} → ${plot?.label || ''}`, de ? 'Du hast geliefert – den Rest machen sie.' : 'You delivered – they do the rest.', 4500);
+    this.ui.banner(de ? 'Die Crew baut!' : 'The crew is building!', `${names.join(' & ')} → ${plot?.label || ''}`, de ? 'Du hast geliefert, den Rest machen sie.' : 'You delivered, they do the rest.', 4500);
     b.crew.npcs.forEach((id, i) => {
       const npc = this.npcs.get(id);
       if (!npc || !plot) return;
@@ -1121,7 +1121,7 @@ export class Game {
       const de = getLang() === 'de';
       if (st?.type === 'talk' && st.npc === id) {
         // their crew is still building / they're still busy: say so instead of "let X build"
-        line = de ? `Ich bin noch dran an „${title}“! Gib mir noch einen Moment – schau gleich nochmal vorbei.` : `I'm still working on "${title}"! Give me a moment – come back in a bit.`;
+        line = de ? `Ich bin noch dran an „${title}“! Gib mir noch einen Moment, schau gleich nochmal vorbei.` : `I'm still working on "${title}"! Give me a moment, come back in a bit.`;
       } else {
         if (step.includes(name)) {
           step = de
@@ -1146,7 +1146,7 @@ export class Game {
       line = de ? 'Hier, trink erstmal ein Wasser. Ich halt das so lange. Kein Ding! 🤗' : 'Here, have some water first. I\'ll hold that. No worries! 🤗';
       this.player.stamina = 1;
       qs.state.karma += 2;
-      this.ui.toast(de ? '🤗 Jules hilft dir – Ausdauer voll, +2 ✺' : '🤗 Jules helps you out – stamina full, +2 ✺');
+      this.ui.toast(de ? '🤗 Jules hilft dir: Ausdauer voll, +2 ✺' : '🤗 Jules helps you out: stamina full, +2 ✺');
       this.refreshHUD();
     }
     // extra things you can ask for (last option: "got anything?")
@@ -1191,7 +1191,7 @@ export class Game {
     qs.state.flags.drinkTokens = (qs.state.flags.drinkTokens || 0) + 1;
     qs.state.karma += 30;
     this.audio.pickup();
-    this.ui.toast(de ? `🎟️ Getränkemarke von Leo! (+30 ✺) – jetzt weißt du, wer die Marken hat. (${qs.state.flags.drinkTokens} gesammelt)` : `🎟️ Drink token from Leo! (+30 ✺) – now you know who has the tokens. (${qs.state.flags.drinkTokens} collected)`);
+    this.ui.toast(de ? `🎟️ Getränkemarke von Leo! (+30 ✺), jetzt weißt du, wer die Marken hat. (${qs.state.flags.drinkTokens} gesammelt)` : `🎟️ Drink token from Leo! (+30 ✺), now you know who has the tokens. (${qs.state.flags.drinkTokens} collected)`);
     this.world.spawnDust(npc.position.clone(), 2.5);
     npc.relocate(this.player.position);
     this.refreshHUD();
@@ -1216,8 +1216,14 @@ export class Game {
 
   // ------------------------------------------------------------------ jobs: build / work / fuel / load
   startBuild(qid, step) {
-    if (this.building) return;
+    if (this.building || this.minigame.open) return;
     if (this.player.vehicle) this.exitVehicle();
+    // a deliver step can ask for a skill game first (e.g. the right order to put up a yurt)
+    const act = this.quests.state.active[qid];
+    if (step.minigame && act && act.mgOk !== act.step) {
+      this.playMinigame(step, () => { act.mgOk = act.step; this.startBuild(qid, step); });
+      return;
+    }
     const dur = (step.buildTime || 3) * this.effects.buildFactor();
     this.building = { t: 0, dur, lastHit: 0, labels: t('b.labels'), done: () => this.quests.build(qid) };
     this.player.work(dur);
@@ -1227,16 +1233,8 @@ export class Game {
 
   startWork(qid, idx, step) {
     if (this.building || this.minigame.open) return;
-    const doneN = this.quests.state.active[qid]?.done?.length || 0, total = step.targets?.length || 1;
-    if (step.minigame && (doneN === 0 || doneN >= total - 1)) {
-      const de = getLang() === 'de';
-      const title = L(step.minigameTitle) || L(step.label);
-      this.player.frozen = true;
-      this.minigame.run(step.minigame, { title, ...(step.minigameOpts || {}) }).then((ok) => {
-        this.player.frozen = false;
-        if (ok) { this.player.work(0.8); this.quests.workDone(qid, idx); }
-        else this.ui.toast(L(step.minigameFail) || (de ? 'Daneben! Nochmal.' : 'Missed! Again.'));
-      });
+    if (step.minigame) {
+      this.playMinigame(step, () => { this.player.work(0.8); this.quests.workDone(qid, idx); });
       return;
     }
     const dur = (step.workTime || 2.5) * this.effects.buildFactor();
@@ -1244,6 +1242,18 @@ export class Game {
     this.player.work(dur);
     const ms = this.world.structures.mainstage;
     if (ms) this.player.char.faceTowards(ms.object.position, 1, 100);
+  }
+
+  /** Run the step's skill game(s); onWin on success, the fail toast otherwise (just try again). */
+  playMinigame(step, onWin) {
+    if (this.devFast) { onWin(); return; } // automated tests: skill games always win, right away
+    const de = getLang() === 'de';
+    this.player.frozen = true;
+    this.minigame.run(step.minigame, { title: L(step.minigameTitle) || L(step.label) || L(step.buildLabel), ...(step.minigameOpts || {}) }).then((ok) => {
+      this.player.frozen = false;
+      if (ok) onWin();
+      else this.ui.toast(L(step.minigameFail) || (de ? 'Daneben! Nochmal.' : 'Missed! Again.'));
+    });
   }
 
   startFuel(qid) {
@@ -1318,7 +1328,7 @@ export class Game {
       if (bd < 2.2 && !this.bikeSys.rider) {
         const de = getLang() === 'de';
         if (this.bikeSys.canRide()) list.push({ d: bd + 0.5, label: de ? '🚲 Hexenrad fahren' : '🚲 Ride the witch bike', action: () => this.enterVehicle(bike) });
-        else list.push({ d: bd + 2, label: de ? `🚲 Franzis Hexenrad – bei Franzi leihen (✺ ${this.bikeSys.cost})` : `🚲 Franzi's witch bike – borrow it from Franzi (✺ ${this.bikeSys.cost})`, disabled: true });
+        else list.push({ d: bd + 2, label: de ? `🚲 Franzis Hexenrad, bei Franzi leihen (✺ ${this.bikeSys.cost})` : `🚲 Franzi's witch bike, borrow it from Franzi (✺ ${this.bikeSys.cost})`, disabled: true });
       }
       // broken generator / poo pump: pro gaffa lets you patch it yourself
       if (this.effects.gaffa > 0) {
@@ -1359,14 +1369,15 @@ export class Game {
     // working for Sabse (e.g. veggie delivery) → she only grumbles
     const forSabse = Object.keys(qs.state.active).some((qid) => {
       const st = qs.currentStep(qid);
-      return qs.quests[qid].giver === 'sabse' || (st?.type === 'talk' && st.npc === 'sabse') || (st?.type === 'deliver' && st.at === 'kitchen');
+      return qs.quests[qid].giver === 'sabse' || (st?.type === 'talk' && st.npc === 'sabse') || (st?.type === 'deliver' && st.at === 'kitchen')
+        || (st?.type === 'pickup' && st.items.some((i) => i.at === 'kitchen')); // fetching something from her kitchen (Franzi's cookies)
     });
     const now = this.time;
     this.kitchenStrikes = now - (this.kitchenLast || -99) < 15 ? (this.kitchenStrikes || 0) + 1 : 1;
     this.kitchenLast = now;
     sabse.angryT = 2;
     if (forSabse || this.kitchenStrikes === 1) {
-      sabse.say(forSabse ? (de ? 'Danke fürs Bringen – aber LANGSAM in meiner Küche!' : 'Thanks for bringing it – but SLOWLY in my kitchen!') : (de ? 'Hey! Das ist eine Küche! Letzte Warnung!' : 'Hey! This is a kitchen! Last warning!'), 3);
+      sabse.say(forSabse ? (de ? 'Danke fürs Bringen, aber LANGSAM in meiner Küche!' : 'Thanks for bringing it, but SLOWLY in my kitchen!') : (de ? 'Hey! Das ist eine Küche! Letzte Warnung!' : 'Hey! This is a kitchen! Last warning!'), 3);
       this.kitchenCD = 3;
       return;
     }
@@ -1636,7 +1647,7 @@ export class Game {
       const vs = this.world.vehicleSpots;
       for (const [id, v] of Object.entries(this.vehicles)) if (vs[id]) { v.place(vs[id].pos, vs[id].heading); v.speed = 0; }
       await this.reply(npc, de ? 'Zdenko und ich schieben das! …Zdenko schiebt. Ich lach. HAHAHA!' : 'Zdenko and I will push it! …Zdenko pushes. I laugh. HAHAHA!');
-      this.ui.toast(de ? '🚜 Quad und Radlader stehen wieder in der Crew-Base.' : '🚜 Quad and wheel loader are back at the crew base.');
+      this.ui.toast(de ? '🚜 Quad und Radlader stehen wieder im Crew Camp.' : '🚜 Quad and wheel loader are back at the crew base.');
     } else await this.reply(npc, npc.line());
   }
 

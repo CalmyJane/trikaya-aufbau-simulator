@@ -9,7 +9,7 @@ import { L, getLang } from '../i18n.js';
 const pick = (a) => a[Math.floor(Math.random() * a.length)];
 
 const SCOLD = [
-  { de: 'Ey! Soundboksen sind auf dem Camping verboten. Steht auf den Schildern. Auf ALLEN Schildern.', en: 'Hey! Soundboxes are forbidden on the camping. It says so on the signs. On ALL the signs.' },
+  { de: 'Ey! Soundboksen sind auf dem Campingplatz verboten. Steht auf den Schildern. Auf ALLEN Schildern.', en: 'Hey! Soundboxes are forbidden on the camping. It says so on the signs. On ALL the signs.' },
   { de: 'Mach das Ding aus. Die Mainstage ist 200 Meter weiter, da läuft Musik. Echte.', en: 'Turn that thing off. The mainstage is 200 metres away, there\'s music there. Real music.' },
   { de: 'Soundboks? Auf dem Camping? Ernsthaft? AUS. Jetzt.', en: 'A soundbox? On the camping? Seriously? OFF. Now.' },
 ];
@@ -111,7 +111,7 @@ export class Soundboxes {
     g.music.shuffle(this.source);
     if (!this.hinted && !forMission) {
       this.hinted = true;
-      g.ui.toast(L({ de: '🔊 Da hat jemand auf dem Camping eine Soundboks aufgedreht! Die sind dort verboten – geh hin und sag Bescheid.', en: '🔊 Someone turned on a soundbox on the camping! They\'re forbidden there – go over and tell them.' }));
+      g.ui.toast(L({ de: '🔊 Da hat jemand auf dem Campingplatz eine Soundboks aufgedreht! Die sind dort verboten, geh hin und sag Bescheid.', en: '🔊 Someone turned on a soundbox on the camping! They\'re forbidden there, go over and tell them.' }));
     }
     g.updateMarkers();
   }

@@ -30,7 +30,7 @@ export const SHOP = [
   {
     id: 'weed', icon: '🌿', cost: 15, dealer: true,
     name: { de: 'Weed', en: 'Weed' },
-    desc: { de: '90 Sekunden richtig hoch springen – über Bauzäune und Büsche. Die Welt wird warm und weich.', en: 'Jump really high for 90 seconds – over fences and bushes. The world turns warm and soft.' },
+    desc: { de: '90 Sekunden richtig hoch springen, über Bauzäune und Büsche. Die Welt wird warm und weich.', en: 'Jump really high for 90 seconds, over fences and bushes. The world turns warm and soft.' },
   },
   {
     id: 'schnaps', icon: '🥃', cost: 8, dealer: true,
@@ -109,7 +109,7 @@ const STASH_POOL = ['weed', 'weed', 'schnaps', 'energy', 'energy', 'beer'];
 const STASH_CD = 240; // seconds until someone has something again after selling
 
 const NO_STASH_LINES = {
-  fabi: { de: 'Gaffa? Ja. Das andere? Nein. Ich weiß, wo alles ist – aber DAS nicht.', en: 'Gaffa? Yes. The other stuff? No. I know where everything is – but not THAT.' },
+  fabi: { de: 'Gaffa? Ja. Das andere? Nein. Ich weiß, wo alles ist, aber DAS nicht.', en: 'Gaffa? Yes. The other stuff? No. I know where everything is, but not THAT.' },
   jan: { de: 'Ich hab Bändchen, Listen und kalten Kaffee. Willst du ein zweites Bändchen?', en: 'I have wristbands, lists and cold coffee. Want a second wristband?' },
   franzi: { de: 'Ich hab Wasser, Kekse und ein offenes Ohr. Mehr gibt\'s bei mir nicht. Und das ist gut so.', en: 'I have water, cookies and an open ear. That\'s all you get from me. And that\'s a good thing.' },
   isi: { de: 'Ich?! Ich bleib nüchtern, einer muss ja fahren! Willst du ein Wasser?', en: 'Me?! I\'m staying sober, someone has to drive! Want a water?' },
@@ -296,7 +296,7 @@ export class Effects {
     this.dealer = { npc, item: pick(['energy', 'weed', 'weed']), t: 0 };
     if (!this.dealerHinted) {
       this.dealerHinted = true;
-      g.ui.toast(L({ de: '🔵 Blaues ! – da will dir jemand was anbieten. Nein sagen ist auch okay.', en: '🔵 Blue ! – someone wants to offer you something. Saying no is fine too.' }));
+      g.ui.toast(L({ de: '🔵 Blaues ! da will dir jemand was anbieten. Nein sagen ist auch okay.', en: '🔵 Blue ! someone wants to offer you something. Saying no is fine too.' }));
     }
     g.updateMarkers();
   }
@@ -323,7 +323,7 @@ export class Effects {
     } else {
       g.quests.state.karma += 2;
       await g.reply(npc, de ? 'Auch okay. Mehr für mich.' : 'Fair enough. More for me.');
-      g.ui.toast(de ? '✺ +2 – gute Entscheidung, sagt dein Karma.' : '✺ +2 – good call, says your karma.');
+      g.ui.toast(de ? '✺ +2, gute Entscheidung, sagt dein Karma.' : '✺ +2, good call, says your karma.');
       g.refreshHUD();
     }
   }
@@ -356,12 +356,13 @@ export class Effects {
     }
     const stash = this.stashOf(npc);
     if (!stash.length) { await g.runDialog([{ who: id, text: pick(NOTHING_LINES) }], null, npc); return; }
-    if ((npc._stashT ?? -999) > g.time - STASH_CD) { await g.runDialog([{ who: id, text: pick(EMPTY_LINES) }], null, npc); return; }
+    const leo = id === 'leocitas'; // only ever speaks of himself as "man selbst"
+    if ((npc._stashT ?? -999) > g.time - STASH_CD) { await g.runDialog([{ who: id, text: leo ? { de: 'Man selbst hat grad alles verschenkt. Später wieder. Es wächst ja nach.', en: 'One has just given everything away. Later. It grows back, after all.' } : pick(EMPTY_LINES) }], null, npc); return; }
     const items = stash.map((s) => this.item(s));
     const karma = g.quests.state.karma;
     const choice = await g.runDialog(
       [{ who: id, text: `${L(pick(HAVE_LINES))} ${de ? `(Du hast ✺ ${karma})` : `(You have ✺ ${karma})`}` }],
-      [...items.map((it) => `${it.icon} ${L(it.name)} (✺ ${it.cost}) – ${L(it.desc)}`), de ? 'Doch nicht, danke.' : 'Never mind, thanks.'],
+      [...items.map((it) => `${it.icon} ${L(it.name)} (✺ ${it.cost}), ${L(it.desc)}`), de ? 'Doch nicht, danke.' : 'Never mind, thanks.'],
       npc,
     );
     const it = items[choice];
@@ -369,7 +370,7 @@ export class Effects {
     // Leocitas gives a little weed away even without karma
     if (this.buy(it.id) || (id === 'leocitas' && this.buy(it.id, true))) {
       npc._stashT = g.time;
-      await g.reply(npc, de ? 'Viel Spaß. Von mir hast du das nicht.' : 'Have fun. You didn\'t get that from me.');
+      await g.reply(npc, leo ? (de ? 'Viel Spaß. Von einem selbst hast du das nicht.' : 'Have fun. You didn\'t get that from oneself.') : de ? 'Viel Spaß. Von mir hast du das nicht.' : 'Have fun. You didn\'t get that from me.');
     } else await g.reply(npc, de ? 'Kein Karma, kein Stoff. So ist das Universum.' : 'No karma, no stuff. That\'s the universe.');
   }
 
@@ -380,7 +381,7 @@ export class Effects {
     const g = this.game;
     const de = getLang() === 'de';
     const greet = {
-      mark: de ? 'Das Zelt? Wird. Irgendwann. Der Chai kocht trotzdem – auf dem Campingkocher! Mate hab ich auch, macht schnelle Beine.' : 'The tent? It\'ll happen. Someday. The chai is brewing anyway – on the camping stove! Got mate too, gives you quick legs.',
+      mark: de ? 'Das Zelt? Wird. Irgendwann. Der Chai kocht trotzdem, auf dem Campingkocher! Mate hab ich auch, macht schnelle Beine.' : 'The tent? It\'ll happen. Someday. The chai is brewing anyway, on the camping stove! Got mate too, gives you quick legs.',
       fabi: de ? 'Du brauchst was? Profi-Gaffa hab ich. Das gute. Nicht das aus dem Hühnercontainer.' : 'Need something? I\'ve got pro gaffa. The good stuff. Not the one from the chicken container.',
       thompsen: de ? 'HAHAHA! Bier? Bier! Fünf Karma, Kasten steht unterm Tisch. Hehehe.' : 'HAHAHA! Beer? Beer! Five karma, the crate is under the table. Hehehe.',
       mux: de ? 'Hey du! Hast du heute schon was gegessen? Nimm eine Banane. Geht aufs Haus. Also, auf meinen Rucksack.' : 'Hey you! Have you eaten today? Take a banana. On the house. Well, on my backpack.',
@@ -389,7 +390,7 @@ export class Effects {
     const karma = g.quests.state.karma;
     const choice = await g.runDialog(
       [{ who: npc.def.id, text: `${greet} ${de ? `(Du hast ✺ ${karma})` : `(You have ✺ ${karma})`}` }],
-      [...items.map((it) => `${it.icon} ${L(it.name)} (✺ ${it.cost}) – ${L(it.desc)}`), de ? 'Nichts, danke.' : 'Nothing, thanks.'],
+      [...items.map((it) => `${it.icon} ${L(it.name)} (✺ ${it.cost}), ${L(it.desc)}`), de ? 'Nichts, danke.' : 'Nothing, thanks.'],
       npc,
     );
     const it = items[choice];
@@ -425,7 +426,7 @@ export class Effects {
       [{ who: npc.def.id, text: npc.def.id === 'sabse'
         ? (de ? `Eine Marke? Eine ECHTE Marke? …Gut. Was willst du? (Du hast 🎟️ ${this.tokens})` : `A token? A REAL token? …Fine. What do you want? (You have 🎟️ ${this.tokens})`)
         : (de ? `Marke gegen Getränk, so läuft das an meiner Bar. Was darf\'s sein? (Du hast 🎟️ ${this.tokens})` : `Token for a drink, that\'s how my bar works. What\'ll it be? (You have 🎟️ ${this.tokens})`) }],
-      [...items.map((it) => `${it.icon} ${L(it.name)} – ${L(it.desc)}`), de ? 'Doch nicht.' : 'Never mind.'],
+      [...items.map((it) => `${it.icon} ${L(it.name)}, ${L(it.desc)}`), de ? 'Doch nicht.' : 'Never mind.'],
       npc,
     );
     const it = items[choice];

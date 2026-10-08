@@ -69,7 +69,7 @@ export const CHATS = {
   ],
   thomas: [
     { line: C('Hey! Läuft alles bei dir? Kann ich irgendwas für dich tun?', 'Hey! Everything going well? Can I do anything for you?'), options: [
-      { text: C('Alles gut – danke, dass du immer hilfst!', 'All good – thanks for always helping!'), karma: 3, reply: C('Ach, gerne! Dafür sind wir doch da.', 'Oh, my pleasure! That\'s what we\'re here for.') },
+      { text: C('Alles gut, danke, dass du immer hilfst!', 'All good, thanks for always helping!'), karma: 3, reply: C('Ach, gerne! Dafür sind wir doch da.', 'Oh, my pleasure! That\'s what we\'re here for.') },
       { text: C('Wo ist eigentlich Felix?', 'Where\'s Felix, actually?'), karma: 1, reply: C('Beim Generator. Er redet mit ihm. Wirklich.', 'At the generator. He\'s talking to it. Really.') },
     ] },
   ],
@@ -117,7 +117,7 @@ export const CHATS = {
       { text: C('Hauptsache laut.', 'As long as it\'s loud.'), karma: 2, reply: C('JA. Bruder. Genau das. *Pogo-Ansatz, verliert das Gleichgewicht*', 'YES. Brother. Exactly. *starts to mosh, loses balance*') },
     ] },
     { line: C('Psst. Ich hab nen neuen Track. Hi-Tech mit Punk-Gitarre. Willst du mal hören? *hält dir ein Handy mit kaputtem Lautsprecher hin*', 'Psst. New track. Hi-tech with punk guitar. Wanna hear it? *holds out a phone with a broken speaker*'), options: [
-      { text: C('Klingt wie ein Föhn im Schleudergang. Geil.', 'Sounds like a hairdryer in a spin cycle. Sick.'), karma: 3, reply: C('DAS ist das Feedback, das ich brauche. Der Track heißt jetzt „Föhn im Schleudergang".', 'THAT\'s the feedback I need. The track is now called "Hairdryer Spin Cycle".') },
+      { text: C('Klingt wie ein Föhn im Schleudergang. Geil.', 'Sounds like a hairdryer in a spin cycle. Sick.'), karma: 3, reply: C('DAS ist das Feedback, das ich brauche. Der Track heißt jetzt „Föhn im Schleudergang“.', 'THAT\'s the feedback I need. The track is now called "Hairdryer Spin Cycle".') },
       { text: C('Rocky, wir müssen echt was aufbauen.', 'Rocky, we really need to build something.'), karma: 1, reply: C('Aufbau ist auch nur Punk mit Kabelbindern. Ich komm gleich. Nach dem Drop.', 'Building is just punk with cable ties. I\'m coming. After the drop.') },
     ] },
   ],
@@ -143,7 +143,7 @@ export const CAMPER_CHATS = [
   ] },
   { line: C('Ich bin so müde… Ich steh seit sechs auf dem Acker.', 'I\'m so tired… I\'ve been on this field since six.'), options: [
     { text: C('Trink Wasser und mach zehn Minuten Pause.', 'Drink some water and take ten.'), karma: 3, reply: C('Gute Idee. Danke, wirklich.', 'Good idea. Thanks, really.') },
-    { text: C('Reiß dich zusammen, morgen ist Festival!', 'Pull yourself together, the festival is tomorrow!'), karma: -2, reply: C('…Wow. Okay.', '…Wow. Okay.') },
+    { text: C('Reiß dich zusammen, wir bauen hier ein Festival auf!', 'Pull yourself together, we\'re building a festival here!'), karma: -2, reply: C('…Wow. Okay.', '…Wow. Okay.') },
     { text: C('Ich auch. Wir schaffen das.', 'Me too. We\'ll make it.'), karma: 2, reply: C('Zusammen. Ja.', 'Together. Yes.') },
   ] },
   { unless: 'x1_nuss', line: C('Hast du die Spezial-Nuss für die Bauzäune gesehen?', 'Have you seen the special nut for the construction fences?'), options: [

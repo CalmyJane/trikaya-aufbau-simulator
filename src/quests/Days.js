@@ -17,13 +17,14 @@ const MORNING = {
   3: [
     { who: 'jan', text: C('Morgen. Neue Sprachnachricht von Leo. Diesmal 3:47 Uhr.', 'Morning. New voice message from Leo. 3:47 am this time.') },
     { who: 'leo', text: C('*Wind* Hab heute Nacht nachgedacht. Wir brauchen einen Eingang. Und Shops. Und den Dome! Und einen Wassertank! Ich organisier das! …Organisiert ihr das?', '*wind* Did some thinking last night. We need an entrance. And shops. And the dome! And a water tank! I\'ll organise it! …Can you organise it?') },
-    { who: 'corni', text: C('Ich hab die Stahlseile. Endlich. Ich wollte es nur mal gesagt haben.', 'I have the steel wires. Finally. Just wanted to say it.') },
+    { who: 'corni', text: C('Die Stahlseile von Leo halten übrigens. Ich hab nachgeschaut. Dreimal. Heute Nacht.', 'Leo\'s steel wires are holding, by the way. I checked. Three times. Last night.') },
   ],
   4: [
     { who: 'jan', text: C('Letzter Aufbautag. Morgen kommen die Gäste. Leo hat… ein Foto geschickt. Von einem Sonnenaufgang.', 'Last build day. The guests arrive tomorrow. Leo sent… a photo. Of a sunrise.') },
     { who: 'schwarzhuber', text: C('Und bevor hier irgendwer feiert, will i no mit eich red\'n. Wegen der Wiese. Und dem Parkplatz.', 'And before anybody parties here, I want a word with you. About the meadow. And the parking.') },
     { who: 'silke', text: C('Das Chai-Zelt ist übrigens so gut wie fertig.', 'The chai tent is as good as finished, by the way.') },
-    { who: 'jan', text: C('…Nein.', '…No.') },
+    { who: 'krygo', text: C('Die Sauna auch! Heute wird sie fertig. Heute wirklich.', 'So is the sauna! It\'ll be done today. Really today.') },
+    { who: 'jan', text: C('…Nein. Beides nein.', '…No. Both no.') },
   ],
 };
 // every evening there's a team meeting in the office container. It never happens.
@@ -39,7 +40,7 @@ const MEETING = {
     { who: 'jan', text: C('Teammeeting! Heute wirklich! Büro-Container, JETZT!', 'Team meeting! For real today! Office container, NOW!') },
     { who: 'matze', text: C('Ich hab die Agenda geschrieben! Sie liegt… Moment… ich hatte sie gerade noch.', 'I wrote the agenda! It\'s… wait… I had it just now.') },
     { who: 'silke', text: C('Die Chai-Crew kann leider nicht. Wir haben gerade Pause. Von der Pause.', 'The chai crew can\'t make it, sorry. We\'re on a break. From the break.') },
-    { who: 'corni', text: C('Da hinten wird\'s schwarz. Vergesst das Meeting – sichert lieber die Technik!', 'It\'s going black over there. Forget the meeting – secure the gear instead!') },
+    { who: 'corni', text: C('Da hinten wird\'s schwarz. Vergesst das Meeting, sichert lieber die Technik!', 'It\'s going black over there. Forget the meeting, secure the gear instead!') },
   ],
   3: [
     { who: 'jan', text: C('Teammeeting. Dritter Versuch. Ich hab Kekse besorgt. Es MUSS heute klappen.', 'Team meeting. Third attempt. I got biscuits. It HAS to work today.') },
@@ -58,7 +59,7 @@ const MEETING = {
 const EVENING = {
   1: [
     { who: 'felix', text: C('Kein Meeting? Dann ab ins Zelt.', 'No meeting? Off to the tent then.') },
-    { who: 'corni', text: C('Ins Zelt? Nein. Der Bauzaun am Eingang wackelt. Ohne die Spezial-Nuss geht der nachts um. Komm mal her.', 'The tent? No. The fence at the entrance wobbles. Without the special nut it\'ll fall over in the night. Come here.') },
+    { who: 'corni', text: C('Ins Zelt? Nein. Der Bauzaun am Eingang wackelt. Ohne die Spezial-Nuss fällt der nachts um. Komm mal her.', 'The tent? No. The fence at the entrance wobbles. Without the special nut it\'ll fall over in the night. Come here.') },
   ],
   2: [
     { who: 'estenko', text: C('Ey mann… es wird dunkel UND nass. Respekt an das Wetter. Das zieht einfach durch!', 'Hey man… it\'s getting dark AND wet. Respect to the weather. It just goes for it!') },
@@ -119,7 +120,7 @@ export class DaySystem {
     if (g.world.night < 0.9) g.world.setNight(1, g.devFast ? 0.1 : 20);
     g.sunriseT = 0;
     await this.wait(2500);
-    g.ui.banner(de ? `Nacht ${this.day}` : `Night ${this.day}`, de ? 'Feierabend? Nicht ganz.' : 'Time off? Not quite.', de ? 'Neue Jobs für die Nacht – halt Ausschau nach dem gelben !' : 'New jobs for the night – look for the yellow !', 4500);
+    g.ui.banner(de ? `Nacht ${this.day}` : `Night ${this.day}`, de ? 'Feierabend? Nicht ganz.' : 'Time off? Not quite.', de ? 'Neue Jobs für die Nacht, halt Ausschau nach dem gelben !' : 'New jobs for the night, look for the yellow !', 4500);
     this.qs.refreshMarkers();
     g.refreshHUD();
     await this.wait(3500);
@@ -152,7 +153,7 @@ export class DaySystem {
     g.save?.();
     g.ui.fade(false);
     await this.wait(900);
-    g.ui.banner(de ? `Aufbau-Tag ${d + 1}` : `Build day ${d + 1}`, de ? 'Guten Morgen!' : 'Good morning!', d + 1 === LAST_BUILD_DAY ? (de ? 'Letzter Aufbautag – morgen ist Festival!' : 'Last build day – festival tomorrow!') : '', 4500);
+    g.ui.banner(de ? `Aufbau-Tag ${d + 1}` : `Build day ${d + 1}`, de ? 'Guten Morgen!' : 'Good morning!', d + 1 === LAST_BUILD_DAY ? (de ? 'Letzter Aufbautag, morgen ist Festival!' : 'Last build day, festival tomorrow!') : '', 4500);
     this.qs.refreshMarkers();
     g.refreshHUD();
     await this.wait(3000);

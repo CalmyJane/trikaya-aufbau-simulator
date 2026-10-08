@@ -61,32 +61,60 @@ const TEMPLATES = [
     thanks: C('…Danke.', '…Thanks.') },
 ];
 
-// favour: pass a message on (and come back with the answer)
+// favour: pass a message on (and come back with the answer).
+// msg = what you tell the receiver, reply = their answer, relay = how YOU pass that answer back, back = the sender's reaction.
 const MESSAGES = [
   { from: 'sabse', to: 'mark', ask: C('Sag Mark, er soll mir meine Gewürze zurückbringen. ALLE.', 'Tell Mark to bring my spices back. ALL of them.'),
-    msg: C('Sabse will ihre Gewürze zurück. Alle.', 'Sabse wants her spices back. All of them.'), reply: C('Welche Gewürze? …Okay, die hier. Und die. Und die da.', 'Which spices? …Okay, these. And these. And those.'), back: C('Na also. Geht doch.', 'There you go. See.') },
+    msg: C('Sabse will ihre Gewürze zurück. Alle.', 'Sabse wants her spices back. All of them.'), reply: C('Welche Gewürze? …Okay, die hier. Und die. Und die da.', 'Which spices? …Okay, these. And these. And those.'),
+    relay: C('*stellt drei Gläser hin* Von Mark. Er hat „welche Gewürze?“ gesagt. Dann hat er sie alle gefunden.', '*puts down three jars* From Mark. He said "which spices?". Then he found all of them.'), back: C('Na also. Geht doch.', 'There you go. See.') },
   { from: 'corni', to: 'fabi', ask: C('Frag Fabi, ob er die Stahlseile gesehen hat. Ich weiß, dass ich sie hab. Ich will\'s nur nochmal hören.', 'Ask Fabi whether he\'s seen the steel wires. I know I have them. I just want to hear it again.'),
-    msg: C('Corni fragt, ob du die Stahlseile gesehen hast.', 'Corni asks whether you\'ve seen the steel wires.'), reply: C('Er HAT die Stahlseile. Seit Tag eins. Sag ihm das. Bitte.', 'He HAS the steel wires. Since day one. Tell him. Please.'), back: C('…Ich wollte nur sichergehen.', '…I just wanted to be sure.') },
+    msg: C('Corni fragt, ob du die Stahlseile gesehen hast.', 'Corni asks whether you\'ve seen the steel wires.'), reply: C('Er HAT die Stahlseile. Sie hängen an der Mainstage. Er steht jeden Tag drunter.', 'He HAS the steel wires. They\'re hanging at the mainstage. He stands under them every day.'),
+    relay: C('Fabi sagt, die Seile hängen an der Mainstage. Du stehst jeden Tag drunter.', 'Fabi says the wires are hanging at the mainstage. You stand under them every day.'), back: C('…Ich wollte nur sichergehen.', '…I just wanted to be sure.') },
   { from: 'felix', to: 'julez', ask: C('Sag Julez, das Lichtkonzept ist final. FINAL.', 'Tell Julez the lighting concept is final. FINAL.'),
-    msg: C('Felix sagt, das Lichtkonzept ist final.', 'Felix says the lighting concept is final.'), reply: C('Final ist es, wenn es richtig ist. Sag ihm das.', 'It\'s final when it\'s right. Tell him that.'), back: C('*seufz* Kann man so sagen. Ist halt falsch.', '*sigh* You could say that. It\'s just wrong.') },
-  { from: 'mia', to: 'lenny', ask: C('Sag Lenny, sie soll schrauben, nicht tanzen. Lieb, aber bestimmt. 💛', 'Tell Lenny to screw, not dance. Kindly but firmly. 💛'),
-    msg: C('Mia sagt: schrauben, nicht tanzen.', 'Mia says: screw, don\'t dance.'), reply: C('Ich schraub doch! Im Takt!', 'I am screwing! In rhythm!'), back: C('Im Takt… okay. Das zählt. 💛', 'In rhythm… okay. That counts. 💛') },
+    msg: C('Felix sagt, das Lichtkonzept ist final.', 'Felix says the lighting concept is final.'), reply: C('Final ist es, wenn es richtig ist. Und das ist es nicht.', 'It\'s final when it\'s right. And it isn\'t.'),
+    relay: C('Julez sagt, final ist es erst, wenn es richtig ist. Und das ist es nicht.', 'Julez says it\'s only final once it\'s right. And it isn\'t.'), back: C('*seufz* Julez. Immer Julez. Ich mach\'s trotzdem so. Kann man so machen.', '*sigh* Julez. Always Julez. I\'m doing it anyway. You could do it like that.') },
+  { from: 'mia', to: 'lenny', needs: 'n1_narnia', ask: C('Sag Lenny, sie soll schrauben, nicht tanzen. Lieb, aber bestimmt. 💛', 'Tell Lenny to screw, not dance. Kindly but firmly. 💛'),
+    msg: C('Mia sagt: schrauben, nicht tanzen.', 'Mia says: screw, don\'t dance.'), reply: C('Ich schraub doch! Im Takt!', 'I am screwing! In rhythm!'),
+    relay: C('Lenny schraubt. Im Takt. Mit Hüftschwung.', 'Lenny is screwing. In rhythm. With a hip swing.'), back: C('Im Takt… okay. Das zählt. 💛', 'In rhythm… okay. That counts. 💛') },
   { from: 'silke', to: 'juli', ask: C('Frag Juli, ob wir einen Hammer leihen dürfen. Für die Vision.', 'Ask Juli if we can borrow a hammer. For the vision.'),
-    msg: C('Die Chai-Crew fragt nach einem Hammer. Für die Vision.', 'The chai crew is asking for a hammer. For the vision.'), reply: C('Für die Vision? Nein. …Na gut. Einen. Und er kommt zurück.', 'For the vision? No. …Fine. One. And it comes back.'), back: C('Juli hat JA gesagt?! Das schreib ich in die Chronik!', 'Juli said YES?! That goes in the chronicle!') },
+    msg: C('Die Chai-Crew fragt nach einem Hammer. Für die Vision.', 'The chai crew is asking for a hammer. For the vision.'), reply: C('Für die Vision? Nein. …Na gut. Einen. Und er kommt zurück.', 'For the vision? No. …Fine. One. And it comes back.'),
+    relay: C('*gibt ihr den Hammer* Von Juli. Einer. Und er geht zurück.', '*hands her the hammer* From Juli. One. And it goes back.'), back: C('Juli hat JA gesagt?! Das schreib ich in die Chronik!', 'Juli said YES?! That goes in the chronicle!') },
   { from: 'jan', to: 'corni', ask: C('Erinner Corni ans Teammeeting heute Abend. Er vergisst es immer.', 'Remind Corni of the team meeting tonight. He always forgets.'),
-    msg: C('Jan sagt: Teammeeting heute Abend.', 'Jan says: team meeting tonight.'), reply: C('Welches Teamm… ach DAS. Das findet eh nicht statt.', 'Which team meet… oh THAT. That never happens anyway.'), back: C('Es findet statt! …Vermutlich.', 'It\'s happening! …Probably.') },
+    msg: C('Jan sagt: Teammeeting heute Abend.', 'Jan says: team meeting tonight.'), reply: C('Welches Teamm… ach DAS. Das findet eh nicht statt.', 'Which team meet… oh THAT. That never happens anyway.'),
+    relay: C('Corni kommt. Glaub ich. Er hat „ach DAS“ gesagt.', 'Corni is coming. I think. He said "oh THAT".'), back: C('Es findet statt! …Vermutlich.', 'It\'s happening! …Probably.') },
   { from: 'aylien', to: 'sabse', ask: C('Bring Sabse eine Umarmung von mir. Vorsichtig. 🫶', 'Bring Sabse a hug from me. Carefully. 🫶'),
-    msg: C('*umarmt Sabse* Von Aylien.', '*hugs Sabse* From Aylien.'), reply: C('Eine… was? …Raus aus meiner Küche. *lächelt fast*', 'A… what? …Out of my kitchen. *almost smiles*'), back: C('Sie hat FAST gelächelt? Das ist ein Durchbruch! 🫶', 'She ALMOST smiled? That\'s a breakthrough! 🫶') },
+    msg: C('*umarmt Sabse* Von Aylien.', '*hugs Sabse* From Aylien.'), reply: C('Eine… was? …Raus aus meiner Küche. *lächelt fast*', 'A… what? …Out of my kitchen. *almost smiles*'),
+    relay: C('Zugestellt. Sie hat mich rausgeworfen. Aber sie hat fast gelächelt.', 'Delivered. She threw me out. But she almost smiled.'), back: C('Sie hat FAST gelächelt? Das ist ein Durchbruch! 🫶', 'She ALMOST smiled? That\'s a breakthrough! 🫶') },
   { from: 'alf', to: 'lotta', ask: C('Sag Lotta, ich hab eine neue Geschichte. Die mit dem Esel. Version vier.', 'Tell Lotta I have a new story. The one with the donkey. Version four.'),
-    msg: C('Alf hat eine neue Version von der Esel-Geschichte.', 'Alf has a new version of the donkey story.'), reply: C('Version vier?! Ich komm gleich! Die wird jedes Mal besser.', 'Version four?! I\'m coming! It gets better every time.'), back: C('Hehe. Die Wahrheit ist dehnbar.', 'Hehe. The truth is stretchy.') },
-  { from: 'georg', to: 'fabbe', ask: C('Sag Fabbe, sein Dome hat eine interessante Energie. Nur damit er\'s weiß.', 'Tell Fabbe his dome has an interesting energy. Just so he knows.'),
-    msg: C('Georg sagt, dein Dome hat eine interessante Energie.', 'Georg says your dome has an interesting energy.'), reply: C('Interessant? Was heißt INTERESSANT?! …Danke, glaub ich.', 'Interesting? What does INTERESTING mean?! …Thanks, I think.'), back: C('Ich hab nur gesagt, was ich sehe.', 'I only said what I see.') },
+    msg: C('Alf hat eine neue Version von der Esel-Geschichte.', 'Alf has a new version of the donkey story.'), reply: C('Version vier?! Ich komm gleich! Die wird jedes Mal besser.', 'Version four?! I\'m coming! It gets better every time.'),
+    relay: C('Lotta kommt gleich. Sie sagt, die Esel-Geschichte wird jedes Mal besser.', 'Lotta is coming. She says the donkey story gets better every time.'), back: C('Hehe. Die Wahrheit ist dehnbar.', 'Hehe. The truth is stretchy.') },
+  { from: 'georg', to: 'fabbe', needs: 'q8_forestdome', ask: C('Sag Fabbe, sein Dome hat eine interessante Energie. Nur damit er\'s weiß.', 'Tell Fabbe his dome has an interesting energy. Just so he knows.'),
+    msg: C('Georg sagt, dein Dome hat eine interessante Energie.', 'Georg says your dome has an interesting energy.'), reply: C('Interessant? Was heißt INTERESSANT?! …Danke, glaub ich.', 'Interesting? What does INTERESTING mean?! …Thanks, I think.'),
+    relay: C('Fabbe will wissen, was „interessant“ heißt. Er bedankt sich trotzdem. Glaub ich.', 'Fabbe wants to know what "interesting" means. He says thanks anyway. I think.'), back: C('Ich hab nur gesagt, was ich sehe.', 'I only said what I see.') },
   { from: 'jonas', to: 'thompsen', ask: C('Sag Tinyhaus, ich hab mehr Bier als er. Kälter auch. SKÅL!', 'Tell Tinyhaus I have more beer than him. Colder too. SKÅL!'),
-    msg: C('Jonas sagt, er hat mehr Bier. Und kälter.', 'Jonas says he has more beer. And colder.'), reply: C('HAHAHA! Sag ihm: Meins ist wärmer, aber ich lach lauter! HAHAHA!', 'HAHAHA! Tell him: mine is warmer, but I laugh louder! HAHAHA!'), back: C('SKÅL. Das nehm ich als Kapitulation.', 'SKÅL. I\'ll take that as surrender.') },
+    msg: C('Jonas sagt, er hat mehr Bier. Und kälter.', 'Jonas says he has more beer. And colder.'), reply: C('HAHAHA! Sein Bier ist kälter, aber ich lach lauter! HAHAHA!', 'HAHAHA! His beer is colder, but I laugh louder! HAHAHA!'),
+    relay: C('Tinyhaus sagt, dein Bier ist kälter, aber er lacht lauter. Er hat es auch bewiesen.', 'Tinyhaus says your beer is colder, but he laughs louder. He proved it, too.'), back: C('SKÅL. Das nehm ich als Kapitulation.', 'SKÅL. I\'ll take that as surrender.') },
   { from: 'harry', to: 'janina', ask: C('Frag Janina, welche Farben ihre Tücher haben. Fürs Mapping.', 'Ask Janina what colours her fabrics are. For the mapping.'),
-    msg: C('Harry fragt, welche Farben deine Tücher haben.', 'Harry asks what colours your fabrics are.'), reply: C('Alle. Alle Farben. Sag ihm: alle.', 'All. All the colours. Tell him: all.'), back: C('Alle… okay. Ich brauch mehr Beamer.', 'All… okay. I need more projectors.') },
+    msg: C('Harry fragt, welche Farben deine Tücher haben.', 'Harry asks what colours your fabrics are.'), reply: C('Alle. Alle Farben. Wirklich alle.', 'All. All the colours. Really all of them.'),
+    relay: C('Janina sagt: alle Farben. Wirklich alle.', 'Janina says: all the colours. Really all of them.'), back: C('Alle… okay. Ich brauch mehr Beamer.', 'All… okay. I need more projectors.') },
   { from: 'cosma', to: 'mathias', ask: C('Sag Mathias, er soll mal Pause machen. Ich seh doch, dass er zu viel trägt. 😁', 'Tell Mathias to take a break. I can see he\'s carrying too much. 😁'),
-    msg: C('Cosma sagt, du sollst Pause machen.', 'Cosma says you should take a break.'), reply: C('Pause? Ich trag doch nur… drei Bretter. Gleichzeitig. Okay, eine kurze. 😄', 'A break? I\'m only carrying… three planks. At once. Okay, a short one. 😄'), back: C('Er hat sich nicht hingesetzt, oder? …Hab ich mir gedacht. 😁', 'He didn\'t sit down, did he? …Thought so. 😁') },
+    msg: C('Cosma sagt, du sollst Pause machen.', 'Cosma says you should take a break.'), reply: C('Pause? Ich trag doch nur… drei Bretter. Gleichzeitig. Okay, eine kurze. 😄', 'A break? I\'m only carrying… three planks. At once. Okay, a short one. 😄'),
+    relay: C('Mathias macht eine kurze Pause. Hat er gesagt. Mit drei Brettern unterm Arm.', 'Mathias is taking a short break. He said so. With three planks under his arm.'), back: C('Er hat sich nicht hingesetzt, oder? …Hab ich mir gedacht. 😁', 'He didn\'t sit down, did he? …Thought so. 😁') },
+  { from: 'matze', to: 'felix', needs: 'q2_sails', ask: C('Frag Felix, ob die Sonnensegel nachts leuchten sollen. Ich weiß es nicht mehr. Ich hab sie aber bestellt. Glaub ich.', 'Ask Felix whether the shade sails are supposed to glow at night. I don\'t remember. But I ordered them. I think.'),
+    msg: C('Matze fragt, ob die Sonnensegel nachts leuchten sollen.', 'Matze asks whether the shade sails should glow at night.'), reply: C('Natürlich! UV-Farbe! MEIN Konzept. Er war dabei, als ich es erklärt hab. Zweimal.', 'Of course! UV paint! MY concept. He was there when I explained it. Twice.'),
+    relay: C('Felix sagt: ja, UV-Farbe, sein Konzept. Du warst dabei, als er es erklärt hat. Zweimal.', 'Felix says: yes, UV paint, his concept. You were there when he explained it. Twice.'), back: C('War ich? …War ich. Stimmt. Danke! Was wollte ich jetzt nochmal?', 'Was I? …I was. Right. Thanks! What did I want again?') },
+  { from: 'rocky', to: 'futuremoon', ask: C('Sag Luna, Full-On ist Kindergeburtstag. Mit Bass, okay. Aber Kindergeburtstag.', 'Tell Luna full-on is a kids\' party. With bass, okay. But a kids\' party.'),
+    msg: C('Rocky sagt, Full-On ist Kindergeburtstag.', 'Rocky says full-on is a kids\' party.'), reply: C('Kindergeburtstag?! Auf meinem Kindergeburtstag tanzen mehr Leute als bei seinem ganzen Set. Mit Liebe gesagt.', 'A kids\' party?! More people dance at my kids\' party than at his whole set. Said with love.'),
+    relay: C('Luna sagt, auf ihrem Kindergeburtstag tanzen mehr Leute als bei deinem Set. Mit Liebe gesagt.', 'Luna says more people dance at her kids\' party than at your set. Said with love.'), back: C('…Okay. Das war gut. Respekt. Ich mach heute Nacht trotzdem 190 BPM.', '…Okay. That was good. Respect. I\'m still doing 190 BPM tonight.') },
+  { from: 'franzi', to: 'delsin', needs: 'q6_awareness', ask: C('Sag Delsin, er soll auch mal was trinken. Er atmet seit drei Stunden nur noch.', 'Tell Delsin to drink something too. He\'s been doing nothing but breathing for three hours.'),
+    msg: C('Franzi sagt, du sollst was trinken.', 'Franzi says you should drink something.'), reply: C('Ich trink doch. Bewusst. Schluck für Schluck. *atmet ein* …*atmet aus*', 'I am drinking. Mindfully. Sip by sip. *breathes in* …*breathes out*'),
+    relay: C('Delsin trinkt. Schluck für Schluck. Zwischen den Atemzügen.', 'Delsin is drinking. Sip by sip. Between breaths.'), back: C('Schluck für Schluck… Hauptsache Schlucke. Danke dir.', 'Sip by sip… as long as there are sips. Thank you.') },
+  { from: 'krygo', to: 'corni', ask: C('Sag Corni, die Sauna ist morgen fertig. Er soll schon mal sein Handtuch suchen.', 'Tell Corni the sauna will be done tomorrow. He should start looking for his towel.'),
+    msg: C('Krygo sagt, die Sauna ist morgen fertig.', 'Krygo says the sauna will be done tomorrow.'), reply: C('Morgen. Klar. Ich hab das Wettbier von 2019 noch. Ungeöffnet.', 'Tomorrow. Sure. I still have the bet beer from 2019. Unopened.'),
+    relay: C('Corni sagt, er hat das Wettbier von 2019 noch. Ungeöffnet.', 'Corni says he still has the bet beer from 2019. Unopened.'), back: C('Haha! Das Bier verliert er. Morgen. Ganz sicher.', 'Haha! He\'s going to lose that beer. Tomorrow. For sure.') },
+  { from: 'schwarzhuber', to: 'jan', needs: 'e1_entrance', ask: C('Sag dem Jan, sei Bändchen-Tisch steht auf meim Klee. Des is koa Parkplatz für Tisch.', 'Tell Jan his wristband table is standing on my clover. That\'s no parking space for tables.'),
+    msg: C('Schwarzhuber sagt, dein Bändchen-Tisch steht auf seinem Klee.', 'Schwarzhuber says your wristband table is standing on his clover.'), reply: C('Auf seinem… oh. Sag ihm, wir zahlen den Klee. Pro Blatt, wenn\'s sein muss.', 'On his… oh. Tell him we\'ll pay for the clover. Per leaf, if we have to.'),
+    relay: C('Jan sagt, ihr zahlt den Klee. Pro Blatt, wenn es sein muss.', 'Jan says you\'ll pay for the clover. Per leaf, if you have to.'), back: C('Pro Blattl? Mei. Des is anständig. Fast.', 'Per leaf? Well. That\'s decent. Almost.') },
 ];
 
 // favour: help a volunteer pitch their tent at the camping (a quick skill game)
@@ -99,8 +127,8 @@ const TENT_ASKS = [
 
 // favour: have a beer with someone (karma + a little buzz)
 const BEER_ASKS = {
-  thompsen: [C('HAHAHA! Komm, trink ein Bier mit mir! Hol zwei aus dem Kühlschrank im Aufenthaltszelt! HAHA!', 'HAHAHA! Come on, have a beer with me! Grab two from the fridge in the crew tent! HAHA!'), C('PROST! HAHAHA! Siehst du? Gemeinsam lacht sich\'s besser!', 'CHEERS! HAHAHA! See? Laughing\'s better together!')],
-  jonas: [C('SKÅL! Zeit für ein Feierabendbier. Also, ein Zwischendurchbier. Holst du zwei aus dem Aufenthaltszelt?', 'SKÅL! Time for an after-work beer. Well, a middle-of-work beer. Grab two from the crew tent?'), C('SKÅL! Auf die Strohwände! Und auf dich!', 'SKÅL! To the straw walls! And to you!')],
+  thompsen: [C('HAHAHA! Komm, trink ein Bier mit mir! Mein Kasten ist leer, ausgerechnet! Hol zwei aus dem Kühlschrank im Aufenthaltszelt! HAHA!', 'HAHAHA! Come on, have a beer with me! My crate is empty, of all things! Grab two from the fridge in the crew tent! HAHA!'), C('PROST! HAHAHA! Siehst du? Gemeinsam lacht sich\'s besser!', 'CHEERS! HAHAHA! See? Laughing\'s better together!')],
+  jonas: [C('SKÅL! Zeit für ein Zwischendurchbier. Meine eigenen sind warm, die Sonne hat sie erwischt. Holst du zwei kalte aus dem Aufenthaltszelt?', 'SKÅL! Time for a middle-of-work beer. Mine are warm, the sun got them. Grab two cold ones from the crew tent?'), C('SKÅL! Auf die Strohwände! Und auf dich!', 'SKÅL! To the straw walls! And to you!')],
   strom_andi: [C('Hey! Felix sieht gerade nicht hin. Hol uns zwei Bier aus dem Aufenthaltszelt, schnell!', 'Hey! Felix isn\'t looking. Grab us two beers from the crew tent, quick!'), C('Prost! Auf den Strom! Und auf Pausen, von denen Felix nix weiß!', 'Cheers! To the power! And to breaks Felix doesn\'t know about!')],
 };
 
@@ -247,7 +275,7 @@ export class Errands {
       { type: 'talk', npc: t.giver, text: C(`Bring es zu ${giverName}`, `Bring it to ${giverName}`), consumes: [itemId], dialog: [{ who: t.giver, text: t.thanks }] },
     ], urgent ? 25 : 15, {
       timeLimit: urgent ? 75 : undefined,
-      failDialog: [{ who: t.giver, text: C('Zu spät… Na gut. Frag mich nochmal, wenn du Zeit hast.', 'Too late… Fine. Ask me again when you have time.') }],
+      failDialog: [{ who: t.giver, text: C('Zu spät… Na gut. Dann hol ich es halt selbst. Nächstes Mal.', 'Too late… Fine. I\'ll get it myself then. Next time.') }],
     });
   }
 
@@ -276,14 +304,14 @@ export class Errands {
   }
 
   make_message() {
-    const ok = MESSAGES.filter((m) => this.free(m.from) && this.game.npcs.get(m.to) && !this.game.npcs.get(m.to).hidden && m.from !== this.lastGiver);
+    const ok = MESSAGES.filter((m) => this.free(m.from) && this.game.npcs.get(m.from) && this.game.npcs.get(m.to) && !this.game.npcs.get(m.to).hidden && m.from !== this.lastGiver && (!m.needs || this.game.quests.isDone(m.needs)));
     if (!ok.length) return null;
     const m = ok[Math.floor(Math.random() * ok.length)];
     const g = this.game;
     const toName = g.npcs.get(m.to).def.name, fromName = g.npcs.get(m.from).def.name;
     return this.base(this.newId('msg'), m.from, C(`Nachricht an ${toName}`, `Message for ${toName}`), m.ask, [
       { type: 'talk', npc: m.to, text: C(`Richte ${toName} die Nachricht aus`, `Pass the message on to ${toName}`), dialog: [{ who: 'you', text: m.msg }, { who: m.to, text: m.reply }] },
-      { type: 'talk', npc: m.from, text: C(`Bring ${fromName} die Antwort`, `Bring ${fromName} the answer`), dialog: [{ who: 'you', text: m.reply }, { who: m.from, text: m.back }] },
+      { type: 'talk', npc: m.from, text: C(`Bring ${fromName} die Antwort`, `Bring ${fromName} the answer`), dialog: [{ who: 'you', text: m.relay }, { who: m.from, text: m.back }] },
     ], 15);
   }
 
@@ -312,7 +340,7 @@ export class Errands {
     const cap = (s) => s[0].toUpperCase() + s.slice(1);
     const fill = (t) => C(t.de.replace('{Place}', cap(placeName.de)).replace('{place}', placeName.de), t.en.replace('{place}', placeName.en));
     return this.base(this.newId('trash'), id, C(`Müll ${placeName.de}`, `Rubbish ${placeName.en}`), fill(ask), [
-      { type: 'pickup', text: fill(C('Sammel drei Müllsäcke {place} ein', 'Collect three bin bags {place}')), items: ['a', 'b', 'c'].map((k) => ({ item: `err_trash_${k}`, at: placeSpot, search: 14 })) },
+      { type: 'pickup', text: fill(C('Sammle drei Müllsäcke {place} ein', 'Collect three bin bags {place}')), items: ['a', 'b', 'c'].map((k) => ({ item: `err_trash_${k}`, at: placeSpot, search: 14 })) },
       { type: 'talk', npc: id, text: C(`Bring die Säcke zu ${name}`, `Bring the bags to ${name}`), consumes: ['err_trash_a', 'err_trash_b', 'err_trash_c'], dialog: [{ who: id, text: thanks }] },
     ], 20);
   }

@@ -102,8 +102,8 @@ export class UI {
       const d = e.pos() ? Math.round(Math.hypot(e.pos().x - playerPos.x, e.pos().z - playerPos.z)) : 0;
       const left = Math.max(0, Math.ceil(e.deadline - e.t));
       const waiting = e.blocked && !drama.tent;
-      const timeTxt = e.helping ? L({ de: 'Hilfe ist unterwegs', en: 'help is on the way' }) : waiting ? L({ de: 'wartet auf das Awareness-Zelt', en: 'waiting for the awareness tent' }) : `⏱ ${clock(left)} ${L({ de: 'bis es zu spät ist', en: 'until too late' })}`;
-      dramaCards.push(`<div class="track drama ${!e.helping && !waiting && left < 30 ? 'urgent' : ''}"><div class="tt">⚠️ ${L(e.def.title)}${e.victims[0] ? ` – ${e.victims[0].def.name}` : ''}</div><div class="ts">${e.helping ? `${e.helping.def.name} ${L({ de: 'ist unterwegs…', en: 'is on the way…' })}` : drama.taskText(e)}</div><div class="td">${d} m · ${timeTxt}</div></div>`);
+      const timeTxt = e.helping ? L({ de: 'Hilfe ist unterwegs', en: 'help is on the way' }) : waiting ? L({ de: 'wartet auf das Awareness-Zelt', en: 'waiting for the awareness tent' }) : `⏱ ${clock(left)} ${L({ de: 'bis es zu spät ist', en: 'before it\'s too late' })}`;
+      dramaCards.push(`<div class="track drama ${!e.helping && !waiting && left < 30 ? 'urgent' : ''}"><div class="tt">⚠️ ${L(e.def.title)}${e.victims[0] ? ` – ${drama.victimName(e)}` : ''}</div><div class="ts">${e.helping ? `${e.helping.def.name} ${L({ de: 'ist unterwegs…', en: 'is on the way…' })}` : drama.taskText(e)}</div><div class="td">${d} m · ${timeTxt}</div></div>`);
     }
     // the timed job goes first, then drama, then everything else
     active.sort((a, b) => (b === timedQid) - (a === timedQid));
@@ -158,7 +158,7 @@ export class UI {
       }
       const isTimed = qid === timedQid;
       const tl = isTimed ? Math.ceil(qs.timer.left) : 0;
-      const timerRow = isTimed ? `<div class="tbar ${tl < 30 ? 'urgent' : ''}">⏱ ${clock(tl)} <span>${L({ de: 'Zeit-Mission – hat Vorrang!', en: 'timed job – do this first!' })}</span></div>` : '';
+      const timerRow = isTimed ? `<div class="tbar ${tl < 30 ? 'urgent' : ''}">⏱ ${clock(tl)} <span>${L({ de: 'Zeit-Mission, hat Vorrang!', en: 'timed job, do this first!' })}</span></div>` : '';
       html += `<div class="track ${isTimed ? 'timed' : ''} ${tracked || isTimed ? '' : 'dim'}">${timerRow}<div class="tt">${L(q.title)}</div><div class="ts">${qs.stepText(qid)}${step.type === 'wait' && qs.state.active[qid].waitLeft > 0 ? ` <b>⏳ ${Math.ceil(qs.state.active[qid].waitLeft)} s</b>` : ''}</div>${extra}${dist}</div>`;
       if (isTimed) flushDrama();
     }
@@ -301,7 +301,7 @@ export class UI {
             b.onclick = (e) => { e.stopPropagation(); close(ci); };
             choiceEl.appendChild(b);
           });
-          $('dialog-hint').textContent = t('d.choose');
+          $('dialog-hint').textContent = t(matchMedia('(pointer: coarse)').matches ? 'd.chooseTouch' : 'd.choose');
         } else {
           $('dialog-hint').textContent = t('d.continue');
         }

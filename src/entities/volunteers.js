@@ -43,7 +43,7 @@ export const VOLUNTEERS = [
     { de: 'Der Hund nach unten hilft auch gegen Kater. Probier\'s.', en: 'Downward dog helps against hangovers too. Try it.' },
   ] },
   { name: 'Ben', f: false, role: { de: 'Schraubt gern', en: 'Loves screws' }, lines: [
-    { de: 'Torx, Kreuz, Schlitz – ich hab alles. Nur keinen Akku.', en: 'Torx, Phillips, flat – I have everything. Just no battery.' },
+    { de: 'Torx, Kreuz, Schlitz, ich hab alles. Nur keinen Akku.', en: 'Torx, Phillips, flat, I have everything. Just no battery.' },
     { de: 'Wer hat die 8er-Nuss? Ich brauch immer die 8er.', en: 'Who has the 8 mm socket? I always need the 8.' },
     { de: 'Das hält. Ich hab drei Schrauben reingemacht. Vier wären Angabe.', en: 'That holds. I put three screws in. Four would be showing off.' },
   ] },
@@ -68,7 +68,7 @@ export const VOLUNTEERS = [
     { de: 'Das Budget war schon immer im Minus. Das ist Tradition.', en: 'The budget was always in the red. It\'s tradition.' },
   ] },
   { name: 'Paula', f: true, role: { de: 'Fotografin', en: 'Photographer' }, lines: [
-    { de: 'Nicht bewegen – das Licht ist gerade perfekt!', en: 'Don\'t move – the light is perfect right now!' },
+    { de: 'Nicht bewegen, das Licht ist gerade perfekt!', en: 'Don\'t move, the light is perfect right now!' },
     { de: 'Ich mach Behind-the-Scenes. Also Fotos von Leuten, die Kisten tragen.', en: 'I\'m doing behind-the-scenes. So photos of people carrying crates.' },
     { de: 'Hast du Leo gesehen? Ich brauch noch ein Foto von ihm. Seit drei Jahren.', en: 'Seen Leo? I still need a photo of him. For three years.' },
   ] },
@@ -114,7 +114,7 @@ export const VOLUNTEERS = [
   ] },
   { name: 'Yogi', f: false, role: { de: 'Barfuß-Philosoph', en: 'Barefoot philosopher' }, lines: [
     { de: 'Schuhe trennen uns von der Erde. Und schützen vor Nägeln. Egal.', en: 'Shoes separate us from the earth. And protect us from nails. Whatever.' },
-    { de: 'Wenn ein Zelt im Wald aufgebaut wird und keiner hilft – steht es dann?', en: 'If a tent is pitched in the forest and nobody helps – does it stand?' },
+    { de: 'Wenn ein Zelt im Wald aufgebaut wird und keiner hilft, steht es dann?', en: 'If a tent is pitched in the forest and nobody helps, does it stand?' },
     { de: 'Der Weg ist das Ziel. Der Weg zum Dixi auch.', en: 'The journey is the destination. The journey to the portaloo too.' },
   ] },
   { name: 'Frieda', f: true, role: { de: 'Organisiert Schichten', en: 'Organises shifts' }, lines: [

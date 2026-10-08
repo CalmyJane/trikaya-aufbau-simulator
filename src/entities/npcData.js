@@ -40,9 +40,9 @@ export const NPCS = [
       { de: 'Wo Leo ist? Frag lieber nicht.', en: 'Where\'s Leo? Better not ask.' },
       { de: 'Erst die Stahlseile, dann die Deko. Nicht andersrum. NIE andersrum.', en: 'Steel wires first, then deco. Never the other way round. NEVER.' },
       // running gag: Corni always asks about the rigging material
-      { de: 'Hast du das Rigging-Material? Die Stahlseile für die Mainstage?', en: 'Have you got the rigging material? The steel wires for the mainstage?' },
-      { de: 'Sag mal… wo ist eigentlich das Rigging-Material?', en: 'Say… where\'s the rigging material, actually?' },
-      { de: 'Stahlseile. Hat irgendwer die Stahlseile gesehen?!', en: 'Steel wires. Has anyone seen the steel wires?!' },
+      { de: 'Hast du das Rigging-Material? Die Stahlseile für die Mainstage?', en: 'Have you got the rigging material? The steel wires for the mainstage?', until: 'q1_rigging' },
+      { de: 'Sag mal… wo ist eigentlich das Rigging-Material?', en: 'Say… where\'s the rigging material, actually?', until: 'q1_rigging' },
+      { de: 'Stahlseile. Hat irgendwer die Stahlseile gesehen?!', en: 'Steel wires. Has anyone seen the steel wires?!', until: 'q1_rigging' },
     ],
   },
   {
@@ -53,7 +53,7 @@ export const NPCS = [
       { de: 'Moment… was wollte ich gerade?', en: 'Wait… what was I about to do?' },
       { de: 'War das links oder rechts von links?', en: 'Was that left or right of left?' },
       { de: 'Ich hab den Plan! …irgendwo.', en: 'I have the plan! …somewhere.' },
-      { de: 'Warum stehen hier sechs Pfosten? Ach ja. Die Stage.', en: 'Why are there six posts here? Oh right. The stage.' },
+      { de: 'Warum stehen hier sechs Pfosten? Ach ja. Die Stage.', en: 'Why are there six posts here? Oh right. The stage.', after: 'q1a_posts' },
       { de: 'Hab ich schon Kaffee getrunken? Ich trink sicherheitshalber noch einen.', en: 'Did I have coffee yet? I\'ll have another, just in case.' },
     ],
   },
@@ -62,7 +62,7 @@ export const NPCS = [
     look: { base: 'm_hoodie', skin: SKIN.tan, hair: '#1e150e', shirt: '#6b3a2a', pants: '#3a4a2a', patchwork: true, height: 1.66 },
     behavior: 'wander', home: 'base_yard', radius: 12,
     lines: [
-      { de: 'Alles, was du suchst – ich weiß, wo es ist. Meistens.', en: 'Whatever you\'re looking for – I know where it is. Mostly.' },
+      { de: 'Alles, was du suchst, ich weiß, wo es ist. Meistens.', en: 'Whatever you\'re looking for, I know where it is. Mostly.' },
       { de: 'Künstlergasse-Container, hinten links, unter der Plane. Oder im Hühnercontainer.', en: 'Künstlergasse container, back left, under the tarp. Or in the chicken container.' },
       { de: 'Wer hat mein Maßband?!', en: 'Who has my tape measure?!' },
       { de: 'Ich hab eine Liste. Die Liste ist leider im Hühnercontainer.', en: 'I have a list. Sadly the list is in the chicken container.' },
@@ -88,8 +88,8 @@ export const NPCS = [
       { de: 'Chai ist fertig, wenn er fertig ist.', en: 'Chai is ready when it\'s ready.' },
       { de: 'Schuhe aus in der Lounge. Ach, du hast eh keine.', en: 'Shoes off in the lounge. Oh, you don\'t have any anyway.' },
       { de: 'Kardamom ist die Antwort. Egal auf welche Frage.', en: 'Cardamom is the answer. Whatever the question.' },
-      { de: 'Mein Zelt steht noch nicht, aber Mate gibt\'s trotzdem. Campingkocher, Baby.', en: 'My tent isn\'t up yet, but there\'s mate anyway. Camping stove, baby.' },
-      { de: 'Wir sind fünfundzwanzig Leute am Chai-Zelt. Und ein Zelt. Das liegt noch.', en: 'There are twenty-five of us at the chai tent. And one tent. It\'s still lying down.' },
+      { de: 'Mein Zelt steht noch nicht, aber Mate gibt\'s trotzdem. Campingkocher, Baby.', en: 'My tent isn\'t up yet, but there\'s mate anyway. Camping stove, baby.', until: 'q9_festzelt' },
+      { de: 'Wir sind fünfundzwanzig Leute am Chai-Zelt. Und ein Zelt. Das liegt noch.', en: 'There are twenty-five of us at the chai tent. And one tent. It\'s still lying down.', until: 'q9_festzelt' },
       { de: 'Heute haben wir am Chai-Zelt richtig was geschafft. Wir wissen jetzt, wo vorne ist.', en: 'We got a lot done at the chai tent today. We now know where the front is.' },
     ],
   },
@@ -126,7 +126,7 @@ export const NPCS = [
       { de: 'HAHAHAHA!', en: 'HAHAHAHA!' },
       { de: 'Hahaha, der Zdenko! Hahaha!', en: 'Hahaha, that Zdenko! Hahaha!' },
       { de: '*lacht Tränen*', en: '*cries laughing*' },
-      { de: 'Hahaha — worüber lachen wir eigentlich? HAHAHA!', en: 'Hahaha — what are we laughing about? HAHAHA!' },
+      { de: 'Hahaha, worüber lachen wir eigentlich? HAHAHA!', en: 'Hahaha, what are we laughing about? HAHAHA!' },
       { de: 'Prost! Hehehe.', en: 'Cheers! Hehehe.' },
     ],
   },
@@ -198,7 +198,7 @@ export const NPCS = [
     behavior: 'worker', route: ['plot_mainstage', 'base_yard', 'plot_chai_lounge', 'plot_forest_dome', 'plot_planetarium'],
     lines: [
       { de: 'Brauchst du Hilfe? Ich helf dir. Ich helf allen. Ich helf mir sogar selbst!', en: 'Need help? I\'ll help. I help everyone. I even help myself!' },
-      { de: 'Woah… die Wolken heute. Sorry. Was tragen wir?', en: 'Whoa… the clouds today. Sorry. What are we carrying?' },
+      { de: 'Boah… die Wolken heute. Sorry. Was tragen wir?', en: 'Whoa… the clouds today. Sorry. What are we carrying?' },
       { de: 'Noch drei Paletten, dann Pause. Hab ich vor drei Paletten auch gesagt.', en: 'Three more pallets, then a break. Said that three pallets ago.' },
     ],
   },
@@ -208,7 +208,7 @@ export const NPCS = [
     behavior: 'wander', home: 'plot_forest_dome', offset: [7, 8], radius: 4,
     lines: [
       { de: 'Der Forest Dome wird magisch. Zwischen den Bäumen. Mit Bass.', en: 'The Forest Dome will be magical. Between the trees. With bass.' },
-      { de: 'Schön, dass du da bist! Wirklich!', en: 'Great that you\'re here! Really!' },
+      { de: 'Hey, du! Hörst du die Bäume? Die freuen sich auch, dass du da bist. Ehrlich.', en: 'Hey, you! Hear the trees? They\'re happy you\'re here too. Honestly.' },
       { de: 'Holz, Seile, Liebe. Mehr braucht ein Dome nicht.', en: 'Wood, ropes, love. That\'s all a dome needs.' },
     ],
   },
@@ -221,7 +221,7 @@ export const NPCS = [
       { de: 'Die Deko kommt ganz am Schluss. Dafür dann richtig.', en: 'The deco comes right at the end. But then properly.' },
       { de: 'TouchDesigner, Baby. 140 Nodes, und jeder einzelne reagiert auf die Kickdrum.', en: 'TouchDesigner, baby. 140 nodes, and every single one reacts to the kick drum.' },
       { de: 'Wenn das Lichthäuschen wackelt, wackeln die Visuals. Also bitte nicht anlehnen.', en: 'If the light booth wobbles, the visuals wobble. So please don\'t lean on it.' },
-      { de: 'Ich hab ein Feedback-Loop gebaut, der aussieht wie ein Drache, der träumt. Glaub ich.', en: 'I built a feedback loop that looks like a dragon dreaming. I think.' },
+      { de: 'Ich hab einen Feedback-Loop gebaut, der aussieht wie ein Drache, der träumt. Glaub ich.', en: 'I built a feedback loop that looks like a dragon dreaming. I think.' },
       { de: 'Auf das Holz kommt nachts ein 3D-Mapping. Du wirst weinen.', en: 'At night we project a 3D mapping onto the wood. You\'ll cry.' },
       { de: 'Hat jemand den Beamer gesehen? Den großen?', en: 'Has anyone seen the projector? The big one?' },
     ],
@@ -251,7 +251,7 @@ export const NPCS = [
       { de: 'Hör mal… das Brummen vom Generator… das ist ein Sample. Das kommt in meinen nächsten Track.', en: 'Listen… the generator hum… that\'s a sample. It\'s going in my next track.' },
       { de: 'Auflegen tu ich als Geist. Weil ich nach dem Set einfach weg bin. Keiner weiß, wohin. Ich auch nicht.', en: 'I DJ as Geist. Because after the set I just vanish. Nobody knows where. Me neither.' },
       { de: 'Geist legt am Festival auf. So schnell, dass die Zeit rückwärts läuft.', en: 'Geist is playing the festival. So fast that time runs backwards.' },
-      { de: '„Praktikum bei Astro TV" – mein Track, Bruder. Die Hotline hat mich nie zurückgerufen. Also hab ich sie gesampelt.', en: '"Praktikum bei Astro TV" – my track, brother. The hotline never called me back. So I sampled it.' },
+      { de: '„Praktikum bei Astro TV“, mein Track, Bruder. Die Hotline hat mich nie zurückgerufen. Also hab ich sie gesampelt.', en: '"Praktikum bei Astro TV", my track, brother. The hotline never called me back. So I sampled it.' },
       { de: 'Weißt du, was Hi-Tech und Punk gemeinsam haben? Beides ist zu schnell für deine Eltern.', en: 'You know what hi-tech and punk have in common? Both are too fast for your parents.' },
       { de: 'Vor dem Psytrance war ich Punk. Bin ich immer noch. Nur mit mehr Hall drauf.', en: 'Before psytrance I was punk. Still am. Just with more reverb.' },
       { de: 'Drei Akkorde, Bruder. Mehr braucht keiner. Ich brauch null, ich hab nen Sequencer.', en: 'Three chords, brother. Nobody needs more. I need zero, I\'ve got a sequencer.' },
@@ -268,7 +268,7 @@ export const NPCS = [
     soapBubbles: true, // Isi blows soap bubbles. Always.
     behavior: 'patrol', route: ['base_yard', 'plot_mainstage', 'kitchen', 'plot_chai_lounge', 'plot_awareness', 'plot_entrance', 'plot_biergarten', 'plot_narnia_floor', 'plot_firespace', 'plot_mainstage'], speed: 2.0,
     lines: [
-      { de: 'Guten Morgen! Ich hab schon drei Zelte aufgebaut und Wasser für alle geholt!', en: 'Good morning! I already pitched three tents and got water for everyone!' },
+      { de: 'Guten Morgen! Ich hab schon drei Zelte aufgebaut und Wasser für alle geholt!', en: 'Good morning! I already pitched three tents and got water for everyone!', night: false },
       { de: 'Seifenblasen machen alles besser. Sogar den Aufbau. Vor allem den Aufbau!', en: 'Soap bubbles make everything better. Even the build. Especially the build!' },
       { de: 'Ich hab drei Liter Seifenlauge dabei. Für Notfälle. Jeder Moment ist ein Notfall.', en: 'I brought three litres of bubble mix. For emergencies. Every moment is an emergency.' },
       { de: 'Schau, die da drüben schillert in allen Farben! …Und weg. Wie das Chai-Zelt.', en: 'Look, that one shimmers in every colour! …And gone. Like the chai tent.' },
@@ -398,7 +398,7 @@ export const NPCS = [
       { de: 'Hängematten sind die beste Erfindung der Menschheit. Direkt nach Pfosten.', en: 'Hammocks are humanity\'s best invention. Right after posts.' },
       { de: 'Der Schnurrbart? Der hält die Seile gerade. Physik.', en: 'The moustache? Keeps the ropes straight. Physics.' },
       { de: 'Klein, aber ich schlepp jeden Pfosten. Zu zweit. Mit Radlader.', en: 'Small, but I carry every post. With help. And a wheel loader.' },
-      { de: 'Wenn der Wald steht, leg ich mich rein und steh erst nach dem Festival wieder auf.', en: 'Once the forest stands, I lie down and won\'t get up until after the festival.' },
+      { de: 'Wenn der Wald steht, leg ich mich rein und steh erst nach dem Festival wieder auf.', en: 'Once the forest stands, I lie down and won\'t get up until after the festival.', until: 'h1_hammocks' },
     ],
   },
   // ------------------------------------------------------------------ the landowner & the helpful one
@@ -414,11 +414,11 @@ export const NPCS = [
       { de: 'Den Radlader fahrt ma so ned. Aber wurscht, is ja ned meiner.', en: 'That\'s not how you drive a wheel loader. But whatever, it\'s not mine.' },
       { de: 'Barfuß auf\'m Acker. Wenn des mei Großvater g\'sehn hätt…', en: 'Barefoot on the field. If my grandfather had seen that…' },
       { de: 'Zdenko, du bist a Hund. Prost.', en: 'Zdenko, you rascal. Cheers.' },
-      { de: 'Sechs Pfosten und a Holzdrach. Und des nennts ihr dann Bühne. Mei. I find\'s guad.', en: 'Six posts and a wooden dragon. And you call that a stage. Well. I like it.' },
+      { de: 'Sechs Pfosten und a Holzdrach. Und des nennts ihr dann Bühne. Mei. I find\'s guad.', en: 'Six posts and a wooden dragon. And you call that a stage. Well. I like it.', after: 'q1a_posts' },
       { de: 'Alles dilettantisch. Jedes Jahr. Und jedes Jahr kimmt ihr wieder. Und i sag jedes Jahr ja.', en: 'All amateurish. Every year. And every year you come back. And every year I say yes.' },
     ],
     benchLines: [
-      { de: 'Zdenko, Tinyhaus – habts ihr heut scho was g\'arbeitet? …Na. Hab i ma denkt.', en: 'Zdenko, Tinyhaus – done any work today? …No. Thought so.' },
+      { de: 'Zdenko, Tinyhaus, habts ihr heut scho was g\'arbeitet? …Na. Hab i ma denkt.', en: 'Zdenko, Tinyhaus, done any work today? …No. Thought so.' },
       { de: 'Gib ma a Bier, Tinyhaus. Des is mei Wiese, i derf des.', en: 'Give me a beer, Tinyhaus. It\'s my meadow, I\'m allowed.' },
       { de: 'So dilettantisch, wie ihr des macht… aber lustig seids.', en: 'As amateurish as you do it all… but you\'re fun.' },
       { de: 'Prost, ihr Hippies. Auf mei Wiese.', en: 'Cheers, you hippies. To my meadow.' },
@@ -433,7 +433,7 @@ export const NPCS = [
       { de: 'Felix, soll ich die Kabeltrommel holen? …Hab sie schon!', en: 'Felix, want me to get the cable drum? …Already got it!' },
       { de: 'Kein Stress, das kriegen wir zusammen hin!', en: 'No stress, we\'ll get it done together!' },
       { de: 'Ich hab noch Kabelbinder, falls du welche brauchst. Immer.', en: 'I\'ve got cable ties if you need some. Always.' },
-      { de: 'Schön, dass du da bist! Echt jetzt.', en: 'Great that you\'re here! Really.' },
+      { de: 'Wenn Felix fragt: Ich war die ganze Zeit hier. Und du auch. Wir haben gearbeitet. Sehr.', en: 'If Felix asks: I was here the whole time. And so were you. We worked. A lot.' },
       { de: 'Strom ist wie Liebe: Muss fließen. Sagt Felix. Glaub ich.', en: 'Power is like love: it has to flow. Felix says. I think.' },
     ],
   },
@@ -443,12 +443,12 @@ export const NPCS = [
     behavior: 'wander', home: 'base_yard', offset: [3, -3], radius: 6,
     homeAfter: { quest: 'q9_festzelt', spot: 'plot_biergarten', offset: [7.6, 2], radius: 1.5 }, // behind her bar at the Techno Floor once it stands
     lines: [
-      { de: 'Meine Bar steht noch nicht. Meine Barcrew schon. Ist ja auch was.', en: 'My bar isn\'t up yet. My bar crew is. That\'s something.' },
+      { de: 'Meine Bar steht noch nicht. Meine Barcrew schon. Ist ja auch was.', en: 'My bar isn\'t up yet. My bar crew is. That\'s something.', until: 'q9_festzelt' },
       { de: 'Ich steh nicht hinter der Bar. Ich sorg dafür, dass da immer wer steht.', en: 'I don\'t stand behind the bar. I make sure someone always does.' },
       { de: 'Schichtplan für die Bar: acht Leute, drei Schichten, null Ausreden.', en: 'Bar rota: eight people, three shifts, zero excuses.' },
       { de: 'Wer zu spät zur Barschicht kommt, macht die nächste gleich mit. So einfach.', en: 'Whoever is late for their bar shift does the next one too. Simple.' },
-      { de: 'Fabi ist mein Freund. Wenn er sagt, er weiß, wo alles ist – glaub ihm die Hälfte.', en: 'Fabi is my boyfriend. When he says he knows where everything is – believe half of it.' },
-      { de: 'Den Kratzer? Vom Kühlschrank-Schleppen. Halb so wild.', en: 'The scratch? From hauling the fridge. No big deal.' },
+      { de: 'Fabi ist mein Freund. Wenn er sagt, er weiß, wo alles ist, glaub ihm die Hälfte.', en: 'Fabi is my boyfriend. When he says he knows where everything is, believe half of it.' },
+      { de: 'Mein Rücken? Vom Kühlschrank-Schleppen. Halb so wild.', en: 'My back? From hauling the fridge. No big deal.' },
       { de: 'Ich hab schon Bars ohne Strom gemanagt. Eine Bar ohne Gläser ist da gar nix.', en: 'I\'ve run bars without power. A bar without glasses is nothing.' },
     ],
   },
@@ -459,7 +459,7 @@ export const NPCS = [
     homeAfter: { quest: 'n2_narnia', spot: 'narnia_deck', radius: 3.5 }, // hangs her deco in the stretch tent once it stands
     lines: [
       { de: 'Noch eine Lichterkette hier, eine Girlande da… und dann noch eine. Und noch eine.', en: 'One more fairy light here, a garland there… and another one. And another one.' },
-      { de: 'Sobald das Stretchzelt über dem Narnia Floor steht, häng ich meine Tücher auf. Kisten voll. KISTEN.', en: 'Once the stretch tent is up over the Narnia Floor I\'ll hang my fabrics. Crates of them. CRATES.' },
+      { de: 'Sobald das Stretchzelt über dem Narnia Floor steht, häng ich meine Tücher auf. Kisten voll. KISTEN.', en: 'Once the stretch tent is up over the Narnia Floor I\'ll hang my fabrics. Crates of them. CRATES.', until: 'n2_narnia' },
       { de: 'Mia baut den Floor, ich mach das Zelt schön. Arbeitsteilung. 💫', en: 'Mia builds the floor, I make the tent pretty. Division of labour. 💫' },
       { de: 'Ich leg am Festival auf! Ich bin SO aufgeregt. Hab schon 400 Tracks ausgesucht. Für zwei Stunden.', en: 'I\'m DJing at the festival! I\'m SO excited. Already picked 400 tracks. For two hours.' },
       { de: 'Hörst du das? Das ist mein Set. In meinem Kopf. Läuft seit drei Tagen.', en: 'Hear that? That\'s my set. In my head. Been playing for three days.' },
@@ -524,7 +524,7 @@ export const NPCS = [
       { de: 'Ich helf hier ein bisschen, da ein bisschen. Überall ein bisschen. Läuft.', en: 'I help a bit here, a bit there. A bit everywhere. All good.' },
       { de: 'Die Sonnenbrille? Die bleibt auf. Auch nachts. Vor allem nachts.', en: 'The sunglasses? They stay on. At night too. Especially at night.' },
       { de: 'Brauchst du ne Hand? Ich hab zwei. Eine ist frei.', en: 'Need a hand? I\'ve got two. One is free.' },
-      { de: 'Hab grad Sabse geholfen. Dann Felix. Dann Corni. Jetzt helf ich mir mal selbst – mit Pause.', en: 'Just helped Sabse. Then Felix. Then Corni. Now I\'m helping myself – to a break.' },
+      { de: 'Hab grad Sabse geholfen. Dann Felix. Dann Corni. Jetzt helf ich mir mal selbst, mit Pause.', en: 'Just helped Sabse. Then Felix. Then Corni. Now I\'m helping myself, to a break.' },
       { de: 'Entspannt bleiben. Das Festival kommt sowieso. Ob wir fertig sind oder nicht.', en: 'Stay relaxed. The festival is coming anyway. Whether we\'re done or not.' },
       { de: 'Ich seh dich. Du siehst mich nicht. Sonnenbrille, Baby.', en: 'I see you. You don\'t see me. Sunglasses, baby.' },
     ],
@@ -563,7 +563,7 @@ export const NPCS = [
     look: { base: 'm_adventurer', backpack: false, skin: SKIN.light, hair: '#0c0a0a', brows: '#0c0a0a', hairStyle: 'dreads', hairStyleColor: '#0c0a0a', dreadLength: 0.66, beads: true, tattoos: true, shirt: '#1a1a1a', pants: '#5a3a2a', patchwork: true, shirtPatch: ['#1a1a1a', '#6a2a1a', '#2a2a2a'], height: 1.92 },
     behavior: 'wander', home: 'plot_firespace', offset: [-6, 4], radius: 5,
     lines: [
-      { de: 'Schön, dass du da bist! Wirklich. …Du trägst aber schon Schuhe, oder? Hm. Jeder, wie er meint.', en: 'Lovely that you\'re here! Really. …You are wearing shoes, though? Hm. Each to their own.' },
+      { de: 'Schön, dass du da bist! Wirklich. …Barfuß auf der Baustelle? Hm. Jeder, wie er meint.', en: 'Lovely that you\'re here! Really. …Barefoot on a building site? Hm. Each to their own.' },
       { de: 'Ich will ja niemanden verurteilen. Aber Zdenko. Ich mein ja nur. Zdenko.', en: 'I don\'t want to judge anyone. But Zdenko. I\'m just saying. Zdenko.' },
       { de: 'Namaste, Bruder! Hast du heute schon Plastik benutzt? Ich frag nur. Ganz ohne Wertung.', en: 'Namaste, brother! Used any plastic today? Just asking. No judgement at all.' },
       { de: 'Tinyhaus trinkt schon wieder. Um elf. Ich sag nix. Ich denk es nur sehr laut.', en: 'Tinyhaus is drinking again. At eleven. I won\'t say anything. I\'m just thinking it very loudly.' },
@@ -580,7 +580,7 @@ export const NPCS = [
     homeAfter: { quest: 'q6_awareness', spot: 'plot_awareness', offset: [-5, 5], radius: 5 }, // joins Franzi once her tent stands
     lines: [
       { de: 'Hey. Alles okay bei dir? Echt jetzt, nicht nur so.', en: 'Hey. You okay? For real, not just saying it.' },
-      { de: 'Sobald Franzis Zelt steht, helf ich ihr. Für die, die zu viel erwischt haben.', en: 'Once Franzi\'s tent is up, I\'ll help her. For the ones who overdid it.' },
+      { de: 'Sobald Franzis Zelt steht, helf ich ihr. Für die, die zu viel erwischt haben.', en: 'Once Franzi\'s tent is up, I\'ll help her. For the ones who overdid it.', until: 'q6_awareness' },
       { de: 'Verbände sind Franzis Ding. Ich bin eher für Wasser, Decke und „du bist sicher“.', en: 'Bandages are Franzi\'s thing. I\'m more water, blanket and "you\'re safe".' },
       { de: 'Wenn jemand zu drauf ist: hol mich. Ich setz mich dazu und erklär, dass der Boden nicht atmet.', en: 'If someone\'s too high: get me. I\'ll sit with them and explain the ground isn\'t breathing.' },
       { de: 'Atmen. Ein, aus. Funktioniert bei allen. Sogar bei Zdenko. Manchmal.', en: 'Breathe. In, out. Works for everyone. Even Zdenko. Sometimes.' },
@@ -608,7 +608,7 @@ export const NPCS = [
       { de: 'Cosma hat die Ideen, ich hab den Akkuschrauber. Perfektes Team. 😄', en: 'Cosma has the ideas, I have the cordless drill. Perfect team. 😄' },
       { de: 'Pfosten rein, Seil dran, festziehen, grinsen. So baut man Zelte.', en: 'Post in, rope on, tighten, grin. That\'s how you build tents.' },
       { de: 'Die Dreads? Die helfen beim Bauen. Die halten Schrauben. Manchmal.', en: 'The dreads? They help with building. They hold screws. Sometimes.' },
-      { de: 'Wenn du irgendwas tragen musst – sag Bescheid, ich pack mit an! 😄', en: 'If you need to carry anything – just say, I\'ll pitch in! 😄' },
+      { de: 'Wenn du irgendwas tragen musst, sag Bescheid, ich pack mit an! 😄', en: 'If you need to carry anything, just say, I\'ll pitch in! 😄' },
     ],
   },
   {
@@ -629,7 +629,7 @@ export const NPCS = [
     look: { base: 'f_casual', skin: SKIN.fair, hair: '#8a3a1e', brows: '#6a2a14', hairStyle: 'long', hairStyleColor: '#8a3a1e', hairLength: 0.4, headband: '#e0a030', shirt: '#d9803c', pants: '#5b3a73', patchwork: true, shirtPatch: ['#d9803c', '#8e2b3a', '#2e5d7a'], height: 1.7 },
     behavior: 'builder', home: 'plot_chai_lounge', offset: [-2, -2], radius: 5,
     lines: [
-      { de: 'Morgen steht das Chai-Zelt. Ganz sicher. Spätestens übermorgen.', en: 'The chai tent will be up tomorrow. Definitely. The day after at the latest.' },
+      { de: 'Morgen steht das Chai-Zelt. Ganz sicher. Spätestens übermorgen.', en: 'The chai tent will be up tomorrow. Definitely. The day after at the latest.', until: 'q9_festzelt' },
       { de: 'Wir sind gerade in der Konzeptphase. Seit Montag. Es ist ein sehr gutes Konzept.', en: 'We\'re in the concept phase. Since Monday. It\'s a very good concept.' },
       { de: 'Alle helfen mit! Wirklich alle! Wir sind die größte Crew vom ganzen Festival.', en: 'Everyone\'s helping! Really everyone! We\'re the biggest crew of the whole festival.' },
       { de: 'Wir haben das Zelt heute einmal ausgerollt. Dann war Chai-Pause. Dann war Mittag.', en: 'We unrolled the tent once today. Then there was a chai break. Then lunch.' },
@@ -649,7 +649,7 @@ export const NPCS = [
       { de: 'Eine Strohwand ist wie ein Wikingerschild. Nur gelber. Und weicher. Und es piekst.', en: 'A straw wall is like a viking shield. Just yellower. And softer. And it itches.' },
       { de: 'Wenn die Nachbarn aus Karlsfeld anrufen, sag ich: mehr Stroh! Und dann: Bier.', en: 'When the neighbours from Karlsfeld call, I say: more straw! And then: beer.' },
       { de: 'Ich hab heute schon 80 Ballen bewegt. Also, gedanklich. Mit Bier.', en: 'Already moved 80 bales today. Mentally. With beer.' },
-      { de: 'Die Chai-Crew wollte mir Stroh fürs Zelt abkaufen. Das Zelt gibt\'s ja noch nicht. HAHA. Skål!', en: 'The chai crew wanted to buy straw for their tent. There is no tent yet. HAHA. Skål!' },
+      { de: 'Die Chai-Crew wollte mir Stroh fürs Zelt abkaufen. Das Zelt gibt\'s ja noch nicht. HAHA. Skål!', en: 'The chai crew wanted to buy straw for their tent. There is no tent yet. HAHA. Skål!', until: 'q9_festzelt' },
     ],
   },
   {
@@ -677,8 +677,8 @@ export const NPCS = [
       { de: 'Jeder Stand braucht Lichterketten. Und Räucherstäbchen. Und noch mehr Lichterketten.', en: 'Every stall needs fairy lights. And incense. And more fairy lights.' },
       { de: 'Ich hab zwölf Händler, drei Stromkabel und null Ahnung, wie das passt. Wird schon!', en: 'I\'ve got twelve vendors, three power cables and zero idea how that fits. It\'ll work out!' },
       { de: 'Kristalle, Pumphosen, Traumfänger. Das Übliche. Und ein Stand mit Socken. Barfuß-Festival. Mutig.', en: 'Crystals, harem pants, dreamcatchers. The usual. And a sock stall. At a barefoot festival. Brave.' },
-      { de: 'Wenn die Marktstraße steht, kauf ich mir selbst als Erstes was. Das ist der Deal mit mir selbst.', en: 'Once the market street stands, I\'m the first one to buy something. That\'s my deal with myself.' },
-      { de: 'Das Chai-Zelt wollte einen Stand bei mir. Für Chai. Den es nicht gibt.', en: 'The chai tent wanted a stall at mine. For chai. Which doesn\'t exist.' },
+      { de: 'Wenn die Marktstraße steht, kauf ich mir selbst als Erstes was. Das ist der Deal mit mir selbst.', en: 'Once the market street stands, I\'m the first one to buy something. That\'s my deal with myself.', until: 'm1_shops' },
+      { de: 'Das Chai-Zelt wollte einen Stand bei mir. Für Chai. Den verkauft Mark doch längst, auf dem Campingkocher.', en: 'The chai tent wanted a stall at mine. For chai. Mark has been selling that for ages, on his camping stove.' },
     ],
   },
   {
@@ -701,7 +701,7 @@ export const NPCS = [
     look: { base: 'm_hoodie', skin: SKIN.light, hair: '#e8cc78', brows: '#c8a85a', hairCut: [0.95, 0.5, 0.95], beard: 'moustache', beardColor: '#dcbc68', shirt: '#2a8a7a', pants: '#5a4a3a', patchwork: true, shirtPatch: ['#2a8a7a', '#e0a030', '#2e6b5e'], height: 1.97, width: 1.08 },
     behavior: 'patrol', route: ['base_yard', 'plot_mainstage', 'generator', 'kitchen', 'plot_chai_lounge', 'plot_forest_dome', 'plot_narnia_floor', 'chill'], speed: 1.8,
     lines: [
-      { de: 'Hey! Alles gut bei dir? Wenn du was brauchst – ich bin da.', en: 'Hey! You alright? If you need anything – I\'m here.' },
+      { de: 'Hey! Alles gut bei dir? Wenn du was brauchst, ich bin da.', en: 'Hey! You alright? If you need anything, I\'m here.' },
       { de: 'Komm, ich halt mal kurz fest. Du schraubst.', en: 'Come on, I\'ll hold it. You screw.' },
       { de: 'Das hast du richtig gut gemacht. Ehrlich. Hat nur keiner gesagt.', en: 'You did that really well. Honestly. Nobody said it, that\'s all.' },
       { de: 'Julez meint das nicht so. …Doch, meint er schon. Aber er mag dich trotzdem.', en: 'Julez doesn\'t mean it like that. …Okay, he does. But he likes you anyway.' },
@@ -715,14 +715,14 @@ export const NPCS = [
     look: { base: 'm_hoodie', skin: SKIN.light, hair: '#e6cc7a', brows: '#c8a85a', hairStyle: 'long', hairStyleColor: '#e6cc7a', hairLength: 0.62, beard: 'short', beardColor: '#dcbc68', shirt: '#9b3d8a', pants: '#2e6b5e', patchwork: true, shirtPatch: ['#9b3d8a', '#2a8a7a', '#e0a030'], height: 2.02, width: 0.86, extras: ['pennyboard'] },
     behavior: 'wander', home: 'festival_random', roam: 'festival_random', radius: 14,
     lines: [
-      { de: 'Es freut, dich zu sehen. Hat der Wanderer schon gegessen? Es sei Zeit, kurz zu sitzen.', en: 'Rejoiced to see you. Has the wanderer eaten yet? Let it be a moment to sit.' },
-      { de: 'Hier werden grad Gesichter gemalt. Es sei Spiel, es sei Freude. Mag der Wanderer auch eins?', en: 'Faces are being painted right now. Let it be play, let it be joy. Does the wanderer want one too?' },
-      { de: 'Barfuß auf der Wiese, Brett unterm Arm, Pinsel in der Hand. Damit ist alles da, was es braucht.', en: 'Barefoot on the meadow, board under the arm, brush in the hand. That is everything that is needed.' },
-      { de: 'Es sei alles gut. Der Aufbau wird fertig, wenn er fertig wird, heißt es hier.', en: 'Let all be well. The build-up finishes when it finishes, it is said here.' },
-      { de: 'Es lädt ein: Spür die Erde unter den Füßen. Ja, genau so. Und dann weiter, Kisten tragen.', en: 'An invitation: feel the earth beneath your feet. Yes, just so. And then onward, carrying crates.' },
-      { de: 'Fallen gehört dazu, auch auf dem Brett. Es wird aufgestanden, gelacht und weitergerollt.', en: 'Falling belongs to it, even on the board. One rises, laughs and rolls on.' },
-      { de: 'Es spürt sich: Farbe macht Menschen sanfter. Eine Studie braucht es dafür nie, das Herz weiß es.', en: 'It is felt: colour makes people gentler. A study is never needed, the heart knows.' },
-      { de: 'Es sei gesegnet, dass alle hier sind. Das Wichtigste überhaupt, findet sich hier.', en: 'Blessed be that all are here. The most important thing of all, is found here.' },
+      { de: 'Man selbst freut sich, dich zu sehen. Hat der Wanderer schon gegessen? Man selbst würde sich jetzt kurz hinsetzen.', en: 'One is glad to see you. Has the wanderer eaten yet? One would sit down for a moment now.' },
+      { de: 'Hier werden grad Gesichter gemalt. Man selbst hat schon drei. Mag der Wanderer auch eins?', en: 'Faces are being painted right now. One already has three. Does the wanderer want one too?' },
+      { de: 'Barfuß auf der Wiese, Brett unterm Arm, Pinsel in der Hand. Mehr braucht man selbst nicht.', en: 'Barefoot on the meadow, board under the arm, brush in the hand. One needs nothing more.' },
+      { de: 'Der Aufbau wird fertig, wenn er fertig wird. Das hat man selbst schon oft erlebt. Jedes Jahr, um genau zu sein.', en: 'The build-up finishes when it finishes. One has seen that often. Every year, to be exact.' },
+      { de: 'Spür mal die Erde unter den Füßen. Ja, genau so. Man selbst macht das jeden Morgen. Und dann weiter, Kisten tragen.', en: 'Feel the earth beneath your feet. Yes, just so. One does that every morning. And then onward, carrying crates.' },
+      { de: 'Fallen gehört dazu, auch auf dem Brett. Man selbst fällt oft. Und steht immer wieder auf, lacht und rollt weiter.', en: 'Falling belongs to it, even on the board. One falls often. And always gets up again, laughs and rolls on.' },
+      { de: 'Farbe macht Menschen sanfter. Das weiß man selbst auch ohne Studie. Das Herz weiß es.', en: 'Colour makes people gentler. One knows that without any study. The heart knows.' },
+      { de: 'Dass alle hier sind, ist das Wichtigste überhaupt. Findet man selbst.', en: 'That everyone is here is the most important thing of all. So one finds.' },
     ],
   },
   {
@@ -740,7 +740,7 @@ export const NPCS = [
     ],
   },
   {
-    id: 'leon', name: 'Leon', role: { de: 'DJ Stillbendana – Hype & Beats', en: 'DJ Stillbendana – hype & beats' }, portrait: '🎧',
+    id: 'leon', name: 'Leon', role: { de: 'DJ Stillbendana: Hype & Beats', en: 'DJ Stillbendana: hype & beats' }, portrait: '🎧',
     look: { base: 'm_hoodie', skin: SKIN.light, hair: '#8a6a3a', brows: '#6a4e2a', hairCut: [0.95, 0.4, 0.95], shirt: '#c8683a', pants: '#3a3a4a', patchwork: true, shirtPatch: ['#c8683a', '#2a8a7a', '#e0a030'], height: 1.78, width: 0.98 },
     behavior: 'wander', home: 'festival_random', roam: 'festival_random', radius: 14,
     lines: [
@@ -748,7 +748,7 @@ export const NPCS = [
       { de: 'Ich leg später auf. Hip-Hop zum Aufwärmen, dann Techno bis die Sonne aufgeht. Du kommst, ne?', en: 'I\'m playing later. Hip-hop to warm up, then techno till sunrise. You\'re coming, right?' },
       { de: 'Kisten tragen? Ich trag dich moralisch. Das zählt auch! Los, du packst das!', en: 'Carrying crates? I\'m carrying you morally. That counts too! Go, you got this!' },
       { de: 'Stillbendana, so heiß ich auf dem Plakat. Bandana vibes, du verstehst.', en: 'Stillbendana, that\'s my name on the poster. Bandana vibes, you know.' },
-      { de: 'Boom bap am Morgen, vier-to-the-floor am Abend. Das ist mein Aufbau-Rhythmus.', en: 'Boom bap in the morning, four-to-the-floor at night. That\'s my build-up rhythm.' },
+      { de: 'Boom bap am Morgen, Four-to-the-Floor am Abend. Das ist mein Aufbau-Rhythmus.', en: 'Boom bap in the morning, four-to-the-floor at night. That\'s my build-up rhythm.' },
       { de: 'Hab gerade nen Beat im Kopf. Warte… nee, war nur der Generator. Trotzdem Bass!', en: 'Got a beat in my head. Wait… nah, that was the generator. Still bass!' },
       { de: 'Alle zusammen, jetzt: Aufbau! Aufbau! Aufbau! …Wo geht\'s zur Soundanlage?', en: 'Everybody now: build-up! Build-up! Build-up! …Where\'s the sound system?' },
     ],
@@ -758,21 +758,20 @@ export const NPCS = [
     look: { base: 'f_casual', skin: SKIN.tan, hair: '#2a1a10', brows: '#1e120a', hairStyle: 'dreads', hairStyleColor: '#5a3820', dreadLength: 1.25, dreadThick: 1.2, beads: true, headband: '#7a2a24', shirt: '#2e2232', pants: '#4e5a2a', patchwork: true, shirtPatch: ['#2e2232', '#6a2a24', '#3a2a3a'], pantsPatch: ['#4e5a2a', '#5a3e24', '#3e4a2a'], height: 1.82, width: 0.9, extras: ['pendant'] },
     behavior: 'wander', home: 'plot_forest_dome', radius: 12,
     lines: [
-      { de: 'Oh, hallo… Schön, dass du da bist. Wie geht\'s dir? So richtig, meine ich.', en: 'Oh, hi… Nice that you\'re here. How are you? Like, really?' },
+      { de: 'Oh, hallo… Wie geht\'s dir? So richtig, meine ich.', en: 'Oh, hi… How are you? Like, really?' },
       { de: 'Schau mal, da unterm Baum. Ein Schwefelporling. Nicht essen, nur bewundern.', en: 'Look, under that tree. A chicken-of-the-woods. Don\'t eat it, just admire it.' },
       { de: 'Den Stein hab ich heute früh am Bach gefunden. Ich glaub, er wollte mit.', en: 'Found this stone by the stream this morning. I think it wanted to come along.' },
       { de: 'Mondstein. Der hilft beim Ankommen. Und du siehst aus, als bräuchtest du das gerade.', en: 'Moonstone. It helps you arrive. And you look like you could use that right now.' },
       { de: 'Pilze sind unterirdisch alle verbunden. Eigentlich wie wir hier beim Aufbau. Nur leiser.', en: 'Mushrooms are all connected underground. A bit like us at the build. Just quieter.' },
       { de: 'Du wirkst müde. Setz dich kurz zu mir, der Wald hält das aus.', en: 'You look tired. Sit with me for a bit, the forest can take it.' },
       { de: 'Ich red nicht so viel. Aber ich hör gern zu.', en: 'I don\'t talk that much. But I like to listen.' },
-      { de: 'Bitte nicht auf das Moos treten. Das wächst da schon länger als wir alle hier sind.', en: 'Please don\'t step on the moss. It\'s been growing there longer than any of us have been here.' },
+      { de: 'Bitte nicht auf das Moos treten. Das wächst da schon länger, als es uns alle hier gibt.', en: 'Please don\'t step on the moss. It\'s been growing there longer than any of us have been here.' },
     ],
   },
 ];
 
 // ------------------------------------------------------------------ random campers
 // Extra hippies arrive as the build progresses (NPCManager.setCrowd).
-const CAMPER_NAMES = ['Luna', 'Shiva', 'Kai', 'Nomi', 'Baba', 'Sunny', 'Mo', 'Tara', 'Pixie', 'Rumi', 'Juju', 'Zappa', 'Indra', 'Ollo', 'Fee', 'Surya', 'Mika', 'Yogi', 'Kiki', 'Balu', 'Lenni', 'Mira', 'Tobi', 'Jojo', 'Sina', 'Basti', 'Paula', 'Ben', 'Marie', 'Chris', 'Ronja', 'Paule', 'Nele', 'Timo', 'Anni', 'Flocke'];
 const CAMPER_LINES = [
   { de: 'Namaste, Bruder!', en: 'Namaste, brother!' },
   { de: 'Hast du Tape? Irgendein Tape?', en: 'Got tape? Any tape?' },
@@ -787,9 +786,9 @@ const CAMPER_LINES = [
 
 // Running gag: half the volunteers are "chai crew". The chai tent never gets finished.
 export const CHAI_CREW_LINES = [
-  { de: 'Ich bin beim Chai-Zelt. Wir sind vierzig Leute. Das Zelt ist… in Planung.', en: 'I\'m on the chai tent. There are forty of us. The tent is… in planning.' },
+  { de: 'Ich bin beim Chai-Zelt. Wir sind vierzig Leute. Das Zelt ist… in Planung.', en: 'I\'m on the chai tent. There are forty of us. The tent is… in planning.', until: 'q9_festzelt' },
   { de: 'Heute haben wir am Chai-Zelt richtig viel geschafft. Wir haben besprochen, wo die Kissen hinkommen.', en: 'We got so much done at the chai tent today. We discussed where the cushions go.' },
-  { de: 'Chai-Crew! Wir bauen gerade die Vision. Das Zelt kommt dann später.', en: 'Chai crew! We\'re building the vision right now. The tent comes later.' },
+  { de: 'Chai-Crew! Wir bauen gerade die Vision. Das Zelt kommt dann später.', en: 'Chai crew! We\'re building the vision right now. The tent comes later.', until: 'q9_festzelt' },
   { de: 'Ich hab heute drei Stunden am Chai-Zelt gearbeitet. Also, ich war dort. Es war sehr intensiv.', en: 'I worked three hours at the chai tent today. Well, I was there. It was very intense.' },
   { de: 'Wir haben das Chai-Zelt einmal aufgebaut und wieder abgebaut. Die Energie hat nicht gestimmt.', en: 'We put the chai tent up once and took it down again. The energy wasn\'t right.' },
   { de: 'Bei uns am Chai ist immer was los! Was genau, weiß keiner.', en: 'There\'s always something going on at the chai! Nobody knows what exactly.' },
@@ -808,7 +807,7 @@ export const TOKEN_LINES = [
   { de: 'Jan sagt, Leo hat die Marken. Leo hab ich noch nie gesehen.', en: 'Jan says Leo has the tokens. I\'ve never seen Leo.' },
   { de: 'Gibt\'s die Essensmarken im Büro? Oder im Hühnercontainer? Oder… gibt es sie überhaupt?', en: 'Are the food tokens in the office? Or in the chicken container? Or… do they even exist?' },
   { de: 'Hast du \'ne Marke für mich? Nur eine. Für ein Wasser.', en: 'Got a token for me? Just one. For a water.' },
-  { de: 'Ich arbeite hier seit drei Tagen und hab noch keine einzige Marke gesehen.', en: 'I\'ve worked here for three days and haven\'t seen a single token.' },
+  { de: 'Ich schlepp hier den ganzen Tag und hab noch keine einzige Marke gesehen.', en: 'I\'ve been hauling stuff all day and haven\'t seen a single token.' },
   { de: 'Sabse will eine Essensmarke sehen. WO GIBT ES DIE?!', en: 'Sabse wants to see a food token. WHERE DO YOU GET THEM?!' },
 ];
 
@@ -850,7 +849,7 @@ export function makeCamper(i, rng = Math.random) {
       : { behavior: 'wander', home: 'festival_random', roam: 'festival_random', radius: 14 }), // half of them hang out on the festival ground
     // half of all volunteers are chai crew – and they love talking about it
     ...(i % 2 === 0 ? { role: { de: `${persona.role.de} · Chai-Crew`, en: `${persona.role.en} · chai crew` }, chaiCrew: true } : {}),
-    lines: [...persona.lines, pick(CAMPER_LINES), ...(i % 2 === 0 ? [pick(CHAI_CREW_LINES), pick(CHAI_CREW_LINES)] : [])],
+    lines: [...persona.lines, pick(CAMPER_LINES), ...(i % 2 === 0 ? [...CHAI_CREW_LINES].sort(() => Math.random() - 0.5).slice(0, 2) : [])],
     tokenAsker: rng() < 0.6, // most (not all) keep asking about food/drink tokens
   };
 }

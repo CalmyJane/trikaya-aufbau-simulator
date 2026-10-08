@@ -47,7 +47,7 @@ export class FranziBike {
     g.quests.state.karma -= RENT;
     this.rented = true;
     this.idleT = 0;
-    g.ui.toast(de ? `🚲 Franzis Hexenrad gehört dir (−${RENT} ✺). Steht neben ihr – E zum Aufsteigen. Lässt du es länger liegen, holt sie es sich zurück.` : `🚲 Franzi's witch bike is yours (−${RENT} ✺). It's next to her – E to get on. Leave it lying around too long and she takes it back.`);
+    g.ui.toast(de ? `🚲 Franzis Hexenrad gehört dir (−${RENT} ✺). Steht neben ihr, E zum Aufsteigen. Lässt du es länger liegen, holt sie es sich zurück.` : `🚲 Franzi's witch bike is yours (−${RENT} ✺). It's next to her, E to get on. Leave it lying around too long and she takes it back.`);
     g.refreshHUD();
     return true;
   }

@@ -98,9 +98,9 @@ export class Police {
     document.body.classList.add('police');
     await new Promise((r) => setTimeout(r, 2600));
     await g.runDialog([
-      { who: 'police', text: de ? 'Guten Tag. Allgemeine Kontrolle. Sie laufen hier barfuß über einen fremden Acker.' : 'Good day. Routine check. You\'re walking barefoot across someone else\'s field.' },
+      { who: 'police', text: de ? 'Guten Tag. Allgemeine Kontrolle. Sie sind hier barfuß auf einem fremden Acker unterwegs.' : 'Good day. Routine check. You\'re out here barefoot on someone else\'s field.' },
       { who: 'you', text: de ? 'Ich… gehör zum Festival. Aufbau-Crew. Ich hab ein Bändchen!' : 'I… belong to the festival. Build crew. I have a wristband!' },
-      { who: 'police', text: de ? 'Ein Bändchen. Aha. Und die Dreadlocks sind auch dienstlich? Sie kommen jetzt mal mit auf die Wache.' : 'A wristband. I see. And the dreadlocks are official too? You\'re coming with us to the station.' },
+      { who: 'police', text: de ? 'Ein Bändchen. Aha. Und die Frisur ist auch dienstlich? Sie kommen jetzt mal mit auf die Wache.' : 'A wristband. I see. And the hairdo is official too? You\'re coming with us to the station.' },
     ], null, null);
     g.ui.fade(true);
     await new Promise((r) => setTimeout(r, 1400));

@@ -116,17 +116,34 @@ export class NPC {
     // talk about what has just been built (once that job is done)
     if (g && r > 0.72) {
       const me = this.def.id;
-      const prog = PROGRESS_LINES.filter(([q, who, , not]) => g.quests.isDone(q) && (who ? who === me : !OWN_VOICE.includes(me) && !not?.includes(me)));
+      // generic lines (who = null) never come from the giver or the crew of that job: they talk about it in first person
+      const mine = (q) => { const qd = g.quests.quests[q]; return qd?.giver === me || qd?.steps?.some((s) => s.build?.crew?.npcs?.includes(me)); };
+      const prog = PROGRESS_LINES.filter(([q, who, , not]) => g.quests.isDone(q) && (who ? who === me : !OWN_VOICE.includes(me) && !not?.includes(me) && !mine(q)));
       if (prog.length) { const own = prog.filter(([, who]) => who === this.def.id); return L(pick(own.length && Math.random() < 0.6 ? own : prog)[2]); }
     }
-    // own lines, never the same one twice in a row (or among the last few)
-    const pool = [...this.def.lines, ...(EXTRA_LINES[this.def.id] || [])];
+    // own lines that fit the moment (until / after a job, build day, day or night), never the same one twice in a row
+    const all = [...this.def.lines, ...(EXTRA_LINES[this.def.id] || [])];
+    const fitting = all.filter((l) => this.fits(l));
+    const pool = fitting.length ? fitting : all;
     this._recent ||= [];
     const fresh = pool.filter((l) => !this._recent.includes(l));
     const line = pick(fresh.length ? fresh : pool);
     this._recent.push(line);
     if (this._recent.length > Math.min(4, pool.length - 1)) this._recent.shift();
     return L(line);
+  }
+
+  /** Does a line fit the game right now? Lines may carry until / after (quest id), minDay / maxDay, night (true / false). */
+  fits(l) {
+    const g = this.manager?.game;
+    if (!g || typeof l !== 'object') return true;
+    const qs = g.quests, day = g.days?.day || 1;
+    if (l.until && qs.isDone(l.until)) return false;
+    if (l.after && !qs.isDone(l.after)) return false;
+    if (l.minDay && day < l.minDay) return false;
+    if (l.maxDay && day > l.maxDay) return false;
+    if (l.night != null && !!g.days?.isNight !== l.night) return false;
+    return true;
   }
 
   sitAt(seat, lookAt) {

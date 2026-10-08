@@ -47,7 +47,7 @@ export class Finale {
     // festival day: sun is up
     g.world.setNight(0, 6); g.sunriseT = 0; g.world.visibility = 220;
     await sleep(3500);
-    g.ui.banner(de ? 'Tore auf!' : 'Gates open!', de ? 'Das Trikaya beginnt' : 'Trikaya begins', de ? 'Die Gäste strömen herein – alle Bühnen laufen. Schau dich um!' : 'Guests are pouring in – every stage is playing. Have a look around!', 6000);
+    g.ui.banner(de ? 'Tore auf!' : 'Gates open!', de ? 'Das Trikaya beginnt' : 'Trikaya begins', de ? 'Die Gäste strömen herein, alle Bühnen laufen. Schau dich um!' : 'Guests are pouring in, every stage is playing. Have a look around!', 6000);
     g.audio.complete?.();
 
     // guests stream in through the entrance and spread to the stages
@@ -106,7 +106,7 @@ export class Finale {
     await this.officeScene();
   }
 
-  /** Leo, Fabi, Jan, Corni and Matze in the office container. */
+  /** The crew in the office container after the cloudburst. */
   async officeScene() {
     const g = this.game;
     const de = getLang() === 'de';
@@ -114,7 +114,7 @@ export class Finale {
     await sleep(1400);
     if (g.player.vehicle) g.exitVehicle();
     const inside = g.world.spots.office_inside, boss = g.world.spots.office_boss;
-    const cast = ['jan', 'corni', 'matze', 'fabi', 'leo', 'estenko', 'schwarzhuber', 'thomas'];
+    const cast = ['jan', 'corni', 'matze', 'fabi', 'leo', 'estenko', 'schwarzhuber', 'juli'];
     const spots = [[boss.x, boss.z], [inside.x + 0.9, inside.z - 0.6], [inside.x - 0.4, inside.z + 0.7], [inside.x + 1.3, inside.z + 0.6], [inside.x - 1.4, inside.z - 0.2],
       [inside.x - 1.0, inside.z + 1.3], [inside.x + 1.6, inside.z - 1.3], [inside.x - 1.6, inside.z - 1.2]];
     cast.forEach((id, i) => {
@@ -136,14 +136,14 @@ export class Finale {
     const T = (d, e) => (de ? d : e);
     await g.runDialog([
       { who: 'jan', text: T('So. Alle weg. Der Regen hat gewonnen.', 'Right. Everyone\'s gone. The rain won.') },
-      { who: 'corni', text: T('Drei Wochen Aufbau. Zwei Stunden Festival. Dann Weltuntergang.', 'Three weeks of building. Two hours of festival. Then the end of the world.') },
+      { who: 'corni', text: T('Vier Tage Aufbau. Zwei Stunden Festival. Dann Weltuntergang.', 'Four days of building. Two hours of festival. Then the end of the world.') },
       { who: 'estenko', text: T('*hicks* Ey mann… RESPEKT! An den Regen! Der hat… der hat einfach DURCHGEZOGEN! *hicks* …Wo bin ich?', '*hic* Hey man… RESPECT! To the rain! It just… it just WENT FOR IT! *hic* …Where am I?') },
       { who: 'matze', text: T('Moment… war das jetzt das Festival? Ich war Kaffee holen.', 'Wait… was that the festival? I was getting coffee.') },
       { who: 'schwarzhuber', text: T('Mei Wiese! Der Radlader is drübergfahrn wia a Panzer. Des is koa Acker mehr, des is a Schlammbad. DILETTANTISCH!', 'My meadow! That wheel loader drove over it like a tank. That\'s not a field anymore, that\'s a mud bath. AMATEURS!') },
       { who: 'fabi', text: T('Die Hälfte vom Material steht unter Wasser. Die andere Hälfte schwimmt gerade Richtung Karlsfeld.', 'Half the gear is under water. The other half is floating towards Karlsfeld right now.') },
-      { who: 'thomas', text: T('Und die Klos sind voll. ALLE. Bis oben. Und rate mal, was wieder kaputt ist.', 'And the toilets are full. ALL of them. To the brim. And guess what\'s broken again.') },
+      { who: 'juli', text: T('Und die Klos sind voll. ALLE. Bis oben. Und rate mal, was kaputt ist.', 'And the toilets are full. ALL of them. To the brim. And guess what\'s broken.') },
       { who: 'corni', text: T('…Nein.', '…No.') },
-      { who: 'thomas', text: T('Die Kackepumpe.', 'The poo pump.') },
+      { who: 'juli', text: T('Die Kackepumpe. Ich hab drei Tage gesagt. Es waren drei Tage. Und wen holt ihr jetzt? Mich. Wie immer.', 'The poo pump. I said three days. It was three days. And who do you fetch now? Me. As always.') },
       { who: 'estenko', text: T('KACKEPUMPE! *hicks* Ich hab… ich hab der einen Namen gegeben. Sie heißt Gerda.', 'POO PUMP! *hic* I… I gave her a name. Her name is Gerda.') },
       { who: 'leo', text: T('Leute! LEUTE! Super Arbeit! Hab ich doch gesagt, dass wir das schaffen. …Was hab ich verpasst?', 'Guys! GUYS! Great work! Told you we\'d make it. …What did I miss?') },
       { who: 'jan', text: T(`Budget: ${money} €. Klos voll, Acker Matsch, Pumpe hin, Zdenko voll.`, `Budget: €${money}. Toilets full, field mud, pump dead, Zdenko wasted.`) },
@@ -172,12 +172,12 @@ export class Finale {
       <div class="end-rain">${drops}</div>
       <div class="end-inner">
         <div class="end-word">${letters}</div>
-        <div class="end-sub">${de ? 'Klos voll. Acker Matsch. Kackepumpe kaputt.<br><b>Läuft ja super – wie jedes Jahr.</b>' : 'Toilets full. Field mud. Poo pump broken.<br><b>Going great – like every year.</b>'}</div>
+        <div class="end-sub">${de ? 'Klos voll. Acker Matsch. Kackepumpe kaputt.<br><b>Läuft ja super, wie jedes Jahr.</b>' : 'Toilets full. Field mud. Poo pump broken.<br><b>Going great, like every year.</b>'}</div>
         <div class="end-card">
           <div><span>${de ? 'Erledigte Jobs' : 'Jobs done'}</span><b>${done}</b></div>
           <div><span>Karma</span><b>✺ ${qs.karma}</b></div>
           <div><span>Budget</span><b>${Math.round(qs.money).toLocaleString('de-DE')} €</b></div>
-          <div><span>${de ? 'Getränkemarken von Leo' : 'Drink tokens from Leo'}</span><b>${qs.flags.drinkTokens || 0}</b></div>
+          <div><span>${de ? 'Getränkemarken gesammelt' : 'Drink tokens collected'}</span><b>${qs.flags.drinkTokens || 0}</b></div>
         </div>
         <div class="end-buttons">
           <button class="btn primary" id="end-again">${de ? 'Nochmal aufbauen' : 'Build it again'}</button>

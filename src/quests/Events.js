@@ -25,19 +25,19 @@ const NEVER = ['leo', 'franzi', 'sabse', 'jan', 'juli', 'verena', 'fabi', 'isi',
 // Juli vs. a volunteer. {a} = the volunteer.
 export const JULI_FIGHTS = [
   { intro: { de: 'Juli und {a} stehen sich gegenüber. {a} hat einen Akkuschrauber in der Hand. Julis Akkuschrauber.', en: 'Juli and {a} are facing off. {a} is holding a cordless drill. Juli\'s cordless drill.' },
-    line: { de: 'Das ist MEIN Akkuschrauber! – Da stand doch kein Name drauf! – Da steht JULI drauf. In GROSS.', en: 'That\'s MY drill! – There was no name on it! – It says JULI. In CAPITALS.' },
+    line: { de: 'Das ist MEIN Akkuschrauber! … Da stand doch kein Name drauf! … Da steht JULI drauf. In GROSS.', en: 'That\'s MY drill! … There was no name on it! … It says JULI. In CAPITALS.' },
     shouts: [{ de: 'GIB HER!', en: 'GIVE IT!' }, { de: 'Ich hab den nur geliehen!', en: 'I only borrowed it!' }, { de: 'Ohne zu fragen ist das KLAUEN!', en: 'Without asking that\'s STEALING!' }] },
   { intro: { de: 'Juli baut gerade ab, was {a} eben aufgebaut hat. {a} ist… nicht begeistert.', en: 'Juli is taking down what {a} just built. {a} is… not thrilled.' },
-    line: { de: 'Das ist schief. – Das ist KUNST! – Das ist SCHIEF.', en: 'That\'s crooked. – That\'s ART! – That\'s CROOKED.' },
+    line: { de: 'Das ist schief. … Das ist KUNST! … Das ist SCHIEF.', en: 'That\'s crooked. … That\'s ART! … That\'s CROOKED.' },
     shouts: [{ de: 'SCHIEF!', en: 'CROOKED!' }, { de: 'Das hatte eine Energie!', en: 'It had an energy!' }, { de: 'Energie hält keine Plane!', en: 'Energy doesn\'t hold a tarp!' }] },
   { intro: { de: '{a} will Julis Werkzeugkiste fürs Chai-Zelt ausleihen.', en: '{a} wants to borrow Juli\'s toolbox for the chai tent.' },
-    line: { de: 'Für das Chai-Zelt? Das Zelt, das seit Montag nicht steht? NEIN. – Aber wir brauchen sie für die VISION! – NEIN.', en: 'For the chai tent? The tent that hasn\'t stood since Monday? NO. – But we need it for the VISION! – NO.' },
+    line: { de: 'Für das Chai-Zelt? Das Zelt, das seit Montag nicht steht? NEIN. … Aber wir brauchen sie für die VISION! … NEIN.', en: 'For the chai tent? The tent that hasn\'t stood since Monday? NO. … But we need it for the VISION! … NO.' },
     shouts: [{ de: 'NEIN!', en: 'NO!' }, { de: 'Die Vision braucht einen Hammer!', en: 'The vision needs a hammer!' }, { de: 'Die Vision braucht ein ZELT!', en: 'The vision needs a TENT!' }] },
   { intro: { de: '{a} hat den Bus direkt vor die Werkstatt gestellt. Juli steht davor. Mit verschränkten Armen.', en: '{a} parked the van right in front of the workshop. Juli is standing there. Arms crossed.' },
-    line: { de: 'Weg mit dem Bus. – Der springt grad nicht an! – Dann SCHIEB.', en: 'Move the van. – It won\'t start right now! – Then PUSH.' },
+    line: { de: 'Weg mit dem Bus. … Der springt grad nicht an! … Dann SCHIEB.', en: 'Move the van. … It won\'t start right now! … Then PUSH.' },
     shouts: [{ de: 'SCHIEB!', en: 'PUSH!' }, { de: 'Der hat eine Seele, der Bus!', en: 'The van has a soul!' }, { de: 'Dann schieb die Seele!', en: 'Then push the soul!' }] },
   { intro: { de: '{a} hat Gaffa um ein Kabel gewickelt. Sehr viel Gaffa. Juli hat es gesehen.', en: '{a} wrapped gaffa around a cable. A LOT of gaffa. Juli saw it.' },
-    line: { de: 'Das ist ein Starkstromkabel, kein Geschenk! – Es hat gewackelt! – DANN SAG WAS!', en: 'That\'s a high-voltage cable, not a present! – It was wobbly! – THEN SAY SOMETHING!' },
+    line: { de: 'Das ist ein Starkstromkabel, kein Geschenk! … Es hat gewackelt! … DANN SAG WAS!', en: 'That\'s a high-voltage cable, not a present! … It was wobbly! … THEN SAY SOMETHING!' },
     shouts: [{ de: 'Gaffa ist keine Lösung!', en: 'Gaffa is not a solution!' }, { de: 'Gaffa ist IMMER eine Lösung!', en: 'Gaffa is ALWAYS a solution!' }] },
 ];
 
@@ -46,39 +46,39 @@ export const JULI_FIGHTS = [
 export const KITCHEN_FIGHTS = [
   { sabse: true,
     intro: { de: 'Sabse und {a} stehen sich in der Küche gegenüber. Es geht um… die Uhrzeit.', en: 'Sabse and {a} are facing off in the kitchen. It\'s about… the time.' },
-    line: { de: 'Es ist 12:58! Essen gibt\'s um EINS! – Ich hab aber jetzt Hunger, Sabse!', en: 'It\'s 12:58! Food is at ONE! – But I\'m hungry NOW, Sabse!' },
+    line: { de: 'Es ist 12:58! Essen gibt\'s um EINS! … Ich hab aber jetzt Hunger, Sabse!', en: 'It\'s 12:58! Food is at ONE! … But I\'m hungry NOW, Sabse!' },
     shouts: [{ de: 'ZWEI MINUTEN!', en: 'TWO MINUTES!' }, { de: 'Ich hab seit gestern nix gegessen!', en: 'I haven\'t eaten since yesterday!' }, { de: 'Finger weg vom Topf!', en: 'Hands off the pot!' }] },
   { sabse: true,
     intro: { de: 'Sabse hält {a} am Kragen. Im Curry schwimmt etwas Gelbes.', en: 'Sabse has {a} by the collar. Something yellow is floating in the curry.' },
-    line: { de: 'Wer tut KÄSE in mein VEGANES Curry?! – Das war doch nur ein bisschen Parmesan!', en: 'Who puts CHEESE in my VEGAN curry?! – It was just a bit of parmesan!' },
+    line: { de: 'Wer tut KÄSE in mein VEGANES Curry?! … Das war doch nur ein bisschen Parmesan!', en: 'Who puts CHEESE in my VEGAN curry?! … It was just a bit of parmesan!' },
     shouts: [{ de: 'VEGAN heißt VEGAN!', en: 'VEGAN means VEGAN!' }, { de: 'Parmesan ist quasi Gemüse!', en: 'Parmesan is basically a vegetable!' }] },
   { sabse: true,
     intro: { de: '{a} will Essen. Sabse will eine Essensmarke sehen. Keiner hat eine.', en: '{a} wants food. Sabse wants to see a food token. Nobody has one.' },
-    line: { de: 'Ohne Essensmarke kein Essen! – ICH WEISS DOCH NICHT, WO ES DIE MARKEN GIBT!', en: 'No food token, no food! – I DON\'T KNOW WHERE YOU GET THE TOKENS!' },
-    shouts: [{ de: 'MARKE!', en: 'TOKEN!' }, { de: 'Wer verteilt die überhaupt?!', en: 'Who even hands them out?!' }, { de: 'Frag Leo! – WER IST LEO?!', en: 'Ask Leo! – WHO IS LEO?!' }] },
+    line: { de: 'Ohne Essensmarke kein Essen! … ICH WEISS DOCH NICHT, WO ES DIE MARKEN GIBT!', en: 'No food token, no food! … I DON\'T KNOW WHERE YOU GET THE TOKENS!' },
+    shouts: [{ de: 'MARKE!', en: 'TOKEN!' }, { de: 'Wer verteilt die überhaupt?!', en: 'Who even hands them out?!' }, { de: 'Frag Leo! … WER IST LEO?!', en: 'Ask Leo! … WHO IS LEO?!' }] },
   { sabse: true,
     intro: { de: '{a} hat die Dreads in der Spüle gewaschen. Sabse hat es gesehen.', en: '{a} washed their dreads in the sink. Sabse saw it.' },
-    line: { de: 'Das ist die SPÜLE, nicht dein BADEZIMMER! – Aber das Wasser ist hier so schön warm!', en: 'This is the SINK, not your BATHROOM! – But the water is so nice and warm here!' },
+    line: { de: 'Das ist die SPÜLE, nicht dein BADEZIMMER! … Aber das Wasser ist hier so schön warm!', en: 'This is the SINK, not your BATHROOM! … But the water is so nice and warm here!' },
     shouts: [{ de: 'RAUS mit deinen Haaren!', en: 'OUT with your hair!' }, { de: 'Ist doch Bio-Shampoo!', en: 'It\'s organic shampoo!' }] },
   { sabse: true,
     intro: { de: 'Sabse probiert den Topf, den {a} umgerührt hat. Ihr Gesicht sagt alles.', en: 'Sabse tastes the pot {a} was stirring. Her face says it all.' },
-    line: { de: 'Du hast den Topf VERSALZEN! – Das war Kurkuma! …Glaub ich.', en: 'You OVER-SALTED the pot! – That was turmeric! …I think.' },
+    line: { de: 'Du hast den Topf VERSALZEN! … Das war Kurkuma! …Glaub ich.', en: 'You OVER-SALTED the pot! … That was turmeric! …I think.' },
     shouts: [{ de: 'Das ist ein Salzsee!', en: 'That\'s a salt lake!' }, { de: 'Mit genug Kurkuma schmeckt alles!', en: 'With enough turmeric everything tastes fine!' }] },
   { sabse: false,
     intro: { de: '{a} und {b} ziehen beide an demselben Löffel.', en: '{a} and {b} are both pulling at the same spoon.' },
-    line: { de: 'DER hat MEINEN Löffel benutzt! – Das ist ein GEMEINSCHAFTSLÖFFEL!', en: 'HE used MY spoon! – It\'s a COMMUNITY SPOON!' },
+    line: { de: 'DER hat MEINEN Löffel benutzt! … Das ist ein GEMEINSCHAFTSLÖFFEL!', en: 'HE used MY spoon! … It\'s a COMMUNITY SPOON!' },
     shouts: [{ de: 'MEIN Löffel!', en: 'MY spoon!' }, { de: 'Eigentum ist Diebstahl!', en: 'Property is theft!' }] },
   { sabse: false,
     intro: { de: '{a} und {b} streiten sich um eine leere Kaffeekanne.', en: '{a} and {b} are fighting over an empty coffee pot.' },
-    line: { de: 'Das war MEIN letzter Kaffee! – Da stand kein Name drauf!', en: 'That was MY last coffee! – It didn\'t have a name on it!' },
+    line: { de: 'Das war MEIN letzter Kaffee! … Da stand kein Name drauf!', en: 'That was MY last coffee! … It didn\'t have a name on it!' },
     shouts: [{ de: 'Ich hab ihn GEKOCHT!', en: 'I MADE it!' }, { de: 'Kaffee gehört allen!', en: 'Coffee belongs to everyone!' }] },
   { sabse: false,
     intro: { de: '{a} und {b} streiten sich über die Musik in der Küche.', en: '{a} and {b} are arguing about the music in the kitchen.' },
-    line: { de: 'Psytrance beim Zwiebelschneiden ist PFLICHT! – Nicht um sieben Uhr morgens!', en: 'Psytrance while chopping onions is MANDATORY! – Not at seven in the morning!' },
+    line: { de: 'Psytrance beim Zwiebelschneiden ist PFLICHT! … Nicht um sieben Uhr morgens!', en: 'Psytrance while chopping onions is MANDATORY! … Not at seven in the morning!' },
     shouts: [{ de: '145 BPM!', en: '145 BPM!' }, { de: 'Mach das LEISER!', en: 'Turn it DOWN!' }] },
   { sabse: false,
     intro: { de: '{a} und {b} stehen vor einem Berg Geschirr.', en: '{a} and {b} are standing in front of a mountain of dishes.' },
-    line: { de: 'Du bist dran mit Spülen! – Ich hab GESTERN gespült! – Gestern war Abbau-Probe!', en: 'Your turn to do the dishes! – I did them YESTERDAY! – Yesterday was a teardown rehearsal!' },
+    line: { de: 'Du bist dran mit Spülen! … Ich hab GESTERN gespült! … Gestern war Abbau-Probe!', en: 'Your turn to do the dishes! … I did them YESTERDAY! … Yesterday was a teardown rehearsal!' },
     shouts: [{ de: 'DU bist dran!', en: 'YOUR turn!' }, { de: 'Ich hab Gaffa an den Händen!', en: 'I have gaffa on my hands!' }] },
 ];
 
@@ -164,44 +164,48 @@ export const EVENT_TYPES = {
   passedout: {
     weight: 2, helpers: ['franzi'], victims: 1, cost: 0, penalty: 0, karma: 25, prefer: ['rocky', 'estenko'], exclude: ['isi'],
     title: { de: 'Jemand liegt im Gras…', en: 'Someone\'s lying in the grass…' },
-    task: { de: '{victim} ist umgekippt – hol Franzi', en: '{victim} passed out – get Franzi' },
+    task: { de: '{victim} ist umgekippt: hol Franzi', en: '{victim} passed out: get Franzi' },
     victimLine: { de: 'Zzzz… *mumpf* … fünf Minuten noch… zzz', en: 'Zzzz… *mumble* … five more minutes… zzz' },
     helperDialog: { de: 'Oh nein. Ich komm. Erst wach kriegen, dann ab ins Awareness-Zelt: Wasser, Decke, Ruhe.', en: 'Oh no. I\'m coming. Wake them up, then off to the awareness tent: water, blanket, quiet.' },
     doneLine: { de: 'Nur ausgetrocknet und durch. Wasser trinken, Leute!', en: 'Just dehydrated and done. Drink water, people!' },
+    noTent: { help: { de: 'Oh nein. Ich komm. Erst wach kriegen, dann ab in den Schatten: Wasser, Decke, Ruhe.', en: 'Oh no. I\'m coming. Wake them up, then into the shade: water, blanket, quiet.' } },
     mode: 'lying',
   },
   drunk: {
     weight: 2, helpers: ['franzi', 'delsin'], victims: 1, cost: 0, penalty: 0, karma: 25, prefer: ['estenko', 'thompsen', 'flo', 'andi', 'strom_andi', 'strom_andi'], exclude: ['isi'], storyChance: 0.4,
     title: { de: 'Zu betrunken zum Arbeiten', en: 'Too drunk to work' },
-    task: { de: '{victim} ist sturzbetrunken – hol Franzi', en: '{victim} is blind drunk – get Franzi' },
+    task: { de: '{victim} ist sturzbetrunken: hol Franzi', en: '{victim} is blind drunk: get Franzi' },
     victimLine: { de: 'Hicks! Ich arbeite… hicks… ganz normal. Wo ist oben?', en: 'Hic! I\'m working… hic… totally normal. Where is up?' },
     helperDialog: { de: 'Oh je. Ab ins Awareness-Zelt, ich kümmer mich. Wasser, Brot, Ruhe.', en: 'Oh dear. I\'ll fetch them and take them to the awareness tent. Water, bread, rest.' },
     doneLine: { de: 'Wird jetzt erstmal ausgeschlafen. Bei mir im Zelt.', en: 'Sleeping it off now. With me.' },
+    noTent: { help: { de: 'Oh je. Ich kümmer mich. Wasser, Brot, Schatten. Ein Zelt wär schöner, aber gut.', en: 'Oh dear. I\'ll take care of it. Water, bread, shade. A tent would be nicer, but fine.' }, done: { de: 'Schläft jetzt im Schatten aus. Ich schau nachher nochmal.', en: 'Sleeping it off in the shade now. I\'ll check back later.' } },
     mode: 'drunk',
   },
   high: {
     weight: 2, helpers: ['franzi', 'delsin'], victims: 1, cost: 0, penalty: 0, karma: 25, prefer: ['rocky', 'niklas'], exclude: ['isi'], storyChance: 0.4,
     title: { de: 'Zu drauf zum Arbeiten', en: 'Too high to work' },
-    task: { de: '{victim} ist zu drauf – hol Franzi', en: '{victim} is way too high – get Franzi' },
+    task: { de: '{victim} ist zu drauf: hol Franzi', en: '{victim} is way too high: get Franzi' },
     victimLine: { de: 'Duuude… der Boden… der atmet… ich kann heute nicht tragen. Oder stehen.', en: 'Dudeee… the ground… it\'s breathing… I can\'t carry today. Or stand.' },
     helperDialog: { de: 'Alles klar, ab ins Awareness-Zelt. Tee, Kekse, keine Musik.', en: 'Alright, I\'ll take them to the awareness tent. Tea, cookies, no music.' },
     doneLine: { de: 'Liegt jetzt bei den Kissen und erklärt den Kissen das Universum.', en: 'Lying with the cushions now, explaining the universe to them.' },
+    noTent: { help: { de: 'Alles klar, ich kümmer mich. Tee, Kekse, ein ruhiges Plätzchen, keine Musik.', en: 'Alright, I\'ll handle it. Tea, cookies, a quiet spot, no music.' }, done: { de: 'Liegt jetzt im Gras und erklärt den Wolken das Universum.', en: 'Lying in the grass now, explaining the universe to the clouds.' } },
     mode: 'high',
   },
   keta: {
     weight: 2, helpers: ['franzi', 'delsin'], victims: 1, cost: 0, penalty: 0, karma: 25, prefer: ['rocky', 'estenko'], exclude: ['isi'], storyChance: 0.4,
     title: { de: 'Völlig verballert', en: 'Completely wasted' },
-    task: { de: '{victim} ist völlig verballert – hol Franzi', en: '{victim} is completely wasted – get Franzi' },
+    task: { de: '{victim} ist völlig verballert: hol Franzi', en: '{victim} is completely wasted: get Franzi' },
     victimLine: { de: '…… …hm? …… Ich bin grad… nicht hier. Ruf später an.', en: '…… …hm? …… I\'m not… here right now. Call later.' },
     helperDialog: { de: 'Mitten beim Aufbau? …Okay. Ganz langsam rüber ins Awareness-Zelt.', en: 'In the middle of the build? …Okay. Very slowly over to the awareness tent.' },
     doneLine: { de: 'Sitzt jetzt ganz ruhig im Zelt und findet langsam den Weg zurück.', en: 'Sitting quietly in the tent now, slowly finding the way back.' },
+    noTent: { help: { de: 'Mitten beim Aufbau? …Okay. Ganz langsam in den Schatten. Ich bleib dabei.', en: 'In the middle of the build? …Okay. Very slowly into the shade. I\'ll stay with them.' }, done: { de: 'Sitzt jetzt ganz ruhig im Schatten und findet langsam den Weg zurück.', en: 'Sitting quietly in the shade now, slowly finding the way back.' } },
     mode: 'keta',
   },
   kitchenfight: {
     weight: 2, helpers: ['fabi', 'jan', 'leo'], victims: 2, cost: 0, penalty: 280, karma: 20, exclude: ['isi'], campersOnly: true,
     title: { de: 'Streit in der Küche!', en: 'Fight in the kitchen!' },
     task: { de: 'Hol Fabi oder Jan (oder Leo, haha) zum Schlichten', en: 'Get Fabi or Jan (or Leo, haha) to calm it down' },
-    victimLine: { de: 'DER hat MEINEN Löffel benutzt! – Das ist ein GEMEINSCHAFTSLÖFFEL!', en: 'HE used MY spoon! – It\'s a COMMUNITY SPOON!' },
+    victimLine: { de: 'DER hat MEINEN Löffel benutzt! … Das ist ein GEMEINSCHAFTSLÖFFEL!', en: 'HE used MY spoon! … It\'s a COMMUNITY SPOON!' },
     helperDialog: { de: 'Schon wieder Küche? Ich komm. Atmen, Leute. Atmen.', en: 'The kitchen again? I\'m coming. Breathe, people. Breathe.' },
     doneLine: { de: 'So. Alle atmen einmal durch. Und dann: Handschlag. Ja, du auch, Sabse.', en: 'Right. Everyone takes a breath. And then: shake hands. Yes, you too, Sabse.' },
     costReason: { de: 'Zerbrochenes Geschirr', en: 'Broken dishes' },
@@ -210,7 +214,7 @@ export const EVENT_TYPES = {
   julifight: {
     weight: 2, helpers: ['jan', 'fabi', 'leo'], victims: 2, cost: 0, penalty: 150, karma: 20, juli: true, mode: 'fight',
     title: { de: 'Juli hat Streit!', en: 'Juli is in a fight!' },
-    task: { de: 'Hol Jan oder Fabi (oder Leo, haha) – Juli streitet mit {victim}', en: 'Get Jan or Fabi (or Leo, haha) – Juli is fighting with {victim}' },
+    task: { de: 'Hol Jan oder Fabi (oder Leo, haha), Juli streitet mit {victim}', en: 'Get Jan or Fabi (or Leo, haha), Juli is fighting with {victim}' },
     helperDialog: { de: 'Juli? Schon wieder? *seufz* Ich komm. Und ich bring Geduld mit. Viel Geduld.', en: 'Juli? Again? *sigh* I\'m coming. And I\'m bringing patience. Lots of patience.' },
     doneLine: { de: 'So. Ihr gebt euch jetzt die Hand. Juli, du auch. JULI. …Danke.', en: 'Right. You two shake hands now. Juli, you too. JULI. …Thanks.' },
     penaltyReason: { de: 'Kaputtes Werkzeug nach dem Streit', en: 'Tools broken in the fight' },
@@ -218,7 +222,7 @@ export const EVENT_TYPES = {
   generator: {
     weight: 2, helpers: ['felix', 'thomas', 'andi', 'strom_andi', 'juli'], victims: 0, cost: 150, penalty: 1500, karma: 15,
     title: { de: 'Generator kaputt!', en: 'Generator broke!' },
-    task: { de: 'Hol Felix, Thompsen (Strom & Licht), Strom Andi, Andi oder Juli – sonst neuer Generator (1.500 €)', en: 'Get Felix, Thompsen (power & light), Strom Andi, Andi or Juli – or buy a new generator (€1,500)' },
+    task: { de: 'Hol Felix, Thompsen (Strom & Licht), Strom Andi, Andi oder Juli, sonst neuer Generator (1.500 €)', en: 'Get Felix, Thompsen (power & light), Strom Andi, Andi or Juli, or buy a new generator (€1,500)' },
     helperDialog: { de: 'Der Generator? *seufz* Hab ich doch gesagt, dass der raucht. Ich schau\'s mir an.', en: 'The generator? *sigh* Told you it was smoking. I\'ll look at it.' },
     doneLine: { de: 'Läuft wieder. Neue Dichtung, bisschen Gaffa, gutes Zureden.', en: 'Running again. New seal, some gaffa, kind words.' },
     costReason: { de: 'Generator-Ersatzteile', en: 'Generator spare parts' },
@@ -378,7 +382,7 @@ export class DramaSystem {
       g.audio.alarm?.();
       g.ui.toast(`⚠️ <b>${L(def.title)}</b>`);
     } else {
-      g.ui.toast(L({ de: '🔴 Jemand braucht Hilfe – achte auf das rote !', en: '🔴 Someone needs help – look for the red !' }));
+      g.ui.toast(L({ de: '🔴 Jemand braucht Hilfe, achte auf das rote !', en: '🔴 Someone needs help, look for the red !' }));
     }
     g.quests.refreshMarkers();
     return e;
@@ -387,7 +391,7 @@ export class DramaSystem {
   victimName(e) { return (e.def.juli ? e.victims[1] : e.victims[0])?.def.name || ''; }
 
   taskText(e) {
-    if (e.blocked && !this.tent) return L({ de: 'Franzi braucht erst ihr Awareness-Zelt – hilf ihr beim Aufbau', en: 'Franzi needs her awareness tent first – help her build it' });
+    if (e.blocked && !this.tent) return L({ de: 'Franzi braucht erst ihr Awareness-Zelt, hilf ihr beim Aufbau', en: 'Franzi needs her awareness tent first: help her build it' });
     let txt = L(e.def.task).replace('{victim}', this.victimName(e));
     if (e.def.helpers.includes('delsin') && this.delsinReady) txt += L({ de: ' (oder Delsin)', en: ' (or Delsin)' });
     return txt;
@@ -454,9 +458,10 @@ export class DramaSystem {
 
   discoverHint(e) {
     const de = getLang() === 'de';
-    if (e.type === 'kitchenfight' || e.type === 'julifight') return de ? '(Ich muss Fabi oder Jan holen – schnell!)' : '(I need to get Fabi or Jan – quickly!)';
+    if (e.type === 'kitchenfight' || e.type === 'julifight') return de ? '(Ich muss Fabi oder Jan holen, schnell!)' : '(I need to get Fabi or Jan, quickly!)';
     if (AWARENESS_MODES.includes(e.def.mode) && !this.tent && e.story) return de ? '(Ich hol Franzi! …Sie wird ihr Awareness-Zelt brauchen.)' : '(I\'ll get Franzi! …She\'ll need her awareness tent.)';
-    return de ? '(Ich muss Franzi holen – schnell!)' : '(I need to get Franzi – quickly!)';
+    if (this.delsinReady && e.def.helpers.includes('delsin')) return de ? '(Ich muss Franzi oder Delsin holen, schnell!)' : '(I need to get Franzi or Delsin, quickly!)';
+    return de ? '(Ich muss Franzi holen, schnell!)' : '(I need to get Franzi, quickly!)';
   }
 
   /** Talking to a possible helper while an event runs. Returns true if handled. */
@@ -478,15 +483,16 @@ export class DramaSystem {
       e.blocked = true;
       const name = this.victimName(e);
       await g.runDialog([
-        { who: 'you', text: L(e.def.title) + ` – ${name}` },
+        { who: 'you', text: L(e.def.title) + `${name}` },
         { who: 'franzi', text: { de: `${name}? Oh nein. Den kann ich nicht mitten auf dem Acker betreuen. Ich brauch mein Awareness-Zelt!`, en: `${name}? Oh no. I can't look after them in the middle of the field. I need my awareness tent!` } },
-        { who: 'franzi', text: { de: 'Hilf mir, das Zelt aufzubauen – dann kümmer ich mich sofort. Bis dahin ist mit dem nichts anzufangen.', en: 'Help me build the tent – then I\'ll take care of it right away. Until then they\'re no use to anyone.' } },
+        { who: 'franzi', text: { de: 'Hilf mir, das Zelt aufzubauen, dann kümmer ich mich sofort. Bis dahin ist mit dem nichts anzufangen.', en: 'Help me build the tent, then I\'ll take care of it right away. Until then they\'re no use to anyone.' } },
       ], null, npc);
       g.refreshHUD();
       // if she can give us the tent job right now, go straight into it
       return !g.quests.offeredBy(id).some((q) => q.id === 'q6_awareness');
     }
-    await g.runDialog([{ who: 'you', text: L(e.def.title) + (e.victims[0] ? ` – ${this.victimName(e)}` : '') }, { who: id, text: L(e.def.helperDialog) }], null, npc);
+    const noTent = needsTent && !this.tent && e.def.noTent; // no awareness tent yet: she looks after them on the spot
+    await g.runDialog([{ who: 'you', text: L(e.def.title) + (e.victims[0] ? `${this.victimName(e)}` : '') }, { who: id, text: L(noTent ? e.def.noTent.help : e.def.helperDialog) }], null, npc);
     e.helping = npc;
     npc.task = {
       phase: 'go', pos: () => e.pos(), arriveDist: 1.8, workTime: e.def.mode === 'lying' ? 4 : 3, speed: 5,
@@ -530,7 +536,7 @@ export class DramaSystem {
 
   resolve(e, helper, keepVictims = false) {
     const g = this.game;
-    helper.say(L(e.def.doneLine), 5);
+    helper.say(L(AWARENESS_MODES.includes(e.def.mode) && !this.tent && e.def.noTent?.done ? e.def.noTent.done : e.def.doneLine), 5);
     if (e.def.cost) g.economy.spend(e.def.cost, e.def.costReason);
     const k = e.def.karma || 15;
     g.quests.state.karma += k;

@@ -491,70 +491,19 @@ export function buildFirespace() {
   g.add(safety);
   spots.fire_rack = [RACK.x + 1.2, RACK.z + 2.2];
 
-  // ---- the wooden Shiva (seated, ~7.5 m)
-  const woodA = woodMat('#b98a55'), woodB = woodMat('#9a6a3a'), woodC = woodMat('#7a4f2a');
+  // ---- the wooden Shiva (like the real one): a giant built from raw boards, sitting cross-legged on a
+  // mound of bark-edged slabs, spiky board crown, right hand holding the trident, left arm resting on the knee
   const shiva = new THREE.Group();
-  shiva.position.set(0, 0, -8);
+  shiva.position.set(0, 0, -8.6);
   g.add(shiva);
-  shiva.add(cyl(2.8, 3.1, 0.7, woodC, 8, 0, 0.35, 0));                  // plinth
-  // crossed legs (lotus)
-  for (const s of [-1, 1]) {
-    const leg = new THREE.Mesh(new THREE.CapsuleGeometry(0.62, 2.3, 4, 8), woodA);
-    leg.rotation.set(0, s * 0.55, Math.PI / 2);
-    leg.position.set(s * 0.25, 1.35, 0.55 + (s > 0 ? 0.15 : 0));
-    leg.castShadow = true;
-    shiva.add(leg);
-  }
-  const torso = cyl(1.0, 1.3, 2.4, woodA, 10, 0, 2.95, 0);
-  shiva.add(torso);
-  shiva.add(box(2.9, 0.7, 1.1, woodB, 0, 4.05, 0));                        // shoulders
-  shiva.add(cyl(0.34, 0.4, 0.5, woodA, 8, 0, 4.55, 0));                    // neck
-  const snake = new THREE.Mesh(new THREE.TorusGeometry(0.48, 0.1, 5, 14), woodC);
-  snake.rotation.x = Math.PI / 2;
-  snake.position.set(0, 4.45, 0);
-  shiva.add(snake);
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.72, 10, 8), woodA);
-  head.scale.set(0.92, 1.12, 0.95);
-  head.position.set(0, 5.35, 0);
-  head.castShadow = true;
-  shiva.add(head);
-  const bun = new THREE.Mesh(new THREE.SphereGeometry(0.42, 8, 6), woodB); // jata (hair knot)
-  bun.scale.set(1, 1.3, 1);
-  bun.position.set(0, 6.35, -0.1);
-  shiva.add(bun);
-  const moon = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.06, 4, 10, Math.PI), woodC);
-  moon.position.set(0.25, 6.15, 0.35);
-  moon.rotation.set(0.3, 0, -0.6);
-  shiva.add(moon);
-  const eye3 = new THREE.Mesh(new THREE.SphereGeometry(0.07, 6, 4), new THREE.MeshStandardMaterial({ color: '#ffcc66', emissive: '#ff8a00', emissiveIntensity: 1.2 }));
-  eye3.position.set(0, 5.55, 0.68);
-  shiva.add(eye3);
-  for (const x of [-0.26, 0.26]) shiva.add(box(0.22, 0.04, 0.05, woodC, x, 5.38, 0.66)); // closed eyes
-  // left arm resting on the knee (mudra)
-  shiva.add(strut(new THREE.Vector3(-1.35, 4.0, 0), new THREE.Vector3(-1.65, 2.9, 0.4), 0.3, woodA));
-  shiva.add(strut(new THREE.Vector3(-1.65, 2.9, 0.4), new THREE.Vector3(-1.2, 1.85, 1.3), 0.26, woodA));
-  const lh = new THREE.Mesh(new THREE.SphereGeometry(0.3, 6, 5), woodB);
-  lh.position.set(-1.15, 1.8, 1.4);
-  shiva.add(lh);
-  // right arm holding the trident (trishul)
-  shiva.add(strut(new THREE.Vector3(1.35, 4.0, 0), new THREE.Vector3(1.9, 3.0, 0.3), 0.3, woodA));
-  shiva.add(strut(new THREE.Vector3(1.9, 3.0, 0.3), new THREE.Vector3(2.25, 3.9, 0.55), 0.26, woodA));
-  const rh = new THREE.Mesh(new THREE.SphereGeometry(0.3, 6, 5), woodB);
-  rh.position.set(2.25, 3.95, 0.55);
-  shiva.add(rh);
-  const metal = mat('#8a8f96', { metalness: 0.6, roughness: 0.35 });
-  shiva.add(cyl(0.09, 0.09, 8.2, woodC, 6, 2.3, 4.1, 0.55));               // shaft
-  shiva.add(box(1.4, 0.14, 0.14, metal, 2.3, 7.9, 0.55));                   // crossbar
-  for (const x of [-0.62, 0, 0.62]) {
-    const prong = new THREE.Mesh(new THREE.ConeGeometry(0.13, x === 0 ? 1.1 : 0.85, 5), metal);
-    prong.position.set(2.3 + x, x === 0 ? 8.5 : 8.35, 0.55);
-    shiva.add(prong);
-  }
-  const drum = cyl(0.2, 0.2, 0.3, woodC, 8, 2.3, 7.1, 0.55); // damaru on the trident
-  drum.rotation.z = Math.PI / 2;
-  shiva.add(drum);
-  shiva.traverse((o) => { if (o.isMesh) o.castShadow = true; });
-  colliders.push({ type: 'circle', x: 0, z: -8, r: 3.1 });
+  shiva.add(plankStatue());
+  // dark eye slits & a little "TORTUGA FIRESPACE" plaque hanging on the knee
+  for (const x of [-0.19, 0.19]) shiva.add(box(0.22, 0.05, 0.04, mat('#2a1a0e'), x, 5.92, 0.5));
+  const plaque = textPlane('TORTUGA FIRESPACE', 1.1, 0.32, { bg: '#1c1c22', fg: '#d8e0ff', font: 'bold 44px sans-serif', w: 512, h: 150 });
+  plaque.position.set(2.0, 1.25, 2.25);
+  plaque.rotation.set(-0.25, -0.35, 0.08);
+  shiva.add(plaque);
+  colliders.push({ type: 'circle', x: 0, z: -8.6, r: 3.6 });
 
   const sign = signPost('FIRESPACE', { width: 3.0, height: 1.0, bg: '#3a1a0a', fg: '#ffb060' });
   sign.position.set(-5, 0, 6.8);
@@ -1078,4 +1027,115 @@ export function buildMarket() {
   sign.position.set(-4, 0, 7.5);
   g.add(sign);
   return { object: g, colliders };
+}
+
+// ------------------------------------------------------------------ board statue (firespace Shiva)
+function rng(seed) { return () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+
+/**
+ * The firespace giant, built from ~200 rough boards (one InstancedMesh). Faces +z, ~10.5 m incl. trident.
+ * Every limb is a bundle of boards along a line, ends sticking out a little – like the real one.
+ */
+function plankStatue() {
+  const R = rng(7);
+  const V = (x, y, z) => new THREE.Vector3(x, y, z);
+  const list = [];
+  const LIGHT = ['#e6bd80', '#d9ab6c', '#cf9f60', '#e9c992', '#c68f52'];
+  const BARK = ['#8a5a32', '#a06a3a', '#b98a55'];
+  /** one board from a to b; `face` = direction the flat side looks to (random if omitted) */
+  const plank = (a, b, w = 0.22, t = 0.05, face = null, cols = LIGHT) => list.push({ a, b, w, t, face, col: cols[(R() * cols.length) | 0] });
+  /** a bundle of n boards along a→b, spread sideways, ends sticking out */
+  const bundle = (a, b, n, spread, w = 0.22, face = null) => {
+    const d = b.clone().sub(a), len = d.length(); d.normalize();
+    const u = new THREE.Vector3().crossVectors(d, Math.abs(d.y) > 0.9 ? V(1, 0, 0) : V(0, 1, 0)).normalize();
+    const v = new THREE.Vector3().crossVectors(d, u);
+    for (let i = 0; i < n; i++) {
+      const off = u.clone().multiplyScalar((R() - 0.5) * spread).addScaledVector(v, (R() - 0.5) * spread);
+      const e0 = (R() * 0.25 - 0.05) * len, e1 = (R() * 0.3 - 0.05) * len;
+      plank(a.clone().add(off).addScaledVector(d, -e0), b.clone().add(off).addScaledVector(d, e1), w * (0.7 + R() * 0.6), 0.05, face);
+    }
+  };
+
+  // mound of bark-edged slabs, leaning inwards in rings
+  for (let k = 0; k < 4; k++) {
+    const r = 3.6 - k * 0.75, y = 0.12 + k * 0.3, n = 22 - k * 4;
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2 + k * 0.3 + R() * 0.15;
+      const c = Math.cos(a), s = Math.sin(a);
+      plank(V(c * (r + 0.3), y, s * (r + 0.3)), V(c * (r - 1.4), y + 0.45, s * (r - 1.4)), 0.42 + R() * 0.2, 0.09, V(c * 0.3, 1, s * 0.3), k === 0 ? BARK : [...BARK, ...LIGHT]);
+    }
+  }
+  for (let i = 0; i < 9; i++) plank(V(-1.6, 1.25, -1.6 + i * 0.4), V(1.6, 1.25, -1.6 + i * 0.4), 0.38, 0.08, V(0, 1, 0), BARK); // seat deck
+
+  // crossed legs (the left one on top)
+  bundle(V(-0.6, 1.6, 0.1), V(-2.8, 1.5, 1.4), 7, 0.75);
+  bundle(V(-2.8, 1.45, 1.4), V(0.7, 1.4, 2.3), 6, 0.6);
+  bundle(V(0.6, 1.65, 0.1), V(2.8, 1.55, 1.4), 7, 0.75);
+  bundle(V(2.8, 1.6, 1.4), V(-0.7, 1.65, 2.15), 6, 0.6);
+
+  // torso: boards fanning from a narrow waist to a wide chest, front & back
+  for (const side of [1, -1]) {
+    for (let i = 0; i < 14; i++) {
+      const t = i / 13 - 0.5;
+      plank(V(t * 0.95, 1.7, side * (0.38 - Math.abs(t) * 0.3)), V(t * 2.9, 4.75, side * (0.5 - Math.abs(t) * 0.6)), 0.24, 0.05, V(t * 0.6, 0, side));
+    }
+  }
+  for (const s of [-1, 1]) {
+    for (let k = 0; k < 3; k++) plank(V(s * 1.25, 4.3 - k * 0.24, 0.55), V(s * 0.08, 4.2 - k * 0.24, 0.66), 0.32, 0.06, V(0, 0, 1)); // chest plates
+    for (let k = 0; k < 4; k++) plank(V(s * 0.05, 3.45 - k * 0.38, 0.55), V(s * 0.5, 3.4 - k * 0.38, 0.5), 0.28, 0.06, V(0, 0, 1)); // abs
+    plank(V(s * 1.55, 4.8, 0), V(s * 0.15, 4.95, 0.35), 0.2, 0.05, V(0, 1, 0.4)); // collar bones
+    bundle(V(s * 1.5, 4.75, 0), V(s * 1.9, 4.2, 0.1), 4, 0.5, 0.3); // shoulder caps
+  }
+
+  // neck & head: horizontal boards for the face, a V-shaped jaw
+  bundle(V(0, 4.8, 0), V(0, 5.45, 0.05), 6, 0.38, 0.18);
+  [0.3, 0.38, 0.43, 0.46, 0.45, 0.42, 0.36, 0.3].forEach((hw, j) => plank(V(-hw, 5.45 + j * 0.15, 0.44), V(hw, 5.45 + j * 0.15, 0.44), 0.16, 0.05, V(0, 0, 1)));
+  for (const s of [-1, 1]) plank(V(0, 5.35, 0.5), V(s * 0.45, 5.85, 0.4), 0.14, 0.05, V(0, 0, 1));
+  bundle(V(0, 5.4, -0.15), V(0, 6.6, -0.1), 6, 0.7, 0.25);
+  plank(V(-0.42, 6.05, 0.5), V(0.42, 6.05, 0.5), 0.12, 0.08, V(0, 0, 1)); // brow
+  for (let i = 0; i < 16; i++) { // spiky crown
+    const a = (i / 16) * Math.PI * 2;
+    const c = Math.cos(a), s = Math.sin(a);
+    plank(V(c * 0.3, 6.45, s * 0.25), V(c * (0.45 + R() * 0.7), 7.3 + R() * 1.0, s * (0.35 + R() * 0.5)), 0.1 + R() * 0.1, 0.04);
+  }
+
+  // right arm (−x) holding the trident
+  bundle(V(-1.5, 4.6, 0), V(-2.4, 3.35, 0.3), 5, 0.5);
+  bundle(V(-2.4, 3.35, 0.3), V(-2.6, 4.5, 0.8), 5, 0.42);
+  for (let k = 0; k < 4; k++) plank(V(-2.95, 4.35 + k * 0.1, 0.8), V(-2.25, 4.4 + k * 0.1, 0.85), 0.12, 0.06); // fist around the staff
+  const SX = -2.6, SZ = 0.82;
+  bundle(V(SX, 0.3, SZ), V(SX, 9.8, SZ), 2, 0.1, 0.18);
+  plank(V(SX - 0.25, 7.2, SZ), V(SX + 0.25, 7.2, SZ), 0.12, 0.12);
+  plank(V(SX - 0.95, 9.3, SZ), V(SX + 0.95, 9.3, SZ), 0.2, 0.12, V(0, 0, 1)); // crossbar
+  plank(V(SX, 9.3, SZ), V(SX, 10.9, SZ), 0.28, 0.1, V(0, 0, 1)); // middle prong
+  for (const s of [-1, 1]) { // blade-like side prongs, as on the photo
+    plank(V(SX + s * 0.9, 9.3, SZ), V(SX + s * 1.2, 10.0, SZ), 0.34, 0.08, V(0, 0, 1));
+    plank(V(SX + s * 1.2, 10.0, SZ), V(SX + s * 0.95, 10.6, SZ), 0.3, 0.08, V(0, 0, 1));
+  }
+
+  // left arm (+x) reaching out and resting on the knee
+  bundle(V(1.5, 4.6, 0), V(2.8, 3.2, 0.5), 5, 0.5);
+  bundle(V(2.8, 3.2, 0.5), V(2.45, 2.05, 2.35), 5, 0.42);
+  for (let k = 0; k < 4; k++) plank(V(2.45, 2.05, 2.35), V(2.15 + k * 0.17, 1.75, 2.95), 0.09, 0.05); // fingers
+
+  // → one instanced mesh
+  const geo = new THREE.BoxGeometry(1, 1, 1);
+  const im = new THREE.InstancedMesh(geo, new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.92, flatShading: true }), list.length);
+  const m4 = new THREE.Matrix4(), X = new THREE.Vector3(), Y = new THREE.Vector3(), Z = new THREE.Vector3();
+  list.forEach((p, i) => {
+    Z.subVectors(p.b, p.a);
+    const len = Z.length();
+    Z.normalize();
+    const f = p.face ? p.face.clone() : V(R() - 0.5, R() - 0.5, R() - 0.5);
+    Y.copy(f).addScaledVector(Z, -f.dot(Z));
+    if (Y.lengthSq() < 1e-6) Y.set(1, 0, 0).addScaledVector(Z, -Z.x);
+    Y.normalize();
+    X.crossVectors(Y, Z);
+    m4.makeBasis(X, Y, Z).multiply(new THREE.Matrix4().makeScale(p.w, p.t, len));
+    m4.setPosition(p.a.clone().add(p.b).multiplyScalar(0.5));
+    im.setMatrixAt(i, m4);
+    im.setColorAt(i, new THREE.Color(p.col));
+  });
+  im.castShadow = im.receiveShadow = true;
+  return im;
 }

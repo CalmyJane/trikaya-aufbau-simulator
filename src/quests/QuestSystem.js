@@ -653,6 +653,7 @@ export class QuestSystem {
     st.built = st.built.filter((b) => b.id !== 'chai_lounge'); // the chai lounge is a permanent construction site now
     delete st.active.q5_chai;
     for (const b of st.built) if (b.id === 'dixis_1') b.rotation = 0.17; // row moved along the north fence
+    for (const b of st.built) if (b.id === 'forest_dome' || b.id === 'mapping_deco') b.rotation = -0.45; // Forest Dome turned like the real one
     if (!st.completed.includes('q1a_posts') && (st.completed.includes('q1_rigging') || st.active.q1_rigging)) {
       st.completed.push('q1a_posts');
       st.progress.posts = [0, 1, 2, 3, 4, 5];

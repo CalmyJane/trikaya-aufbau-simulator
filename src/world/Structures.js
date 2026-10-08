@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { mat, box, cyl, strut, signPost, beerBench } from './Props.js';
-import { buildMainstage, buildShadeSails, buildKitchen } from './Mainstage.js';
+import { buildMainstage, buildShadeSails, buildKitchen, woodMat } from './Mainstage.js';
 import { buildKuenstlergasse, buildWaterTank, buildSauna, buildBarTent, buildBeerGarden } from './Structures3.js';
 import { buildAwarenessTent, buildForestDome, buildMappingDeco, buildWcContainer, buildDixiRow, buildFirespace, buildNarniaFloor, buildHammockForest, buildTechnoFloor, buildEntranceTent, buildMarket } from './Structures2.js';
 
@@ -57,43 +57,11 @@ function buildChaiTent() {
   const colliders = [];
   const add = (o, min = 0, max = 9) => { o.userData.minStage = min; o.userData.maxStage = max; staged.push(o); g.add(o); return o; };
   const col = (c, min = 0, max = 9) => stageColliders.push({ ...c, minStage: min, maxStage: max });
-  const W = 14, D = 10;
-  const peaks = [[-3, 0, 5.2], [3, 0, 5.2]];
-  const geo = new THREE.PlaneGeometry(W, D, 28, 20);
-  geo.rotateX(-Math.PI / 2);
-  const pos = geo.attributes.position;
-  for (let i = 0; i < pos.count; i++) {
-    const x = pos.getX(i), z = pos.getZ(i);
-    const ex = Math.abs(x) / (W / 2), ez = Math.abs(z) / (D / 2);
-    const edge = Math.max(ex, ez);
-    let y = 2.4 - edge * 0.6;
-    // corners pulled down, sides sag
-    y -= Math.pow(ex * ez, 2) * 0.9;
-    for (const [px, pz, ph] of peaks) {
-      const d = Math.hypot(x - px, z - pz);
-      y += (ph - 2.4) * Math.exp(-(d * d) / 5.5);
-    }
-    pos.setY(i, y);
-  }
-  geo.computeVertexNormals();
-  const sailMat = new THREE.MeshStandardMaterial({ color: '#d9803c', roughness: 0.8, side: THREE.DoubleSide });
-  add(new THREE.Mesh(geo, sailMat), 1);
-
+  // stage 1: the two-pole royal tent finally stands (front rolled up)
+  const tent = royalTent({ a: 3, r: 4.2, h: 5.2, eave: 2.1 });
+  add(tent.object, 1);
+  for (const c of tent.colliders) col(c, 1);
   const pole = mat('#8b5e34');
-  for (const [px, pz, ph] of peaks) {
-    add(cyl(0.1, 0.12, ph, pole, 8, px, ph / 2, pz), 1);
-    col({ type: 'circle', x: px, z: pz, r: 0.25 }, 1);
-  }
-  // edge poles + guy ropes
-  const rope = mat('#d8cfb8');
-  const edgePts = [[-7, -5], [0, -5], [7, -5], [-7, 5], [7, 5], [-7, 0], [7, 0]];
-  for (const [x, z] of edgePts) {
-    const h = 1.9 - (Math.abs(x) === 7 && Math.abs(z) === 5 ? 0.9 : 0);
-    add(cyl(0.06, 0.07, h, pole, 6, x, h / 2, z), 1);
-    col({ type: 'circle', x, z, r: 0.2 }, 1);
-    const out = new THREE.Vector3(x * 1.25, 0, z * 1.35);
-    add(strut(new THREE.Vector3(x, h, z), out, 0.015, rope, 4), 1);
-  }
 
   // ---- stage 0: the site. One pole stands (since Monday), the rest lies in the grass.
   add(cyl(0.1, 0.12, 5.2, pole, 8, -3, 2.6, 0), 0, 0);
@@ -151,12 +119,9 @@ function buildChaiTent() {
   col({ type: 'box', x: 2, z: -1.8, hw: 1.0, hd: 0.5 }, 1);
   add(box(0.5, 0.5, 0.5, mat('#c9a878'), -1.2, 0.25, -1.4), 1);
 
-  const signA = signPost('CHAI LOUNGE – BALD!', { width: 3.2, height: 0.9, bg: '#5b2c1d', fg: '#ffdca0' });
-  signA.position.set(-5.5, 0, 6.5);
-  add(signA, 0, 0);
-  const signB = signPost('CHAI LOUNGE – FAST!', { width: 3.2, height: 0.9, bg: '#5b2c1d', fg: '#ffdca0' });
-  signB.position.set(-5.5, 0, 6.5);
-  add(signB, 1);
+  const sign = signPost('CHAI-LOUNGE', { width: 3.2, height: 0.9, bg: '#5b2c1d', fg: '#ffdca0' });
+  sign.position.set(-5.5, 0, 6.5);
+  g.add(sign);
 
   const api = {
     stage: 0,
@@ -171,90 +136,83 @@ function buildChaiTent() {
   return { object: g, colliders, api };
 }
 
-// ------------------------------------------------------------ Planetarium geodesic dome
+// ------------------------------------------------------------ Planetarium: long stretch tent spanned like a hill
+/**
+ * A big, long beige stretch tent with open sides. Three tall poles along the middle lift it into a
+ * soft hill; the underside is printed with a night sky (lie on the cushions and watch the "stars").
+ */
 function buildDome() {
   const g = new THREE.Group();
   const colliders = [];
-  const R = 7.5;
-  const ico = new THREE.IcosahedronGeometry(R, 2);
-  const p = ico.attributes.position;
-  const minY = -0.6;
-  // collect triangles of upper hemisphere
-  const keep = [];
-  const edges = new Map();
-  const key = (v) => `${v.x.toFixed(2)},${v.y.toFixed(2)},${v.z.toFixed(2)}`;
-  for (let i = 0; i < p.count; i += 3) {
-    const tri = [0, 1, 2].map((k) => new THREE.Vector3().fromBufferAttribute(p, i + k));
-    if (tri.some((v) => v.y < minY)) continue;
-    const c = tri[0].clone().add(tri[1]).add(tri[2]).divideScalar(3);
-    // entrance: open triangles low on the +z side
-    const isDoor = c.z > R * 0.72 && c.y < R * 0.4 && Math.abs(c.x) < R * 0.4;
-    if (!isDoor) keep.push(...tri);
-    for (let k = 0; k < 3; k++) {
-      const a = tri[k], b = tri[(k + 1) % 3];
-      const kk = [key(a), key(b)].sort().join('|');
-      edges.set(kk, [a, b]);
+  const L = 24, D = 13, EDGE = 2.1;
+  const peaks = [[-8, 0, 5.4], [0, 0, 6.6], [8, 0, 5.4]];
+  const geo = new THREE.PlaneGeometry(L, D, 48, 26);
+  geo.rotateX(-Math.PI / 2);
+  const pos = geo.attributes.position;
+  const anchorsX = [-12, -6, 0, 6, 12];
+  for (let i = 0; i < pos.count; i++) {
+    let x = pos.getX(i), z = pos.getZ(i);
+    const ex = Math.abs(x) / (L / 2), ez = Math.abs(z) / (D / 2);
+    // hill: high along the ridge, falling to the edges; the ends come down further
+    let y = EDGE + 3.0 * Math.pow(1 - ez * ez, 0.9) * (1 - 0.55 * ex * ex);
+    for (const [px, pz, ph] of peaks) {
+      const d = Math.hypot(x - px, (z - pz) * 1.2);
+      y = Math.max(y, ph - d * 0.55);
+    }
+    y -= Math.pow(ex, 6) * 0.9; // ends pulled down to the anchors
+    // tensioned fabric: edges curve inwards between the anchor points
+    if (ez > 0.98) {
+      const k = anchorsX.findIndex((ax) => ax >= x) || 1;
+      const x0 = anchorsX[k - 1], x1 = anchorsX[k];
+      const t = (x - x0) / (x1 - x0);
+      z *= 1 - 0.09 * Math.sin(Math.PI * t);
+      y += 0.35 * Math.sin(Math.PI * t);
+    }
+    if (ex > 0.98) z *= 1 - 0.06 * Math.sin(Math.PI * (z / D + 0.5));
+    pos.setXYZ(i, x, y, z);
+  }
+  geo.computeVertexNormals();
+  const top = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: '#e2d3b0', roughness: 0.9, side: THREE.FrontSide }));
+  top.castShadow = true;
+  g.add(top);
+  const sky = starTexture();
+  sky.wrapS = sky.wrapT = THREE.RepeatWrapping;
+  sky.repeat.set(3, 1.6);
+  const under = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: '#ffffff', map: sky, emissive: '#ffffff', emissiveMap: sky, emissiveIntensity: 0.5, side: THREE.BackSide, roughness: 1 }));
+  under.castShadow = false;
+  g.add(under);
+
+  // poles: three tall ones in the middle, short ones along the open sides, guy ropes to the ground
+  const pole = mat('#9a7a52');
+  const rope = mat('#d8cfb8');
+  for (const [px, pz, ph] of peaks) {
+    g.add(cyl(0.12, 0.14, ph, pole, 8, px, ph / 2, pz));
+    colliders.push({ type: 'circle', x: px, z: pz, r: 0.3 });
+  }
+  for (const ax of anchorsX) {
+    for (const s of [-1, 1]) {
+      const z = s * D / 2, h = ax === -12 || ax === 12 ? EDGE - 0.6 : EDGE + 0.1;
+      g.add(cyl(0.06, 0.07, h, pole, 6, ax, h / 2, z));
+      g.add(strut(new THREE.Vector3(ax, h, z), new THREE.Vector3(ax * 1.05, 0, z * 1.35), 0.015, rope, 4));
+      colliders.push({ type: 'circle', x: ax, z, r: 0.2 });
     }
   }
-  const skinGeo = new THREE.BufferGeometry().setFromPoints(keep);
-  skinGeo.computeVertexNormals();
-  const skin = new THREE.Mesh(skinGeo, new THREE.MeshStandardMaterial({
-    color: '#f2efe6', roughness: 0.9, side: THREE.DoubleSide, flatShading: true,
-  }));
-  skin.position.y = -minY;
-  g.add(skin);
-
-  // struts as one instanced mesh
-  const list = [...edges.values()];
-  const im = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.06, 0.06, 1, 5), mat('#9aa3ad', { metalness: 0.7, roughness: 0.3 }), list.length);
-  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0);
-  list.forEach(([a, b], i) => {
-    const d = b.clone().sub(a);
-    const len = d.length();
-    q.setFromUnitVectors(up, d.normalize());
-    const mid = a.clone().add(b).multiplyScalar(0.5).multiplyScalar(1.012);
-    mid.y += -minY;
-    m4.compose(mid, q, new THREE.Vector3(1, len, 1));
-    im.setMatrixAt(i, m4);
-  });
-  im.castShadow = true;
-  g.add(im);
-
-  // dark inner projection surface – with the same opening as the door, so you can see the way out
-  const innerGeo = new THREE.SphereGeometry(R * 0.96, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2).toNonIndexed();
-  {
-    const ip = innerGeo.attributes.position, uv = innerGeo.attributes.uv;
-    const pos = [], uvs = [];
-    for (let i = 0; i < ip.count; i += 3) {
-      let cx = 0, cy = 0, cz = 0;
-      for (let k = 0; k < 3; k++) { cx += ip.getX(i + k) / 3; cy += ip.getY(i + k) / 3; cz += ip.getZ(i + k) / 3; }
-      if (cz > R * 0.62 && cy < R * 0.45 && Math.abs(cx) < R * 0.42) continue; // door
-      for (let k = 0; k < 3; k++) { pos.push(ip.getX(i + k), ip.getY(i + k), ip.getZ(i + k)); uvs.push(uv.getX(i + k), uv.getY(i + k)); }
-    }
-    innerGeo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-    innerGeo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
-    innerGeo.deleteAttribute('normal');
+  // cushions & beanbags to lie on, projector in the middle
+  const cols = ['#5a3a8a', '#2a4a8a', '#8a2a5a', '#2a6a6a', '#6a4a2a'];
+  for (let i = 0; i < 14; i++) {
+    const x = -9 + (i % 7) * 3 + (i > 6 ? 1.5 : 0), z = i > 6 ? 2.6 : -2.6;
+    const bag = new THREE.Mesh(new THREE.SphereGeometry(0.55, 10, 6), mat(cols[i % cols.length]));
+    bag.scale.set(1.3, 0.45, 1);
+    bag.position.set(x, 0.25, z);
+    g.add(bag);
   }
-  const inner = new THREE.Mesh(innerGeo, new THREE.MeshBasicMaterial({ map: starTexture(), side: THREE.BackSide }));
-  inner.position.y = -minY - 0.2;
-  inner.castShadow = false;
-  g.add(inner);
-
-  // collision ring with a gap for the entrance
-  for (let a = 0; a < Math.PI * 2; a += Math.PI / 12) {
-    const x = Math.sin(a) * R, z = Math.cos(a) * R;
-    if (z > R * 0.8 && Math.abs(x) < R * 0.45) continue;
-    colliders.push({ type: 'circle', x, z, r: 1.2 });
-  }
-  // projector in the middle
   g.add(cyl(0.3, 0.4, 1.2, mat('#333'), 8, 0, 0.6, 0));
   const proj = new THREE.Mesh(new THREE.SphereGeometry(0.45, 12, 8), mat('#222', { metalness: 0.8 }));
   proj.position.y = 1.4;
   g.add(proj);
-  colliders.push({ type: 'circle', x: 0, z: 0, r: 0.6 });
 
   const sign = signPost('PLANETARIUM', { width: 2.6, height: 1.3, bg: '#101838', fg: '#cfe0ff' });
-  sign.position.set(4.5, 0, R + 1.8);
+  sign.position.set(5, 0, D / 2 + 2.2);
   g.add(sign);
   return { object: g, colliders };
 }
@@ -400,3 +358,63 @@ function addBunting(g, a, b) {
   }
 }
 
+
+/**
+ * Two-pole royal tent ("Königszelt"): straight middle with a ridge between the poles, round ends,
+ * cream canvas with red stripes, scalloped valance, pennants on the poles.
+ * Returns the parts so callers can stage them; `openFront` leaves the front wall rolled up.
+ */
+export function royalTent({ a = 3, r = 4.2, h = 5.2, eave = 2.1, cream = '#f1e8d4', red = '#9a2a2a', openFront = true } = {}) {
+  const g = new THREE.Group();
+  const colliders = [];
+  // perimeter: front side, right half circle, back side, left half circle (x along the ridge)
+  const per = [];
+  const N = 8, C = 10;
+  for (let i = 0; i < N; i++) per.push({ x: -a + (i / N) * 2 * a, z: r, front: true });
+  for (let i = 0; i < C; i++) { const t = Math.PI / 2 - (i / C) * Math.PI; per.push({ x: a + Math.cos(t) * r, z: Math.sin(t) * r }); }
+  for (let i = 0; i < N; i++) per.push({ x: a - (i / N) * 2 * a, z: -r });
+  for (let i = 0; i < C; i++) { const t = -Math.PI / 2 - (i / C) * Math.PI; per.push({ x: -a + Math.cos(t) * r, z: Math.sin(t) * r }); }
+  const roof = [[], []], wall = [[], []];
+  const quad = (arr, p) => arr.push(p[0], p[1], p[2], p[0], p[2], p[3]);
+  for (let i = 0; i < per.length; i++) {
+    const p = per[i], q = per[(i + 1) % per.length];
+    const rp = new THREE.Vector3(THREE.MathUtils.clamp(p.x, -a, a), h, 0), rq = new THREE.Vector3(THREE.MathUtils.clamp(q.x, -a, a), h, 0);
+    const ep = new THREE.Vector3(p.x, eave, p.z), eq = new THREE.Vector3(q.x, eave, q.z);
+    const stripe = Math.floor(i / 2) % 2;
+    quad(roof[stripe], [rp, ep, eq, rq]);
+    if (!(openFront && p.front)) quad(wall[stripe], [ep, new THREE.Vector3(p.x, 0, p.z), new THREE.Vector3(q.x, 0, q.z), eq]);
+    // valance scallop
+    const m = ep.clone().lerp(eq, 0.5); m.y -= 0.42;
+    wall[1].push(ep, m, eq);
+  }
+  const mk = (pts, color) => {
+    const geo = new THREE.BufferGeometry().setFromPoints(pts);
+    geo.computeVertexNormals();
+    const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color, roughness: 0.9, side: THREE.DoubleSide }));
+    mesh.castShadow = true;
+    return mesh;
+  };
+  g.add(mk(roof[0], cream), mk(roof[1], red), mk(wall[0], cream), mk(wall[1], red));
+  const pole = woodMat('#7a5232');
+  for (const x of [-a, a]) {
+    g.add(cyl(0.11, 0.13, h + 0.9, pole, 8, x, (h + 0.9) / 2, 0));
+    colliders.push({ type: 'circle', x, z: 0, r: 0.25 });
+    const finial = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.4, 8), mat('#d8b040', { metalness: 0.5 }));
+    finial.position.set(x, h + 1.1, 0);
+    g.add(finial);
+    const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.4), new THREE.MeshStandardMaterial({ color: red, side: THREE.DoubleSide }));
+    flag.position.set(x + 0.45, h + 0.7, 0);
+    g.add(flag);
+  }
+  // guy ropes from the eave, walls block (front stays open when rolled up)
+  const rope = mat('#d8cfb8');
+  per.forEach((p, i) => {
+    if (i % 3) return;
+    const e = new THREE.Vector3(p.x, eave, p.z);
+    const out = new THREE.Vector3(p.x + (p.x - THREE.MathUtils.clamp(p.x, -a, a)) * 0.5, 0, p.z * 1.5);
+    g.add(strut(e, out, 0.012, rope, 4));
+    g.add(cyl(0.05, 0.05, eave, pole, 5, p.x, eave / 2, p.z));
+  });
+  per.forEach((p) => { if (!(openFront && p.front)) colliders.push({ type: 'circle', x: p.x * 0.97, z: p.z * 0.97, r: 0.45 }); });
+  return { object: g, colliders };
+}

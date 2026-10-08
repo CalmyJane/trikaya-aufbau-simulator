@@ -494,7 +494,7 @@ export class UI {
       ctx.strokeText(pl.label, x, y + s / 2 + 10); ctx.fillText(pl.label, x, y + s / 2 + 10);
     }
     // area labels
-    const labels = [['CREW BASE', P(1019, 391)], ['Crew & Artist Camp', P(700, 320)], ['Parkplatz', P(1030, 250)], ['Küche', P(445, 530)], ['Mainstage', P(370, 520)], ['TSV Allach', P(725, 710)], ['Hängemattenwald', P(190, 530)], ['FESTIVAL', P(420, 700)], ['Enterstraße', P(900, 480)], ['Gündinger Weg', P(1195, 150)]];
+    const labels = [['CREW BASE', P(1019, 391)], ['Crew & Artist Camp', P(700, 320)], ['Parkplatz', P(1030, 250)], ['Küche', P(445, 530)], ['Mainstage', P(370, 520)], ['TSV Allach', P(725, 710)], ['Hängemattenwald', P(215, 705)], ['FESTIVAL', P(420, 700)], ['Enterstraße', P(900, 480)], ['Gündinger Weg', P(1195, 150)]];
     ctx.font = 'bold 16px "Baloo 2", sans-serif';
     for (const [t, p] of labels) {
       const [x, y] = toC(p);

@@ -249,7 +249,7 @@ export class World {
 
     // light masts from the site plan (red dots) – built during the night mission
     this.masts = [];
-    const mastPts = [[230, 600], [325, 640], [412, 628], [530, 700], [600, 650], [110, 650], [400, 770], [215, 720]];
+    const mastPts = [[230, 600], [325, 640], [412, 628], [530, 700], [600, 650], [110, 650], [400, 770], [190, 650]];
     mastPts.forEach(([px, py], i) => {
       const p = P(px, py);
       const lm = lightMast();
@@ -350,8 +350,8 @@ export class World {
   buildStrawWalls() {
     const defs = [
       { plot: 'mainstage', rot: 0, d: -24, lat: -9, len: 21 },   // behind the dragon
-      { plot: 'forest_dome', rot: 1.7, d: -12.8, lat: 0, len: 18 }, // behind the Forest Dome
-      { plot: 'forest_dome', rot: 1.7, d: 17.5, lat: 0, len: 18 },  // in front of it
+      { plot: 'forest_dome', rot: -0.45, d: -12.8, lat: 0, len: 18 }, // behind the Forest Dome
+      { plot: 'forest_dome', rot: -0.45, d: 17.5, lat: 0, len: 18 },  // in front of it
       { plot: 'narnia_floor', rot: 0.15, d: -12, lat: 0, len: 18 }, // behind the elephant
       { plot: 'biergarten', rot: 0.2, d: -10, lat: 0, len: 21 },   // behind the Techno Floor
       { plot: 'biergarten', rot: 0.2, d: 15.5, lat: 0, len: 21 },   // in front of it

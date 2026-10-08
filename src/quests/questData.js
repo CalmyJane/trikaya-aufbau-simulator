@@ -352,20 +352,20 @@ export const QUESTS = [
   // ------------------------------------------------------------------ 7 — Planetarium dome
   {
     id: 'q7_dome',
-    title: { de: 'Dome Sweet Dome', en: 'Dome Sweet Dome' },
+    title: { de: 'Sterne unterm Stretchzelt', en: 'Stars Under Canvas' },
     giver: 'matze',
     day: 3,
     requires: ['q4_lights'],
-    summary: { de: 'Die Dome-Streben für das Planetarium sind… verteilt.', en: 'The planetarium dome struts are… scattered.' },
+    summary: { de: 'Die Zeltstangen für das Planetarium-Stretchzelt sind… verteilt.', en: 'The poles for the planetarium stretch tent are… scattered.' },
     offer: [
-      { who: 'matze', text: { de: 'Das Planetarium! Das war doch… meins? Ja. Die Streben kamen in drei Bündeln.', en: 'The planetarium! That was… mine? Yes. The struts came in three bundles.' } },
+      { who: 'matze', text: { de: 'Das Planetarium! Das war doch… meins? Ja. Das lange Stretchzelt mit dem Sternenhimmel drunter. Die Stangen kamen in drei Bündeln.', en: 'The planetarium! That was… mine? Yes. The long stretch tent with the starry sky underneath. The poles came in three bundles.' } },
       { who: 'matze', text: { de: 'Eins ist beim Pickup. Eins hat jemand als Torpfosten auf der Bolzwiese benutzt. Und eins ist… bei den Dixis. Frag nicht.', en: 'One is by the pickup. Someone used one as a goalpost on the meadow. And one is… by the portaloos. Don\'t ask.' } },
     ],
     accept: { de: 'Ich such sie.', en: 'I\'ll find them.' },
     decline: { de: 'Später.', en: 'Later.' },
     steps: [
       {
-        type: 'pickup', text: { de: 'Finde die 3 Streben-Bündel', en: 'Find the 3 strut bundles' },
+        type: 'pickup', text: { de: 'Finde die 3 Stangen-Bündel', en: 'Find the 3 pole bundles' },
         items: [
           { item: 'dome_struts_a', at: 'pickup_bed' },
           { item: 'dome_struts_b', at: 'soccer_goal', search: 18 },
@@ -373,14 +373,14 @@ export const QUESTS = [
         ],
       },
       {
-        type: 'deliver', text: { de: 'Bau den Dome am Planetarium-Platz', en: 'Assemble the dome at the planetarium plot' },
+        type: 'deliver', text: { de: 'Spann das Stretchzelt am Planetarium-Platz', en: 'Put up the stretch tent at the planetarium plot' },
         items: ['dome_struts_a', 'dome_struts_b', 'dome_struts_c'], plot: 'planetarium', buildTime: 4,
         build: { id: 'planetarium', type: 'planetarium_dome', plot: 'planetarium', rotation: -0.5, cost: 4200 },
       },
       {
-        type: 'talk', npc: 'matze', text: { de: 'Zeig Matze den Dome', en: 'Show Matze the dome' },
+        type: 'talk', npc: 'matze', text: { de: 'Zeig Matze das Planetarium', en: 'Show Matze the planetarium' },
         dialog: [
-          { who: 'matze', text: { de: 'Geodätisch! Wunderschön! Zu 40% Gaffa! …Wo war ich? Ach ja. Danke!', en: 'Geodesic! Beautiful! 40% gaffa! …Where was I? Oh right. Thanks!' } },
+          { who: 'matze', text: { de: 'Gespannt wie ein Hügel! Wunderschön! Zu 40% Gaffa! …Wo war ich? Ach ja. Danke!', en: 'Spanned like a hill! Beautiful! 40% gaffa! …Where was I? Oh right. Thanks!' } },
         ],
       },
     ],
@@ -410,7 +410,7 @@ export const QUESTS = [
         type: 'deliver', text: { de: 'Bring das Material zu Fabbe an den Waldrand', en: 'Bring the material to Fabbe at the forest edge' },
         items: ['dome_wood', 'rope_bag'], plot: 'forest_dome', buildTime: 2,
         buildLabel: { de: 'Material abladen', en: 'Unload material' },
-        build: { id: 'forest_dome', type: 'forest_dome', plot: 'forest_dome', rotation: 1.7, cost: 5200, crew: { npcs: ['fabbe', 'niklas'], time: 22 } },
+        build: { id: 'forest_dome', type: 'forest_dome', plot: 'forest_dome', rotation: -0.45, cost: 5200, crew: { npcs: ['fabbe', 'niklas'], time: 22 } },
       },
       {
         type: 'talk', npc: 'fabbe', text: { de: 'Lass Fabbe bauen und sprich dann mit ihm', en: 'Let Fabbe build, then talk to him' },
@@ -485,7 +485,7 @@ export const QUESTS = [
         type: 'deliver', text: { de: 'Bau die Skulptur am Forest Dome', en: 'Build the sculpture at the Forest Dome' },
         items: ['wood_panels'], plot: 'forest_dome', buildTime: 6,
         buildLabel: { de: 'Holzskulptur bauen', en: 'Build wooden sculpture' },
-        build: { id: 'mapping_deco', type: 'mapping_deco', plot: 'forest_dome', rotation: 1.7, cost: 7400 },
+        build: { id: 'mapping_deco', type: 'mapping_deco', plot: 'forest_dome', rotation: -0.45, cost: 7400 },
       },
       { type: 'night', text: { de: 'Warte auf die Dunkelheit…', en: 'Wait for darkness…' } },
       {

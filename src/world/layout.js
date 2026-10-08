@@ -62,7 +62,8 @@ export const HEDGES = [
 ];
 
 export const TREE_CLUSTERS = [
-  { c: P(200, 562), r: 11, count: 18 }, // Hängemattenwald
+  { c: P(215, 728), r: 10, count: 16 }, // Hängemattenwald
+  { c: P(190, 560), r: 8, count: 7 },   // trees in the north-west
   { c: P(60, 700), r: 7, count: 6 },    // forest edge behind the Forest Dome
   { c: P(362, 458), r: 7, count: 5 },   // the big old trees behind the dragon
   { c: P(300, 405), r: 10, count: 8 },  // the small group where the field tracks meet (north-west corner)
@@ -96,7 +97,7 @@ AREAS.crewBase = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([sx, sz]) => baseToWo
 export const LANDMARKS = {
   dixiRow: P(470, 470),
   tsvPitch: P(725, 710),
-  hammockForest: P(200, 562),
+  hammockForest: P(215, 728),
   soccerGoalW: P(845, 400),
   soccerGoalE: P(900, 380),
   parking: P(1030, 262),
@@ -114,15 +115,15 @@ export const PLOTS = {
   // West → east, as on the drone photos. The dragon stands at the hedge in the middle of the north side.
   mainstage:    { pos: P(370, 577), size: 30, flatRadius: 24, label: 'Mainstage', prebuilt: true },
   // the firespace with the wooden Shiva statue is already standing too
-  firespace:    { pos: P(274, 746), size: 18, flatRadius: 13, label: 'Firespace', prebuilt: true }, // south-west of the dancefloor, where the dragon looks
-  hammocks:     { pos: P(200, 562), size: 18, label: 'Hängemattenwald' },                         // the trees in the north-west
+  firespace:    { pos: P(295, 734), size: 18, flatRadius: 13, label: 'Firespace', prebuilt: true }, // south-west of the dancefloor, where the dragon looks
+  hammocks:     { pos: P(215, 728), size: 18, label: 'Hängemattenwald' },                         // between the Forest Dome and the statue
   chai_lounge:  { pos: P(442, 653), size: 16, label: 'Chai Lounge', prebuilt: true },               // right below the mainstage – eternal construction site
   planetarium:  { pos: P(512, 596), size: 18, label: 'Planetarium' },                               // the rectangle at the far east
   biergarten:   { pos: P(480, 723), size: 18, label: 'Techno Floor' },                              // the two tents south-west of the entrance
   awareness:    { pos: P(562, 654), size: 12, label: 'Awareness' },                                 // green & light green, below-right of the planetarium
   // future plots - marked in the dirt until a quest builds them
   narnia_floor: { pos: P(262, 655), size: 16, label: 'Narnia Floor', prebuilt: true }, // the pentagon tent + the white one next to it – Mia's crew builds it in stages
-  forest_dome:  { pos: P(150, 700), size: 16, label: 'Forest Dome', clearRadius: 19 },  // two half-round tents in the south-west, stage in the gap
+  forest_dome:  { pos: P(140, 692), size: 16, label: 'Forest Dome', clearRadius: 19 },  // two half-round tents in the south-west, stage in the gap
   shops:        { pos: P(502, 670), size: 14, label: 'Shops' },          // stalls scattered between chai lounge, planetarium and techno floor
   kuenstlergasse: { pos: P(276, 545), size: 18, label: 'Künstlergasse' }, // Cosma & Mathias, at the north hedge west of the dragon
   entrance:     { pos: P(565, 725), size: 12, label: 'Eingang' },          // the white tent at the east gate

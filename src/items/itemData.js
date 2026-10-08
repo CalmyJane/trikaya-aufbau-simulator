@@ -4,6 +4,8 @@ import { mat, box, cyl } from '../world/Props.js';
 // Item definitions. `mesh` is a factory returning the object shown on the ground / carried.
 // Add new quest items here and reference them by id from questData.js.
 export const ITEMS = {
+  sauna_boards: { name: { de: 'Saunabretter (Krygo)', en: 'Sauna boards (Krygo)' }, icon: '🪵', mesh: timberStack },
+  sauna_stove: { name: { de: 'Saunaofen', en: 'Sauna stove' }, icon: '🔥', mesh: () => cyl(0.25, 0.25, 0.6, mat('#2a2a2a', { metalness: 0.6 }), 10, 0, 0.3, 0) },
   steel_wire: { name: { de: 'Stahlseil-Rollen', en: 'Steel wire coils' }, icon: '🪢', mesh: wireCoils },
   shackles: { name: { de: 'Schäkel & Spanngurte', en: 'Shackles & ratchet straps' }, icon: '⛓️', mesh: shackleBox },
   diesel_can: { name: { de: 'Dieselkanister', en: 'Diesel canister' }, icon: '⛽', mesh: dieselCan },

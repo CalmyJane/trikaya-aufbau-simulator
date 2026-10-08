@@ -624,6 +624,49 @@ export const QUESTS = [
     reward: { karma: 25 },
   },
 
+  // ------------------------------------------------------------------ KR1 — Krygo's sauna (never gets finished)
+  {
+    id: 'kr1_sauna',
+    title: { de: 'Krygos Sauna', en: 'Krygo\'s Sauna' },
+    giver: 'krygo',
+    day: 2,
+    requires: ['q0_leo'],
+    summary: { de: 'Krygo baut im Crew Camp eine Sauna für die Crew. Seit Jahren. Dieses Jahr wird sie fertig. Sagt er.', en: 'Krygo is building a sauna for the crew in the crew camp. For years. This year it\'ll be done. He says.' },
+    offer: [
+      { who: 'krygo', text: { de: 'Ey! Krygo. Ich bau hier ne Sauna. Für die Crew. Nach dem Aufbau alle schwitzen, Aufguss, Birkenzweige. Wird legendär.', en: 'Hey! Krygo. I\'m building a sauna here. For the crew. After the build-up everyone sweats, infusions, birch twigs. It\'ll be legendary.' } },
+      { who: 'krygo', text: { de: 'Mir fehlen nur die Bretter – liegen hinterm Pickup – und der Ofen aus der Werkstatt. Dann ist sie quasi fertig. Quasi.', en: 'I just need the boards – behind the pickup – and the stove from the workshop. Then it\'s basically done. Basically.' } },
+    ],
+    accept: { de: 'Saunieren nach dem Aufbau? Bin dabei!', en: 'Sauna after the build-up? I\'m in!' },
+    decline: { de: 'Später, Krygo.', en: 'Later, Krygo.' },
+    steps: [
+      { type: 'pickup', text: { de: 'Hol die Bretter (hinterm Pickup) und den Saunaofen (Werkstatt)', en: 'Get the boards (behind the pickup) and the sauna stove (workshop)' }, items: [{ item: 'sauna_boards', at: 'pickup_bed' }, { item: 'sauna_stove', at: 'werkstatt_inside' }] },
+      {
+        type: 'deliver', text: { de: 'Bring alles zu Krygos Sauna im Crew Camp', en: 'Bring it all to Krygo\'s sauna in the crew camp' },
+        items: ['sauna_boards', 'sauna_stove'], at: 'sauna_site', radius: 4, buildTime: 1.5,
+        buildLabel: { de: 'Material abladen', en: 'Unload material' },
+        build: { id: 'sauna', type: 'sauna', at: 'sauna_site', rotation: 0.2, cost: 240 },
+      },
+      {
+        type: 'work', text: { de: 'Hilf Krygo, die Bretter anzunageln', en: 'Help Krygo nail on the boards' },
+        targets: ['sauna_site'], workTime: 3, label: { de: 'Bretter annageln', en: 'Nail boards' },
+        minigame: 'mash', minigameTitle: { de: 'Nageln! Nageln! NAGELN!', en: 'Nail! Nail! NAIL!' }, minigameOpts: { need: 10, time: 4.5 },
+        minigameFail: { de: 'Krumm. Krygo sagt, das ist Absicht. Nochmal.', en: 'Crooked. Krygo says it\'s on purpose. Again.' },
+        doneDialog: [
+          { who: 'krygo', text: { de: 'Perfekt! Jetzt noch kurz das Dach, die Tür, das Ofenrohr, die Steine, Isolierung, Lüftung… und dann Aufguss!', en: 'Perfect! Now quickly the roof, the door, the stove pipe, the stones, insulation, ventilation… and then infusion!' } },
+          { who: 'krygo', text: { de: '…Weißt du was? Mach ich morgen. Morgen ist sie fertig.', en: '…You know what? I\'ll do it tomorrow. It\'ll be done tomorrow.' } },
+        ],
+      },
+      {
+        type: 'talk', npc: 'krygo', text: { de: 'Sprich mit Krygo', en: 'Talk to Krygo' },
+        dialog: [
+          { who: 'krygo', text: { de: 'Danke dir! Die Bänke sind schon fertig. Setz dich ruhig. Stell dir die Hitze einfach vor.', en: 'Thanks! The benches are done already. Go on, sit down. Just imagine the heat.' } },
+          { who: 'corni', text: { de: 'Die Sauna? Die baut er seit 2019. Jedes Jahr „morgen“. Ich hab mal ein Bier drauf gewettet. Ich hab das Bier noch.', en: 'The sauna? He\'s been building it since 2019. Every year "tomorrow". I once bet a beer on it. I still have the beer.' } },
+        ],
+      },
+    ],
+    reward: { karma: 20 },
+  },
+
   // ------------------------------------------------------------------ X1 — the special nut (night 1, Corni)
   {
     id: 'x1_nuss',

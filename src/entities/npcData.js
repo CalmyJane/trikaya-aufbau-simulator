@@ -541,6 +541,20 @@ export const NPCS = [
     ],
   },
   {
+    id: 'krygo', name: 'Krygo', role: { de: 'Baut eine Sauna. Seit Jahren.', en: 'Building a sauna. For years.' }, portrait: '🧖',
+    look: { base: 'm_casual', skin: SKIN.light, hair: '#3a2a1a', brows: '#3a2a1a', hairCut: [0.9, 0.45, 0.9], beard: 'full', beardColor: '#4a3220', shirt: '#c0602a', pants: '#4a5a3a', patchwork: true, shirtPatch: ['#c0602a', '#e0e0d0', '#8a3a3a'], height: 1.85, width: 1.12 },
+    behavior: 'stationary', home: 'sauna_site', offset: [-1.5, 3],
+    lines: [
+      { de: 'Die Sauna? Ist fast fertig. Fehlt nur noch Dach, Tür, Ofen und so.', en: 'The sauna? Almost done. Just needs a roof, a door, the stove and stuff.' },
+      { de: 'Nach dem Aufbau gibt\'s Aufguss für alle. Versprochen. Wie letztes Jahr. …Also, anders als letztes Jahr.', en: 'After the build-up there\'ll be a sauna session for everyone. Promise. Like last year. …Well, unlike last year.' },
+      { de: 'Morgen. Morgen ist sie fertig.', en: 'Tomorrow. It\'ll be done tomorrow.' },
+      { de: 'Eine Sauna braucht Zeit. Und Holz. Und jemanden, der hilft. Du hast nicht zufällig…?', en: 'A sauna takes time. And wood. And someone who helps. You don\'t happen to…?' },
+      { de: 'Die Bänke sind schon fertig! Man kann sich draufsetzen. Halt ohne Dach. Und ohne Wärme.', en: 'The benches are done! You can sit on them. Without a roof. And without heat.' },
+      { de: 'Corni sagt, die Sauna ist ein Mythos. Corni hat keine Ahnung von Mythen.', en: 'Corni says the sauna is a myth. Corni knows nothing about myths.' },
+      { de: 'Holz arbeitet. Ich arbeite auch. Nur halt langsamer als das Holz.', en: 'Wood works. I work too. Just slower than the wood.' },
+    ],
+  },
+  {
     id: 'georg', name: 'Georg', role: { de: 'Firespace', en: 'Firespace' }, portrait: '🕉️',
     look: { base: 'm_adventurer', backpack: false, skin: SKIN.light, hair: '#0c0a0a', brows: '#0c0a0a', hairStyle: 'dreads', hairStyleColor: '#0c0a0a', dreadLength: 0.66, beads: true, tattoos: true, shirt: '#1a1a1a', pants: '#5a3a2a', patchwork: true, shirtPatch: ['#1a1a1a', '#6a2a1a', '#2a2a2a'], height: 1.92 },
     behavior: 'wander', home: 'plot_firespace', offset: [-6, 4], radius: 5,

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { mat, box, cyl, signPost } from './Props.js';
+import { mat, box, cyl, strut, signPost } from './Props.js';
 
 // ------------------------------------------------------------------ Künstlergasse
 /**
@@ -198,4 +198,43 @@ export function buildWaterTank() {
     new THREE.Vector3(-0.55, 0.25, 0), new THREE.Vector3(-1.2, 0.05, 0.2), new THREE.Vector3(-2.6, 0.05, -0.3), new THREE.Vector3(-3.6, 0.3, 0)]), 16, 0.04, 6), mat('#2a8a3a'));
   g.add(hose);
   return { object: g, colliders: [{ type: 'box', x: 0, z: 0, hw: 0.7, hd: 0.6 }] };
+}
+
+// ------------------------------------------------------------------ Krygo's sauna
+/** Krygo's sauna in the crew camp: it will never be finished. Floor, a frame, half the boards, no roof, a stove outside. */
+export function buildSauna() {
+  const g = new THREE.Group();
+  const wood = mat('#c49a62'), dark = mat('#8a6236'), fresh = mat('#e0bf88');
+  const W = 3, D = 2.6, H = 2.2;
+  g.add(box(W + 0.3, 0.2, D + 0.3, dark, 0, 0.1, 0)); // floor on pallets
+  for (const [x, z] of [[-W / 2, -D / 2], [W / 2, -D / 2], [W / 2, D / 2], [-W / 2, D / 2], [0, -D / 2]]) g.add(box(0.12, H, 0.12, wood, x, 0.2 + H / 2, z));
+  g.add(box(W, 0.12, 0.12, wood, 0, 0.2 + H, -D / 2));
+  g.add(box(0.12, 0.12, D, wood, -W / 2, 0.2 + H, 0));
+  // back wall fully boarded, left wall half, right wall three boards
+  for (let i = 0; i < 9; i++) g.add(box(W, 0.2, 0.04, i % 2 ? wood : fresh, 0, 0.35 + i * 0.22, -D / 2 - 0.07));
+  for (let i = 0; i < 5; i++) g.add(box(0.04, 0.2, D, i % 2 ? wood : fresh, -W / 2 - 0.07, 0.35 + i * 0.22, 0));
+  for (let i = 0; i < 3; i++) g.add(box(0.04, 0.2, D * 0.6, fresh, W / 2 + 0.07, 0.35 + i * 0.22, -D * 0.2));
+  // one lonely rafter, one crooked board
+  g.add(strut(new THREE.Vector3(-W / 2, 0.2 + H, -D / 2), new THREE.Vector3(W / 2, 0.2 + H + 0.5, -D / 2), 0.06, dark));
+  const loose = box(0.04, 0.2, 1.6, fresh, W / 2 + 0.07, 1.1, 0.5);
+  loose.rotation.x = 0.5;
+  g.add(loose);
+  // benches inside (the only finished part)
+  g.add(box(W - 0.3, 0.08, 0.5, fresh, 0, 0.65, -D / 2 + 0.35));
+  g.add(box(W - 0.3, 0.08, 0.5, fresh, 0, 1.05, -D / 2 + 0.3));
+  // stove outside, still strapped, pipe lying next to it
+  const iron = mat('#2a2a2a', { metalness: 0.6, roughness: 0.5 });
+  g.add(cyl(0.32, 0.32, 0.8, iron, 12, W / 2 + 1.0, 0.4, 0.9));
+  g.add(cyl(0.34, 0.34, 0.05, mat('#e0a020'), 12, W / 2 + 1.0, 0.45, 0.9));
+  const pipe = cyl(0.08, 0.08, 1.6, iron, 8, W / 2 + 1.5, 0.7, 0.6);
+  pipe.rotation.z = 0.4;
+  g.add(pipe);
+  for (let i = 0; i < 6; i++) g.add(box(0.2, 0.14, 0.2, mat('#7a7a72'), W / 2 + 0.6 + (i % 3) * 0.24, 0.07 + Math.floor(i / 3) * 0.12, 1.5)); // sauna stones
+  // board pile, sign
+  for (let i = 0; i < 8; i++) g.add(box(2.2, 0.05, 0.18, i % 2 ? wood : fresh, -W / 2 - 0.9, 0.04 + Math.floor(i / 4) * 0.06, 0.6 + (i % 4) * 0.2));
+  const sign = signPost('SAUNA – fast fertig', { width: 2.2, height: 0.8, bg: '#f4e2b8', fg: '#7a2a10' });
+  sign.position.set(-0.6, 0, D / 2 + 1.0);
+  sign.scale.setScalar(0.8);
+  g.add(sign);
+  return { object: g, colliders: [{ type: 'box', x: 0, z: 0, hw: W / 2 + 0.2, hd: D / 2 + 0.2 }, { type: 'circle', x: W / 2 + 1.0, z: 0.9, r: 0.4 }] };
 }

@@ -155,6 +155,7 @@ export function buildCrewBase(world) {
   spots.C2_front = spots.kuenstler_front;         // cables & steel wires, drill
   spots.C3_front = spots.huehner_front;           // tents, tarps, yurt
   addSpot('C4_front', 8.5, -12.6);                // deco stuff next to the Hühnercontainer
+  addSpot('sauna_site', -12, -12);                // Krygo's sauna (eternal construction site)
 
   // ------------------------------------------------ vehicles, pallets, clutter
   const pickup = Assets.model('pickup', { length: 5.3 });

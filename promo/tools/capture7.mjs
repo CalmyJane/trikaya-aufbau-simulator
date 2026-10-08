@@ -34,7 +34,7 @@ const HELPERS = `
   const p = document.createElement('div'); p.id = 'promo'; document.body.appendChild(p);
   window.promo = (html, op = 1) => { if (p._h !== html) { p.innerHTML = html; p._h = html; } p.style.opacity = op; };
   window.cap = (txt, f, n, a = 4, b = 4) => promo(txt ? '<div class="cap">' + txt + '</div>' : '', Math.min(1, f / a, (n - 1 - f) / b));
-  const m = document.createElement('div'); m.id = 'cjmark'; m.innerHTML = '<img class="h" src="/CalmyJaneHeadWhite.png"><img class="t" src="assets/ui/calmyjane_text.svg">'; document.body.appendChild(m);
+  const m = document.createElement('div'); m.id = 'cjmark'; m.innerHTML = '<img class="t" src="assets/ui/calmyjane_text.svg">'; document.body.appendChild(m);
   window.cjmark = (op) => { m.style.opacity = op; };
   // portrait: dialogs span the full width – lift the mark above the dialog box
   window.cjfollow = () => { const d = document.getElementById('dialog'); const r = d.getBoundingClientRect(); m.style.bottom = (innerHeight > innerWidth && g.ui.dialogOpen && r.height) ? (innerHeight - r.top + B * 0.02) + 'px' : (B * 0.03) + 'px'; };
@@ -91,7 +91,6 @@ const SHOTS = [
   ['BIRD', 'saves4/24.json', 75, 30,
     `shot([-18, 58, 22], [-18, 0, 14]); hud(false); g.player.root.position.set(-30, 0, 40); g.player.root.visible = false; g.world.setNight(0, .1); g.npcs.setCrowd(30); document.getElementById('bubbles').style.visibility = 'hidden';`,
     `const e = k * k * (3 - 2 * k); shot([-18 - e * 32, 58 - e * 12, 22 + e * 40], [-18 - e * 32, 0, 14 + e * 40]);
-     cap('Jedes Zelt. Jede Bühne. Jeder Bauzaun.', f, n);
      if (f === n - 1) document.getElementById('bubbles').style.visibility = '';`],
   ['AMAIN', 'saves4/24.json', 60, 30,
     `shot([-99 + Math.cos(1.1) * 42, 20, 31.5 + Math.sin(1.1) * 42], [-99, 4, 31.5]); hud(false); g.player.root.position.set(-99, 0, 40); g.player.root.visible = false; g.world.setNight(0, .1); g.npcs.setCrowd(30); document.getElementById('bubbles').style.visibility = 'hidden';`,

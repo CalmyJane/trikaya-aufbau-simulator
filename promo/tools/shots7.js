@@ -12,7 +12,6 @@ const SHOTS = [
   ['BIRD', 'saves4/24.json', 75, 30,
     `shot([-18, 58, 22], [-18, 0, 14]); hud(false); g.player.root.position.set(-30, 0, 40); g.player.root.visible = false; g.world.setNight(0, .1); g.npcs.setCrowd(30); document.getElementById('bubbles').style.visibility = 'hidden';`,
     `const e = k * k * (3 - 2 * k); shot([-18 - e * 32, 58 - e * 12, 22 + e * 40], [-18 - e * 32, 0, 14 + e * 40]);
-     cap('Jedes Zelt. Jede Bühne. Jeder Bauzaun.', f, n);
      if (f === n - 1) document.getElementById('bubbles').style.visibility = '';`],
   ['AMAIN', 'saves4/24.json', 60, 30,
     `shot([-99 + Math.cos(1.1) * 42, 20, 31.5 + Math.sin(1.1) * 42], [-99, 4, 31.5]); hud(false); g.player.root.position.set(-99, 0, 40); g.player.root.visible = false; g.world.setNight(0, .1); g.npcs.setCrowd(30); document.getElementById('bubbles').style.visibility = 'hidden';`,

@@ -9,7 +9,7 @@ head = head.replace('capture3.mjs full|preview', 'capture7.mjs full|preview')
 # corner mark: Calmy Jane head + lettering
 a = """m.innerHTML = '<img class="t" src="assets/ui/calmyjane_text.svg">';"""
 assert a in head
-head = head.replace(a, """m.innerHTML = '<img class="h" src="/CalmyJaneHeadWhite.png"><img class="t" src="assets/ui/calmyjane_text.svg">';""")
+# corner: only the lettering logo (it has the face built in)
 a = """window.CJBIG = '<div class="cjbig"><img class="t" src="assets/ui/calmyjane_text.svg"></div>';"""
 assert a in head
 head = head.replace(a, """window.CJBIG = '<div class="cjbig"><img class="h" src="/CalmyJaneHeadWhite.png"><img class="t" src="assets/ui/calmyjane_text.svg"></div>';""")

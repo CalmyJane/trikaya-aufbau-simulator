@@ -90,14 +90,16 @@ export class Game {
   }
 
   /** Build everything after assets are loaded. */
-  init() {
+  async init(breathe = async () => {}) {
     this.world = new World(this.scene);
-    this.world.build();
+    await this.world.build(breathe);
     if (this.input.touch) this.world.sun.shadow.mapSize.set(1024, 1024);
     this.player = new Player(this.world, this.input);
     this.cam = new CameraRig(this.camera, this.input, this.settings);
     this.fly = new FlyCam(this.camera, this.input);
+    await breathe('player');
     this.npcs = new NPCManager(this.world);
+    await this.npcs.populate(breathe);
     this.trigel = new Trigel(this.world);
     this.npcs.game = this;
     this.vehicles = { quad: new Quad(this.world), radlader: new Radlader(this.world), bike: new Bike(this.world) };
@@ -132,8 +134,9 @@ export class Game {
     this.errands = new Errands(this);
     this.npcs.partyLine = () => this.soundbox.partyLine();
     // pre-compile the police car's materials so the arrest doesn't hitch
+    await breathe('systems');
     this.police.car.visible = true;
-    try { this.renderer.compile(this.scene, this.camera); } catch { /* ignore */ }
+    await this.precompile(breathe);
     this.police.car.visible = false;
     this.headlamp = new THREE.PointLight('#ffe6c0', 0, 16, 1.4);
     this.scene.add(this.headlamp);
@@ -159,6 +162,18 @@ export class Game {
     onLangChange(() => this.refreshHUD(true));
     this.resetWorldState();
     this.renderer.setAnimationLoop(() => this.frame());
+  }
+
+  /**
+   * Compile all shaders before the first frame (no hitches later) – object by object with breaks,
+   * so the loading screen keeps reacting (e.g. turning the phone) instead of freezing for seconds.
+   */
+  async precompile(breathe = async () => {}) {
+    let t = performance.now();
+    for (const obj of [...this.scene.children]) {
+      try { this.renderer.compile(obj, this.camera, this.scene); } catch { /* ignore */ }
+      if (performance.now() - t > 50) { await breathe('compile'); t = performance.now(); }
+    }
   }
 
   resetWorldState() {

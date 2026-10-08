@@ -47,18 +47,25 @@ export class World {
     return { x, z };
   }
 
-  build() {
+  /** Builds the world in steps; `breathe` lets the browser draw a frame in between (loading screen, rotation). */
+  async build(breathe = async () => {}) {
     // the festival generator must not stand on the road at the entrance
     Object.assign(LANDMARKS.festival_generator, this.offRoad(LANDMARKS.festival_generator, 3));
     this.setupSky();
     this.setupLights();
-    const { canvas } = createGround(this.scene);
+    await breathe('sky');
+    const { canvas } = await createGround(this.scene, breathe);
     this.groundCanvas = canvas;
+    await breathe('ground');
     this.buildTrees();
+    await breathe('trees');
     this.buildFestivalSite();
+    await breathe('festival');
     buildCrewBase(this);
+    await breathe('crewbase');
     this.buildSurroundings();
     this.registerSpots();
+    await breathe('surroundings');
   }
 
   // ------------------------------------------------------------------ sky & light

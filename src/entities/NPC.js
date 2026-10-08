@@ -849,8 +849,16 @@ export class NPCManager {
   constructor(world) {
     this.world = world;
     this.map = new Map();
-    for (const def of NPCS) this.map.set(def.id, new NPC(def, world, this));
     this.campers = [];
+  }
+
+  /** Create the NPCs in small batches (each is a skinned character) so loading never freezes the page. */
+  async populate(breathe = async () => {}) {
+    let i = 0;
+    for (const def of NPCS) {
+      this.map.set(def.id, new NPC(def, this.world, this));
+      if (++i % 12 === 0) await breathe('npcs');
+    }
   }
   get(id) { return this.map.get(id); }
   get all() { return [...this.map.values()]; }

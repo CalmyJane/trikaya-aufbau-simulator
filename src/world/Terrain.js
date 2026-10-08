@@ -60,7 +60,8 @@ function noiseSpeckle(ctx, pts, colors, count, size) {
   ctx.restore();
 }
 
-export function paintGroundCanvas() {
+/** Paints the ground map; awaits `breathe` between the big phases so the page stays responsive while loading. */
+export async function paintGroundCanvas(breathe = async () => {}) {
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = CANVAS_RES;
   const ctx = canvas.getContext('2d');
@@ -113,10 +114,16 @@ export function paintGroundCanvas() {
       ctx.restore();
     }
     fieldBorder(ctx, () => pathPoly(ctx, f.pts), M);
+    ctx.getImageData(0, 0, 1, 1);
+    await breathe('ground:field');
   }
+  ctx.getImageData(0, 0, 1, 1); // canvas draws are deferred – run them now, not all at once later
+  await breathe('ground:fields');
   // fields, villages, Lippweg and the motorway around the site
   paintOutskirts(ctx, (x, z) => toCanvas({ x, z }), M);
 
+  ctx.getImageData(0, 0, 1, 1);
+  await breathe('ground:outskirts');
   // meadows (mown grass)
   const meadow = (pts, col, stripes) => {
     ctx.save();
@@ -135,7 +142,11 @@ export function paintGroundCanvas() {
   meadow(AREAS.westMeadow, '#6b9a44');
   meadow(AREAS.sportsMeadow, '#6fa449', true);
   meadow(AREAS.crewCamp, '#7e9a4f');
+  ctx.getImageData(0, 0, 1, 1);
+  await breathe('ground:meadows');
   paintFestivalDirt(ctx);
+  ctx.getImageData(0, 0, 1, 1);
+  await breathe('ground:festival');
 
   // parking: gravel
   ctx.save(); pathPoly(ctx, AREAS.parking); ctx.fillStyle = '#9aa06a'; ctx.fill(); ctx.restore();
@@ -169,6 +180,8 @@ export function paintGroundCanvas() {
     plotGround[id] = { box: b, marked: ctx.getImageData(...b), under: under[id] };
   }
 
+  ctx.getImageData(0, 0, 1, 1);
+  await breathe('ground:plots');
   // roads
   const roadStyle = {
     asphalt: { edge: '#6b6a60', core: '#55565a', w: 1 },
@@ -188,6 +201,8 @@ export function paintGroundCanvas() {
     }
   }
 
+  ctx.getImageData(0, 0, 1, 1);
+  await breathe('ground:roads');
   // crew base: trampled meadow with dirt paths between the cabins (no concrete)
   ctx.save(); pathPoly(ctx, AREAS.crewBase); ctx.fillStyle = '#809a52'; ctx.fill(); ctx.restore();
   noiseSpeckle(ctx, AREAS.crewBase, ['#6c8a44', '#94a860', '#8a8458'], 900, 0.9 * M);
@@ -351,8 +366,8 @@ function paintDetailMask() {
   return c;
 }
 
-export function createGround(scene) {
-  const canvas = paintGroundCanvas();
+export async function createGround(scene, breathe) {
+  const canvas = await paintGroundCanvas(breathe);
   const tex = new THREE.CanvasTexture(canvas);
   groundCtx = canvas.getContext('2d');
   groundTex = tex;

@@ -52,13 +52,18 @@
     #loading-text { color: #dfe6d6; font: 16px 'Baloo 2', system-ui, sans-serif; letter-spacing: 0.3px; min-height: 1.5em; text-align: center; }
     #loading-text.in { animation: ld-rise 0.5s ease both; }
     .ld-rotate { display: none; color: #e8a33a; font: 14px 'Baloo 2', system-ui, sans-serif; opacity: 0.85; }
-    @media (orientation: portrait) and (pointer: coarse) { .ld-rotate { display: block; } }
-    /* phones sideways: logo left, text right */
-    @media (orientation: landscape) and (max-height: 540px) {
-      .ld-stage { flex-direction: row; gap: 7vw; }
-      .ld-mandala { width: min(60vh, 38vw); }
-      .ld-word { width: min(42vw, 58vh); }
-    }
+    #loading.ld-port.ld-touch .ld-rotate { display: block; }
+    /* phones sideways: logo left, text right (class set by the script below, so turning the phone animates) */
+    #loading.ld-land .ld-stage { flex-direction: row; gap: 7vw; }
+    #loading.ld-land .ld-mandala { width: min(60vh, 38vw); }
+    #loading.ld-land .ld-word { width: min(42vw, 58vh); }
+    /* turning the phone: the parts glide to their new place */
+    .ld-mandala { view-transition-name: ld-mandala; }
+    .ld-word { view-transition-name: ld-word; }
+    #loading-text { view-transition-name: ld-text; }
+    ::view-transition-group(*) { animation-duration: 0.55s; animation-timing-function: cubic-bezier(.3, .8, .25, 1); }
+    #loading.ld-fade .ld-stage { opacity: 0; transform: scale(0.96); }
+    .ld-stage { transition: opacity 0.25s ease, transform 0.25s ease; }
     @keyframes ld-spin { to { transform: rotate(360deg); } }
     @keyframes ld-fade { from { opacity: 0; } to { opacity: 1; } }
     @keyframes ld-pop { from { transform: scale(0.82) rotate(-25deg); opacity: 0; } to { transform: none; opacity: 1; } }
@@ -115,6 +120,31 @@
         word.appendChild(s);
       });
     };
+    // loading screen follows the phone's orientation – smoothly (also while the world is being built)
+    (function () {
+      var ld = document.getElementById('loading');
+      if (('ontouchstart' in window) || navigator.maxTouchPoints > 0) ld.classList.add('ld-touch');
+      var mode = null;
+      function apply(m) { ld.classList.toggle('ld-land', m === 'land'); ld.classList.toggle('ld-port', innerHeight > innerWidth); }
+      function update() {
+        if (ld.classList.contains('hidden')) return;
+        var m = innerWidth > innerHeight && innerHeight < 540 ? 'land' : 'col';
+        if (m === mode) { apply(m); return; }
+        var first = mode === null;
+        mode = m;
+        if (first) { apply(m); return; }
+        if (document.startViewTransition) { document.startViewTransition(function () { apply(m); }); setTimeout(function () { if (mode === m) apply(m); }, 600); } // safety net: no painted frames → apply anyway
+        else { ld.classList.add('ld-fade'); setTimeout(function () { apply(m); ld.classList.remove('ld-fade'); }, 250); }
+      }
+      update();
+      addEventListener('resize', update);
+      addEventListener('orientationchange', function () { setTimeout(update, 50); });
+    })();
+    // ?probe: record the longest gap between two frames while loading (to spot freezes)
+    if (/[?&]probe/.test(location.search)) (function () {
+      var last = performance.now(), gaps = (window.__frameGaps = []);
+      var iv = setInterval(function () { var t = performance.now(); if (t - last > 100) (window.__bigGaps = window.__bigGaps || []).push([Math.round(last), Math.round(t - last)]); gaps.push(Math.round(t - last)); last = t; if (document.getElementById('loading').classList.contains('hidden')) clearInterval(iv); }, 16);
+    })();
     // fullscreen works already while loading
     document.getElementById('btn-fullscreen').onclick = function () {
       if (document.fullscreenElement) document.exitFullscreen && document.exitFullscreen();

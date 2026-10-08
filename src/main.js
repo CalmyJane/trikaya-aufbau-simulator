@@ -20,13 +20,28 @@ async function boot() {
   const ticker = setInterval(() => game.ui.setLoading(null, L(LOADING_LINES[++li % LOADING_LINES.length])), 900);
   await Assets.loadAll((p) => game.ui.setLoading(p * 0.9));
   game.ui.setLoading(0.95, L({ de: 'Welt wird aufgebaut…', en: 'Building the world…' }));
-  await new Promise((r) => setTimeout(r, 30));
-  game.init();
+  // build the world in small steps: between them the browser can draw the loading animation and
+  // re-layout it when the phone is turned (a long blocking init would freeze it in the old orientation)
+  const times = (window.__loadTimes = []);
+  let last = performance.now(), prog = 0.9;
+  const breathe = (step) => new Promise((resolve) => {
+    const now = performance.now();
+    times.push([step, Math.round(now - last), Math.round(now)]);
+    prog = Math.min(0.99, prog + 0.009);
+    game.ui.setLoading(prog);
+    let done = false;
+    const go = () => { if (!done) { done = true; last = performance.now(); resolve(); } };
+    requestAnimationFrame(() => setTimeout(go, 0)); // after the next painted frame…
+    setTimeout(go, 80); // …or anyway (tab in the background: no frames)
+  });
+  await breathe('assets');
+  await game.init(breathe);
   game.load();
+  await breathe('save');
   clearInterval(ticker);
   game.ui.setLoading(1, L({ de: 'Fertig!', en: 'Ready!' }));
-  // compile shaders before revealing
-  game.renderer.compile(game.scene, game.camera);
+  // compile the shaders of the loaded state before revealing
+  await game.precompile(breathe);
   setTimeout(() => {
     game.ui.hideLoading();
     game.toMenu();

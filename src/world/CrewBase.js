@@ -163,8 +163,8 @@ export function buildCrewBase(world) {
   pickup.rotation.y = -0.4;
   base.add(pickup);
   world.crewPickup = pickup;
-  addBoxCollider(8, 9, 2.6, 1.05, -0.4, 'pickup');
-  addSpot('pickup_bed', 8 - Math.cos(0.4) * 3.4, 9 - Math.sin(0.4) * 3.4); // behind the truck
+  addBoxCollider(8, 9, 1.05, 2.6, -0.4, 'pickup'); // the model is long along its z axis
+  addSpot('pickup_bed', 8 + Math.sin(0.4) * 3.6, 9 - Math.cos(0.4) * 3.6); // behind the truck (the bed points to -z)
 
   const clutter = [
     ['pallet', { length: 1.2 }, 11, -12, 0.2], ['pallet', { length: 1.2 }, 12.4, -11.6, -0.1],

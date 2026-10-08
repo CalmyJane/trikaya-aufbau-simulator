@@ -15,6 +15,7 @@ export class UI {
     this.dialogClosedAt = 0;
     this.bubbleEls = new Map();
     this.minimap = $('minimap').getContext('2d');
+    this.pmap = $('pmap').getContext('2d');
     this._dialogKey = null;
 
     $('modal-close').onclick = () => this.closeModal();
@@ -22,8 +23,13 @@ export class UI {
 
   // ------------------------------------------------------------ screens
   setLoading(p, text) {
-    if (p != null) $('loading-fill').style.transform = `scaleX(${Math.min(1, Math.max(0, p)).toFixed(3)})`;
-    if (text) $('loading-text').textContent = text;
+    // progress ring around the logo (circumference of r=48 → 301.6)
+    if (p != null) $('loading-ring').style.strokeDashoffset = (301.6 * (1 - Math.min(1, Math.max(0, p)))).toFixed(1);
+    if (text && $('loading-text').textContent !== text) {
+      const el = $('loading-text');
+      el.textContent = text;
+      el.classList.remove('in'); void el.offsetWidth; el.classList.add('in'); // soft fade for every new line
+    }
   }
   hideLoading() {
     const el = $('loading');
@@ -376,10 +382,11 @@ export class UI {
     this.mapCanvas = c;
   }
 
-  drawMinimap(player, heading, camYaw, objectives, npcs, qs, vehicles) {
-    const ctx = this.minimap;
+  /** opts: ctx (other canvas), range (metres to the edge), mark (extra white dot, e.g. the player while flying) */
+  drawMinimap(player, heading, camYaw, objectives, npcs, qs, vehicles, opts = {}) {
+    const ctx = opts.ctx || this.minimap;
     const S = 220, R = S / 2;
-    const range = 75; // metres from centre to edge
+    const range = opts.range || 75; // metres from centre to edge
     const k = R / range;
     const mapPx = 1024 / GROUND_SIZE;
     ctx.save();
@@ -430,10 +437,14 @@ export class UI {
       ctx.strokeStyle = '#1b1206'; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.arc(x, y, o.hint ? 4 + Math.sin(performance.now() / 200) : o.drama ? 7 : 6, 0, 7); ctx.fill(); ctx.stroke();
     }
-    // player arrow
+    if (opts.mark) { // where you actually stand
+      const [x, y] = toM(opts.mark);
+      if (Math.hypot(x, y) < R) { ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#000'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, 5, 0, 7); ctx.fill(); ctx.stroke(); }
+    }
+    // player arrow (or the drone camera)
     ctx.save();
     ctx.rotate(-heading);
-    ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5;
+    ctx.fillStyle = opts.arrow || '#ffffff'; ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.moveTo(0, 9); ctx.lineTo(6, -6); ctx.lineTo(0, -3); ctx.lineTo(-6, -6); ctx.closePath();
     ctx.fill(); ctx.stroke();
     ctx.restore();

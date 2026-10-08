@@ -360,7 +360,7 @@ export class Game {
     $('bigmap').addEventListener('pointerdown', () => { if (this.mode === 'map') this.resume(); });
     $('btn-log').onclick = () => this.openQuestLog();
     $('btn-vol').onclick = () => this.openVolunteers();
-    $('btn-map').onclick = () => { this.ui.showPause(false); this.openMap(); };
+    $('btn-map').onclick = $('pmap-btn').onclick = () => { this.ui.showPause(false); this.openMap(); };
     $('btn-psettings').onclick = () => this.openSettings();
     $('btn-pcontrols').onclick = () => this.ui.modal(this.controlsHtml());
     $('btn-quit').onclick = () => { this.save(); this.ui.showPause(false); this.toMenu(); };
@@ -1539,7 +1539,17 @@ export class Game {
     this.ui.tracker(this.quests, this.player.position, this.drama);
     this.ui.stamina(veh ? 1 : this.player.stamina, veh ? 1 : this.player.staminaMax || 1);
     this.ui.vehicleHud(veh);
-    this.ui.drawMinimap(this.player.position, this.headingOf(), this.cam.yaw, [...this.quests.trackedObjectives(), ...this.drama.objectives(), ...this.soundbox.objectives()], this.npcs.all.filter((n) => !n.hidden), this.quests, this.vehicles);
+    const objectives = [...this.quests.trackedObjectives(), ...this.drama.objectives(), ...this.soundbox.objectives()];
+    const visibleNpcs = this.npcs.all.filter((n) => !n.hidden);
+    if (this.mode === 'pause') {
+      // pause: the minimap glides along under the drone camera; the white dot is you
+      const f = this.camera.getWorldDirection(this._pmapDir ||= new THREE.Vector3());
+      const range = THREE.MathUtils.clamp(this.camera.position.y * 1.4, 70, 220);
+      const c = this.fly.focus(this._pmapC ||= new THREE.Vector3()); // the spot the drone looks at
+      this.ui.drawMinimap(c, Math.atan2(f.x, f.z), Math.atan2(-f.x, -f.z), objectives, visibleNpcs, this.quests, this.vehicles, { ctx: this.ui.pmap, range, mark: this.player.position, arrow: '#ffd27a' });
+    } else {
+      this.ui.drawMinimap(this.player.position, this.headingOf(), this.cam.yaw, objectives, visibleNpcs, this.quests, this.vehicles);
+    }
     this.ui.overlays(this.npcs.all.filter((n) => !n.hidden), this.camera, this.player.position);
     this.music.update(paused ? this.camera.position : this.player.position, this.camera);
 

@@ -27,15 +27,50 @@ export class UI {
   }
   hideLoading() { $('loading').classList.add('hidden'); }
 
+  /** The Trikaya wordmark, cut into letters that get "craned in" one by one. */
+  buildBrandLetters() {
+    const word = document.querySelector('.brand-word');
+    if (!word || word.children.length) return;
+    const W = 473, H = 189;
+    const top = [[4, 70], [79, 163], [176, 187], [208, 274], [277, 343], [343, 405], [405, 470]];
+    const bot = [[103, 130], [139, 170], [176, 212], [213, 247], [255, 261], [269, 305], [306, 341], [350, 379]];
+    const cuts = [...top.map(([a, b]) => [a, b, 0, 120]), ...bot.map(([a, b]) => [a, b, 120, H])];
+    cuts.forEach(([x0, x1, y0, y1], i) => {
+      const s = document.createElement('span');
+      const w = x1 - x0, h = y1 - y0;
+      Object.assign(s.style, {
+        left: `${(x0 / W) * 100}%`, top: `${(y0 / H) * 100}%`, width: `${(w / W) * 100}%`, height: `${(h / H) * 100}%`,
+        backgroundSize: `${(W / w) * 100}% ${(H / h) * 100}%`,
+        backgroundPosition: `${(x0 / (W - w)) * 100}% ${(y0 / (H - h)) * 100}%`,
+      });
+      s.style.setProperty('--i', i);
+      s.style.setProperty('--r', `${(i % 2 ? 1 : -1) * (6 + (i * 7) % 9)}deg`);
+      word.appendChild(s);
+    });
+  }
+
   showMenu(hasSave) {
-    $('menu').classList.remove('hidden');
+    const menu = $('menu');
+    clearTimeout(this.menuHideT);
+    this.buildBrandLetters();
+    const wasHidden = menu.classList.contains('hidden') || menu.classList.contains('unbuild');
+    menu.classList.remove('hidden', 'unbuild');
+    if (wasHidden) { menu.classList.remove('build'); void menu.offsetWidth; menu.classList.add('build'); }
     $('btn-continue').classList.toggle('hidden', !hasSave);
     $('btn-new').textContent = hasSave ? t('menu.reset') : t('menu.start');
     $('btn-new').classList.toggle('primary', !hasSave);
     $('btn-continue').classList.toggle('primary', hasSave);
     $('hud').classList.add('hidden');
   }
-  hideMenu() { $('menu').classList.add('hidden'); }
+  hideMenu() {
+    const menu = $('menu');
+    if (menu.classList.contains('hidden')) return;
+    // the logo takes itself apart, then the menu goes away
+    menu.classList.remove('build');
+    menu.classList.add('unbuild');
+    clearTimeout(this.menuHideT);
+    this.menuHideT = setTimeout(() => { menu.classList.add('hidden'); menu.classList.remove('unbuild'); }, 900);
+  }
   showHUD(v = true) { $('hud').classList.toggle('hidden', !v); }
 
   modal(html) {

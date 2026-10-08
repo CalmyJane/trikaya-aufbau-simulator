@@ -35,9 +35,15 @@
   <!-- Main menu -->
   <div id="menu" class="screen hidden">
     <div class="menu-panel">
-      <img src="assets/ui/logo.png" alt="Trikaya Festival" class="menu-logo" />
-      <h1 class="menu-title">AUFBAU<span>SIMULATOR</span></h1>
-      <div class="menu-sub" data-i18n="menu.sub"></div>
+      <div class="menu-brand" aria-label="Trikaya Festival – Aufbau Simulator">
+        <div class="brand-mandala">
+          <div class="ring r-outer"><i></i></div>
+          <div class="ring r-mid"><i></i></div>
+          <div class="ring r-core"><i></i></div>
+        </div>
+        <div class="brand-word"></div>
+        <h1 class="menu-title">AUFBAU<span>SIMULATOR</span></h1>
+      </div>
       <div class="menu-buttons">
         <button id="btn-continue" class="btn hidden" data-i18n="menu.continue"></button>
         <button id="btn-new" class="btn primary" data-i18n="menu.start"></button>
@@ -46,7 +52,6 @@
         <button id="btn-settings" class="btn" data-i18n="menu.settings"></button>
         <button id="btn-credits" class="btn" data-i18n="menu.credits"></button>
       </div>
-      <div class="menu-foot" data-i18n="menu.foot"></div>
     </div>
     <div class="sys-icons">
       <button id="btn-mute" class="icon-btn btn-mute" title="Sound"></button>

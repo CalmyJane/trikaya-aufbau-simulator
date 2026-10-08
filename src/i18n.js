@@ -41,7 +41,6 @@ export function applyDom() {
 
 const STRINGS = {
   // menu
-  'menu.sub': { de: 'Das Festival baut sich nicht von selbst auf. (Wirklich nicht. Wir haben\'s probiert.)', en: 'The festival won\'t build itself. (It really won\'t. We checked.)' },
   'menu.soundOn': { de: '🔊 Ton an', en: '🔊 Sound on' },
   'menu.soundOff': { de: '🔇 Ton aus', en: '🔇 Sound off' },
   'fly.hint': { de: '🛸 Rumfliegen: WASD · E/Q hoch/runter · Maus ziehen = umschauen · Mausrad · Shift = schnell', en: '🛸 Fly around: WASD · E/Q up/down · drag the mouse = look · wheel · Shift = fast' },
@@ -62,7 +61,6 @@ const STRINGS = {
   'hud.dayN': { de: 'Aufbau-Tag {day} · noch {left} Tage', en: 'Build day {day} · {left} days left' },
   'hud.dayLast': { de: 'Aufbau-Tag {day} · morgen ist Festival!', en: 'Build day {day} · festival tomorrow!' },
   'menu.fullscreen': { de: 'Vollbild', en: 'Fullscreen' },
-  'menu.foot': { de: 'Aufbau-Tag 1 · noch 4 Tage bis Festival · München-Allach', en: 'Build day 1 · 4 days until the festival · Munich-Allach' },
   'close': { de: 'Schließen', en: 'Close' },
   // pause
   'pause.title': { de: 'Kaffeepause', en: 'Coffee break' },

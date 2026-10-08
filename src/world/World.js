@@ -317,7 +317,7 @@ export class World {
     // the chai lounge: a permanent construction site (staged, see Game.applyProgressLevel)
     this.placeStructure('chai_lounge', 'chai_tent', 'chai_lounge', { animate: false, rotation: 0.35 });
     // decoration that is simply there: the bar tent and the little beer garden
-    this.placeStructure('bar_tent', 'bar_tent', null, { animate: false, at: LANDMARKS.bar_tent, rotation: -0.1 });
+    this.placeStructure('bar_tent', 'bar_tent', null, { animate: false, at: LANDMARKS.bar_tent, rotation: Math.PI - 0.1 });
     this.placeStructure('beer_garden', 'beer_garden', null, { animate: false, at: LANDMARKS.beer_garden, rotation: -0.5 });
     this.kitchenZone = { x: LANDMARKS.kitchen.x, z: LANDMARKS.kitchen.z, r: k.zone?.r || 5.5 };
     this.buildStrawWalls();

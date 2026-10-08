@@ -48,123 +48,305 @@ export function buildAwarenessTent() {
 }
 
 // ------------------------------------------------------------------ Forest Dome stage (Fabbe)
-/** Fabbe's stage at the forest edge: two stretch tents (one over the stage, one over the dance floor). */
+/**
+ * Fabbe's Forest Dome: two white half-round tents (a dome cut in half and pulled apart),
+ * open towards each other. The stage sits in the gap; Harry's mapping facade goes behind it.
+ * A loose ring of wooden benches around the front.
+ */
 export function buildForestDome() {
   const g = new THREE.Group();
   const colliders = [];
-  const pole = woodMat('#6b4a2a');
-  const rope = new THREE.LineBasicMaterial({ color: '#d8d0c0' });
+  const R = 5.6, GAP = 3.6, SQ = 0.66; // half-dome radius, half gap width, height squash
+  const canvas = new THREE.MeshStandardMaterial({ color: '#f1ede2', roughness: 0.95, side: THREE.DoubleSide });
+  const pole = woodMat('#8a6236');
   const bulb = new THREE.MeshStandardMaterial({ color: '#ffe8a0', emissive: '#ffcc55', emissiveIntensity: 1.2 });
   const bulbGeo = new THREE.SphereGeometry(0.07, 5, 4);
-  const tent = (cx, cz, w, d, peaks, base, color) => {
-    const { mesh, hAt } = stretchSheet(w, d, peaks, base, color);
-    mesh.position.set(cx, 0, cz);
-    g.add(mesh);
-    for (const [px, pz] of peaks) {
-      const h = hAt(px, pz);
-      g.add(cyl(0.1, 0.12, h, pole, 6, cx + px, h / 2, cz + pz));
-      colliders.push({ type: 'circle', x: cx + px, z: cz + pz, r: 0.22 });
+  for (const s of [-1, 1]) {
+    const cx = s * GAP;
+    // half dome, closed towards the outside, open towards the gap
+    const half = new THREE.Mesh(new THREE.SphereGeometry(R, 22, 9, s < 0 ? -Math.PI / 2 : Math.PI / 2, Math.PI, 0, Math.PI / 2), canvas);
+    half.scale.y = SQ;
+    half.position.x = cx;
+    half.castShadow = true;
+    g.add(half);
+    // timber arch along the open edge + ribs
+    const arch = new THREE.Mesh(new THREE.TorusGeometry(R, 0.13, 6, 24, Math.PI), pole);
+    arch.scale.y = SQ;
+    arch.rotation.y = Math.PI / 2;
+    arch.position.x = cx;
+    g.add(arch);
+    for (const off of [-Math.PI / 3, 0, Math.PI / 3]) { // quarter-arc ribs from the ground up to the top
+      const rib = new THREE.Mesh(new THREE.TorusGeometry(R + 0.05, 0.07, 5, 10, Math.PI / 2), pole);
+      rib.scale.y = SQ;
+      rib.rotation.y = (s < 0 ? Math.PI : 0) + off;
+      rib.position.x = cx;
+      g.add(rib);
     }
-    for (const [ex, ez] of [[-w / 2, -d / 2], [w / 2, -d / 2], [-w / 2, d / 2], [w / 2, d / 2]]) {
-      const top = new THREE.Vector3(cx + ex, hAt(ex, ez), cz + ez);
-      g.add(cyl(0.05, 0.05, top.y, pole, 5, top.x, top.y / 2, top.z));
-      g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([top, new THREE.Vector3(cx + ex * 1.18, 0, cz + ez * 1.22)]), rope));
-      colliders.push({ type: 'circle', x: top.x, z: top.z, r: 0.2 });
+    // fairy lights hanging along the arch
+    for (let i = 1; i < 16; i++) {
+      const a = (i / 16) * Math.PI;
+      const b = new THREE.Mesh(bulbGeo, bulb);
+      b.position.set(cx - s * 0.15, Math.sin(a) * R * SQ - 0.2, Math.cos(a) * R);
+      g.add(b);
     }
-    // fairy lights along the front and back edge
-    for (let i = 0; i <= 14; i++) {
-      const x = -w / 2 + (i / 14) * w;
-      for (const ez of [-d / 2 + 0.2, d / 2 - 0.2]) {
-        const b = new THREE.Mesh(bulbGeo, bulb);
-        b.position.set(cx + x, hAt(x, ez) - 0.25 - Math.sin((i / 14) * Math.PI) * 0.15, cz + ez);
-        g.add(b);
-      }
+    // the curved canvas wall blocks, the open side stays walkable
+    for (let a = -Math.PI / 2; a <= Math.PI / 2 + 0.01; a += Math.PI / 10) {
+      colliders.push({ type: 'circle', x: cx + s * Math.cos(a) * (R - 0.4), z: Math.sin(a) * (R - 0.4), r: 0.6 });
     }
-  };
-  tent(0, -2.2, 12, 9, [[-3, 0, 2.6], [3, 0, 2.6]], 2.8, '#e2d3b0'); // over the stage
-  tent(-1.2, 5.4, 11, 8, [[0, 0, 3.0]], 2.6, '#c4744a');             // over the dance floor
-  // stage + DJ + speakers at the back
-  g.add(box(7, 0.8, 3.5, mat('#a07040'), 0, 0.4, -3.8));
-  colliders.push({ type: 'box', x: 0, z: -3.8, hw: 3.5, hd: 1.75, rot: 0 });
-  g.add(box(2, 0.9, 0.8, mat('#5a3a1a'), 0, 1.25, -3.4));
-  for (const x of [-2.8, 2.8]) g.add(box(1, 1.8, 0.9, mat('#1a1a1a'), x, 1.7, -4.2));
+    // cushions & a carpet inside
+    const rug = new THREE.Mesh(new THREE.CircleGeometry(R - 1, 20, s < 0 ? Math.PI / 2 : -Math.PI / 2, Math.PI), mat(s < 0 ? '#8a3a3a' : '#2e6b5e'));
+    rug.rotation.x = -Math.PI / 2;
+    rug.position.set(cx, 0.03, 0);
+    g.add(rug);
+  }
+  // stage in the gap, at the back
+  g.add(box(2 * GAP - 0.4, 0.8, 3.6, mat('#a07040'), 0, 0.4, -4.6));
+  colliders.push({ type: 'box', x: 0, z: -4.6, hw: GAP - 0.2, hd: 1.8, rot: 0 });
+  g.add(box(2.2, 0.9, 0.8, mat('#5a3a1a'), 0, 1.25, -4.2));
+  g.add(box(2, 0.05, 0.6, mat('#222'), 0, 1.72, -4.2));
+  for (const x of [-2.1, 2.1]) g.add(box(0.9, 1.6, 0.8, mat('#1a1a1a'), x, 1.6, -5.6));
+  // ring of wooden benches around the front
+  const bench = woodMat('#b98a55');
+  for (let i = 0; i < 9; i++) {
+    const a = -1.25 + (i / 8) * 2.5;
+    if (Math.abs(a) < 0.3) continue; // way in
+    const x = Math.sin(a) * 12, z = Math.cos(a) * 12 - 1;
+    const b = new THREE.Group();
+    b.add(box(2.4, 0.08, 0.4, bench, 0, 0.45, 0));
+    for (const bx of [-1, 1]) b.add(box(0.1, 0.45, 0.35, bench, bx, 0.22, 0));
+    b.position.set(x, 0, z);
+    b.rotation.y = a;
+    g.add(b);
+    colliders.push({ type: 'box', x, z, hw: 1.2, hd: 0.25, rot: a });
+  }
   const s = signPost('FOREST DOME', { width: 2.4, height: 0.9, bg: '#1f3a1f', fg: '#b8f0a0' });
-  s.position.set(6.8, 0, 8.4);
-  s.rotation.y = -0.4;
+  s.position.set(4.5, 0, 12.5);
+  s.rotation.y = -0.3;
   g.add(s);
   return { object: g, colliders };
 }
 
-// ------------------------------------------------------------------ Harry's mapping sculpture
-/** Giant faceted wooden sculpture behind the Forest Dome – plain wood by day, 3D-mapped at night. */
+// ------------------------------------------------------------------ Harry's mapping installation
+function hexPath(r, rot = Math.PI / 6) {
+  const p = new THREE.Path();
+  for (let i = 0; i <= 6; i++) { const a = rot + (i / 6) * Math.PI * 2; i ? p.lineTo(Math.cos(a) * r, Math.sin(a) * r) : p.moveTo(Math.cos(a) * r, Math.sin(a) * r); }
+  return p;
+}
+
+/** Laser-cut plywood print: ochre wood with white/grey geometric inlays (lens facade or round mandala). */
+function plywoodTexture(round) {
+  const c = document.createElement('canvas');
+  c.width = round ? 512 : 1024; c.height = 512;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height, cx = W / 2, cy = H / 2;
+  ctx.fillStyle = '#c98a3a'; ctx.fillRect(0, 0, W, H);
+  const light = '#ece6da', grey = '#a8a49c', dark = '#7a4a1a';
+  ctx.lineJoin = 'round';
+  if (round) {
+    for (let ring = 5; ring >= 1; ring--) {
+      const R = ring * 48, n = 6 + ring * 2;
+      for (let i = 0; i < n; i++) {
+        ctx.save(); ctx.translate(cx, cy); ctx.rotate((i / n) * Math.PI * 2 + ring * 0.2);
+        ctx.beginPath(); ctx.moveTo(-10, R - 30); ctx.lineTo(10, R - 30); ctx.lineTo(16, R + 8); ctx.lineTo(-16, R + 8); ctx.closePath();
+        ctx.fillStyle = ring % 2 ? light : grey; ctx.fill(); ctx.strokeStyle = dark; ctx.lineWidth = 3; ctx.stroke();
+        ctx.restore();
+      }
+    }
+    // central star with honeycomb
+    ctx.save(); ctx.translate(cx, cy);
+    for (let i = 0; i < 6; i++) {
+      ctx.rotate(Math.PI / 3);
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(18, 60); ctx.lineTo(0, 95); ctx.lineTo(-18, 60); ctx.closePath();
+      ctx.fillStyle = grey; ctx.fill(); ctx.strokeStyle = dark; ctx.stroke();
+    }
+    ctx.beginPath(); ctx.arc(0, 0, 22, 0, 7); ctx.fillStyle = light; ctx.fill();
+    ctx.restore();
+  } else {
+    // stripes and chevrons around the lens, snakes towards the window
+    for (let i = 0; i < 46; i++) {
+      const a = (i / 46) * Math.PI * 2;
+      const x = cx + Math.cos(a) * W * 0.44, y = cy + Math.sin(a) * H * 0.4;
+      ctx.save(); ctx.translate(x, y); ctx.rotate(a + Math.PI / 2);
+      ctx.fillStyle = i % 2 ? light : grey;
+      ctx.beginPath(); ctx.moveTo(-14, -18); ctx.lineTo(14, -18); ctx.lineTo(4, 18); ctx.lineTo(-24, 18); ctx.closePath(); ctx.fill();
+      ctx.restore();
+    }
+    for (let i = 0; i < 12; i++) {
+      const a = (i / 12) * Math.PI * 2;
+      ctx.save(); ctx.translate(cx + Math.cos(a) * 150, cy + Math.sin(a) * 130); ctx.rotate(a);
+      ctx.beginPath(); ctx.ellipse(0, 0, 46, 16, 0, 0, 7); ctx.fillStyle = grey; ctx.fill(); ctx.strokeStyle = dark; ctx.lineWidth = 3; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(-40, 0); ctx.lineTo(40, 0); ctx.stroke();
+      ctx.restore();
+    }
+    for (let i = 0; i < 6; i++) {
+      const a = Math.PI / 6 + (i / 6) * Math.PI * 2;
+      ctx.beginPath(); ctx.moveTo(cx + Math.cos(a) * 90, cy + Math.sin(a) * 90); ctx.lineTo(cx + Math.cos(a + 0.4) * 210, cy + Math.sin(a + 0.4) * 190); ctx.lineTo(cx + Math.cos(a - 0.4) * 210, cy + Math.sin(a - 0.4) * 190); ctx.closePath();
+      ctx.fillStyle = light; ctx.globalAlpha = 0.85; ctx.fill(); ctx.globalAlpha = 1;
+    }
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 4;
+  return t;
+}
+
+/** Colourful psy stretch print for the side wings. */
+function psyTexture() {
+  const c = document.createElement('canvas');
+  c.width = c.height = 256;
+  const ctx = c.getContext('2d');
+  const grd = ctx.createLinearGradient(0, 0, 256, 256);
+  ['#5a2a8a', '#2a8ab0', '#39c46a', '#e0c020', '#e04a8a', '#5a2a8a'].forEach((col, i) => grd.addColorStop(i / 5, col));
+  ctx.fillStyle = grd; ctx.fillRect(0, 0, 256, 256);
+  for (let y = 0; y < 9; y++) for (let x = 0; x < 9; x++) {
+    const px = x * 30 + (y % 2) * 15, py = y * 27;
+    ctx.beginPath();
+    for (let i = 0; i <= 6; i++) { const a = (i / 6) * Math.PI * 2; ctx.lineTo(px + Math.cos(a) * 10, py + Math.sin(a) * 10); }
+    ctx.strokeStyle = 'rgba(255,240,120,0.8)'; ctx.lineWidth = 2; ctx.stroke();
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
+/**
+ * Harry's installation in the gap of the Forest Dome (like the real one): a wide laser-cut plywood
+ * lens with a hexagonal DJ window and two big mandala discs, under a black tarp roof on timber,
+ * line arrays on both sides, psy stretch wings. Plain wood by day, 3D-mapped at night.
+ */
 export function buildMappingDeco() {
   const g = new THREE.Group();
   const colliders = [];
-  const uniforms = { uTime: { value: 0 }, uMap: { value: 0 } };
-  const woodMap = new THREE.MeshStandardMaterial({ color: '#b98a55', roughness: 0.9, flatShading: true, side: THREE.DoubleSide });
-  woodMap.onBeforeCompile = (sh) => {
-    sh.uniforms.uTime = uniforms.uTime;
-    sh.uniforms.uMap = uniforms.uMap;
-    sh.vertexShader = sh.vertexShader
-      .replace('#include <common>', '#include <common>\nvarying vec3 vWPos;')
-      .replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;');
-    sh.fragmentShader = sh.fragmentShader
-      .replace('#include <common>', '#include <common>\nvarying vec3 vWPos;\nuniform float uTime;\nuniform float uMap;')
-      .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
-        vec3 lp = vWPos - vec3(cameraPosition.x * 0.0);
-        float r = length(lp.xy - vec2(0.0, 6.0));
-        float wave = sin(r * 1.6 - uTime * 3.0) * 0.5 + 0.5;
-        float stripes = step(0.5, fract(lp.y * 0.6 + uTime * 0.4 + sin(lp.x * 0.5) * 0.4));
-        float phase = floor(mod(uTime * 0.2, 3.0));
-        vec3 pal = 0.5 + 0.5 * cos(6.2831 * (vec3(0.0, 0.33, 0.67) + r * 0.08 - uTime * 0.15));
-        pal = pow(pal, vec3(2.2)); // saturated neon
-        float w3 = pow(wave, 3.0);
-        float pat = phase < 1.0 ? w3 : (phase < 2.0 ? stripes * (0.3 + 0.7 * w3) : smoothstep(0.35, 0.4, fract(r * 0.35 - uTime * 0.5)) * w3);
-        totalEmissiveRadiance += pal * pat * uMap * 1.4;
-        diffuseColor.rgb *= 1.0 - 0.75 * uMap; // projector dominates, wood goes dark`);
+  const Z = -8.4, Y = 3.7; // facade plane and lens centre height
+  const uniforms = { uTime: { value: 0 }, uMap: { value: 0 }, uCenter: { value: new THREE.Vector3() }, uAxis: { value: new THREE.Vector3(1, 0, 0) } };
+  const mapped = (opts) => {
+    const m = new THREE.MeshStandardMaterial({ roughness: 0.9, flatShading: true, ...opts });
+    m.onBeforeCompile = (sh) => {
+      Object.assign(sh.uniforms, uniforms);
+      sh.vertexShader = sh.vertexShader
+        .replace('#include <common>', '#include <common>\nvarying vec3 vWPos;')
+        .replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+      sh.fragmentShader = sh.fragmentShader
+        .replace('#include <common>', '#include <common>\nvarying vec3 vWPos;\nuniform float uTime;\nuniform float uMap;\nuniform vec3 uCenter;\nuniform vec3 uAxis;')
+        .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+          vec3 dw = vWPos - uCenter;
+          vec2 lp = vec2(dot(dw, uAxis), dw.y);
+          float r = length(lp);
+          float wave = sin(r * 1.6 - uTime * 3.0) * 0.5 + 0.5;
+          float stripes = step(0.5, fract(lp.y * 0.6 + uTime * 0.4 + sin(lp.x * 0.5) * 0.4));
+          float phase = floor(mod(uTime * 0.2, 3.0));
+          vec3 pal = 0.5 + 0.5 * cos(6.2831 * (vec3(0.0, 0.33, 0.67) + r * 0.08 - uTime * 0.15));
+          pal = pow(pal, vec3(2.2)); // saturated neon
+          float w3 = pow(wave, 3.0);
+          float pat = phase < 1.0 ? w3 : (phase < 2.0 ? stripes * (0.3 + 0.7 * w3) : smoothstep(0.35, 0.4, fract(r * 0.35 - uTime * 0.5)) * w3);
+          totalEmissiveRadiance += pal * pat * uMap * 1.4 * (0.6 + 0.4 * diffuseColor.r);
+          diffuseColor.rgb *= 1.0 - 0.75 * uMap; // projector dominates, wood goes dark`);
+    };
+    return m;
   };
-  // faceted "tree spirit" sculpture behind the dome: a fan of big wooden plates around a trunk
-  const sc = new THREE.Group();
-  sc.position.set(0, 0, -9.5);
-  g.add(sc);
-  const H = 11;
-  sc.add(cyl(0.6, 0.9, H * 0.55, woodMap, 7, 0, H * 0.27, 0));
-  const plates = 11;
-  for (let i = 0; i < plates; i++) {
-    const a = -Math.PI * 0.55 + (i / (plates - 1)) * Math.PI * 1.1;
-    const len = 5 + Math.sin(i * 1.3) * 1.2 + (i % 2) * 1.2;
-    const shape = new THREE.Shape();
-    shape.moveTo(-0.9, 0); shape.lineTo(0.9, 0); shape.lineTo(1.4, len * 0.6); shape.lineTo(0, len); shape.lineTo(-1.4, len * 0.6); shape.closePath();
-    const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.18, bevelEnabled: false });
-    const m = new THREE.Mesh(geo, woodMap);
-    m.position.set(0, H * 0.5, (i % 2) * 0.25);
-    m.rotation.z = a;
-    m.castShadow = true;
-    sc.add(m);
+  const edge = mapped({ color: '#a8732e' });
+  const fac = new THREE.Group();
+  fac.position.set(0, 0, Z);
+  g.add(fac);
+
+  // black curtain under the lens (the DJ climbs in from behind)
+  fac.add(box(11.5, 1.6, 0.15, mat('#121212'), 0, 0.8, -0.1));
+  // the lens with the hexagonal window
+  const lens = new THREE.Shape();
+  lens.absellipse(0, 0, 6.2, 2.5, 0, Math.PI * 2, false, 0);
+  lens.holes.push(hexPath(1.3));
+  const lensTex = plywoodTexture(false);
+  lensTex.repeat.set(1 / 12.4, 1 / 5);
+  lensTex.offset.set(0.5, 0.5);
+  const lensMesh = new THREE.Mesh(new THREE.ExtrudeGeometry(lens, { depth: 0.3, bevelEnabled: false, curveSegments: 28 }), [mapped({ color: '#ffffff', map: lensTex }), edge]);
+  lensMesh.position.set(0, Y, 0);
+  lensMesh.castShadow = true;
+  fac.add(lensMesh);
+  // hexagon frame around the window
+  const frame = new THREE.Shape(hexPath(1.75).getPoints());
+  frame.holes.push(hexPath(1.3));
+  const frameMesh = new THREE.Mesh(new THREE.ExtrudeGeometry(frame, { depth: 0.2, bevelEnabled: false }), mapped({ color: '#ddd6c8' }));
+  frameMesh.position.set(0, Y, 0.3);
+  fac.add(frameMesh);
+  // psychedelic backdrop + DJ desk behind the window
+  const back = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 2.8), new THREE.MeshStandardMaterial({ map: psyTexture(), emissive: '#ffffff', emissiveMap: psyTexture(), emissiveIntensity: 0.25 }));
+  back.position.set(0, Y, -1.4);
+  fac.add(back);
+  fac.add(box(2.2, 0.15, 0.7, mat('#222'), 0, Y - 1.05, -0.6));
+  // two big mandala discs
+  const discTex = plywoodTexture(true);
+  for (const x of [-4.4, 4.4]) {
+    const disc = new THREE.Mesh(new THREE.CylinderGeometry(2.45, 2.45, 0.35, 36), [edge, mapped({ color: '#ffffff', map: discTex }), edge]);
+    disc.rotation.x = Math.PI / 2;
+    disc.position.set(x, Y, 0.35);
+    disc.castShadow = true;
+    fac.add(disc);
   }
-  const face = new THREE.Mesh(new THREE.IcosahedronGeometry(2.2, 0), woodMap);
-  face.position.set(0, H * 0.52, 0.6);
-  face.scale.set(1, 1.2, 0.5);
-  sc.add(face);
-  colliders.push({ type: 'circle', x: 0, z: -9.5, r: 1.4 });
-  // projector tower beside the dome, aimed at the sculpture
+  // timber frame + black tarp roof with beams sticking out
+  const timber = woodMat('#c9a26a');
+  for (const x of [-6.3, -1.9, 1.9, 6.3]) fac.add(box(0.18, 7.0, 0.18, timber, x, 3.5, -0.9));
+  fac.add(box(13, 0.2, 0.2, timber, 0, 6.4, -0.7));
+  fac.add(box(9, 0.2, 0.2, timber, 0, 7.4, -1.6));
+  fac.add(strut(new THREE.Vector3(-6.3, 6.4, -0.7), new THREE.Vector3(-9.2, 9.6, 0.4), 0.12, timber));
+  fac.add(strut(new THREE.Vector3(6.3, 6.4, -0.7), new THREE.Vector3(9.2, 9.6, 0.4), 0.12, timber));
+  fac.add(strut(new THREE.Vector3(0, 6.4, -0.7), new THREE.Vector3(0.3, 9.3, 0.2), 0.12, timber));
+  const tarpPts = [
+    [-7.6, 8.6, 0.3], [0, 7.6, 0.0], [7.6, 8.6, 0.3], // front edge, corners up
+    [-7.0, 7.4, -3.2], [0, 6.9, -3.2], [7.0, 7.4, -3.2], // back edge
+  ].map((p) => new THREE.Vector3(...p));
+  const tarpGeo = new THREE.BufferGeometry().setFromPoints([0, 1, 3, 1, 4, 3, 1, 2, 4, 2, 5, 4].map((i) => tarpPts[i]));
+  tarpGeo.computeVertexNormals();
+  const tarp = new THREE.Mesh(tarpGeo, new THREE.MeshStandardMaterial({ color: '#1a1a1a', roughness: 1, side: THREE.DoubleSide }));
+  tarp.castShadow = true;
+  fac.add(tarp);
+  // psy stretch wings down to the ground
+  const psy = new THREE.MeshStandardMaterial({ map: psyTexture(), side: THREE.DoubleSide, roughness: 0.9, emissive: '#ffffff', emissiveMap: psyTexture(), emissiveIntensity: 0.12 });
+  for (const s of [-1, 1]) {
+    const pts = [new THREE.Vector3(s * 5.6, 4.6, 0.1), new THREE.Vector3(s * 5.6, 1.4, 0.1), new THREE.Vector3(s * 11, 0.1, 2.2), new THREE.Vector3(s * 9.5, 3.2, 1.0)];
+    const geo = new THREE.BufferGeometry().setFromPoints([pts[0], pts[1], pts[2], pts[0], pts[2], pts[3]]);
+    geo.setAttribute('uv', new THREE.Float32BufferAttribute([0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1], 2));
+    geo.computeVertexNormals();
+    fac.add(new THREE.Mesh(geo, psy));
+    // line array on a stand
+    const la = new THREE.Group();
+    la.position.set(s * 7.6, 0, -0.4);
+    la.add(cyl(0.09, 0.12, 4.2, mat('#1a1a1a'), 6, 0, 2.1, 0));
+    la.add(box(0.5, 0.15, 0.5, mat('#1a1a1a'), 0, 0.08, 0));
+    for (let k = 0; k < 3; k++) {
+      const cab = box(1.1, 0.55, 0.85, mat('#161616'), 0, 4.6 + k * 0.58, 0.05 * k);
+      cab.rotation.x = -0.06 * k;
+      la.add(cab);
+    }
+    fac.add(la);
+    colliders.push({ type: 'circle', x: s * 7.6, z: Z - 0.4, r: 0.5 });
+  }
+  colliders.push({ type: 'box', x: 0, z: Z - 0.5, hw: 6.4, hd: 0.7, rot: 0 });
+
+  // projector tower in front of the dance floor, aimed at the lens
   const tower = new THREE.Group();
-  tower.position.set(9.5, 0, 3);
+  const T = new THREE.Vector3(1.6, 0, 10.5);
+  tower.position.copy(T);
   tower.add(cyl(0.08, 0.08, 4, mat('#555'), 6, 0, 2, 0));
   tower.add(box(0.8, 0.5, 0.9, mat('#222'), 0, 4.2, 0));
-  const beamGeo = new THREE.ConeGeometry(4.5, 1, 20, 1, true);
+  const beamGeo = new THREE.ConeGeometry(6.5, 1, 20, 1, true);
   beamGeo.translate(0, -0.5, 0); // apex at the projector
   const beam = new THREE.Mesh(beamGeo, new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.0, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending }));
-  const from = new THREE.Vector3(9.5, 4.3, 3), to = new THREE.Vector3(0, H * 0.55, -9.5);
+  const from = new THREE.Vector3(T.x, 4.3, T.z), to = new THREE.Vector3(0, Y, Z);
   const dir = to.clone().sub(from);
   beam.scale.set(1, dir.length(), 1);
   beam.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), dir.normalize());
   beam.position.set(0, 4.3, 0);
   tower.add(beam);
   g.add(tower);
-  colliders.push({ type: 'circle', x: 9.5, z: 3, r: 0.4 });
+  colliders.push({ type: 'circle', x: T.x, z: T.z, r: 0.4 });
+
   g.userData.mapping = { uniforms, beam };
-  g.userData.animate = (t) => { uniforms.uTime.value = t; };
+  g.userData.animate = (t) => {
+    uniforms.uTime.value = t;
+    // mapping coordinates relative to the lens centre, in the facade's own plane
+    fac.localToWorld(uniforms.uCenter.value.set(0, Y, 0));
+    uniforms.uAxis.value.set(1, 0, 0).applyQuaternion(g.quaternion);
+  };
   return { object: g, colliders };
 }
 
@@ -861,6 +1043,7 @@ export function buildEntranceTent() {
 }
 
 // ------------------------------------------------------------------ shops: a little market street
+const STALLS = [[-6.5, -2.5, 0.5], [-1.5, 4.5, -0.3], [4, -5, 0.9], [6.5, 2.5, -1.3], [0, -1, Math.PI + 0.2]];
 export function buildMarket() {
   const g = new THREE.Group();
   const colliders = [];
@@ -868,7 +1051,7 @@ export function buildMarket() {
   const goods = [['#e84a8a', '#f1c40f', '#3ad1ff'], ['#7fb040', '#c0602a'], ['#f4f1ea', '#b8283a', '#d6a21e'], ['#2a2a2a', '#9a6a3a'], ['#ff7a1a', '#35ff6a', '#b07aff']];
   const wood = woodMat('#8a6a42');
   roofs.forEach((rc, i) => {
-    const x = -8 + i * 4, z = i % 2 ? 1.2 : -1.2, rot = i % 2 ? Math.PI : 0;
+    const [x, z, rot] = STALLS[i]; // scattered, not in a row
     const st = new THREE.Group();
     for (const dx of [-1.4, 1.4]) for (const dz of [-0.9, 0.9]) st.add(cyl(0.05, 0.05, 2.4, wood, 5, dx, 1.2, dz));
     const roof = box(3.2, 0.05, 2.2, mat(rc), 0, 2.45, 0);
@@ -881,17 +1064,18 @@ export function buildMarket() {
     st.position.set(x, 0, z);
     st.rotation.y = rot;
     g.add(st);
-    colliders.push({ type: 'box', x, z: z + (rot ? -0.6 : 0.6), hw: 1.5, hd: 0.5 });
+    colliders.push({ type: 'box', x: x + Math.sin(rot) * 0.6, z: z + Math.cos(rot) * 0.6, hw: 1.5, hd: 0.5, rot });
   });
   // string of lights over the market street
   for (let i = 0; i < 24; i++) {
     const t = i / 23;
     const b = new THREE.Mesh(new THREE.SphereGeometry(0.06, 5, 4), new THREE.MeshBasicMaterial({ color: ['#ffd24a', '#ff6ab4', '#5ad1ff'][i % 3] }));
-    b.position.set(-9 + t * 18, 2.9 - Math.sin(t * Math.PI * 4) * 0.25, 0);
+    const k = Math.min(3, Math.floor(t * 4)), f = t * 4 - k, a = STALLS[[0, 4, 2, 3][k]], b2 = STALLS[[4, 2, 3, 1][k]];
+    b.position.set(a[0] + (b2[0] - a[0]) * f, 2.9 - Math.sin(f * Math.PI) * 0.3, a[1] + (b2[1] - a[1]) * f);
     g.add(b);
   }
   const sign = signPost('SHOPS', { width: 2.0, height: 0.8, bg: '#2a1a3a', fg: '#ffd24a' });
-  sign.position.set(-10.5, 0, 3.5);
+  sign.position.set(-4, 0, 7.5);
   g.add(sign);
   return { object: g, colliders };
 }

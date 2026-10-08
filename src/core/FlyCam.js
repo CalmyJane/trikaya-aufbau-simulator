@@ -10,7 +10,7 @@ import { P } from '../world/layout.js';
 const LIMIT = 420;     // metres from the centre you may fly
 const MAX_Y = 180;
 const IDLE_ORBIT = 30; // seconds without input in the menu → back to the cinematic orbit
-const ORBIT_C = P(360, 545);
+const ORBIT_C = P(370, 640);
 
 const ease = (k) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
 

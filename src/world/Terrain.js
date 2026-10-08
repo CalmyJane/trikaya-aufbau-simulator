@@ -97,6 +97,21 @@ export function paintGroundCanvas() {
     }
     ctx.restore();
     noiseSpeckle(ctx, f.pts, ['#2f4a1d', '#8a9a55'], 2500, 2.5 * M);
+    if (f.tracks) { // somebody did donuts and drew pictures into the ploughed field
+      ctx.save();
+      pathPoly(ctx, f.pts);
+      ctx.clip();
+      ctx.strokeStyle = 'rgba(205,190,150,0.5)';
+      ctx.lineWidth = 2.4 * M;
+      for (const [x, z, rx, rz, r] of [[-150, 112, 9, 5, 0.2], [-128, 118, 6, 6, 0], [-95, 140, 20, 9, 0.1], [-40, 120, 7, 7, 0], [-22, 124, 7, 7, 0], [-4, 120, 7, 7, 0]]) {
+        const [cx, cy] = toCanvas({ x, z });
+        ctx.beginPath(); ctx.ellipse(cx, cy, rx * M, rz * M, r, 0, Math.PI * 2); ctx.stroke();
+      }
+      ctx.beginPath();
+      [[-170, 104], [-140, 106], [-110, 102], [-80, 112], [-60, 135], [-30, 150], [0, 145], [20, 132]].forEach(([x, z], i) => { const [cx, cy] = toCanvas({ x, z }); i ? ctx.lineTo(cx, cy) : ctx.moveTo(cx, cy); });
+      ctx.stroke();
+      ctx.restore();
+    }
     fieldBorder(ctx, () => pathPoly(ctx, f.pts), M);
   }
   // fields, villages, Lippweg and the motorway around the site

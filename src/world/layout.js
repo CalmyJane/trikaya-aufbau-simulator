@@ -18,19 +18,20 @@ export const GROUND_SIZE = 480;
 
 // ---------------------------------------------------------------- areas
 export const AREAS = {
-  festival: poly([[68, 633], [100, 520], [300, 482], [455, 455], [622, 578], [630, 882], [295, 893], [90, 660]]),
+  // long strip between the hedge (north), the Enterstraße (north-east) and the straight fence to the big field (south) – like the drone photos
+  festival: poly([[100, 540], [300, 497], [448, 462], [612, 598], [625, 785], [65, 785], [80, 640]]),
   crewCamp: poly([[452, 318], [900, 263], [904, 300], [466, 402]]),
   parking: poly([[945, 245], [1120, 230], [1125, 275], [947, 295]]),
   sportsMeadow: poly([[470, 425], [930, 312], [935, 470], [640, 560]]),
-  westMeadow: poly([[215, 335], [455, 445], [300, 482], [100, 520]]),
+  westMeadow: poly([[215, 335], [455, 445], [448, 462], [300, 497], [100, 540]]),
 };
 
 // Fields (crop patterns painted on the ground). stripe angle in degrees.
 export const FIELDS = [
   { pts: poly([[-200, -200], [1085, -200], [1150, 120], [1165, 236], [930, 238], [265, 303], [-200, 340]]), color: '#4d7a33', stripe: '#436c2b', angle: -6, spacing: 14 },
-  { pts: poly([[-200, 340], [265, 303], [215, 335], [100, 520], [68, 633], [-200, 760]]), color: '#557f38', stripe: '#4a7130', angle: 60, spacing: 12 },
-  { pts: poly([[-200, 760], [68, 633], [90, 660], [295, 893], [300, 1100], [-200, 1100]]), color: '#6f8a44', stripe: '#627c3b', angle: -2, spacing: 10 },
-  { pts: poly([[295, 893], [630, 882], [640, 1100], [300, 1100]]), color: '#7a6f58', stripe: '#6d624d', angle: 0, spacing: 9 },
+  { pts: poly([[-200, 340], [265, 303], [215, 335], [100, 540], [80, 640], [65, 785], [-200, 785]]), color: '#557f38', stripe: '#4a7130', angle: 60, spacing: 12 },
+  // the big ploughed field south of the festival fence (somebody drew pictures into it with a car)
+  { pts: poly([[-200, 785], [65, 785], [625, 785], [640, 1100], [-200, 1100]]), color: '#7a6f58', stripe: '#6d624d', angle: 0, spacing: 9, tracks: true },
   { pts: poly([[1160, -200], [1500, -200], [1500, 405], [1255, 412], [1205, 340], [1175, 240]]), color: '#3f6a2c', stripe: '#355d25', angle: -8, spacing: 13 },
   { pts: poly([[1100, 452], [1255, 412], [1500, 405], [1500, 1100], [1110, 1100]]), color: '#80745c', stripe: '#72674f', angle: 90, spacing: 9 },
   { pts: poly([[760, 520], [1100, 452], [1110, 1100], [760, 1100]]), color: '#5c8a3a', stripe: '#8a7d62', angle: 90, spacing: 28 },
@@ -61,15 +62,16 @@ export const HEDGES = [
 ];
 
 export const TREE_CLUSTERS = [
-  { c: P(200, 628), r: 13, count: 22 }, // Hängemattenwald
-  { c: P(70, 640), r: 7, count: 6 },    // forest edge behind the Forest Dome
+  { c: P(200, 562), r: 11, count: 18 }, // Hängemattenwald
+  { c: P(60, 700), r: 7, count: 6 },    // forest edge behind the Forest Dome
+  { c: P(362, 458), r: 7, count: 5 },   // the big old trees behind the dragon
   { c: P(300, 405), r: 10, count: 8 },  // the small group where the field tracks meet (north-west corner)
 ];
 
 // Fence (Bauzaun) along the festival boundary; gaps = entrances
 export const FESTIVAL_FENCE = {
-  pts: poly([[68, 633], [100, 520], [300, 482], [455, 455], [622, 578], [630, 882], [295, 893], [90, 660], [68, 633]]),
-  gaps: [P(565, 535), P(622, 600), P(98, 535), P(450, 458)], // last one: corner towards the camping (loader!)
+  pts: poly([...[[100, 540], [300, 497], [448, 462], [612, 598], [625, 785], [65, 785], [80, 640]], [100, 540]]),
+  gaps: [P(560, 555), P(616, 606), P(623, 725), P(73, 700), P(450, 464)], // last one: corner towards the camping (loader!)
   gapRadius: 6,
 };
 
@@ -94,40 +96,42 @@ AREAS.crewBase = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([sx, sz]) => baseToWo
 export const LANDMARKS = {
   dixiRow: P(470, 470),
   tsvPitch: P(725, 710),
-  hammockForest: P(200, 628),
+  hammockForest: P(200, 562),
   soccerGoalW: P(845, 400),
   soccerGoalE: P(900, 380),
   parking: P(1030, 262),
-  kitchen: P(392, 508),       // crew kitchen, on the festival ground
+  kitchen: P(445, 548),       // crew kitchen, on the festival ground (right of the dragon, straw bales behind)
   dixi_delivery: P(434, 390), // pallets of Dixis are dropped at the front of the crew camp, next to the road
-  wc_container: P(462, 548),   // the toilet trailer is delivered straight onto the festival ground
-  festival_generator: P(600, 560),
+  wc_container: P(604, 760),   // the toilet trailer is delivered straight onto the festival ground
+  festival_generator: P(585, 615),
+  bar_tent: P(358, 740),       // the red & black round bar tent at the south fence
+  beer_garden: P(594, 676),    // small beige stretch tent with beer table sets (east, middle)
   chill: P(680, 316), // Zdenko & Thompsen's beer bench, middle of the crew & artist camp
 };
 
 // Festival build plots (from the site plan). Quests reference these by id.
 export const PLOTS = {
-  // the main stage (wooden dragon + 6 rigging posts) is already standing; quests rig & decorate it
-  mainstage:    { pos: P(310, 575), size: 30, flatRadius: 24, label: 'Mainstage', prebuilt: true },
+  // West → east, as on the drone photos. The dragon stands at the hedge in the middle of the north side.
+  mainstage:    { pos: P(370, 577), size: 30, flatRadius: 24, label: 'Mainstage', prebuilt: true },
   // the firespace with the wooden Shiva statue is already standing too
-  firespace:    { pos: P(305, 815), size: 18, flatRadius: 13, label: 'Firespace', prebuilt: true }, // behind the Narnia Floor, where the dragon looks
-  hammocks:     { pos: P(212, 700), size: 18, label: 'Hängemattenwald' },
-  chai_lounge:  { pos: P(430, 612), size: 16, label: 'Chai Lounge', prebuilt: true }, // eternal construction site
-  planetarium:  { pos: P(532, 645), size: 18, label: 'Planetarium' },
-  biergarten:   { pos: P(452, 705), size: 18, label: 'Techno Floor' },
-  awareness:    { pos: P(522, 552), size: 12, label: 'Awareness' },
+  firespace:    { pos: P(274, 746), size: 18, flatRadius: 13, label: 'Firespace', prebuilt: true }, // south-west of the dancefloor, where the dragon looks
+  hammocks:     { pos: P(200, 562), size: 18, label: 'Hängemattenwald' },                         // the trees in the north-west
+  chai_lounge:  { pos: P(442, 653), size: 16, label: 'Chai Lounge', prebuilt: true },               // right below the mainstage – eternal construction site
+  planetarium:  { pos: P(512, 596), size: 18, label: 'Planetarium' },                               // the rectangle at the far east
+  biergarten:   { pos: P(480, 723), size: 18, label: 'Techno Floor' },                              // the two tents south-west of the entrance
+  awareness:    { pos: P(562, 654), size: 12, label: 'Awareness' },                                 // green & light green, below-right of the planetarium
   // future plots - marked in the dirt until a quest builds them
-  narnia_floor: { pos: P(305, 725), size: 16, label: 'Narnia Floor', prebuilt: true }, // Mia's crew builds it in stages
-  forest_dome:  { pos: P(120, 600), size: 16, label: 'Forest Dome', clearRadius: 19 },
-  shops:        { pos: P(562, 725), size: 14, label: 'Shops' },
-  kuenstlergasse: { pos: P(205, 548), size: 18, label: 'Künstlergasse' }, // Cosma & Mathias
-  entrance:     { pos: P(578, 598), size: 12, label: 'Eingang' },
+  narnia_floor: { pos: P(262, 655), size: 16, label: 'Narnia Floor', prebuilt: true }, // the pentagon tent + the white one next to it – Mia's crew builds it in stages
+  forest_dome:  { pos: P(150, 700), size: 16, label: 'Forest Dome', clearRadius: 19 },  // two half-round tents in the south-west, stage in the gap
+  shops:        { pos: P(502, 670), size: 14, label: 'Shops' },          // stalls scattered between chai lounge, planetarium and techno floor
+  kuenstlergasse: { pos: P(276, 545), size: 18, label: 'Künstlergasse' }, // Cosma & Mathias, at the north hedge west of the dragon
+  entrance:     { pos: P(565, 725), size: 12, label: 'Eingang' },          // the white tent at the east gate
 };
 
 // Dixi rows (built by the toilet job): stand spot is computed in front of the row
 export const DIXI_ROWS = [
-  { pos: P(352, 480), n: 6, rot: 0.17 }, // along the north fence, clear of the camping gate
-  { pos: P(385, 655), n: 4, rot: 0.1 },
+  { pos: P(128, 562), n: 6, rot: 0.2 },  // along the north hedge in the west
+  { pos: P(535, 772), n: 4, rot: 0 },     // at the south fence near the entrance
 ];
 
 // The festival site. Wander off too far beyond it and the police picks you up.

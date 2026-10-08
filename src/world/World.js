@@ -249,7 +249,7 @@ export class World {
 
     // light masts from the site plan (red dots) – built during the night mission
     this.masts = [];
-    const mastPts = [[240, 494], [395, 612], [490, 610], [628, 604], [62, 612], [385, 718], [634, 690], [645, 798]];
+    const mastPts = [[230, 600], [325, 640], [412, 628], [530, 700], [600, 650], [110, 650], [400, 770], [215, 720]];
     mastPts.forEach(([px, py], i) => {
       const p = P(px, py);
       const lm = lightMast();
@@ -316,9 +316,31 @@ export class World {
     this.placeStructure('narnia_floor', 'narnia_floor', 'narnia_floor', { animate: false, rotation: 0.15 });
     // the chai lounge: a permanent construction site (staged, see Game.applyProgressLevel)
     this.placeStructure('chai_lounge', 'chai_tent', 'chai_lounge', { animate: false, rotation: 0.35 });
+    // decoration that is simply there: the bar tent and the little beer garden
+    this.placeStructure('bar_tent', 'bar_tent', null, { animate: false, at: LANDMARKS.bar_tent, rotation: -0.1 });
+    this.placeStructure('beer_garden', 'beer_garden', null, { animate: false, at: LANDMARKS.beer_garden, rotation: -0.5 });
     this.kitchenZone = { x: LANDMARKS.kitchen.x, z: LANDMARKS.kitchen.z, r: k.zone?.r || 5.5 };
     this.buildStrawWalls();
     this.buildChillCorner();
+    this.buildBaleStack();
+  }
+
+  /** Round straw bales and green silage bales stacked at the north hedge behind the crew kitchen (like on site). */
+  buildBaleStack() {
+    const a = P(398, 484), b = P(446, 474);
+    const straw = mat('#d8b860'), silage = mat('#7fa070', { roughness: 0.5 });
+    const n = 9;
+    for (let i = 0; i < n; i++) {
+      const t = i / (n - 1), x = a.x + (b.x - a.x) * t, z = a.z + (b.z - a.z) * t;
+      const green = i >= 5;
+      for (let k = 0; k < (i % 3 ? 2 : 1); k++) {
+        const bale = cyl(0.75, 0.75, 1.2, green ? silage : straw, 12, x, heightAt(x, z) + 0.75 + k * 1.4, z);
+        if (!green) bale.rotation.z = Math.PI / 2; else bale.rotation.set(0, 0, 0);
+        this.scene.add(bale);
+      }
+    }
+    const len = Math.hypot(b.x - a.x, b.z - a.z);
+    this.colliders.addBox((a.x + b.x) / 2, (a.z + b.z) / 2, len / 2 + 0.8, 0.9, Math.atan2(-(b.z - a.z), b.x - a.x), 'bales');
   }
 
   /**
@@ -328,7 +350,7 @@ export class World {
   buildStrawWalls() {
     const defs = [
       { plot: 'mainstage', rot: 0, d: -24, lat: -9, len: 21 },   // behind the dragon
-      { plot: 'forest_dome', rot: 1.7, d: -11.5, lat: 0, len: 18 }, // behind the Forest Dome
+      { plot: 'forest_dome', rot: 1.7, d: -12.8, lat: 0, len: 18 }, // behind the Forest Dome
       { plot: 'forest_dome', rot: 1.7, d: 17.5, lat: 0, len: 18 },  // in front of it
       { plot: 'narnia_floor', rot: 0.15, d: -12, lat: 0, len: 18 }, // behind the elephant
       { plot: 'biergarten', rot: 0.2, d: -10, lat: 0, len: 21 },   // behind the Techno Floor
@@ -629,7 +651,7 @@ export class World {
   /** Remove every built structure (new game). */
   clearStructures() {
     for (const [id, rec] of Object.entries(this.structures)) {
-      if (['mainstage', 'kitchen', 'firespace', 'narnia_floor', 'chai_lounge'].includes(id)) continue;
+      if (['mainstage', 'kitchen', 'firespace', 'narnia_floor', 'chai_lounge', 'bar_tent', 'beer_garden'].includes(id)) continue;
       this.scene.remove(rec.object);
       this.cameraBlockers = this.cameraBlockers.filter((o) => o !== rec.object);
       this.colliders.removeTag(`struct_${id}`);

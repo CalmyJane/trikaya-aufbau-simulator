@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { mat, box, cyl, strut, signPost, beerBench } from './Props.js';
 import { buildMainstage, buildShadeSails, buildKitchen } from './Mainstage.js';
-import { buildKuenstlergasse, buildWaterTank, buildSauna } from './Structures3.js';
+import { buildKuenstlergasse, buildWaterTank, buildSauna, buildBarTent, buildBeerGarden } from './Structures3.js';
 import { buildAwarenessTent, buildForestDome, buildMappingDeco, buildWcContainer, buildDixiRow, buildFirespace, buildNarniaFloor, buildHammockForest, buildTechnoFloor, buildEntranceTent, buildMarket } from './Structures2.js';
 
 // Registry of buildable structures. A quest's `build` effect references one of these by key.
@@ -31,6 +31,8 @@ export const STRUCTURES = {
   kuenstlergasse: buildKuenstlergasse,
   water_tank: buildWaterTank,
   sauna: buildSauna,
+  bar_tent: buildBarTent,
+  beer_garden: buildBeerGarden,
 };
 
 export function buildStructure(type, params = {}) {

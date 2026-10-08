@@ -176,6 +176,12 @@ export class Character {
     const rs = this.root.getWorldScale(new THREE.Vector3());
     holder.quaternion.copy(bq.invert().multiply(rq));
     holder.scale.set(rs.x / bs.x, rs.y / bs.y, rs.z / bs.z);
+    // wide characters have a wider head too – hair caps, beards, glasses & hats must widen with it
+    // (otherwise the skull pokes through a short-hair cap and only a stripe of hair is left)
+    if (boneName === 'Head') {
+      const k = (this.look.height || 1.8) / 1.8, w = this.look.width || 1; // the model is scaled to its height
+      holder.scale.multiply(new THREE.Vector3(k * w, k, k * w));
+    }
     // offset expressed in character space -> bone local
     const off = offset.clone().applyQuaternion(holder.quaternion).multiply(holder.scale);
     holder.position.copy(off);
@@ -337,7 +343,7 @@ export class Character {
         g.add(c);
       }
     } else if (style === 'short') {
-      const cap = new THREE.Mesh(new THREE.SphereGeometry(r * 1.06, 10, 6, 0, Math.PI * 2, 0, Math.PI * 0.45), hm);
+      const cap = new THREE.Mesh(new THREE.SphereGeometry(r * 1.1, 12, 7, 0, Math.PI * 2, 0, Math.PI * 0.47), hm);
       cap.position.set(0, len * 0.5, -r * 0.05);
       g.add(cap);
     }

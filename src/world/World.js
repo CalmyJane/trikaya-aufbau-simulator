@@ -316,7 +316,9 @@ export class World {
     this.placeStructure('firespace', 'firespace', 'firespace', { animate: false, rotation: Math.PI });
     this.placeStructure('narnia_floor', 'narnia_floor', 'narnia_floor', { animate: false, rotation: 0.15 });
     // the chai lounge: a permanent construction site (staged, see Game.applyProgressLevel)
-    this.placeStructure('chai_lounge', 'chai_tent', 'chai_lounge', { animate: false, rotation: 0.35 });
+    // open side (+ awning) towards the mainstage
+    const cl = PLOTS.chai_lounge.pos, ms = PLOTS.mainstage.pos;
+    this.placeStructure('chai_lounge', 'chai_tent', 'chai_lounge', { animate: false, rotation: Math.atan2(ms.x - cl.x, ms.z - cl.z) });
     // decoration that is simply there: the bar tent and the little beer garden
     this.placeStructure('bar_tent', 'bar_tent', null, { animate: false, at: LANDMARKS.bar_tent, rotation: Math.PI - 0.1 });
     this.placeStructure('beer_garden', 'beer_garden', null, { animate: false, at: LANDMARKS.beer_garden, rotation: -0.5 });

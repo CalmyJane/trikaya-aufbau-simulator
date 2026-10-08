@@ -322,23 +322,53 @@ export function buildMappingDeco() {
   }
   colliders.push({ type: 'box', x: 0, z: Z - 0.5, hw: 6.4, hd: 0.7, rot: 0 });
 
-  // projector tower in front of the dance floor, aimed at the lens
-  const tower = new THREE.Group();
-  const T = new THREE.Vector3(1.6, 0, 10.5);
-  tower.position.copy(T);
-  tower.add(cyl(0.08, 0.08, 4, mat('#555'), 6, 0, 2, 0));
-  tower.add(box(0.8, 0.5, 0.9, mat('#222'), 0, 4.2, 0));
+  // light booth opposite the DJ: Harry maps the visuals from here at night (TouchDesigner on two screens)
+  const booth = new THREE.Group();
+  const T = new THREE.Vector3(0, 0, 14.5);
+  booth.position.copy(T);
+  booth.rotation.y = Math.PI; // open side towards the stage
+  g.add(booth);
+  const plank = woodMat('#9a7448'), plankD = woodMat('#7a5832');
+  booth.add(box(2.8, 0.25, 2.4, plankD, 0, 0.12, 0));                          // floor
+  booth.add(box(2.8, 2.4, 0.1, plank, 0, 1.45, -1.15));                         // back wall (outside)
+  for (const sx of [-1, 1]) booth.add(box(0.1, 2.4, 2.4, plank, sx * 1.35, 1.45, 0)); // side walls
+  booth.add(box(2.8, 0.9, 0.1, plank, 0, 0.7, 1.15));                           // front parapet, open above
+  const roof = box(3.2, 0.1, 2.9, plankD, 0, 2.75, 0);
+  roof.rotation.x = -0.12;
+  booth.add(roof);
+  booth.add(box(2.6, 0.06, 0.7, plankD, 0, 1.15, 0.78));                        // desk
+  // screens with TouchDesigner networks, laptop, controller – they glow at night
+  const td = touchDesignerTexture();
+  const scrMat = new THREE.MeshStandardMaterial({ color: '#ffffff', map: td, emissive: '#ffffff', emissiveMap: td, emissiveIntensity: 0.9, roughness: 0.4 });
+  for (const sx of [-0.55, 0.55]) {
+    booth.add(box(0.9, 0.55, 0.05, mat('#151515'), sx, 1.55, 0.95));
+    const s = new THREE.Mesh(new THREE.PlaneGeometry(0.84, 0.49), scrMat);
+    s.position.set(sx, 1.55, 0.92);
+    s.rotation.y = Math.PI;
+    booth.add(s);
+    booth.add(box(0.06, 0.25, 0.06, mat('#151515'), sx, 1.3, 1.0));
+  }
+  booth.add(box(0.5, 0.03, 0.34, mat('#2a2a2a'), 0, 1.2, 0.62));               // laptop
+  const lid = box(0.5, 0.32, 0.02, mat('#2a2a2a'), 0, 1.36, 0.79); lid.rotation.x = -0.25; booth.add(lid);
+  booth.add(box(0.36, 0.04, 0.2, mat('#3a3a3a'), 0.9, 1.2, 0.6));              // MIDI controller
+  for (let i = 0; i < 4; i++) booth.add(cyl(0.025, 0.025, 0.03, mat(['#ff3aa0', '#3ad1ff', '#b0ff3a', '#ffcf3a'][i]), 8, 0.78 + i * 0.08, 1.235, 0.6));
+  booth.add(box(0.4, 0.45, 0.4, mat('#3a2a1a'), 0, 0.47, -0.2));               // stool
+  // projector on the roof, aimed at the lens
+  booth.add(box(0.7, 0.4, 0.8, mat('#222'), 0, 3.0, 0.4));
+  const projLens = cyl(0.12, 0.12, 0.1, mat('#88aaff', { emissive: '#4466ff' }), 10, 0, 3.0, 0.85); projLens.rotation.x = Math.PI / 2; booth.add(projLens);
+  colliders.push({ type: 'box', x: T.x, z: T.z + 1.15, hw: 1.45, hd: 0.15, rot: 0 });  // back wall (local -z of the booth = +z here)
+  for (const sx of [-1, 1]) colliders.push({ type: 'box', x: T.x + sx * 1.35, z: T.z, hw: 0.1, hd: 1.2, rot: 0 });
+  colliders.push({ type: 'box', x: T.x, z: T.z - 0.95, hw: 1.3, hd: 0.35, rot: 0 }); // desk + parapet
   const beamGeo = new THREE.ConeGeometry(6.5, 1, 20, 1, true);
   beamGeo.translate(0, -0.5, 0); // apex at the projector
   const beam = new THREE.Mesh(beamGeo, new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.0, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending }));
-  const from = new THREE.Vector3(T.x, 4.3, T.z), to = new THREE.Vector3(0, Y, Z);
+  const from = new THREE.Vector3(T.x, 3.0, T.z - 0.85), to = new THREE.Vector3(0, Y, Z);
   const dir = to.clone().sub(from);
   beam.scale.set(1, dir.length(), 1);
   beam.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), dir.normalize());
-  beam.position.set(0, 4.3, 0);
-  tower.add(beam);
-  g.add(tower);
-  colliders.push({ type: 'circle', x: T.x, z: T.z, r: 0.4 });
+  beam.position.copy(from);
+  g.add(beam);
+  g.userData.spots = { light_booth: [T.x, T.z + 0.35] };
 
   g.userData.mapping = { uniforms, beam };
   g.userData.animate = (t) => {
@@ -592,8 +622,8 @@ export function buildFirespace() {
 
 // ------------------------------------------------------------------ Mia's Narnia Floor (built in stages by her crew)
 /**
- * Outdoor floor with a straw dance floor. The audience side is +z.
- * Stage 0: straw bales, half the straw floor. 1: full floor + the elephant DJ booth facing the crowd.
+ * Outdoor floor on the bare field. The audience side is +z.
+ * Stage 0: straw bales. 1: the elephant DJ booth facing the crowd.
  * 2: stretch tent over the floor, wardrobe entrance, lamp post. 3: royal tent (chill-out) with two poles.
  * Objects & colliders carry minStage/maxStage.
  */
@@ -605,16 +635,7 @@ export function buildNarniaFloor() {
   const col = (c, min = 0, max = 9) => stageColliders.push({ ...c, minStage: min, maxStage: max });
   const W = 12, D = 9;
 
-  // ---- straw dance floor (strips, slightly uneven colours)
-  const strawCols = ['#d9c27a', '#cdb26a', '#e2cc88', '#c7aa5e'];
-  const strips = 12;
-  for (let i = 0; i < strips; i++) {
-    const z = -D / 2 + (i + 0.5) * (D / strips);
-    const st = new THREE.Mesh(new THREE.BoxGeometry(W, 0.06, D / strips + 0.05), mat(strawCols[i % 4], { roughness: 1 }));
-    st.position.set((Math.random() - 0.5) * 0.3, 0.03, z);
-    st.receiveShadow = true;
-    add(st, i < strips * 0.45 ? 0 : 1);
-  }
+  // the dance floor is the bare field – nothing laid out (like at most spots)
   // straw bales waiting to be spread (stage 0) / as seats at the edge (later)
   const bale = mat('#d2b566', { roughness: 1 });
   for (const [x, z, s] of [[-4, 3.4, 0], [-2.6, 3.6, 0], [-3.3, 3.5, 0]]) {
@@ -1210,4 +1231,29 @@ function plankStatue() {
   });
   im.castShadow = im.receiveShadow = true;
   return im;
+}
+
+/** A TouchDesigner network on a screen: operator nodes (TOP purple, CHOP green, SOP blue), wires, previews. */
+function touchDesignerTexture() {
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 300;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#2b2b2b'; ctx.fillRect(0, 0, 512, 300);
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  for (let x = 0; x < 512; x += 16) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 300); ctx.stroke(); }
+  const cols = ['#8a5ad8', '#5ac86a', '#4a8ae8', '#e8a83a'];
+  const nodes = [];
+  for (let i = 0; i < 14; i++) nodes.push({ x: 18 + (i % 5) * 98, y: 22 + Math.floor(i / 5) * 92 + (i % 2) * 14, c: cols[(i * 7) % 4] });
+  ctx.lineWidth = 2;
+  nodes.forEach((n, i) => { const m = nodes[(i * 3 + 1) % nodes.length]; ctx.strokeStyle = 'rgba(220,220,220,0.55)'; ctx.beginPath(); ctx.moveTo(n.x + 70, n.y + 30); ctx.bezierCurveTo(n.x + 110, n.y + 30, m.x - 30, m.y + 30, m.x, m.y + 30); ctx.stroke(); });
+  nodes.forEach((n, i) => {
+    ctx.fillStyle = '#3d3d3d'; ctx.fillRect(n.x, n.y, 70, 58);
+    ctx.fillStyle = n.c; ctx.fillRect(n.x, n.y, 70, 10);
+    const gr = ctx.createLinearGradient(n.x, n.y + 12, n.x + 66, n.y + 56);
+    gr.addColorStop(0, ['#ff2bd6', '#00e0ff', '#ffe600', '#39ff14'][i % 4]); gr.addColorStop(1, ['#2a00ff', '#ff6a00', '#00ffa0', '#ff2b5a'][i % 4]);
+    ctx.fillStyle = gr; ctx.fillRect(n.x + 3, n.y + 13, 64, 42);
+  });
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
 }

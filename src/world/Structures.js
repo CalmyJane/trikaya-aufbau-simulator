@@ -58,7 +58,7 @@ function buildChaiTent() {
   const add = (o, min = 0, max = 9) => { o.userData.minStage = min; o.userData.maxStage = max; staged.push(o); g.add(o); return o; };
   const col = (c, min = 0, max = 9) => stageColliders.push({ ...c, minStage: min, maxStage: max });
   // stage 1: the two-pole royal tent finally stands (front rolled up)
-  const tent = royalTent({ a: 3, r: 4.2, h: 5.2, eave: 2.1 });
+  const tent = royalTent({ a: 3, r: 4.2, h: 5.2, eave: 2.1, porch: 3 });
   add(tent.object, 1);
   for (const c of tent.colliders) col(c, 1);
   const pole = mat('#8b5e34');
@@ -364,7 +364,8 @@ function addBunting(g, a, b) {
  * cream canvas with red stripes, scalloped valance, pennants on the poles.
  * Returns the parts so callers can stage them; `openFront` leaves the front wall rolled up.
  */
-export function royalTent({ a = 3, r = 4.2, h = 5.2, eave = 2.1, cream = '#f1e8d4', red = '#9a2a2a', openFront = true } = {}) {
+const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
+export function royalTent({ a = 3, r = 4.2, h = 5.2, eave = 2.1, cream = '#f1e8d4', red = '#9a2a2a', openFront = true, porch = 0 } = {}) {
   const g = new THREE.Group();
   const colliders = [];
   // perimeter: front side, right half circle, back side, left half circle (x along the ridge)
@@ -416,5 +417,23 @@ export function royalTent({ a = 3, r = 4.2, h = 5.2, eave = 2.1, cream = '#f1e8d
     g.add(cyl(0.05, 0.05, eave, pole, 5, p.x, eave / 2, p.z));
   });
   per.forEach((p) => { if (!(openFront && p.front)) colliders.push({ type: 'circle', x: p.x * 0.97, z: p.z * 0.97, r: 0.45 }); });
+  if (porch) { // small awning in front of the open side, striped like the tent
+    const pw = 2 * a + 1, z0 = r, z1 = r + porch, y0 = eave, y1 = eave - 0.35;
+    const n = 6;
+    for (let i = 0; i < n; i++) {
+      const x0 = -pw / 2 + (i / n) * pw, x1 = -pw / 2 + ((i + 1) / n) * pw;
+      const geo = new THREE.BufferGeometry().setFromPoints([V3(x0, y0, z0), V3(x0, y1, z1), V3(x1, y1, z1), V3(x0, y0, z0), V3(x1, y1, z1), V3(x1, y0, z0)]);
+      geo.computeVertexNormals();
+      g.add(new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: i % 2 ? red : cream, roughness: 0.9, side: THREE.DoubleSide })));
+      const m = V3((x0 + x1) / 2, y1 - 0.3, z1);
+      const geo2 = new THREE.BufferGeometry().setFromPoints([V3(x0, y1, z1), m, V3(x1, y1, z1)]);
+      g.add(new THREE.Mesh(geo2, new THREE.MeshStandardMaterial({ color: red, side: THREE.DoubleSide })));
+    }
+    for (const x of [-pw / 2, pw / 2]) {
+      g.add(cyl(0.06, 0.07, y1, pole, 6, x, y1 / 2, z1));
+      g.add(strut(V3(x, y1, z1), V3(x * 1.15, 0, z1 + 1.4), 0.012, rope, 4));
+      colliders.push({ type: 'circle', x, z: z1, r: 0.2 });
+    }
+  }
   return { object: g, colliders };
 }

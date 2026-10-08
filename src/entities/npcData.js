@@ -216,8 +216,12 @@ export const NPCS = [
     id: 'harry', name: 'Harry', role: { de: 'Deko & Mapping', en: 'Deco & mapping' }, portrait: '🎨',
     look: { base: 'm_casual', skin: SKIN.fair, hair: '#e3c46a', brows: '#b8963a', hairStyle: 'ponytail', hairStyleColor: '#e3c46a', hairLength: 0.3, shirt: '#3a3a5a', pants: '#8a6a4a', patchwork: true, height: 1.84 },
     behavior: 'wander', home: 'plot_forest_dome', offset: [-7, 9], radius: 5,
+    homeAfter: { quest: 'q10_mapping', spot: 'light_booth', radius: 0.3 }, // then he lives in the light booth
     lines: [
       { de: 'Die Deko kommt ganz am Schluss. Dafür dann richtig.', en: 'The deco comes right at the end. But then properly.' },
+      { de: 'TouchDesigner, Baby. 140 Nodes, und jeder einzelne reagiert auf die Kickdrum.', en: 'TouchDesigner, baby. 140 nodes, and every single one reacts to the kick drum.' },
+      { de: 'Wenn das Lichthäuschen wackelt, wackeln die Visuals. Also bitte nicht anlehnen.', en: 'If the light booth wobbles, the visuals wobble. So please don\'t lean on it.' },
+      { de: 'Ich hab ein Feedback-Loop gebaut, der aussieht wie ein Drache, der träumt. Glaub ich.', en: 'I built a feedback loop that looks like a dragon dreaming. I think.' },
       { de: 'Auf das Holz kommt nachts ein 3D-Mapping. Du wirst weinen.', en: 'At night we project a 3D mapping onto the wood. You\'ll cry.' },
       { de: 'Hat jemand den Beamer gesehen? Den großen?', en: 'Has anyone seen the projector? The big one?' },
     ],

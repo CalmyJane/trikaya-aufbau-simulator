@@ -271,6 +271,18 @@ export function buildMainstage() {
   centreRing.visible = false;
   g.add(centreRing);
 
+  // ---------------------------------------------------------------- two half-round stretch tents beside the dance floor
+  for (const s of [-1, 1]) {
+    const t = halfRoundTent();
+    t.object.position.set(s * 17.5, 0, 2);
+    if (s < 0) t.object.rotation.y = Math.PI; // the straight, high edge always faces the dance floor
+    g.add(t.object);
+    for (const c of t.colliders) {
+      const x = s < 0 ? -c.x : c.x, z = s < 0 ? -c.z : c.z;
+      colliders.push({ ...c, x: s * 17.5 + x, z: 2 + z });
+    }
+  }
+
   const sign = signPost('MAINSTAGE', { width: 2.6, height: 1.3, bg: '#2a160a', fg: '#ffb020' });
   sign.position.set(7.5, 0, -7);
   sign.rotation.y = -0.4;
@@ -651,4 +663,43 @@ export function buildKitchen() {
   sign.rotation.y = -0.5;
   g.add(sign);
   return { object: g, colliders, zone: { r: 5.5 } };
+}
+
+/**
+ * Half-round (D-shaped) beige stretch tent: the straight edge (local x = 0, along z) is high and open,
+ * the round side bulges out to +x and comes down low, held by short poles and guy ropes.
+ */
+function halfRoundTent({ L = 14, R = 6, HI = 3.8, LO = 2.0 } = {}) {
+  const g = new THREE.Group();
+  const colliders = [];
+  const NU = 24, NV = 10;
+  const P = (u, v) => {
+    const z = (u - 0.5) * L, x = v * R * Math.sin(Math.PI * u) ** 0.6;
+    const y = HI + (LO - HI) * v - 0.45 * Math.sin(Math.PI * u) * Math.sin(Math.PI * v);
+    return [x, y, z];
+  };
+  const verts = [], idx = [];
+  for (let j = 0; j <= NV; j++) for (let i = 0; i <= NU; i++) verts.push(...P(i / NU, j / NV));
+  for (let j = 0; j < NV; j++) for (let i = 0; i < NU; i++) { const a = j * (NU + 1) + i, b = a + NU + 1; idx.push(a, a + 1, b, a + 1, b + 1, b); }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+  geo.setIndex(idx);
+  geo.computeVertexNormals();
+  const sail = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: '#dcc89e', roughness: 0.95, side: THREE.DoubleSide }));
+  sail.castShadow = true;
+  g.add(sail);
+  const pole = mat('#8a6a42'), rope = mat('#d8cfb8');
+  for (const u of [0.04, 0.5, 0.96]) { // high poles along the open edge
+    const [x, y, z] = P(u, 0);
+    g.add(cyl(0.08, 0.1, y, pole, 6, x, y / 2, z));
+    colliders.push({ type: 'circle', x, z, r: 0.2 });
+    if (u !== 0.5) g.add(strut(new THREE.Vector3(x, y, z), new THREE.Vector3(x - 1.2, 0, z + Math.sign(z) * 1.8), 0.015, rope, 4));
+  }
+  for (const u of [0.2, 0.4, 0.6, 0.8]) { // low poles on the round side + guy ropes outwards
+    const [x, y, z] = P(u, 1);
+    g.add(cyl(0.05, 0.06, y, pole, 6, x, y / 2, z));
+    colliders.push({ type: 'circle', x, z, r: 0.15 });
+    g.add(strut(new THREE.Vector3(x, y, z), new THREE.Vector3(x * 1.35, 0, z * 1.25), 0.015, rope, 4));
+  }
+  return { object: g, colliders };
 }

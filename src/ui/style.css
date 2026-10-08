@@ -21,12 +21,6 @@ html, body {
 .screen { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 20; }
 
 /* ---------------------------------------------------------------- loading */
-#loading { background: radial-gradient(circle at 50% 40%, #1e3322, #070a08 70%); flex-direction: column; gap: 22px; z-index: 50; }
-.loading-logo { width: min(260px, 50vw); filter: drop-shadow(0 0 30px rgba(232, 163, 58, 0.35)); animation: pulse 2.4s ease-in-out infinite; }
-.loading-bar { width: min(420px, 70vw); height: 10px; border-radius: 99px; background: #2a3a2d; overflow: hidden; }
-#loading-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--gold), var(--gold-2)); transition: width 0.2s; }
-#loading-text { color: var(--muted); font-size: 15px; }
-@keyframes pulse { 50% { transform: scale(1.03); filter: drop-shadow(0 0 45px rgba(232, 163, 58, 0.55)); } }
 
 /* ---------------------------------------------------------------- menu */
 #menu { justify-content: flex-start; background: linear-gradient(90deg, rgba(6, 10, 7, 0.88) 0%, rgba(6, 10, 7, 0.55) 38%, transparent 65%); }

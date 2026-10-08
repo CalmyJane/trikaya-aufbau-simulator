@@ -22,31 +22,18 @@ export class UI {
 
   // ------------------------------------------------------------ screens
   setLoading(p, text) {
-    if (p != null) $('loading-fill').style.width = `${Math.round(p * 100)}%`;
+    if (p != null) $('loading-fill').style.transform = `scaleX(${Math.min(1, Math.max(0, p)).toFixed(3)})`;
     if (text) $('loading-text').textContent = text;
   }
-  hideLoading() { $('loading').classList.add('hidden'); }
+  hideLoading() {
+    const el = $('loading');
+    el.classList.add('done'); // fades out while the menu logo builds itself up
+    setTimeout(() => el.classList.add('hidden'), 650);
+  }
 
-  /** The Trikaya wordmark, cut into letters that get "craned in" one by one. */
+  /** The Trikaya wordmark, cut into letters that get "craned in" one by one (cutter lives in index.html). */
   buildBrandLetters() {
-    const word = document.querySelector('.brand-word');
-    if (!word || word.children.length) return;
-    const W = 473, H = 189;
-    const top = [[4, 70], [79, 163], [176, 187], [208, 274], [277, 343], [343, 405], [405, 470]];
-    const bot = [[103, 130], [139, 170], [176, 212], [213, 247], [255, 261], [269, 305], [306, 341], [350, 379]];
-    const cuts = [...top.map(([a, b]) => [a, b, 0, 120]), ...bot.map(([a, b]) => [a, b, 120, H])];
-    cuts.forEach(([x0, x1, y0, y1], i) => {
-      const s = document.createElement('span');
-      const w = x1 - x0, h = y1 - y0;
-      Object.assign(s.style, {
-        left: `${(x0 / W) * 100}%`, top: `${(y0 / H) * 100}%`, width: `${(w / W) * 100}%`, height: `${(h / H) * 100}%`,
-        backgroundSize: `${(W / w) * 100}% ${(H / h) * 100}%`,
-        backgroundPosition: `${(x0 / (W - w)) * 100}% ${(y0 / (H - h)) * 100}%`,
-      });
-      s.style.setProperty('--i', i);
-      s.style.setProperty('--r', `${(i % 2 ? 1 : -1) * (6 + (i * 7) % 9)}deg`);
-      word.appendChild(s);
-    });
+    document.querySelectorAll('.brand-word').forEach((w) => window.trikayaWord?.(w));
   }
 
   showMenu(hasSave) {

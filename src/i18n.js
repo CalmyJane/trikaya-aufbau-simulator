@@ -55,6 +55,7 @@ const STRINGS = {
   'menu.controls': { de: 'Steuerung', en: 'Controls' },
   'menu.settings': { de: 'Einstellungen', en: 'Settings' },
   'menu.credits': { de: 'Credits', en: 'Credits' },
+  'load.rotate': { de: '📱↻ Tipp: im Querformat spielt es sich besser', en: '📱↻ Tip: it plays better in landscape' },
   'menu.preview': { de: '🎪 Fertiges Festival ansehen', en: '🎪 See the finished festival' },
   'menu.previewOff': { de: '🚧 Zurück zur Baustelle', en: '🚧 Back to the build site' },
   'menu.shop': { de: 'Karma-Shop', en: 'Karma shop' },

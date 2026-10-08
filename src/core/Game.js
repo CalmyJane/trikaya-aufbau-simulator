@@ -68,7 +68,6 @@ export class Game {
     applyDom();
     if (this.input.touch) {
       this.touch = new TouchControls(this.input, this);
-      if (window.innerHeight > window.innerWidth) portraitHint();
     }
 
     window.addEventListener('resize', () => {

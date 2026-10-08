@@ -10,21 +10,104 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Poiret+One&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="src/ui/style.css" />
+  <link rel="preload" as="image" href="assets/ui/logo_mandala.png" />
+  <link rel="preload" as="image" href="assets/ui/logo_wordmark.png" />
+  <style>
+    /* Loading screen – inline so it animates from the very first frame. Only transform & opacity are
+       animated: the browser runs those on the compositor, so they stay smooth while the game builds. */
+    #loading { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(circle at 50% 42%, #1e3322, #070a08 72%); transition: opacity 0.6s ease; }
+    #loading.done { opacity: 0; pointer-events: none; }
+    .ld-stage { display: flex; flex-direction: column; align-items: center; gap: 2.2vmin; }
+    .ld-mandala { position: relative; width: min(58vw, 42vh, 320px); aspect-ratio: 1; }
+    .ld-mandala > * { position: absolute; inset: 0; will-change: transform, opacity; }
+    .ld-mandala i { position: absolute; inset: 0; background: url('assets/ui/logo_mandala.png') center / 100% no-repeat; will-change: transform; }
+    .ld-glow { inset: -14%; border-radius: 50%; background: radial-gradient(circle closest-side, rgba(232, 163, 58, 0.45), rgba(232, 163, 58, 0.12) 55%, transparent 72%);
+      animation: ld-glow 2.4s ease-in-out infinite; }
+    .ld-rings { animation: ld-rings-in 1.2s cubic-bezier(.2, .8, .2, 1) both; }
+    .ld-rings i { -webkit-mask: radial-gradient(circle closest-side, transparent 36%, #000 37%); mask: radial-gradient(circle closest-side, transparent 36%, #000 37%);
+      animation: ld-spin 16s linear infinite; }
+    .ld-core { animation: ld-core-in 0.9s cubic-bezier(.3, 1.4, .5, 1) 0.45s both; }
+    .ld-core i { -webkit-mask: radial-gradient(circle closest-side, #000 37%, transparent 38%); mask: radial-gradient(circle closest-side, #000 37%, transparent 38%);
+      animation: ld-breathe 2.4s ease-in-out 1.4s infinite; }
+    .ld-orbit { inset: -7%; animation: ld-spin 1.6s linear infinite; }
+    .ld-orbit b { position: absolute; left: 50%; top: 0; width: 3.2%; aspect-ratio: 1; margin-left: -1.6%; border-radius: 50%; background: #ffd27a;
+      box-shadow: 0 0 10px 3px rgba(255, 190, 90, 0.75); transform-origin: 50% 1590%; }
+    .ld-orbit b:nth-child(2) { transform: rotate(-14deg) scale(0.75); opacity: 0.7; }
+    .ld-orbit b:nth-child(3) { transform: rotate(-28deg) scale(0.55); opacity: 0.45; }
+    .ld-orbit b:nth-child(4) { transform: rotate(-42deg) scale(0.38); opacity: 0.25; }
+    .ld-side { display: flex; flex-direction: column; align-items: center; gap: 1.6vmin; }
+    .brand-word { position: relative; aspect-ratio: 473 / 189; }
+    .brand-word span { position: absolute; background: url('assets/ui/logo_wordmark.png') no-repeat; }
+    .ld-word { width: min(78vw, 52vh, 380px); }
+    .ld-word span { will-change: transform, opacity;
+      animation: letter-in 0.6s cubic-bezier(.3, 1.6, .5, 1) calc(0.6s + var(--i) * 0.07s) both, ld-bob 2.8s ease-in-out calc(2s + var(--i) * 0.09s) infinite; }
+    .loading-bar { width: min(70vw, 420px); height: 8px; border-radius: 99px; background: #2a3a2d; overflow: hidden; }
+    #loading-fill { height: 100%; width: 100%; transform: scaleX(0); transform-origin: left; background: linear-gradient(90deg, #e8a33a, #ffd27a); transition: transform 0.3s; }
+    #loading-text { color: #b9c4b0; font: 15px 'Baloo 2', system-ui, sans-serif; min-height: 1.4em; text-align: center; }
+    .ld-rotate { display: none; color: #e8a33a; font: 14px 'Baloo 2', system-ui, sans-serif; opacity: 0.85; }
+    @media (orientation: portrait) and (pointer: coarse) { .ld-rotate { display: block; } }
+    /* phones sideways: logo left, text right */
+    @media (orientation: landscape) and (max-height: 540px) {
+      .ld-stage { flex-direction: row; gap: 6vw; }
+      .ld-mandala { width: min(64vh, 40vw); }
+      .ld-word { width: min(42vw, 60vh); }
+      .loading-bar { width: min(40vw, 320px); }
+    }
+    @keyframes ld-spin { to { transform: rotate(360deg); } }
+    @keyframes ld-glow { 0%, 100% { opacity: 0.55; transform: scale(0.96); } 50% { opacity: 1; transform: scale(1.04); } }
+    @keyframes ld-rings-in { from { transform: rotate(-140deg) scale(0.4); opacity: 0; } to { transform: none; opacity: 1; } }
+    @keyframes ld-core-in { from { transform: scale(0.2); opacity: 0; } to { transform: none; opacity: 1; } }
+    @keyframes ld-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.07); } }
+    @keyframes letter-in { from { transform: translateY(-140%) rotate(var(--r)); opacity: 0; } to { transform: none; opacity: 1; } }
+    @keyframes ld-bob { 0%, 70%, 100% { transform: none; } 35% { transform: translateY(-9%); } }
+    @media (prefers-reduced-motion: reduce) { #loading * { animation-duration: 0.01s !important; animation-iteration-count: 1 !important; } }
+  </style>
 </head>
 <body>
   <div id="game"></div>
 
   <!-- Loading -->
-  <div id="loading" class="screen">
-    <img src="assets/ui/logo.png" alt="Trikaya" class="loading-logo" />
-    <div class="loading-bar"><div id="loading-fill"></div></div>
-    <div id="loading-text">…</div>
+  <div id="loading" aria-label="Trikaya Festival – lädt">
+    <div class="ld-stage">
+      <div class="ld-mandala">
+        <div class="ld-glow"></div>
+        <div class="ld-rings"><i></i></div>
+        <div class="ld-core"><i></i></div>
+        <div class="ld-orbit"><b></b><b></b><b></b><b></b></div>
+      </div>
+      <div class="ld-side">
+        <div class="brand-word ld-word"></div>
+        <div class="loading-bar"><div id="loading-fill"></div></div>
+        <div id="loading-text">Wird geladen…</div>
+        <div class="ld-rotate" data-i18n="load.rotate">📱↻ Tipp: im Querformat spielt es sich besser</div>
+      </div>
+    </div>
     <div class="sys-icons">
       <button id="btn-fullscreen" class="icon-btn" title="Fullscreen">⛶</button>
     </div>
     <div class="cj-badge"><img src="assets/ui/calmyjane_text.svg" alt="Calmy Jane" class="cj-text" /></div>
   </div>
   <script>
+    // the TRIKAYA FESTIVAL wordmark, cut into letters (used by the loading screen and the menu)
+    window.trikayaWord = function (word) {
+      if (!word || word.children.length) return;
+      var W = 473, H = 189;
+      var top = [[4, 70], [79, 163], [176, 187], [208, 274], [277, 343], [343, 405], [405, 470]];
+      var bot = [[103, 130], [139, 170], [176, 212], [213, 247], [255, 261], [269, 305], [306, 341], [350, 379]];
+      var cuts = top.map(function (c) { return [c[0], c[1], 0, 120]; }).concat(bot.map(function (c) { return [c[0], c[1], 120, H]; }));
+      cuts.forEach(function (c, i) {
+        var s = document.createElement('span'), w = c[1] - c[0], h = c[3] - c[2];
+        s.style.left = (c[0] / W) * 100 + '%'; s.style.top = (c[2] / H) * 100 + '%';
+        s.style.width = (w / W) * 100 + '%'; s.style.height = (h / H) * 100 + '%';
+        s.style.backgroundSize = (W / w) * 100 + '% ' + (H / h) * 100 + '%';
+        s.style.backgroundPosition = (c[0] / (W - w)) * 100 + '% ' + (c[2] / (H - h)) * 100 + '%';
+        s.style.setProperty('--i', i);
+        s.style.setProperty('--r', (i % 2 ? 1 : -1) * (6 + (i * 7) % 9) + 'deg');
+        word.appendChild(s);
+      });
+    };
+    window.trikayaWord(document.querySelector('.ld-word'));
     // fullscreen works already while loading
     document.getElementById('btn-fullscreen').onclick = function () {
       if (document.fullscreenElement) document.exitFullscreen && document.exitFullscreen();

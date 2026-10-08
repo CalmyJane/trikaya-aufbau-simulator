@@ -420,15 +420,18 @@ body.police::after { background: radial-gradient(ellipse at center, transparent 
 @media (orientation: portrait) and (max-width: 640px) { #menu .menu-panel { overflow: visible; padding: 0; } #menu .menu-buttons { width: 100%; } }
 
 /* ------------------------------------------------------------------ menu logo: the Trikaya mandala builds itself up */
-.menu-brand { display: flex; flex-direction: column; align-items: center; width: clamp(230px, 25vw, 320px); margin-bottom: 14px; container-type: inline-size; }
-.brand-mandala { position: relative; width: 74%; aspect-ratio: 1; filter: drop-shadow(0 8px 26px rgba(0, 0, 0, 0.65)); }
+.menu-brand { display: flex; flex-direction: column; align-items: center; width: clamp(230px, 25vw, 320px); max-width: 100%; margin-bottom: 14px; container-type: inline-size; }
+.brand-mandala { position: relative; width: 74%; aspect-ratio: 1; }
+/* round soft shadow behind the mandala (a filter on the animated layers shows a faint box in Chrome) */
+.brand-mandala::before { content: ''; position: absolute; inset: -9%; border-radius: 50%; background: radial-gradient(circle closest-side, rgba(0, 0, 0, 0.55) 70%, transparent); pointer-events: none; }
 .brand-mandala .ring { position: absolute; inset: 0; }
 .brand-mandala .ring i { position: absolute; inset: 0; background: url('/assets/ui/logo_mandala.png') center / 100% no-repeat; }
 .r-outer i { -webkit-mask: radial-gradient(circle closest-side, transparent 58%, #000 59%); mask: radial-gradient(circle closest-side, transparent 58%, #000 59%); animation: brand-spin 200s linear infinite; }
 .r-mid i { -webkit-mask: radial-gradient(circle closest-side, transparent 36%, #000 37%, #000 59%, transparent 60%); mask: radial-gradient(circle closest-side, transparent 36%, #000 37%, #000 59%, transparent 60%); animation: brand-spin 200s linear infinite; }
 .r-core i { -webkit-mask: radial-gradient(circle closest-side, #000 37%, transparent 38%); mask: radial-gradient(circle closest-side, #000 37%, transparent 38%); }
 .brand-word { position: relative; width: 100%; aspect-ratio: 473 / 189; margin-top: 10px; }
-.brand-word span { position: absolute; background: url('/assets/ui/logo_wordmark.png') no-repeat; filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.7)); }
+.brand-word span { position: absolute; background: url('/assets/ui/logo_wordmark.png') no-repeat; }
+.brand-word, #menu .menu-title { text-shadow: 0 3px 12px rgba(0, 0, 0, 0.8); }
 #menu .menu-title { font-size: 7.2cqw; letter-spacing: 1.6cqw; margin: 3cqw 0 0; text-align: center; white-space: nowrap; color: var(--text); }
 #menu .menu-title span { display: inline; font-size: inherit; letter-spacing: inherit; color: var(--gold); margin-left: 0.4em; }
 @keyframes brand-spin { to { transform: rotate(360deg); } }

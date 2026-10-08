@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { mat, box, cyl, strut, signPost } from './Props.js';
 
-// The Trikaya mainstage: a wooden dragon (already standing) with a DJ stage in its ribcage,
+// The Trikaya mainstage: a wooden shingle dragon (already standing) crouching over a DJ stage,
 // surrounded by 6 tall posts. Quests rig steel wires between the posts (setRig) and then
 // hang the sun-shade decoration (buildShadeSails).
 
@@ -61,115 +61,175 @@ export function buildMainstage() {
     }
   }
 
-  // ---------------------------------------------------------------- ribcage around the stage
-  for (let i = 0; i < 6; i++) {
-    const z = -11.5 - i * 1.9;
-    const r = 6.4 - Math.abs(i - 2.5) * 0.35;
-    const rib = new THREE.Mesh(new THREE.TorusGeometry(r, 0.2, 5, 18, Math.PI), i % 2 ? woodA : woodB);
-    rib.position.set(0, 1.3, z);
-    rib.castShadow = true;
-    g.add(rib);
-  }
-  // spine
-  const spinePts = [];
-  for (let i = 0; i <= 12; i++) spinePts.push(new THREE.Vector3(0, 1.3 + 6.4 - Math.abs(i / 12 - 0.5) * 1.2, -11.5 - (i / 12) * 11));
-  addBeamChain(g, spinePts, 0.28, woodB);
-  for (let i = 1; i < spinePts.length - 1; i += 1) { // spikes
-    const s = new THREE.Mesh(new THREE.ConeGeometry(0.25, 1.1, 4), woodC);
-    s.position.copy(spinePts[i]).add(new THREE.Vector3(0, 0.6, 0));
+  // ---------------------------------------------------------------- the dragon: hunched over the stage,
+  // covered in sawn wooden shingles, arms reaching down to form the stage arch (like the real Trikaya one)
+  const sh = makeShingles();
+  const dark = mat('#2a1a0e', { side: THREE.DoubleSide });
+  const V = (x, y, z) => new THREE.Vector3(x, y, z);
+
+  // chest vault over the stage (open to the front)
+  const vault = (Rx, Ry) => (u, v) => {
+    const z = -18.6 + v * 6.6;
+    return { p: V(Math.cos(Math.PI * u) * Rx, Math.sin(Math.PI * u) * Ry, z), c: V(0, 0.5, z) };
+  };
+  sh.surface(vault(6.5, 7.2));
+  g.add(paramMesh(vault(6.25, 6.95), 16, 4, dark));
+  g.add(box(13, 7.4, 0.3, dark, 0, 3.7, -18.7)); // back wall behind the DJ
+  colliders.push({ type: 'box', x: 0, z: -18.6, hw: 6.6, hd: 1, rot: 0 });
+
+  // hunched back / shoulders
+  const hood = ellipsoid(V(0, 6.6, -15.5), V(5.4, 3.0, 3.8), 0, 0.58 * Math.PI);
+  sh.surface(hood);
+  g.add(paramMesh(ellipsoid(V(0, 6.6, -15.5), V(5.15, 2.8, 3.55)), 16, 10, dark));
+  for (let z = -13.8; z >= -18.6; z -= 0.8) { // spine spikes
+    const y = 6.6 + 3 * Math.sqrt(Math.max(0, 1 - ((z + 15.5) / 3.8) ** 2));
+    const s = new THREE.Mesh(new THREE.ConeGeometry(0.22, 1.0, 4), woodC);
+    s.position.set(0, y + 0.45, z);
+    s.rotation.x = -0.25;
     s.castShadow = true;
     g.add(s);
   }
-  colliders.push({ type: 'box', x: 0, z: -20.5, hw: 6.5, hd: 3.5, rot: 0 });
 
-  // ---------------------------------------------------------------- neck & head (arching over the DJ)
-  const neck = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0, 7.5, -21.5),
-    new THREE.Vector3(0, 11, -22),
-    new THREE.Vector3(0, 13, -17),
-    new THREE.Vector3(0, 12, -12.5),
-    new THREE.Vector3(0, 10.2, -9.8),
-  ]);
-  const npts = neck.getPoints(22);
-  npts.forEach((p, i) => {
-    const s = 1.3 - (i / npts.length) * 0.55;
-    const seg = box(s, s, 0.9, i % 2 ? woodA : woodC);
-    seg.position.copy(p);
-    const tan = neck.getTangent(i / (npts.length - 1));
-    seg.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), tan);
-    g.add(seg);
-    if (i % 2 === 0) {
-      const sp = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.9, 4), woodB);
-      sp.position.copy(p).add(new THREE.Vector3(0, s * 0.5 + 0.35, 0));
-      sp.castShadow = true;
-      g.add(sp);
+  // arms reaching down to the ground left & right of the stage
+  for (const s of [-1, 1]) {
+    const arm = new THREE.CatmullRomCurve3([V(s * 4.4, 7.6, -13.4), V(s * 6.4, 5.4, -11.6), V(s * 6.6, 2.6, -10.6), V(s * 6.3, 0, -10.0)]);
+    sh.surface(tube(arm, 1.35, 0.85));
+    g.add(paramMesh(tube(arm, 1.2, 0.75), 10, 12, dark));
+    for (let k = -1; k <= 1; k++) { // claws
+      const c = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.6, 4), mat('#e6cf9a'));
+      c.position.set(s * 6.3 + k * 0.4, 0.15, -9.0);
+      c.rotation.x = Math.PI / 2;
+      g.add(c);
     }
-  });
-  const head = new THREE.Group();
-  head.position.copy(npts[npts.length - 1]);
-  head.rotation.x = 0.45; // looking down at the crowd
-  g.add(head);
-  head.add(box(1.7, 1.3, 2.0, woodA, 0, 0, 0.3));          // skull
-  head.add(box(1.3, 0.5, 1.8, woodC, 0, 0.05, 1.9));        // upper snout
-  const jaw = box(1.2, 0.3, 1.9, woodB, 0, -0.55, 1.6);     // open lower jaw
-  jaw.rotation.x = 0.35;
-  head.add(jaw);
-  for (const x of [-0.45, -0.15, 0.15, 0.45]) { // teeth
-    const t = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.25, 4), mat('#f2ead8'));
-    t.position.set(x, -0.3, 2.6);
-    t.rotation.x = Math.PI;
-    head.add(t);
+    colliders.push({ type: 'circle', x: s * 6.3, z: -10.0, r: 1.0 });
+    colliders.push({ type: 'circle', x: s * 6.6, z: -11.2, r: 1.0 });
+  }
+
+  // neck & head (looking out over the crowd, jaws wide open)
+  const neck = new THREE.CatmullRomCurve3([V(0, 8.4, -13.8), V(0, 9.4, -12.7), V(0, 10.0, -11.6)]);
+  sh.surface(tube(neck, 1.5, 1.1));
+  sh.surface(ellipsoid(V(0, 10.2, -11.2), V(1.25, 1.15, 1.35)));
+  const skullCore = new THREE.Mesh(new THREE.SphereGeometry(1, 10, 8), woodB);
+  skullCore.scale.set(1.15, 1.05, 1.25);
+  skullCore.position.set(0, 10.2, -11.2);
+  g.add(skullCore);
+  const jawPart = (rt, rb, len, base, ang, material) => {
+    const geo = new THREE.CylinderGeometry(rt, rb, len, 4);
+    geo.rotateY(Math.PI / 4);
+    const m = new THREE.Mesh(geo, material);
+    const d = V(0, Math.cos(ang), Math.sin(ang));
+    m.position.copy(base).addScaledVector(d, len / 2);
+    m.rotation.x = ang;
+    m.castShadow = true;
+    g.add(m);
+    return { d, base };
+  };
+  const upper = jawPart(0.35, 0.85, 2.4, V(0, 10.35, -10.1), Math.PI / 2 - 0.3, woodC);
+  const lower = jawPart(0.3, 0.7, 2.1, V(0, 9.65, -10.2), Math.PI / 2 + 0.35, woodA);
+  g.add(box(0.9, 0.5, 1.2, mat('#2a1208'), 0, 9.95, -9.6)); // throat
+  const toothMat = mat('#f2ead8');
+  for (const [jaw, len, r0, r1, dir] of [[upper, 2.4, 0.85, 0.35, -1], [lower, 2.1, 0.7, 0.3, 1]]) {
+    const perp = V(0, -jaw.d.z, jaw.d.y).multiplyScalar(-dir); // points into the mouth
+    for (const t of [0.6, 1.1, 1.6, 2.0]) {
+      const r = r0 + (r1 - r0) * (t / len);
+      for (const x of [-1, 1]) {
+        const tooth = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.38, 4), toothMat);
+        tooth.position.copy(jaw.base).addScaledVector(jaw.d, t).addScaledVector(perp, r * 0.6);
+        tooth.position.x = x * r * 0.45;
+        if (dir < 0) tooth.rotation.x = Math.PI;
+        g.add(tooth);
+      }
+    }
   }
   const eyeMat = new THREE.MeshStandardMaterial({ color: '#ffb020', emissive: '#ff7a00', emissiveIntensity: 1.2 });
-  for (const x of [-0.72, 0.72]) {
-    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.18, 8, 6), eyeMat);
-    eye.position.set(x, 0.25, 0.9);
-    head.add(eye);
-    const horn = new THREE.Mesh(new THREE.ConeGeometry(0.2, 1.6, 5), woodB);
-    horn.position.set(x * 0.8, 0.9, -0.5);
-    horn.rotation.x = -1.0;
-    horn.castShadow = true;
-    head.add(horn);
-  }
-  g.userData.eyeMat = eyeMat;
-
-  // ---------------------------------------------------------------- wings (timber frames + cloth)
-  const cloth = new THREE.MeshStandardMaterial({ color: '#7a2a2a', side: THREE.DoubleSide, transparent: true, opacity: 0.85, roughness: 1 });
+  const hornMat = mat('#e6cf9a');
+  const tarp = new THREE.MeshStandardMaterial({ color: '#6e6b63', side: THREE.DoubleSide, roughness: 1 });
   for (const s of [-1, 1]) {
-    const shoulder = new THREE.Vector3(s * 4.5, 7.5, -18);
-    const tips = [
-      new THREE.Vector3(s * 13, 14, -21),
-      new THREE.Vector3(s * 14.5, 10, -22.5),
-      new THREE.Vector3(s * 13, 6, -23.5),
-      new THREE.Vector3(s * 9, 3.2, -23),
-    ];
-    const elbow = new THREE.Vector3(s * 9, 12.5, -19.5);
-    g.add(strut(shoulder, elbow, 0.22, woodB));
-    tips.forEach((t) => g.add(strut(elbow, t, 0.13, woodA)));
-    for (let i = 0; i < tips.length - 1; i++) {
-      const geo = new THREE.BufferGeometry().setFromPoints([elbow, tips[i], tips[i + 1]]);
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.17, 8, 6), eyeMat);
+    eye.position.set(s * 0.8, 10.65, -10.3);
+    g.add(eye);
+    const horn = new THREE.Mesh(new THREE.ConeGeometry(0.2, 1.8, 6), hornMat);
+    horn.position.set(s * 0.75, 11.4, -11.7);
+    horn.rotation.set(-0.5, 0, -s * 0.35);
+    horn.castShadow = true;
+    g.add(horn);
+    // grey spiky frill behind the jaws
+    for (let k = 0; k < 3; k++) {
+      const a = V(s * 0.95, 10.9 - k * 0.5, -11.6), b = V(s * 0.9, 10.4 - k * 0.5, -12.3);
+      const tip = [V(s * 2.2, 12.2, -11.9), V(s * 2.8, 11.0, -12.0), V(s * 2.3, 9.7, -12.2)][k];
+      const geo = new THREE.BufferGeometry().setFromPoints([a, b, tip]);
       geo.computeVertexNormals();
-      g.add(new THREE.Mesh(geo, cloth));
+      g.add(new THREE.Mesh(geo, tarp));
+      g.add(strut(a, tip, 0.05, woodB));
     }
-    const geo2 = new THREE.BufferGeometry().setFromPoints([shoulder, elbow, tips[tips.length - 1]]);
-    geo2.computeVertexNormals();
-    g.add(new THREE.Mesh(geo2, cloth));
   }
+  const crest = new THREE.Mesh(new THREE.ConeGeometry(0.28, 2.6, 4), woodC);
+  crest.position.set(0, 12.3, -11.5);
+  crest.rotation.x = -0.2;
+  crest.castShadow = true;
+  g.add(crest);
+  g.userData.eyeMat = eyeMat;
+  g.add(sh.build());
 
-  // ---------------------------------------------------------------- tail curling round the back
-  const tail = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0, 2.2, -22.5), new THREE.Vector3(3, 1.2, -26), new THREE.Vector3(9, 0.7, -26.5),
-    new THREE.Vector3(13, 0.5, -23), new THREE.Vector3(14.5, 0.9, -19),
-  ]);
-  const tpts = tail.getPoints(18);
-  tpts.forEach((p, i) => {
-    const s = 1.1 - (i / tpts.length) * 0.8;
-    if (i % 2 === 0) colliders.push({ type: 'circle', x: p.x, z: p.z, r: Math.max(0.45, s * 0.6) });
-    const seg = box(s, s * 0.8, 1.0, i % 2 ? woodA : woodB);
-    seg.position.copy(p);
-    seg.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), tail.getTangent(i / (tpts.length - 1)));
-    g.add(seg);
-  });
+  // ---------------------------------------------------------------- wings: log frame + grey tarp,
+  // draped down to the ground with two arched entrances on each side
+  const logMat = woodMat('#a87a48');
+  const pink = new THREE.MeshStandardMaterial({ color: '#ff3a8a', emissive: '#ff2a7a', emissiveIntensity: 1.4 });
+  const horn = (pos, rx, rz, h = 1.3) => {
+    const m = new THREE.Mesh(new THREE.ConeGeometry(0.18, h, 6), hornMat);
+    m.position.copy(pos);
+    m.rotation.set(rx, 0, rz);
+    m.castShadow = true;
+    g.add(m);
+  };
+  for (const s of [-1, 1]) {
+    const S = V(s * 4.8, 7.9, -15.6), W = V(s * 8, 10.4, -16.2), T = V(s * 12.3, 8.4, -15.6), G = V(s * 13.4, 0, -13.6);
+    const B = [V(s * 5.4, 3.6, -15.2), V(s * 8.5, 3.6, -15.2), V(s * 11.2, 3.6, -15.2), T.clone().lerp(G, 0.5)];
+    const fan = [S, B[0], B[1], B[2], B[3], T];
+    for (let i = 0; i < fan.length - 1; i++) {
+      const geo = new THREE.BufferGeometry().setFromPoints([W, fan[i], fan[i + 1]]);
+      geo.computeVertexNormals();
+      const m = new THREE.Mesh(geo, tarp);
+      m.castShadow = true;
+      g.add(m);
+    }
+    g.add(strut(S, W, 0.2, logMat), strut(W, T, 0.17, logMat), strut(T, G, 0.17, logMat));
+    for (const b of B.slice(0, 3)) g.add(strut(W, b, 0.1, logMat));
+    horn(W.clone().add(V(0, 0.7, 0)), 0, -s * 0.15);
+    horn(T.clone().add(V(s * 0.25, 0.5, 0)), 0, -s * 0.5);
+    horn(B[3].clone().add(V(s * 0.3, 0, 0)), 0, -s * 1.2, 1.0);
+    colliders.push({ type: 'circle', x: G.x, z: G.z, r: 0.35 });
+
+    // tarp down to the ground with two arches, black tent behind
+    const shape = new THREE.Shape();
+    shape.moveTo(5.4, 0); shape.lineTo(13.1, 0); shape.lineTo(12.85, 3.6); shape.lineTo(5.4, 3.6); shape.closePath();
+    for (const cx of [7.3, 10.4]) {
+      const hole = new THREE.Path();
+      hole.moveTo(cx - 1.2, 0); hole.lineTo(cx + 1.2, 0); hole.lineTo(cx + 1.2, 1.5);
+      hole.absarc(cx, 1.5, 1.2, 0, Math.PI, false);
+      hole.lineTo(cx - 1.2, 0);
+      shape.holes.push(hole);
+      for (const k of [-1, 1]) g.add(strut(V(s * (cx - 0.8 * k), 0.3, -15.9), V(s * (cx + 0.8 * k), 2.3, -15.9), 0.025, pink));
+    }
+    const panel = new THREE.Mesh(new THREE.ShapeGeometry(shape), tarp);
+    panel.scale.x = s;
+    panel.position.z = -15.2;
+    panel.castShadow = true;
+    g.add(panel);
+    g.add(box(7.4, 3.6, 2.8, mat('#111114'), s * 9.1, 1.8, -16.7));
+    colliders.push({ type: 'box', x: s * 9.1, z: -16.5, hw: 3.8, hd: 1.5, rot: 0 });
+
+    // red speaker stacks on tripods next to the wings
+    const sx = s * 13.8, sz = -11.4;
+    g.add(cyl(0.08, 0.11, 5.6, mat('#1a1a1a'), 6, sx, 2.8, sz));
+    for (let k = 0; k < 3; k++) {
+      const a = (k / 3) * Math.PI * 2;
+      g.add(strut(V(sx, 1.3, sz), V(sx + Math.cos(a), 0, sz + Math.sin(a)), 0.04, mat('#1a1a1a')));
+    }
+    g.add(box(1.1, 1.7, 1.0, mat('#7d1426'), sx, 6.3, sz));
+    g.add(box(0.8, 1.3, 0.05, mat('#3a0a12'), sx, 6.3, sz + 0.51));
+    colliders.push({ type: 'circle', x: sx, z: sz, r: 0.7 });
+  }
 
   // ---------------------------------------------------------------- 6 posts
   const posts = postPositions();
@@ -465,8 +525,92 @@ function sagWire(a, b, sag, material) {
   return m;
 }
 
-function addBeamChain(g, pts, r, material) {
-  for (let i = 0; i < pts.length - 1; i++) g.add(strut(pts[i], pts[i + 1], r, material, 6));
+// ------------------------------------------------------------------ dragon helpers
+// parametric surfaces return { p: point, c: a point inside (to orient normals outwards) }
+function ellipsoid(c, r, t0 = 0, t1 = Math.PI) {
+  return (u, v) => {
+    const ph = u * Math.PI * 2, th = t0 + (t1 - t0) * v;
+    return { p: new THREE.Vector3(c.x + r.x * Math.sin(th) * Math.cos(ph), c.y + r.y * Math.cos(th), c.z + r.z * Math.sin(th) * Math.sin(ph)), c };
+  };
+}
+
+function tube(curve, r0, r1) {
+  const ref = new THREE.Vector3(1, 0, 0);
+  return (u, v) => {
+    const c = curve.getPointAt(v), t = curve.getTangentAt(v);
+    const b1 = new THREE.Vector3().crossVectors(t, ref).normalize();
+    const b2 = new THREE.Vector3().crossVectors(t, b1);
+    const r = r0 + (r1 - r0) * v, a = u * Math.PI * 2;
+    return { p: c.clone().addScaledVector(b1, Math.cos(a) * r).addScaledVector(b2, Math.sin(a) * r), c };
+  };
+}
+
+function paramMesh(P, nu, nv, material) {
+  const verts = [], idx = [];
+  for (let j = 0; j <= nv; j++) for (let i = 0; i <= nu; i++) { const { p } = P(i / nu, j / nv); verts.push(p.x, p.y, p.z); }
+  for (let j = 0; j < nv; j++) for (let i = 0; i < nu; i++) {
+    const a = j * (nu + 1) + i, b = a + nu + 1;
+    idx.push(a, b, a + 1, a + 1, b, b + 1);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+  geo.setIndex(idx);
+  geo.computeVertexNormals();
+  return new THREE.Mesh(geo, material);
+}
+
+/** Overlapping oval wood shingles (sawn log slices with bark rim) laid over parametric surfaces – one InstancedMesh. */
+function makeShingles() {
+  const list = [];
+  const len = (pts) => pts.reduce((s, q, i) => (i ? s + q.distanceTo(pts[i - 1]) : 0), 0);
+  const e = 1e-3;
+  return {
+    surface(P, tu = 0.5, tv = 0.62) {
+      const col = [];
+      for (let k = 0; k <= 24; k++) col.push(P(0.5, k / 24).p);
+      const colLen = len(col), nv = Math.max(2, Math.ceil(colLen / tv));
+      for (let j = 0; j < nv; j++) {
+        const v = (j + 0.5) / nv;
+        const row = [];
+        for (let k = 0; k <= 24; k++) row.push(P(k / 24, v).p);
+        const rowLen = len(row), nu = Math.max(3, Math.ceil(rowLen / tu));
+        for (let i = 0; i < nu; i++) {
+          const u = Math.min(1, (i + 0.5 + (j % 2) * 0.5 + (Math.random() - 0.5) * 0.25) / nu);
+          const { p, c } = P(u, v);
+          const du = P(Math.min(1, u + e), v).p.sub(P(Math.max(0, u - e), v).p);
+          const dv = P(u, Math.min(1, v + e)).p.sub(P(u, Math.max(0, v - e)).p);
+          const n = new THREE.Vector3().crossVectors(du, dv);
+          if (n.lengthSq() < 1e-14) n.subVectors(p, c);
+          n.normalize();
+          if (n.dot(new THREE.Vector3().subVectors(p, c)) < 0) n.negate();
+          list.push({ p: p.addScaledVector(n, 0.05), n, dv: dv.normalize(), su: rowLen / nu, sv: colLen / nv });
+        }
+      }
+    },
+    build() {
+      const geo = new THREE.CylinderGeometry(0.5, 0.5, 0.08, 9);
+      const face = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.95, flatShading: true });
+      const bark = new THREE.MeshStandardMaterial({ color: '#6a4626', roughness: 1, flatShading: true });
+      const im = new THREE.InstancedMesh(geo, [bark, face, face], list.length);
+      const cols = ['#e2bd86', '#d4a86c', '#c8955a', '#b98447', '#e8c99a', '#a87440'].map((c) => new THREE.Color(c));
+      const m = new THREE.Matrix4(), tilt = new THREE.Matrix4().makeRotationX(-0.3), sc = new THREE.Matrix4();
+      const down = new THREE.Vector3(0, -1, 0), x = new THREE.Vector3();
+      list.forEach((s, i) => {
+        const d = down.clone().addScaledVector(s.n, -s.n.dot(down));
+        if (d.length() < 0.25) d.copy(s.dv);
+        d.normalize();
+        x.crossVectors(s.n, d);
+        const k = 0.85 + Math.random() * 0.3;
+        m.makeBasis(x, s.n, d).multiply(tilt)
+          .multiply(sc.makeScale(THREE.MathUtils.clamp(s.su * 1.45, 0.3, 0.85) * k, 1, THREE.MathUtils.clamp(s.sv * 1.7, 0.45, 1.05) * k))
+          .setPosition(s.p);
+        im.setMatrixAt(i, m);
+        im.setColorAt(i, cols[(Math.random() * cols.length) | 0]);
+      });
+      im.castShadow = im.receiveShadow = true;
+      return im;
+    },
+  };
 }
 
 /** Open crew kitchen tent. */

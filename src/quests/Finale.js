@@ -114,7 +114,7 @@ export class Finale {
     await sleep(1400);
     if (g.player.vehicle) g.exitVehicle();
     const inside = g.world.spots.office_inside, boss = g.world.spots.office_boss;
-    const cast = ['jan', 'corni', 'matze', 'fabi', 'leo', 'estenko', 'schwarzhuber', 'andi'];
+    const cast = ['jan', 'corni', 'matze', 'fabi', 'leo', 'estenko', 'schwarzhuber', 'thomas'];
     const spots = [[boss.x, boss.z], [inside.x + 0.9, inside.z - 0.6], [inside.x - 0.4, inside.z + 0.7], [inside.x + 1.3, inside.z + 0.6], [inside.x - 1.4, inside.z - 0.2],
       [inside.x - 1.0, inside.z + 1.3], [inside.x + 1.6, inside.z - 1.3], [inside.x - 1.6, inside.z - 1.2]];
     cast.forEach((id, i) => {
@@ -141,9 +141,9 @@ export class Finale {
       { who: 'matze', text: T('Moment… war das jetzt das Festival? Ich war Kaffee holen.', 'Wait… was that the festival? I was getting coffee.') },
       { who: 'schwarzhuber', text: T('Mei Wiese! Der Radlader is drübergfahrn wia a Panzer. Des is koa Acker mehr, des is a Schlammbad. DILETTANTISCH!', 'My meadow! That wheel loader drove over it like a tank. That\'s not a field anymore, that\'s a mud bath. AMATEURS!') },
       { who: 'fabi', text: T('Die Hälfte vom Material steht unter Wasser. Die andere Hälfte schwimmt gerade Richtung Karlsfeld.', 'Half the gear is under water. The other half is floating towards Karlsfeld right now.') },
-      { who: 'andi', text: T('Und die Klos sind voll. ALLE. Bis oben. Und rate mal, was wieder kaputt ist.', 'And the toilets are full. ALL of them. To the brim. And guess what\'s broken again.') },
+      { who: 'thomas', text: T('Und die Klos sind voll. ALLE. Bis oben. Und rate mal, was wieder kaputt ist.', 'And the toilets are full. ALL of them. To the brim. And guess what\'s broken again.') },
       { who: 'corni', text: T('…Nein.', '…No.') },
-      { who: 'andi', text: T('Die Kackepumpe.', 'The poo pump.') },
+      { who: 'thomas', text: T('Die Kackepumpe.', 'The poo pump.') },
       { who: 'estenko', text: T('KACKEPUMPE! *hicks* Ich hab… ich hab der einen Namen gegeben. Sie heißt Gerda.', 'POO PUMP! *hic* I… I gave her a name. Her name is Gerda.') },
       { who: 'leo', text: T('Leute! LEUTE! Super Arbeit! Hab ich doch gesagt, dass wir das schaffen. …Was hab ich verpasst?', 'Guys! GUYS! Great work! Told you we\'d make it. …What did I miss?') },
       { who: 'jan', text: T(`Budget: ${money} €. Klos voll, Acker Matsch, Pumpe hin, Zdenko voll.`, `Budget: €${money}. Toilets full, field mud, pump dead, Zdenko wasted.`) },

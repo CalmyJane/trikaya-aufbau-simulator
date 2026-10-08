@@ -1575,7 +1575,7 @@ export class Game {
     } else await this.reply(npc, npc.line());
   }
 
-  /** The quad died: Flo or Wasser Andi just happen to be hanging around nearby (with a beer). */
+  /** The quad died: Flo or Andi just happen to be hanging around nearby (with a beer). */
   mechanicNearby() {
     const q = this.vehicles.quad;
     const qp = q.position;

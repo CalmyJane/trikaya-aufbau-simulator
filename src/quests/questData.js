@@ -679,7 +679,7 @@ export const QUESTS = [
     ],
     reward: { karma: 30 },
   },
-  // ------------------------------------------------------------------ R1 — precision parking: the kitchen water tank (Wasser Andi)
+  // ------------------------------------------------------------------ R1 — precision parking: the kitchen water tank (Andi)
   {
     id: 'r1_wassertank',
     title: { de: 'Millimeterarbeit', en: 'Millimetre Work' },
@@ -688,7 +688,7 @@ export const QUESTS = [
     requires: ['q3_toilets'],
     summary: { de: 'Sabses Küche braucht einen 1000-Liter-Wassertank. Der muss mit dem Radlader in eine enge Lücke neben die Küche. Hütchen inklusive.', en: 'Sabse\'s kitchen needs a 1000-litre water tank. It has to go into a tight gap next to the kitchen with the loader. Cones included.' },
     offer: [
-      { who: 'andi', text: { de: 'Wasser Andi hier. Sabse hat kein Wasser mehr in der Küche. Und Sabse ohne Wasser… willst du nicht erleben.', en: 'Wasser Andi here. Sabse has no water left in the kitchen. And Sabse without water… you don\'t want to see it.' } },
+      { who: 'andi', text: { de: 'Andi hier, vom Wasser. Sabse hat kein Wasser mehr in der Küche. Und Sabse ohne Wasser… willst du nicht erleben.', en: 'Andi here, water team. Sabse has no water left in the kitchen. And Sabse without water… you don\'t want to see it.' } },
       { who: 'andi', text: { de: 'Der Tank steht am Parkplatz. Radlader. Und neben der Küche ist es eng – ich hab dir Hütchen hingestellt. Bleib in der Gasse und halt auf der Markierung an.', en: 'The tank is at the parking. Loader. And it\'s tight next to the kitchen – I put out cones for you. Stay in the lane and stop on the mark.' } },
     ],
     accept: { de: 'Millimetergenau!', en: 'Spot on!' },
@@ -858,7 +858,7 @@ export const QUESTS = [
     noRunOver: true,
     summary: { de: 'Das Diagnosegerät liegt am Firespace – am anderen Ende des Geländes. Mit dem Quad hin und zurück, schnell. Wer jemanden umfährt, muss von vorn anfangen.', en: 'The diagnostic tool is at the Firespace – at the other end of the site. There and back on the quad, fast. Run anyone over and you start again.' },
     offer: [
-      { who: 'flo', text: { de: 'Der Generator spinnt. GERADE. Und Wasser Andi hat das Diagnosegerät am Firespace liegen lassen. Ganz am anderen Ende.', en: 'The generator is acting up. RIGHT NOW. And Wasser Andi left the diagnostic tool at the Firespace. At the very other end.' } },
+      { who: 'flo', text: { de: 'Der Generator spinnt. GERADE. Und Andi hat das Diagnosegerät am Firespace liegen lassen. Ganz am anderen Ende.', en: 'The generator is acting up. RIGHT NOW. And Andi left the diagnostic tool at the Firespace. At the very other end.' } },
       { who: 'flo', text: { de: 'Nimm das Quad, Shift gibt Gas. Aber da laufen überall Leute rum. Fährst du einen um, ist Franzi sauer und wir fangen von vorne an.', en: 'Take the quad, Shift is full throttle. But there are people everywhere. Run one over and Franzi gets mad and we start over.' } },
     ],
     accept: { de: 'Vollgas – aber vorsichtig!', en: 'Full throttle – but carefully!' },

@@ -159,7 +159,7 @@ export const NPCS = [
     ],
   },
   {
-    id: 'andi', name: 'Wasser Andi', role: { de: 'Wasser, Technik & Schleppen', en: 'Water, tech & heavy lifting' }, portrait: '🛠️',
+    id: 'andi', name: 'Andi', role: { de: 'Wasser, Technik & Schleppen', en: 'Water, tech & heavy lifting' }, portrait: '🛠️',
     look: { base: 'm_casual', skin: SKIN.tan, hair: '#1a120c', shirt: '#5a6a7a', pants: '#3a3a3a', shoes: '#3a2a1a', height: 1.92, extras: ['bottle'] },
     behavior: 'mechanic', home: 'base_yard', offset: [-8, 6], radius: 14,
     lines: [

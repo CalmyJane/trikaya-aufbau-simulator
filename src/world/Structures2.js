@@ -700,7 +700,7 @@ export function buildHammockForest() {
 }
 
 // ------------------------------------------------------------------ techno floor (where Verena also runs a small bar)
-/** Black floor, truss towers with a black roof over the DJ, speaker stacks, lasers, strobes. Front = +z. */
+/** Black floor under a dark stretch tent (three poles), DJ booth, speaker stacks, lasers, strobes, UV bulbs. Front = +z. */
 export function buildTechnoFloor() {
   const g = new THREE.Group();
   const colliders = [];
@@ -708,21 +708,34 @@ export function buildTechnoFloor() {
   const floor = box(16, 0.06, 12, mat('#1c1c1e', { roughness: 1 }), 0, 0.03, 0);
   floor.receiveShadow = true;
   g.add(floor);
-  // truss towers + roof over the back half
-  for (const [x, z] of [[-6.5, -5.5], [6.5, -5.5], [-6.5, 0.5], [6.5, 0.5]]) {
-    const t = new THREE.Group();
-    for (const [dx, dz] of [[-0.15, -0.15], [0.15, -0.15], [-0.15, 0.15], [0.15, 0.15]]) t.add(cyl(0.03, 0.03, 5, steel, 5, dx, 2.5, dz));
-    for (let y = 0.5; y < 5; y += 0.6) t.add(box(0.34, 0.03, 0.34, steel, 0, y, 0));
-    t.position.set(x, 0, z);
-    g.add(t);
-    colliders.push({ type: 'circle', x, z, r: 0.35 });
+  // stretch tent over the whole floor: two high poles behind the DJ, one over the dance floor
+  const TW = 19, TD = 15, peaks = [[-4.5, -2.5, 2.6], [4.5, -2.5, 2.6], [0, 3.5, 2.2]];
+  const { mesh, hAt } = stretchSheet(TW, TD, peaks, 3.6, '#4a3560');
+  g.add(mesh);
+  const pole = woodMat('#3a2a1a');
+  for (const [px, pz] of peaks) { const h = hAt(px, pz); g.add(cyl(0.11, 0.13, h, pole, 6, px, h / 2, pz)); colliders.push({ type: 'circle', x: px, z: pz, r: 0.22 }); }
+  const rope = new THREE.LineBasicMaterial({ color: '#bdb6a8' });
+  for (const [ex, ez] of [[-TW / 2, -TD / 2], [TW / 2, -TD / 2], [-TW / 2, TD / 2], [TW / 2, TD / 2], [0, -TD / 2]]) {
+    const top = new THREE.Vector3(ex, hAt(ex, ez), ez);
+    g.add(cyl(0.05, 0.05, top.y, pole, 5, ex, top.y / 2, ez));
+    g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([top, new THREE.Vector3(ex * 1.15, 0, ez * 1.2)]), rope));
+    colliders.push({ type: 'circle', x: ex, z: ez, r: 0.2 });
   }
-  for (const z of [-5.5, 0.5]) g.add(box(13.4, 0.35, 0.35, steel, 0, 5, z));
-  for (const x of [-6.5, 6.5]) g.add(box(0.35, 0.35, 6.4, steel, x, 5, -2.5));
-  const roof = box(14, 0.08, 7.2, black, 0, 5.3, -2.5);
-  roof.castShadow = true;
-  g.add(roof);
-  g.add(box(13.4, 4.8, 0.05, black, 0, 2.5, -5.6)); // back curtain
+  // UV bulbs along the edges of the sail
+  const uv = [new THREE.MeshStandardMaterial({ color: '#c38bff', emissive: '#9b4dff', emissiveIntensity: 1.4 }), new THREE.MeshStandardMaterial({ color: '#8affc0', emissive: '#35ff6a', emissiveIntensity: 1.2 })];
+  const bulbGeo = new THREE.SphereGeometry(0.08, 5, 4);
+  for (let i = 0; i <= 16; i++) {
+    const x = -TW / 2 + 0.3 + (i / 16) * (TW - 0.6);
+    for (const ez of [-TD / 2 + 0.3, TD / 2 - 0.3]) {
+      const bl = new THREE.Mesh(bulbGeo, uv[i % 2]);
+      bl.position.set(x, hAt(x, ez) - 0.2, ez);
+      g.add(bl);
+    }
+  }
+  // light bar (lasers + strobes) hanging under the sail, back curtain behind the DJ
+  g.add(box(11, 0.25, 0.25, steel, 0, 4.5, 0.5));
+  for (const x of [-5.5, 5.5]) g.add(cyl(0.015, 0.015, 1.2, steel, 4, x, 5.2, 0.5));
+  g.add(box(13, 2.6, 0.05, black, 0, 1.3, -5.6)); // back curtain
   // DJ booth + speaker stacks
   g.add(box(2.6, 1.1, 1.0, black, 0, 0.55, -3.4));
   g.add(box(2.7, 0.06, 1.1, mat('#2a2a2a'), 0, 1.12, -3.4));
@@ -742,7 +755,7 @@ export function buildTechnoFloor() {
   const lasers = [];
   for (const x of [-4, 0, 4]) {
     const pivot = new THREE.Group();
-    pivot.position.set(x, 4.8, 0.5);
+    pivot.position.set(x, 4.3, 0.5);
     const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 14, 4), beamMat);
     beam.position.y = -7;
     pivot.add(beam);
@@ -750,7 +763,7 @@ export function buildTechnoFloor() {
     lasers.push(pivot);
   }
   const strobeMat = new THREE.MeshBasicMaterial({ color: '#ffffff' });
-  const strobes = [-5, -2, 2, 5].map((x) => { const s = box(0.4, 0.2, 0.2, strobeMat, x, 4.75, 0.7); g.add(s); return s; });
+  const strobes = [-5, -2, 2, 5].map((x) => { const s = box(0.4, 0.2, 0.2, strobeMat, x, 4.25, 0.7); g.add(s); return s; });
   // Verena's little bar at the side
   g.add(box(3.2, 1.05, 0.7, woodMat('#6a4a2a'), 7.2, 0.53, 3.5));
   g.add(box(3.3, 0.06, 0.8, mat('#c9a27a'), 7.2, 1.08, 3.5));

@@ -8,9 +8,9 @@ import { L, getLang } from '../i18n.js';
 //   passedout    – someone passed out                         → Franzi wakes them & takes them to awareness
 //   drunk/high/keta – too drunk / too high / completely wasted → Franzi takes them to the awareness tent
 //   kitchenfight – fight in the kitchen                       → Fabi or Jan (Leo, good luck)
-//   generator    – power generator broke                      → Felix, Thompsen, Wasser Andi, Strom Andi, Juli (or buy a new one)
+//   generator    – power generator broke                      → Felix, Thompsen, Andi, Strom Andi, Juli (or buy a new one)
 //   julifight    – Juli gets into it with a volunteer          → Jan or Fabi (Leo, good luck)
-//   pump         – the WC "Kackepumpe" (lifting pump)         → Juli, Wasser Andi
+//   pump         – the WC "Kackepumpe" (lifting pump)         → Juli, Andi
 //
 // Story people (Corni, Matze, Felix, …) can be the ones who are too wasted. They can't give
 // or continue jobs until Franzi has looked after them – and she needs her awareness tent for that.
@@ -218,7 +218,7 @@ export const EVENT_TYPES = {
   generator: {
     weight: 2, helpers: ['felix', 'thomas', 'andi', 'strom_andi', 'juli'], victims: 0, cost: 150, penalty: 1500, karma: 15,
     title: { de: 'Generator kaputt!', en: 'Generator broke!' },
-    task: { de: 'Hol Felix, Thompsen (Strom & Licht), Strom Andi, Wasser Andi oder Juli – sonst neuer Generator (1.500 €)', en: 'Get Felix, Thompsen (power & light), Strom Andi, Wasser Andi or Juli – or buy a new generator (€1,500)' },
+    task: { de: 'Hol Felix, Thompsen (Strom & Licht), Strom Andi, Andi oder Juli – sonst neuer Generator (1.500 €)', en: 'Get Felix, Thompsen (power & light), Strom Andi, Andi or Juli – or buy a new generator (€1,500)' },
     helperDialog: { de: 'Der Generator? *seufz* Hab ich doch gesagt, dass der raucht. Ich schau\'s mir an.', en: 'The generator? *sigh* Told you it was smoking. I\'ll look at it.' },
     doneLine: { de: 'Läuft wieder. Neue Dichtung, bisschen Gaffa, gutes Zureden.', en: 'Running again. New seal, some gaffa, kind words.' },
     costReason: { de: 'Generator-Ersatzteile', en: 'Generator spare parts' },
@@ -228,7 +228,7 @@ export const EVENT_TYPES = {
   pump: {
     weight: 0, helpers: ['juli', 'andi'], victims: 0, cost: 120, penalty: 900, karma: 15, requires: 'wc_container', // has its own timer (below)
     title: { de: 'Die Kackepumpe ist kaputt!', en: 'The poo pump is broken!' },
-    task: { de: 'Hol Juli oder Wasser Andi zur Hebepumpe am WC-Container', en: 'Get Juli or Wasser Andi to the lifting pump at the WC container' },
+    task: { de: 'Hol Juli oder Andi zur Hebepumpe am WC-Container', en: 'Get Juli or Andi to the lifting pump at the WC container' },
     helperDialog: { de: 'Die Hebepumpe. Natürlich. Keiner will\'s machen, also mach ich\'s. Wie immer.', en: 'The lifting pump. Of course. Nobody wants to do it, so I do. As always.' },
     doneLine: { de: 'Pumpt wieder. Frag nicht, was drin war. Wirklich nicht.', en: 'Pumping again. Don\'t ask what was in it. Really don\'t.' },
     costReason: { de: 'Hebepumpe: Ersatzteil', en: 'Lifting pump: spare part' },
@@ -267,7 +267,7 @@ export class DramaSystem {
       else if (e.helping && e.t > e.deadline + 90 && !e.forced) { e.forced = true; e.helping.task = null; this.resolve(e, e.helping); }
     }
     if (!this.enabled || this.game.ui.dialogOpen) return;
-    // once the poo pump is connected (toilet job done) it breaks every few minutes – Juli or Wasser Andi fix it
+    // once the poo pump is connected (toilet job done) it breaks every few minutes – Juli or Andi fix it
     if (this.game.quests.isDone('q3_toilets') && !this.events.some((e) => e.type === 'pump')) {
       this.pumpT = (this.pumpT ?? 150 + Math.random() * 120) - dt;
       if (this.pumpT <= 0) { this.pumpT = 200 + Math.random() * 160; this.spawn('pump'); }

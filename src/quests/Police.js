@@ -107,7 +107,7 @@ export class Police {
     // back at the crew base
     const spawn = g.world.spots.spawn;
     pl.root.position.set(spawn.x, 0, spawn.z);
-    if (veh) { // Wasser Andi & Flo tow it back
+    if (veh) { // Andi & Flo tow it back
       const vs = g.world.vehicleSpots[veh.id];
       veh.place(vs.pos, vs.heading);
       veh.speed = 0;

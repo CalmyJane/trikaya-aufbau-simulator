@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { Character } from './Character.js';
 import { NPCS, makeCamper, TOKEN_LINES, NUT_LINES } from './npcData.js';
+import { VOLUNTEERS } from './volunteers.js';
 import { EXTRA_LINES, PROGRESS_LINES, OWN_VOICE } from './moreLines.js';
 import { heightAt } from '../world/Height.js';
 import { L } from '../i18n.js';
@@ -876,6 +877,7 @@ export class NPCManager {
 
   /** More volunteers show up as the build progresses. */
   setCrowd(n) {
+    n = Math.min(n, VOLUNTEERS.length); // only the explicit volunteers – no "Sina 2"
     while (this.campers.length < n) {
       const def = makeCamper(this.campers.length);
       const npc = new NPC(def, this.world, this);

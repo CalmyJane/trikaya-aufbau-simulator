@@ -549,6 +549,9 @@ export class Game {
   pause() {
     if (this.mode !== 'play') return;
     this.mode = 'pause';
+    // one Esc press can arrive twice (pointer-lock release + keydown): don't let the second one resume right away
+    this.pausedAt = performance.now();
+    this.input.pressed.delete('Escape');
     this.input.enabled = false;
     this.ui.showPause(true);
     this.ui.showHUD(false);
@@ -1650,13 +1653,14 @@ export class Game {
       if (this._mapKeyReady && (inp.keys.has('KeyM') || inp.keys.has('Escape'))) { this._mapKeyReady = false; this.closeMap(); }
       if (!inp.keys.has('KeyM') && !inp.keys.has('Escape')) this._mapKeyReady = true;
       this.renderer.render(this.scene, this.camera);
+      inp.endFrame(); // else the key that closed the map counts again in the next frame (M reopens it, Esc pauses)
       return;
     }
 
     const playing = this.mode === 'play';
     const paused = this.mode === 'pause';
     this.fly.active = paused && !this.ui.modalOpen;
-    if (paused && !this.ui.modalOpen && inp.hit('Escape')) this.resume();
+    if (paused && !this.ui.modalOpen && inp.hit('Escape') && performance.now() - (this.pausedAt || 0) > 400) this.resume();
     if (playing) {
       if (inp.hit('Escape')) this.pause();
       if (this.minigame.open) inp.pressed.clear();

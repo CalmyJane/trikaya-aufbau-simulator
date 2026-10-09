@@ -237,7 +237,13 @@ body.touch .track ul { font-size: 12px; }
 #tracker.compact .k-drama .tm { color: #ff9a8a; font-weight: 700; }
 #tracker.compact .k-hint { border-left-color: var(--blue); }
 #tracker.compact .k-hint b { color: #ffd21f; } #tracker.compact .k-hint b.g { color: #6fdc6a; }
-#tracker.compact.folded .trow:nth-child(n+2) { display: none; } /* tap: fold down to the most important line */
+#tracker.compact .trow { cursor: pointer; }
+#tracker.compact .trow.on { opacity: 1; background: rgba(20, 26, 32, 0.9); }
+#tracker.compact .trow:active { filter: brightness(1.35); }
+#tracker.compact .k-new { border-left-color: #ffd21f; }
+#tracker.compact .k-new .ti b { color: #ffd21f; font-size: 13px; }
+#tracker.compact .k-head { background: rgba(14, 18, 24, 0.55); border-left-color: transparent; font-weight: 700; color: var(--gold-2); }
+#tracker.compact .k-head .tm { color: var(--text); font-weight: 600; }
 body.touch #toasts { max-width: 62vw; }
 body.touch .toast { font-size: 12px; padding: 4px 10px; border-radius: 12px; text-align: center; }
 body.touch #toasts { top: 56px; }

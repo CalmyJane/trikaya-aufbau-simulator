@@ -726,7 +726,81 @@ export class Character {
     if (this.ride) this.applyRidePose();
     else if (this.sitting) this.applySitPose();
     else if (this.carrying) this.applyCarryPose();
+    else if (this.work) this.applyWorkPose(dt);
+    else if (this.armPose) this.applyArmPose();
     else if (this.flowToy) this.applyFlowPose(dt);
+  }
+
+  // ------------------------------------------------------------------ work with tools (instead of the waving 'interact' clip)
+  /** 'hammer' | 'shovel' | 'saw' | 'drill' | 'measure' | null – a tool in the hands and a looping work motion. */
+  setWork(kind) {
+    if (kind === (this.work?.kind || null)) return;
+    if (this.work) { this.root.remove(this.work.group); this.work = null; }
+    if (!kind) return;
+    this.work = buildWorkTool(kind);
+    this.workT = Math.random() * 5;
+    this.root.add(this.work.group);
+  }
+
+  applyWorkPose(dt) {
+    const w = this.work;
+    const t = (this.workT += dt);
+    const k = (this.look.height || 1.8) / 1.8;
+    const root = this.root;
+    root.updateMatrixWorld(true);
+    const W = (x, y, z) => root.localToWorld(_b1.set(x, y, z));
+    const tool = w.tool;
+    if (w.kind === 'hammer') {
+      // swing up, strike down onto the nail held by the other hand
+      const up = Math.pow((Math.sin(t * 5.5) + 1) / 2, 1.5);
+      tool.position.set(-0.2, (0.92 + 0.38 * up) * k, 0.45 - 0.1 * up);
+      tool.rotation.set(-0.15 - up * 1.3, 0, 0);
+      this.reachArm('R', W(-0.2, (0.92 + 0.38 * up) * k, 0.45 - 0.1 * up));
+      this.reachArm('L', W(0.08, 0.86 * k, 0.52));
+    } else if (w.kind === 'shovel') {
+      // push the blade in, lift, toss to the side
+      const c = (t * 0.8) % 1;
+      const lift = c < 0.45 ? 0 : c < 0.8 ? (c - 0.45) / 0.35 : 1 - (c - 0.8) / 0.2;
+      const toss = c > 0.75 ? (c - 0.75) / 0.25 : 0;
+      const top = _b2.set(-0.02, (0.98 + lift * 0.12) * k, 0.18);
+      const blade = new THREE.Vector3(0.05 + toss * 0.45, 0.06 + lift * 0.5, 0.85 - lift * 0.2 - c * 0.05 * (1 - lift));
+      tool.position.copy(top);
+      tool.quaternion.setFromUnitVectors(_Z, blade.clone().sub(top).normalize());
+      const mid = top.clone().lerp(blade, 0.42);
+      this.reachArm('L', W(top.x + 0.04, top.y, top.z));
+      this.reachArm('R', W(mid.x - 0.05, mid.y, mid.z));
+    } else if (w.kind === 'saw') {
+      // saw back and forth across a plank
+      const s = Math.sin(t * 9);
+      tool.position.set(-0.12, 0.84 * k, 0.4 + 0.14 * s);
+      tool.rotation.set(0.45, 0, 0);
+      this.reachArm('R', W(-0.12, 0.84 * k, 0.4 + 0.14 * s));
+      this.reachArm('L', W(0.22, 0.8 * k, 0.48));
+    } else if (w.kind === 'drill') {
+      // screwing something in above the head – the drill buzzes
+      const buzz = Math.sin(t * 45) * 0.006;
+      tool.position.set(-0.08 + buzz, 1.48 * k, 0.4);
+      tool.rotation.set(-0.5, 0, 0);
+      this.reachArm('R', W(-0.08 + buzz, 1.48 * k, 0.4));
+      this.reachArm('L', W(0.12, 1.5 * k, 0.45));
+    } else if (w.kind === 'measure') {
+      // pull out the tape measure, read it, let it snap back
+      const a = (Math.sin(t * 1.3) + 1) / 2;
+      const lx = 0.12 + 0.3 * a, rx = -0.12 - 0.3 * a;
+      tool.position.set(lx, 0.98 * k, 0.45);
+      w.tape.position.set((lx + rx) / 2, 0.98 * k, 0.45);
+      w.tape.scale.x = Math.max(0.01, lx - rx);
+      this.reachArm('L', W(lx, 0.98 * k, 0.45));
+      this.reachArm('R', W(rx, 0.98 * k, 0.45));
+    }
+  }
+
+  /** Arms to two points in the character's local space (fun moves: cheering, spinning, stretching). */
+  applyArmPose() {
+    const p = this.armPose, k = (this.look.height || 1.8) / 1.8;
+    this.root.updateMatrixWorld(true);
+    if (p.L) this.reachArm('L', this.root.localToWorld(_b1.set(p.L[0], p.L[1] * k, p.L[2])));
+    if (p.R) this.reachArm('R', this.root.localToWorld(_b1.set(p.R[0], p.R[1] * k, p.R[2])));
   }
 
   // ------------------------------------------------------------------ flow toys (fire space crew)
@@ -923,6 +997,48 @@ export class Character {
       this.aimBone(low, end, _v4.set(0.05 * s, -1, 0.12).normalize().applyQuaternion(rq));
     }
   }
+}
+
+const _Z = new THREE.Vector3(0, 0, 1);
+let toolMats;
+/** The tool meshes (all pointing along +z from the grip). */
+function buildWorkTool(kind) {
+  if (!toolMats) toolMats = {
+    wood: new THREE.MeshStandardMaterial({ color: '#8a5a30', roughness: 0.9 }),
+    steel: new THREE.MeshStandardMaterial({ color: '#9aa0a6', metalness: 0.6, roughness: 0.35 }),
+    dark: new THREE.MeshStandardMaterial({ color: '#2a2a2a', roughness: 0.6 }),
+    yellow: new THREE.MeshStandardMaterial({ color: '#f2c21a', roughness: 0.5 }),
+    orange: new THREE.MeshStandardMaterial({ color: '#e8701a', roughness: 0.5 }),
+  };
+  const M = toolMats;
+  const group = new THREE.Group();
+  const tool = new THREE.Group();
+  group.add(tool);
+  const bx = (w, h, d, m, x, y, z) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); o.position.set(x, y, z); tool.add(o); return o; };
+  let tape = null;
+  if (kind === 'hammer') {
+    bx(0.03, 0.03, 0.32, M.wood, 0, 0, 0.14);
+    bx(0.05, 0.13, 0.05, M.steel, 0, 0.02, 0.3);
+  } else if (kind === 'shovel') {
+    bx(0.035, 0.035, 0.95, M.wood, 0, 0, 0.47);
+    bx(0.12, 0.03, 0.05, M.dark, 0, 0, -0.02);           // D-grip
+    bx(0.24, 0.02, 0.28, M.steel, 0, 0, 1.06);           // blade
+  } else if (kind === 'saw') {
+    bx(0.04, 0.09, 0.12, M.wood, 0, 0, 0.02);            // handle
+    bx(0.008, 0.11, 0.5, M.steel, 0, -0.03, 0.32);       // blade
+    const plank = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.04, 0.22), M.wood);
+    plank.position.set(0.05, 0.72, 0.5);
+    group.add(plank);                                     // the plank being cut
+  } else if (kind === 'drill') {
+    bx(0.06, 0.12, 0.06, M.orange, 0, -0.06, 0);         // grip
+    bx(0.07, 0.07, 0.2, M.orange, 0, 0.02, 0.06);        // body
+    bx(0.012, 0.012, 0.12, M.steel, 0, 0.02, 0.21);      // bit
+  } else if (kind === 'measure') {
+    bx(0.08, 0.08, 0.04, M.yellow, 0, 0, 0);             // the case
+    tape = new THREE.Mesh(new THREE.BoxGeometry(1, 0.008, 0.025), M.yellow);
+    group.add(tape);
+  }
+  return { kind, group, tool, tape };
 }
 
 let flameGeo, wickGeo;

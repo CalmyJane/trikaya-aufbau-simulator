@@ -265,6 +265,7 @@ export class NPC {
     // passenger on the quad: sit behind the driver and ride along
     if (this.riding) {
       const q = this.riding;
+      if (this.char.work) this.char.setWork(null);
       if (!this.char.sitting) this.char.setSitting(true);
       if (this.rideSeat) { // a seat on the trailer bench
         q.body.updateMatrixWorld(true);
@@ -351,6 +352,9 @@ export class NPC {
   }
 
   finish(dt) {
+    if (!this._worked && this.char.work) this.char.setWork(null);
+    this._worked = false;
+    if (!this.emote && this.char.armPose) this.char.armPose = null;
     const p = this.root.position;
     p.y = heightAt(p.x, p.z) + (this.party ? this.bob || 0 : 0) + (this.emoteY || 0);
     this.char.update(dt);
@@ -446,6 +450,8 @@ export class NPC {
   /** Hit by the quad / wheel loader: flies backwards head over heels, bounces, slides, lies there. */
   knock(dir, speed, reaction) {
     if (this.knocked || this.hidden) return false;
+    this.char.setWork(null);
+    this.char.armPose = null;
     if (this.char.sitting) this.char.setSitting(false);
     this.char.setFlow?.(null);
     const tb = this.tumbleRig();
@@ -595,7 +601,17 @@ export class NPC {
     return false;
   }
 
-  /** Little moments: dancing near music, a big wave, a hop, very rarely a somersault. */
+  /** Working on something: a tool in the hands (crew → hammer/saw/drill…, anyone → also shovel, tape measure). */
+  doWork() {
+    this._worked = true;
+    if (!this.char.work) {
+      const builder = ['builder', 'worker', 'mechanic'].includes(this.def.behavior);
+      this.char.setWork(pick(builder ? ['hammer', 'hammer', 'saw', 'drill', 'measure', 'shovel'] : ['hammer', 'shovel', 'saw', 'drill', 'measure']));
+    }
+    this.char.play('idle', 0.25);
+  }
+
+  /** Little moments: dancing near music, a big wave, hops, a somersault, a spin, cheering, stretching… */
   startEmote(kind, dur) {
     this.emote = { kind, t: 0, dur, ph: Math.random() * 6 };
     if (kind === 'roll') this.char.play('roll', 0.15, { once: true });
@@ -619,6 +635,30 @@ export class NPC {
       const k = (t % 0.55) / 0.55;
       this.emoteY = Math.sin(Math.PI * k) * 0.35;
       this.char.play('idle', 0.2);
+    } else if (e.kind === 'spin') {
+      // a happy pirouette with the arms out
+      const k = Math.min(1, t / e.dur);
+      this.root.rotation.y += dt * (Math.PI * 2 / e.dur) * (1 + Math.sin(k * Math.PI));
+      this.emoteY = Math.sin(k * Math.PI) * 0.08;
+      this.char.armPose = { L: [0.75, 1.42, 0.05], R: [-0.75, 1.42, 0.05] };
+      this.char.play('idle', 0.2);
+    } else if (e.kind === 'cheer') {
+      // both arms up, jumping for joy
+      this.emoteY = Math.abs(Math.sin(t * 6.5)) * 0.28;
+      const w = Math.sin(t * 13) * 0.08;
+      this.char.armPose = { L: [0.32 + w, 2.05, 0.1], R: [-0.32 - w, 2.05, 0.1] };
+      this.char.play('idle', 0.2);
+    } else if (e.kind === 'stretch') {
+      // a long stretch: arms up high, then out to the sides
+      const k = Math.min(1, t / e.dur), up = Math.sin(k * Math.PI);
+      this.char.armPose = k < 0.6 ? { L: [0.15, 1.6 + up * 0.55, 0.05], R: [-0.15, 1.6 + up * 0.55, 0.05] } : { L: [0.7, 1.45, -0.05], R: [-0.7, 1.45, -0.05] };
+      this.char.play('idle', 0.4);
+    } else if (e.kind === 'jacks') {
+      // jumping jacks
+      const ph = (t * 2.6) % 1, open = ph < 0.5;
+      this.emoteY = Math.sin(ph * Math.PI * 2) > 0 ? Math.sin(ph * Math.PI * 2) * 0.18 : 0;
+      this.char.armPose = open ? { L: [0.55, 1.95, 0.05], R: [-0.55, 1.95, 0.05] } : { L: [0.3, 0.9, 0.05], R: [-0.3, 0.9, 0.05] };
+      this.char.play('idle', 0.15);
     } else if (e.kind === 'roll') {
       // somersault: the roll clip, moving forward a bit
       const h = this.root.rotation.y, s = t < 1 ? 1.8 : 0;
@@ -641,9 +681,13 @@ export class NPC {
     if (this.toPlayer > 60 || this.char.sitting) return;
     const r = Math.random();
     if (this.nearMusic(game) && r < 0.4) this.startEmote('dance', 4 + Math.random() * 5);
-    else if (this.toPlayer < 18 && r < 0.06) this.startEmote('bigwave', 2.2);
-    else if (r < 0.1) this.startEmote('hop', 1.1 + Math.random() * 0.6);
-    else if (r < 0.115) this.startEmote('roll', 1.4);
+    else if (this.toPlayer < 18 && r < 0.05) this.startEmote('bigwave', 2.2);
+    else if (r < 0.12) this.startEmote('hop', 1.1 + Math.random() * 0.6);
+    else if (r < 0.15) this.startEmote('roll', 1.4);
+    else if (r < 0.185) this.startEmote('spin', 1.3);
+    else if (r < 0.215) this.startEmote('cheer', 1.6 + Math.random());
+    else if (r < 0.255) this.startEmote('stretch', 2.4);
+    else if (r < 0.28) this.startEmote('jacks', 2 + Math.random() * 1.5);
   }
 
   /**
@@ -740,7 +784,7 @@ const BEHAVIORS = {
     if (n.emote) { if (n.toPlayer < 2.2) { n.emote = null; n.emoteY = 0; } else if (n.runEmote(dt)) return; }
     if (n.greetCheck(dt, player, { busy: n.wait > 0 && n.workAnim, going: !!n.target && !(n.wait > 0) })) return;
     if (n.toPlayer < 3.5 && !n.snub && n.canAttend()) { n.char.faceTowards(player.position, dt); n.char.play('idle'); return; }
-    if (n.wait > 0) { n.wait -= dt; n.char.play(n.workAnim ? 'interact' : 'idle'); return; }
+    if (n.wait > 0) { n.wait -= dt; if (n.workAnim) n.doWork(); else n.char.play('idle'); return; }
     // don't settle right next to the player unless you're one of the two who stopped
     if (n.target && n.toPlayer < 6 && Math.hypot(n.target.x - player.position.x, n.target.z - player.position.z) < 3.5) n.target = null;
     if (!n.target) n.target = n.pickWanderTarget();
@@ -760,7 +804,7 @@ const BEHAVIORS = {
   route(n, dt, { player }, running, working) {
     if (!running && n.greetCheck(dt, player, { busy: working && n.wait > 0, going: !!n.target && !(n.wait > 0) })) return;
     if (!running && n.toPlayer < 3.5 && !n.snub && n.canAttend()) { n.char.faceTowards(player.position, dt); n.char.play('idle'); return; }
-    if (n.wait > 0) { n.wait -= dt; n.char.play(working ? 'interact' : 'idle'); return; }
+    if (n.wait > 0) { n.wait -= dt; if (working) n.doWork(); else n.char.play('idle'); return; }
     if (!n.target) {
       n.routeIdx = (n.routeIdx + 1) % n.def.route.length;
       n.target = n.resolveSpot(n.def.route[n.routeIdx]);
@@ -972,7 +1016,7 @@ const BEHAVIORS = {
     if (n.wait > 0) {
       n.wait -= dt;
       if (n.lookAt) n.char.faceTowards(n.lookAt, dt, 4);
-      n.char.play(n.workAnim ? 'interact' : 'idle');
+      if (n.workAnim) n.doWork(); else n.char.play('idle');
       return;
     }
     if (!n.target) n.target = n.pickWanderTarget();
@@ -1008,7 +1052,7 @@ const BEHAVIORS = {
       if (n.stateT <= 0) { n.state = 'fbuild'; n.stateT = 12 + Math.random() * 12; n.atSlot = false; n.target = null; n.char.setFlow(null); }
     } else {
       n.char.setFlow(null);
-      if (n.wait > 0) { n.wait -= dt; n.char.play('interact'); }
+      if (n.wait > 0) { n.wait -= dt; n.doWork(); }
       else {
         if (!n.target) n.target = n.pickWanderTarget(9, w.spots.plot_firespace || n.home);
         const r = n.walkTo(n.target, dt, 1.7);

@@ -22,9 +22,10 @@ const MORNING = {
   4: [
     { who: 'jan', text: C('Letzter Aufbautag. Morgen kommen die Gäste. Leo hat… ein Foto geschickt. Von einem Sonnenaufgang.', 'Last build day. The guests arrive tomorrow. Leo sent… a photo. Of a sunrise.') },
     { who: 'schwarzhuber', text: C('Und bevor hier irgendwer feiert, will i no mit eich red\'n. Wegen der Wiese. Und dem Parkplatz.', 'And before anybody parties here, I want a word with you. About the meadow. And the parking.') },
-    { who: 'silke', text: C('Das Chai-Zelt ist übrigens so gut wie fertig.', 'The chai tent is as good as finished, by the way.') },
-    { who: 'krygo', text: C('Die Sauna auch! Heute wird sie fertig. Heute wirklich.', 'So is the sauna! It\'ll be done today. Really today.') },
-    { who: 'jan', text: C('…Nein. Beides nein.', '…No. Both no.') },
+    { who: 'silke', text: C('Habt ihr\'s gesehen?! Das Chai-Zelt STEHT! Über Nacht! Wir haben\'s gestern Abend einfach… gemacht!', 'Have you seen it?! The chai tent is UP! Overnight! We just… did it last night!') },
+    { who: 'jan', text: C('…Es steht. Es ist leer. Aber es steht. Ich muss mich kurz setzen.', '…It stands. It\'s empty. But it stands. I need to sit down for a second.') },
+    { who: 'krygo', text: C('Und die Sauna wird heute fertig! Heute wirklich.', 'And the sauna gets finished today! Really today.') },
+    { who: 'jan', text: C('…Nein.', '…No.') },
   ],
 };
 // every evening there's a team meeting in the office container. It never happens.

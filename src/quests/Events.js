@@ -155,9 +155,21 @@ export const EVENT_TYPES = {
     weight: 3, helpers: ['franzi'], victims: 1, cost: 40, penalty: 60, karma: 20,
     title: { de: 'Nagel im Fuß!', en: 'Nail in the foot!' },
     task: { de: 'Hol Franzi zu {victim}', en: 'Get Franzi to {victim}' },
-    victimLine: { de: 'AUAAA! Ein Nagel! Barfuß war doch keine gute Idee! Hol Franzi!', en: 'OUCH! A nail! Barefoot wasn\'t a great idea! Get Franzi!' },
-    helperDialog: { de: 'Ein Nagel? Barfuß? …Natürlich. Ich komm mit dem Verbandskasten!', en: 'A nail? Barefoot? …Of course. I\'m coming with the first-aid kit!' },
-    doneLine: { de: 'So. Desinfiziert, verbunden, Tetanus hast du? Gut. Und jetzt: Sandalen.', en: 'There. Disinfected, bandaged, tetanus shot? Good. And now: sandals.' },
+    victimLine: [
+      { de: 'AUAAA! Ein Nagel! Barfuß war doch keine gute Idee! Hol Franzi!', en: 'OUCH! A nail! Barefoot wasn\'t a great idea! Get Franzi!' },
+      { de: 'Aua aua aua! Da lag ein Nagel im Gras. Jetzt liegt er in mir. Holst du Franzi?', en: 'Ow ow ow! There was a nail in the grass. Now it\'s in me. Will you get Franzi?' },
+      { de: '*hüpft auf einem Bein* Nagel! NAGEL! Wer lässt hier Nägel liegen?! Franzi, bitte!', en: '*hops on one foot* Nail! NAIL! Who leaves nails lying around?! Franzi, please!' },
+    ],
+    helperDialog: [
+      { de: 'Ein Nagel? Barfuß? …Natürlich. Ich komm mit dem Verbandskasten!', en: 'A nail? Barefoot? …Of course. I\'m coming with the first-aid kit!' },
+      { de: 'Schon wieder ein Nagel? Ich hol den Verbandskasten. Und einen Magneten für die Wiese.', en: 'Another nail? I\'ll get the first-aid kit. And a magnet for the meadow.' },
+      { de: 'Oh nein. Bleib sitzen, nicht drauftreten. Ich bin gleich da.', en: 'Oh no. Stay seated, don\'t step on it. I\'ll be right there.' },
+    ],
+    doneLine: [
+      { de: 'So. Desinfiziert, verbunden, Tetanus hast du? Gut. Und jetzt: Sandalen.', en: 'There. Disinfected, bandaged, tetanus shot? Good. And now: sandals.' },
+      { de: 'Pflaster drauf, Nagel weg. Der Nagel kommt ins Nagelglas. Das ist dieses Jahr schon halb voll.', en: 'Plaster on, nail out. The nail goes in the nail jar. It\'s already half full this year.' },
+      { de: 'Fertig. Tapfer warst du. Und jetzt zwei Minuten sitzen bleiben. Ja, zwei ganze.', en: 'Done. You were brave. Now stay seated for two minutes. Yes, two whole ones.' },
+    ],
     costReason: { de: 'Verbandszeug & Tetanus', en: 'Bandages & tetanus' },
     mode: 'hurt',
   },
@@ -165,9 +177,17 @@ export const EVENT_TYPES = {
     weight: 2, helpers: ['franzi'], victims: 1, cost: 0, penalty: 0, karma: 25, prefer: ['rocky', 'estenko'], exclude: ['isi'],
     title: { de: 'Jemand liegt im Gras…', en: 'Someone\'s lying in the grass…' },
     task: { de: '{victim} ist umgekippt: hol Franzi', en: '{victim} passed out: get Franzi' },
-    victimLine: { de: 'Zzzz… *mumpf* … fünf Minuten noch… zzz', en: 'Zzzz… *mumble* … five more minutes… zzz' },
+    victimLine: [
+      { de: 'Zzzz… *mumpf* … fünf Minuten noch… zzz', en: 'Zzzz… *mumble* … five more minutes… zzz' },
+      { de: '*liegt flach im Gras* …Ich bin nur kurz… die Wolken zählen… alle drei…', en: '*lying flat in the grass* …I\'m just… counting the clouds… all three…' },
+      { de: '…Hm? Ist schon Festival? …Nein? Dann noch kurz liegen.', en: '…Hm? Is it festival already? …No? Then a bit longer.' },
+    ],
     helperDialog: { de: 'Oh nein. Ich komm. Erst wach kriegen, dann ab ins Awareness-Zelt: Wasser, Decke, Ruhe.', en: 'Oh no. I\'m coming. Wake them up, then off to the awareness tent: water, blanket, quiet.' },
-    doneLine: { de: 'Nur ausgetrocknet und durch. Wasser trinken, Leute!', en: 'Just dehydrated and done. Drink water, people!' },
+    doneLine: [
+      { de: 'Nur ausgetrocknet und durch. Wasser trinken, Leute!', en: 'Just dehydrated and done. Drink water, people!' },
+      { de: 'Zu wenig getrunken, zu viel geschleppt. Wasser, Schatten, Banane. Wird wieder.', en: 'Too little water, too much hauling. Water, shade, banana. They\'ll be fine.' },
+      { de: 'Kreislauf. Sonne. Kein Frühstück. Die übliche Aufbau-Mischung.', en: 'Circulation. Sun. No breakfast. The usual build-up mix.' },
+    ],
     noTent: { help: { de: 'Oh nein. Ich komm. Erst wach kriegen, dann ab in den Schatten: Wasser, Decke, Ruhe.', en: 'Oh no. I\'m coming. Wake them up, then into the shade: water, blanket, quiet.' } },
     mode: 'lying',
   },
@@ -175,9 +195,17 @@ export const EVENT_TYPES = {
     weight: 2, helpers: ['franzi', 'delsin'], victims: 1, cost: 0, penalty: 0, karma: 25, prefer: ['estenko', 'thompsen', 'flo', 'andi', 'strom_andi', 'strom_andi'], exclude: ['isi'], storyChance: 0.4,
     title: { de: 'Zu betrunken zum Arbeiten', en: 'Too drunk to work' },
     task: { de: '{victim} ist sturzbetrunken: hol Franzi', en: '{victim} is blind drunk: get Franzi' },
-    victimLine: { de: 'Hicks! Ich arbeite… hicks… ganz normal. Wo ist oben?', en: 'Hic! I\'m working… hic… totally normal. Where is up?' },
+    victimLine: [
+      { de: 'Hicks! Ich arbeite… hicks… ganz normal. Wo ist oben?', en: 'Hic! I\'m working… hic… totally normal. Where is up?' },
+      { de: 'Du bisssst… mein bester Freund. Weißt du das? Hicks. Wo war ich?', en: 'You arrre… my best friend. Did you know? Hic. Where was I?' },
+      { de: 'Ich trag das noch rüber… *lässt die Kiste fallen* …später.', en: 'I\'ll just carry this over… *drops the crate* …later.' },
+    ],
     helperDialog: { de: 'Oh je. Ab ins Awareness-Zelt, ich kümmer mich. Wasser, Brot, Ruhe.', en: 'Oh dear. I\'ll fetch them and take them to the awareness tent. Water, bread, rest.' },
-    doneLine: { de: 'Wird jetzt erstmal ausgeschlafen. Bei mir im Zelt.', en: 'Sleeping it off now. With me.' },
+    doneLine: [
+      { de: 'Wird jetzt erstmal ausgeschlafen. Bei mir im Zelt.', en: 'Sleeping it off now. With me.' },
+      { de: 'Liegt jetzt mit einer Flasche Wasser im Zelt. Und schwört, nie wieder. Bis heute Abend.', en: 'Lying in the tent with a bottle of water now. Swearing never again. Until tonight.' },
+      { de: 'Schläft. Schnarcht. Alles gut. Morgen gibt\'s Kopfweh gratis dazu.', en: 'Asleep. Snoring. All good. Tomorrow comes with a free headache.' },
+    ],
     noTent: { help: { de: 'Oh je. Ich kümmer mich. Wasser, Brot, Schatten. Ein Zelt wär schöner, aber gut.', en: 'Oh dear. I\'ll take care of it. Water, bread, shade. A tent would be nicer, but fine.' }, done: { de: 'Schläft jetzt im Schatten aus. Ich schau nachher nochmal.', en: 'Sleeping it off in the shade now. I\'ll check back later.' } },
     mode: 'drunk',
   },
@@ -185,9 +213,17 @@ export const EVENT_TYPES = {
     weight: 2, helpers: ['franzi', 'delsin'], victims: 1, cost: 0, penalty: 0, karma: 25, prefer: ['rocky', 'niklas'], exclude: ['isi'], storyChance: 0.4,
     title: { de: 'Zu drauf zum Arbeiten', en: 'Too high to work' },
     task: { de: '{victim} ist zu drauf: hol Franzi', en: '{victim} is way too high: get Franzi' },
-    victimLine: { de: 'Duuude… der Boden… der atmet… ich kann heute nicht tragen. Oder stehen.', en: 'Dudeee… the ground… it\'s breathing… I can\'t carry today. Or stand.' },
+    victimLine: [
+      { de: 'Duuude… der Boden… der atmet… ich kann heute nicht tragen. Oder stehen.', en: 'Dudeee… the ground… it\'s breathing… I can\'t carry today. Or stand.' },
+      { de: 'Hast du gewusst, dass Paletten Gesichter haben? Die hier ist traurig. Ich bleib bei ihr.', en: 'Did you know pallets have faces? This one is sad. I\'m staying with it.' },
+      { de: 'Ich hab den Akkuschrauber angeschaut. Er hat zurückgeschaut. Jetzt sind wir verbunden.', en: 'I looked at the drill. It looked back. Now we\'re connected.' },
+    ],
     helperDialog: { de: 'Alles klar, ab ins Awareness-Zelt. Tee, Kekse, keine Musik.', en: 'Alright, I\'ll take them to the awareness tent. Tea, cookies, no music.' },
-    doneLine: { de: 'Liegt jetzt bei den Kissen und erklärt den Kissen das Universum.', en: 'Lying with the cushions now, explaining the universe to them.' },
+    doneLine: [
+      { de: 'Liegt jetzt bei den Kissen und erklärt den Kissen das Universum.', en: 'Lying with the cushions now, explaining the universe to them.' },
+      { de: 'Trinkt Tee und malt Kreise. Viele Kreise. Ist okay.', en: 'Drinking tea and drawing circles. Lots of circles. It\'s okay.' },
+      { de: 'Hat jetzt einen Keks in jeder Hand und ist sehr glücklich. Das reicht für heute.', en: 'Has a cookie in each hand now and is very happy. That\'s enough for today.' },
+    ],
     noTent: { help: { de: 'Alles klar, ich kümmer mich. Tee, Kekse, ein ruhiges Plätzchen, keine Musik.', en: 'Alright, I\'ll handle it. Tea, cookies, a quiet spot, no music.' }, done: { de: 'Liegt jetzt im Gras und erklärt den Wolken das Universum.', en: 'Lying in the grass now, explaining the universe to the clouds.' } },
     mode: 'high',
   },
@@ -195,7 +231,11 @@ export const EVENT_TYPES = {
     weight: 2, helpers: ['franzi', 'delsin'], victims: 1, cost: 0, penalty: 0, karma: 25, prefer: ['rocky', 'estenko'], exclude: ['isi'], storyChance: 0.4,
     title: { de: 'Völlig verballert', en: 'Completely wasted' },
     task: { de: '{victim} ist völlig verballert: hol Franzi', en: '{victim} is completely wasted: get Franzi' },
-    victimLine: { de: '…… …hm? …… Ich bin grad… nicht hier. Ruf später an.', en: '…… …hm? …… I\'m not… here right now. Call later.' },
+    victimLine: [
+      { de: '…… …hm? …… Ich bin grad… nicht hier. Ruf später an.', en: '…… …hm? …… I\'m not… here right now. Call later.' },
+      { de: '*steht sehr still* …Ich bin ein Zeltpfosten. …Lass mich.', en: '*standing very still* …I\'m a tent pole. …Leave me.' },
+      { de: '…Wie lang steh ich schon hier? …Ist das noch derselbe Tag?', en: '…How long have I been standing here? …Is it still the same day?' },
+    ],
     helperDialog: { de: 'Mitten beim Aufbau? …Okay. Ganz langsam rüber ins Awareness-Zelt.', en: 'In the middle of the build? …Okay. Very slowly over to the awareness tent.' },
     doneLine: { de: 'Sitzt jetzt ganz ruhig im Zelt und findet langsam den Weg zurück.', en: 'Sitting quietly in the tent now, slowly finding the way back.' },
     noTent: { help: { de: 'Mitten beim Aufbau? …Okay. Ganz langsam in den Schatten. Ich bleib dabei.', en: 'In the middle of the build? …Okay. Very slowly into the shade. I\'ll stay with them.' }, done: { de: 'Sitzt jetzt ganz ruhig im Schatten und findet langsam den Weg zurück.', en: 'Sitting quietly in the shade now, slowly finding the way back.' } },
@@ -223,8 +263,16 @@ export const EVENT_TYPES = {
     weight: 2, helpers: ['felix', 'thomas', 'andi', 'strom_andi', 'juli'], victims: 0, cost: 150, penalty: 1500, karma: 15,
     title: { de: 'Generator kaputt!', en: 'Generator broke!' },
     task: { de: 'Hol Felix, Thompsen (Strom & Licht), Strom Andi, Andi oder Juli, sonst neuer Generator (1.500 €)', en: 'Get Felix, Thompsen (power & light), Strom Andi, Andi or Juli, or buy a new generator (€1,500)' },
-    helperDialog: { de: 'Der Generator? *seufz* Hab ich doch gesagt, dass der raucht. Ich schau\'s mir an.', en: 'The generator? *sigh* Told you it was smoking. I\'ll look at it.' },
-    doneLine: { de: 'Läuft wieder. Neue Dichtung, bisschen Gaffa, gutes Zureden.', en: 'Running again. New seal, some gaffa, kind words.' },
+    helperDialog: [
+      { de: 'Der Generator? *seufz* Hab ich doch gesagt, dass der raucht. Ich schau\'s mir an.', en: 'The generator? *sigh* Told you it was smoking. I\'ll look at it.' },
+      { de: 'Gerhard schon wieder? Ich komm. Er braucht nur ein bisschen Zuwendung. Und einen Tritt.', en: 'Gerhard again? I\'m coming. He just needs a little attention. And a kick.' },
+      { de: 'Kein Strom? Dann hört man endlich mal die Vögel. …Okay, ich mach ja schon.', en: 'No power? Finally you can hear the birds. …Okay, I\'m on it.' },
+    ],
+    doneLine: [
+      { de: 'Läuft wieder. Neue Dichtung, bisschen Gaffa, gutes Zureden.', en: 'Running again. New seal, some gaffa, kind words.' },
+      { de: 'Brummt wieder. Luftfilter war voller Heu. Frag mich nicht, wie.', en: 'Humming again. The air filter was full of hay. Don\'t ask me how.' },
+      { de: 'Er läuft. Ich hab ihm gut zugeredet. Und den Diesel nachgefüllt. Hauptsächlich den Diesel.', en: 'He\'s running. I talked to him nicely. And topped up the diesel. Mostly the diesel.' },
+    ],
     costReason: { de: 'Generator-Ersatzteile', en: 'Generator spare parts' },
     penaltyReason: { de: 'Neuer Generator (Notkauf)', en: 'New generator (emergency purchase)' },
     mode: 'place', spot: ['festival_generator_side', 'generator'],
@@ -233,8 +281,16 @@ export const EVENT_TYPES = {
     weight: 0, helpers: ['juli', 'andi'], victims: 0, cost: 120, penalty: 900, karma: 15, requires: 'wc_container', // has its own timer (below)
     title: { de: 'Die Kackepumpe ist kaputt!', en: 'The poo pump is broken!' },
     task: { de: 'Hol Juli oder Andi zur Hebepumpe am WC-Container', en: 'Get Juli or Andi to the lifting pump at the WC container' },
-    helperDialog: { de: 'Die Hebepumpe. Natürlich. Keiner will\'s machen, also mach ich\'s. Wie immer.', en: 'The lifting pump. Of course. Nobody wants to do it, so I do. As always.' },
-    doneLine: { de: 'Pumpt wieder. Frag nicht, was drin war. Wirklich nicht.', en: 'Pumping again. Don\'t ask what was in it. Really don\'t.' },
+    helperDialog: [
+      { de: 'Die Hebepumpe. Natürlich. Keiner will\'s machen, also mach ich\'s. Wie immer.', en: 'The lifting pump. Of course. Nobody wants to do it, so I do. As always.' },
+      { de: 'Schon wieder die Kackepumpe? Ich hol die Handschuhe. Die langen.', en: 'The poo pump again? I\'ll get the gloves. The long ones.' },
+      { de: 'Wenn jemand fragt, warum ich so gucke: Kackepumpe. Ich komm.', en: 'If anyone asks why I look like this: poo pump. I\'m coming.' },
+    ],
+    doneLine: [
+      { de: 'Pumpt wieder. Frag nicht, was drin war. Wirklich nicht.', en: 'Pumping again. Don\'t ask what was in it. Really don\'t.' },
+      { de: 'Läuft. Da steckte ein Flip-Flop drin. EIN Flip-Flop. Wo ist der andere?!', en: 'Running. There was a flip-flop stuck in it. ONE flip-flop. Where\'s the other one?!' },
+      { de: 'Repariert. Und ich hab ein Schild gemalt: KEINE FEUCHTTÜCHER. Mit drei Ausrufezeichen.', en: 'Fixed. And I painted a sign: NO WET WIPES. With three exclamation marks.' },
+    ],
     costReason: { de: 'Hebepumpe: Ersatzteil', en: 'Lifting pump: spare part' },
     penaltyReason: { de: 'Notdienst Abpumpen', en: 'Emergency pump-out service' },
     mode: 'place', spot: ['wc_pump'],
@@ -274,7 +330,10 @@ export class DramaSystem {
     // once the poo pump is connected (toilet job done) it breaks every few minutes – Juli or Andi fix it
     if (this.game.quests.isDone('q3_toilets') && !this.events.some((e) => e.type === 'pump')) {
       this.pumpT = (this.pumpT ?? 150 + Math.random() * 120) - dt;
-      if (this.pumpT <= 0) { this.pumpT = 200 + Math.random() * 160; this.spawn('pump'); }
+      if (this.pumpT <= 0) {
+        this.pumpT = 280 + Math.random() * 200;
+        if (this.events.length < 2) this.spawn('pump'); else this.pumpT = 40; // busy enough right now: try again a bit later
+      }
     }
     this.nextT -= dt;
     if (this.nextT <= 0 && this.events.length < 2) {
@@ -295,7 +354,7 @@ export class DramaSystem {
       for (const [k, d] of types) { r -= d.weight; if (r <= 0) { type = k; break; } }
     }
     const def = EVENT_TYPES[type];
-    const e = { id: ++this.seq, type, def, t: 0, deadline: 120 + Math.random() * 40, victims: [], helping: null };
+    const e = { id: ++this.seq, type, def, t: 0, deadline: 120 + Math.random() * 40, victims: [], helping: null, vi: Math.floor(Math.random() * 6) };
     if (def.victims) {
       const busy = new Set(this.events.flatMap((x) => x.victims.map((v) => v.def.id)));
       const free = (n) => n.root.visible && !n.hidden && !busy.has(n.def.id) && !n.task && !n.incident && !n.talking &&
@@ -449,7 +508,9 @@ export class DramaSystem {
     g.refreshHUD();
   }
 
-  victimLine(e) { return e.fight ? L(e.fight.line) : L(e.def.victimLine); }
+  victimLine(e) { return e.fight ? L(e.fight.line) : L(this.txt(e, e.def.victimLine)); }
+  /** Texts can be a single {de,en} or a list of variants; each event sticks to one variant. */
+  txt(e, v) { return Array.isArray(v) ? v[(e.vi || 0) % v.length] : v; }
 
   fightText(e, text) {
     const names = e.victims.filter((v) => v.def.id !== 'sabse' && !(e.def.juli && v.def.id === 'juli')).map((v) => v.def.name);
@@ -483,7 +544,7 @@ export class DramaSystem {
       e.blocked = true;
       const name = this.victimName(e);
       await g.runDialog([
-        { who: 'you', text: L(e.def.title) + `${name}` },
+        { who: 'you', text: L(e.def.title) + `: ${name}` },
         { who: 'franzi', text: { de: `${name}? Oh nein. Den kann ich nicht mitten auf dem Acker betreuen. Ich brauch mein Awareness-Zelt!`, en: `${name}? Oh no. I can't look after them in the middle of the field. I need my awareness tent!` } },
         { who: 'franzi', text: { de: 'Hilf mir, das Zelt aufzubauen, dann kümmer ich mich sofort. Bis dahin ist mit dem nichts anzufangen.', en: 'Help me build the tent, then I\'ll take care of it right away. Until then they\'re no use to anyone.' } },
       ], null, npc);
@@ -492,7 +553,7 @@ export class DramaSystem {
       return !g.quests.offeredBy(id).some((q) => q.id === 'q6_awareness');
     }
     const noTent = needsTent && !this.tent && e.def.noTent; // no awareness tent yet: she looks after them on the spot
-    await g.runDialog([{ who: 'you', text: L(e.def.title) + (e.victims[0] ? `${this.victimName(e)}` : '') }, { who: id, text: L(noTent ? e.def.noTent.help : e.def.helperDialog) }], null, npc);
+    await g.runDialog([{ who: 'you', text: L(e.def.title) + (e.victims[0] ? `: ${this.victimName(e)}` : '') }, { who: id, text: L(noTent ? e.def.noTent.help : this.txt(e, e.def.helperDialog)) }], null, npc);
     e.helping = npc;
     npc.task = {
       phase: 'go', pos: () => e.pos(), arriveDist: 1.8, workTime: e.def.mode === 'lying' ? 4 : 3, speed: 5,
@@ -536,7 +597,7 @@ export class DramaSystem {
 
   resolve(e, helper, keepVictims = false) {
     const g = this.game;
-    helper.say(L(AWARENESS_MODES.includes(e.def.mode) && !this.tent && e.def.noTent?.done ? e.def.noTent.done : e.def.doneLine), 5);
+    helper.say(L(AWARENESS_MODES.includes(e.def.mode) && !this.tent && e.def.noTent?.done ? e.def.noTent.done : this.txt(e, e.def.doneLine)), 5);
     if (e.def.cost) g.economy.spend(e.def.cost, e.def.costReason);
     const k = e.def.karma || 15;
     g.quests.state.karma += k;

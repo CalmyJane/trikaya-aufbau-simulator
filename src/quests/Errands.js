@@ -228,10 +228,10 @@ export class Errands {
     });
     if (!g.registered || qs.timer || g.finale) return;
     const running = Object.keys(qs.state.active).filter((id) => id.startsWith('err_') && !id.startsWith('err_diesel')).length;
-    if (running + this.offers.length >= 3) return; // there's always something to do – but not a flood
+    if (running + this.offers.length >= 2) return; // there's always something to do – but not a flood
     this.cd -= dt;
     if (this.cd > 0) return;
-    this.cd = 35 + Math.random() * 45;
+    this.cd = 50 + Math.random() * 50;
     this.spawn();
   }
 

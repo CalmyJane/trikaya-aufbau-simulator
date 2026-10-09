@@ -503,7 +503,7 @@ export const QUESTS = [
       {
         type: 'talk', npc: 'corni', text: { de: 'Melde dich bei Corni', en: 'Report to Corni' },
         dialog: [
-          { who: 'corni', text: { de: 'Steht! Mainstage, Klos, Licht, Awareness, Planetarium, Forest Dome, Techno Floor. Chai… lassen wir weg. Trotzdem mehr als letztes Jahr an Tag vier.', en: 'It stands! Mainstage, toilets, lights, awareness, planetarium, Forest Dome, Techno Floor. Chai… let\'s skip that. Still more than last year by day four.' } },
+          { who: 'corni', text: { de: 'Steht! Mainstage, Klos, Licht, Awareness, Planetarium, Forest Dome, Techno Floor. Chai… steht. Leer. Zählt nicht. Trotzdem mehr als letztes Jahr an Tag vier.', en: 'It stands! Mainstage, toilets, lights, awareness, planetarium, Forest Dome, Techno Floor. Chai… stands. Empty. Doesn\'t count. Still more than last year by day four.' } },
           { who: 'corni', text: { de: 'Ach ja: Die Bar am Techno Floor steht. Ab jetzt ist das Verenas Revier. Und Harry braucht dich heute Nacht für seine Deko. Deko kommt immer zum Schluss, sagt er.', en: 'Oh right: the bar at the Techno Floor is up. From now on it\'s Verena\'s territory. And Harry needs you tonight for his deco. Deco always comes last, he says.' } },
         ],
       },

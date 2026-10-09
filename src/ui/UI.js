@@ -103,7 +103,7 @@ export class UI {
       const left = Math.max(0, Math.ceil(e.deadline - e.t));
       const waiting = e.blocked && !drama.tent;
       const timeTxt = e.helping ? L({ de: 'Hilfe ist unterwegs', en: 'help is on the way' }) : waiting ? L({ de: 'wartet auf das Awareness-Zelt', en: 'waiting for the awareness tent' }) : `⏱ ${clock(left)} ${L({ de: 'bis es zu spät ist', en: 'before it\'s too late' })}`;
-      dramaCards.push(`<div class="track drama ${!e.helping && !waiting && left < 30 ? 'urgent' : ''}"><div class="tt">⚠️ ${L(e.def.title)}${e.victims[0] ? ` – ${drama.victimName(e)}` : ''}</div><div class="ts">${e.helping ? `${e.helping.def.name} ${L({ de: 'ist unterwegs…', en: 'is on the way…' })}` : drama.taskText(e)}</div><div class="td">${d} m · ${timeTxt}</div></div>`);
+      dramaCards.push(`<div class="track drama ${!e.helping && !waiting && left < 30 ? 'urgent' : ''}"><div class="tt">⚠️ ${L(e.def.title)}${e.victims[0] ? `: ${drama.victimName(e)}` : ''}</div><div class="ts">${e.helping ? `${e.helping.def.name} ${L({ de: 'ist unterwegs…', en: 'is on the way…' })}` : drama.taskText(e)}</div><div class="td">${d} m · ${timeTxt}</div></div>`);
     }
     // the timed job goes first, then drama, then everything else
     active.sort((a, b) => (b === timedQid) - (a === timedQid));

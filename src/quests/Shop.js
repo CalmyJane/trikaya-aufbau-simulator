@@ -187,6 +187,7 @@ export class Effects {
     this.weedT = 0;
     this.beerLevel = 0;
     this.beerDecay = 0;
+    this.hadSchnaps = false;
     this.collapsed = false;
     this.commentT = 3;
     document.body.classList.remove('weed');
@@ -214,6 +215,7 @@ export class Effects {
     if (id === 'weed') this.weedT = 90;
     if (id === 'beer' || id === 'schnaps') {
       this.beerLevel += id === 'schnaps' ? 2 : 1;
+      if (id === 'schnaps') this.hadSchnaps = true;
       this.beerDecay = 0;
       if (this.beerLevel >= 5) setTimeout(() => this.collapse('beer'), 600);
       else if (this.beerLevel >= 3) g.ui.toast(de ? '🍺 Du schwankst schon ordentlich. Noch mehr wäre eine schlechte Idee.' : '🍺 You\'re swaying quite a bit. More would be a bad idea.');
@@ -462,6 +464,7 @@ export class Effects {
     const g = this.game;
     if (this.collapsed) return;
     this.collapsed = true;
+    const schnaps = this.hadSchnaps, night = !!g.days?.isNight; // remember before reset()
     g.ui.closeModal?.();
     const p = g.player;
     if (p.vehicle) g.exitVehicle();
@@ -482,11 +485,13 @@ export class Effects {
     p.char.play('idle', 0.5);
     g.ui.fade(false);
     const de = getLang() === 'de';
-    const first = kind === 'beer'
-      ? (de ? 'Na du… Aufgewacht? Fünf Bier in der Mittagssonne. Beim Aufbau. Respekt. Und: nein.' : 'Hey you… awake? Five beers in the midday sun. During the build. Respect. And: no.')
-      : kind === 'energy'
+    const first = kind === 'energy'
       ? (de ? 'Na du… Aufgewacht? Dein Herz ist gerade schneller gelaufen als du. Zu viele Energydrinks, hm?' : 'Hey you… awake? Your heart was running faster than you. Too many energy drinks, huh?')
-      : (de ? 'Na du… Aufgewacht? Du bist einfach umgekippt. Zu viel von allem, hm?' : 'Hey you… awake? You just collapsed. Too much of everything, huh?');
+      : schnaps
+      ? (de ? `Na du… Aufgewacht? Schnaps und Bier durcheinander, ${night ? 'mitten in der Nacht' : 'am helllichten Tag'}. Beim Aufbau. Respekt. Und: nein.` : `Hey you… awake? Schnapps and beer mixed, ${night ? 'in the middle of the night' : 'in broad daylight'}. During the build. Respect. And: no.`)
+      : night
+      ? (de ? 'Na du… Aufgewacht? Zu viel Bier, mitten in der Nacht, zwischen den Kabeltrommeln. Respekt. Und: nein.' : 'Hey you… awake? Too much beer, in the middle of the night, between the cable drums. Respect. And: no.')
+      : (de ? 'Na du… Aufgewacht? Zu viel Bier in der prallen Sonne. Beim Aufbau. Respekt. Und: nein.' : 'Hey you… awake? Too much beer in the blazing sun. During the build. Respect. And: no.');
     await g.runDialog([
       { who: 'franzi', text: first },
       { who: 'franzi', text: tent

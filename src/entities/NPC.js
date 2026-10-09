@@ -118,7 +118,8 @@ export class NPC {
       const me = this.def.id;
       // generic lines (who = null) never come from the giver or the crew of that job: they talk about it in first person
       const mine = (q) => { const qd = g.quests.quests[q]; return qd?.giver === me || qd?.steps?.some((s) => s.build?.crew?.npcs?.includes(me)); };
-      const prog = PROGRESS_LINES.filter(([q, who, , not]) => g.quests.isDone(q) && (who ? who === me : !OWN_VOICE.includes(me) && !not?.includes(me) && !mine(q)));
+      const met = (q) => (/^day\d$/.test(q) ? (g.days?.day || 1) >= +q[3] : g.quests.isDone(q));
+      const prog = PROGRESS_LINES.filter(([q, who, , not]) => met(q) && (who ? who === me : !OWN_VOICE.includes(me) && !not?.includes(me) && !mine(q)));
       if (prog.length) { const own = prog.filter(([, who]) => who === this.def.id); return L(pick(own.length && Math.random() < 0.6 ? own : prog)[2]); }
     }
     // own lines that fit the moment (until / after a job, build day, day or night), never the same one twice in a row
@@ -138,8 +139,9 @@ export class NPC {
     const g = this.manager?.game;
     if (!g || typeof l !== 'object') return true;
     const qs = g.quests, day = g.days?.day || 1;
-    if (l.until && qs.isDone(l.until)) return false;
-    if (l.after && !qs.isDone(l.after)) return false;
+    const met = (q) => (/^day\d$/.test(q) ? day >= +q[3] : qs.isDone(q)); // 'day4' = from build day 4 on
+    if (l.until && met(l.until)) return false;
+    if (l.after && !met(l.after)) return false;
     if (l.minDay && day < l.minDay) return false;
     if (l.maxDay && day > l.maxDay) return false;
     if (l.night != null && !!g.days?.isNight !== l.night) return false;

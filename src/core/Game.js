@@ -218,8 +218,8 @@ export class Game {
     const narnia = ['n1_narnia', 'n2_narnia', 'n3_narnia'].filter((id) => this.quests?.isDone(id)).length;
     this.npcs.nutFound = !!this.quests?.isDone('x1_nuss'); // the special nut running gag ends
     this.world.setStructureStage('narnia_floor', narnia);
-    // the chai tent: at some point it stands. Empty. (it's never finished)
-    this.world.setStructureStage('chai_lounge', this.quests?.isDone('q9_festzelt') ? 1 : 0);
+    // the chai tent: overnight before the last build day it suddenly stands. Empty. (it's never finished)
+    this.world.setStructureStage('chai_lounge', (this.quests?.state.day || 1) >= 4 ? 1 : 0);
     // Künstlergasse: paintings & art workshops once Cosma has her art
     const kunst = !!this.quests?.isDone('k2_kunst');
     this.world.setStructureStage('kuenstlergasse', kunst ? 2 : 1);

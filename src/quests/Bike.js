@@ -192,7 +192,7 @@ export class FranziBike extends Rental {
 
 export class FabiScooter extends Rental {
   constructor(game, scooter) {
-    super(game, scooter, { owner: 'fabi', cost: 5, park: [-1.8, 1.4, -0.8] });
+    super(game, scooter, { owner: 'fabi', cost: 5, park: [-1.8, 1.4, -0.8], refund: true });
   }
 
   text() {
@@ -201,24 +201,28 @@ export class FabiScooter extends Rental {
       ask: `🛴 Darf ich mir deinen E-Scooter ausleihen? (✺ ${c})`,
       yes: 'Klar, nimm ihn, wann du willst. Bringst du ihn wieder? Versprochen? …Ich weiß eh, wo er ist. Meistens.',
       noKarma: 'Ohne Karma kein Akku. So ist das.',
-      firstToast: `🛴 Fabis E-Scooter gehört dir (−${c} ✺). Ab jetzt darfst du ihn immer nehmen, jede Fahrt kostet ✺ ${c}. Lässt du ihn liegen, holt Fabi ihn sich.`,
-      takeToast: `🛴 E-Scooter geliehen (−${c} ✺). Versprochen, du bringst ihn zurück!`,
+      firstToast: `🛴 Fabis E-Scooter gehört dir (−${c} ✺). Ab jetzt darfst du ihn immer nehmen. Bringst du ihn Fabi zurück, kriegst du das Karma wieder. Holt er ihn selbst, ist es weg.`,
+      takeToast: `🛴 E-Scooter geliehen (−${c} ✺). Bring ihn zu Fabi zurück, dann kriegst du das Karma wieder!`,
+      returned: '🛴 E-Scooter zurückgebracht. Fabi gibt dir dein Karma wieder: +{n} ✺',
+      thanks: 'Oh, er ist wieder da! Ich hätte schwören können, der steht im Hühnercontainer.',
       noKarmaToast: `🛴 Zu wenig Karma für den E-Scooter (✺ ${c}).`,
       ride: '🛴 E-Scooter fahren',
       take: `🛴 E-Scooter nehmen (✺ ${c})`,
       needAsk: '🛴 Frag Fabi, ob du dir seinen E-Scooter ausleihen darfst',
-      fetched: '🛴 Fabi hat seinen E-Scooter wieder eingesammelt.',
+      fetched: '🛴 Fabi hat seinen E-Scooter selbst eingesammelt. Das Karma behält er.',
     } : {
       ask: `🛴 Can I borrow your e-scooter? (✺ ${c})`,
       yes: 'Sure, take it whenever you want. You\'ll bring it back? Promise? …I know where it is anyway. Mostly.',
       noKarma: 'No karma, no battery. That\'s how it is.',
-      firstToast: `🛴 Fabi's e-scooter is yours (−${c} ✺). From now on you may always take it, each ride costs ✺ ${c}. Leave it lying around and Fabi fetches it.`,
-      takeToast: `🛴 E-scooter borrowed (−${c} ✺). You promised to bring it back!`,
+      firstToast: `🛴 Fabi's e-scooter is yours (−${c} ✺). From now on you may always take it. Bring it back to Fabi and you get the karma back. If he has to fetch it, it's gone.`,
+      takeToast: `🛴 E-scooter borrowed (−${c} ✺). Bring it back to Fabi and you get the karma back!`,
+      returned: '🛴 E-scooter returned. Fabi gives you your karma back: +{n} ✺',
+      thanks: 'Oh, it\'s back! I could have sworn it was in the chicken container.',
       noKarmaToast: `🛴 Not enough karma for the e-scooter (✺ ${c}).`,
       ride: '🛴 Ride the e-scooter',
       take: `🛴 Take the e-scooter (✺ ${c})`,
       needAsk: '🛴 Ask Fabi if you may borrow his e-scooter',
-      fetched: '🛴 Fabi collected his e-scooter again.',
+      fetched: '🛴 Fabi collected his e-scooter himself. He keeps the karma.',
     };
   }
 }

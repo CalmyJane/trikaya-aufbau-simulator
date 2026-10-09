@@ -36,7 +36,7 @@ import { AfterimagePass } from 'three/addons/postprocessing/AfterimagePass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { createItemMesh, isHeavy } from '../items/itemData.js';
 import { UI } from '../ui/UI.js';
-import { PLOTS } from '../world/layout.js';
+import { PLOTS, LANDMARKS } from '../world/layout.js';
 import { L, t, getLang, setLang, onLangChange, applyDom } from '../i18n.js';
 import { TouchControls, portraitHint } from '../ui/TouchControls.js';
 
@@ -917,15 +917,16 @@ export class Game {
       this.scene.add(g);
       this.truck = g;
     }
-    // drive in through the nearest festival entrance
-    const gate = this.world.spots.plot_entrance;
-    const dir = new THREE.Vector3(gate.x - to.x, 0, gate.z - to.z).normalize();
+    // drive in through the gate in the east fence (from outside, east of it)
+    const eg = LANDMARKS.east_gate;
+    const gate = eg ? new THREE.Vector3(eg.x, 0, eg.z) : this.world.spots.plot_entrance;
+    const dir = eg ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(gate.x - to.x, 0, gate.z - to.z).normalize();
     const start = new THREE.Vector3(gate.x, 0, gate.z).addScaledVector(dir, 25);
     const stop = to.clone().addScaledVector(dir, 3);
     const tr = this.truck;
     tr.userData.load.visible = true;
     tr.visible = true;
-    this.ui.toast(de ? '🚚 Der Klowagen wird angeliefert! Er kommt über den Eingang aufs Gelände.' : '🚚 The toilet trailer is being delivered! It comes in through the entrance.');
+    this.ui.toast(de ? '🚚 Der Klowagen wird angeliefert! Er kommt durchs Tor im Ostzaun aufs Gelände.' : '🚚 The toilet trailer is being delivered! It comes in through the gate in the east fence.');
     let t = -(step.delay || 0);
     const leg1 = start.distanceTo(gate) + 0.001, leg2 = new THREE.Vector3(gate.x, 0, gate.z).distanceTo(stop);
     const speed = 7;

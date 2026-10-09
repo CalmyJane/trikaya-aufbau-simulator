@@ -8,6 +8,8 @@ import { getLang } from '../i18n.js';
 //   'order'    – tap the work steps in the right order (opts.items, given in the correct order)
 //   'match'    – match each thing on the left with its partner on the right (opts.pairs)
 //   'spot'     – find the odd one in a grid (the wobbly bolt, the right nut …), opts.rounds times
+//   'crown'    – a ring spins: hit when a free hole passes the top marker, fill opts.holes (speeds up)
+//   'pump'     – pump left/right in turns, keep the pressure in the green until the tank is empty (too wild = splash)
 // step.minigame may also be an array: the games run one after the other, all must succeed.
 // Every game resolves to true (success) or false (missed / too slow / cancelled). Keyboard + touch.
 
@@ -47,6 +49,8 @@ export class Minigame {
       case 'order': return this.order(o);
       case 'match': return this.match(o);
       case 'spot': return this.spot(o);
+      case 'crown': return this.crown(o);
+      case 'pump': return this.pump(o);
       default: return this.timing(o);
     }
   }
@@ -337,6 +341,82 @@ export class Minigame {
           b.classList.add('good'); this.game.audio.hammer?.();
           if (++round >= rounds) finish(true); else { dealing = true; setTimeout(deal, 220); }
         } else { b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); left -= 1.5; }
+      }, () => finish(false), keyMap);
+    });
+  }
+
+  /** Yurt roof ring: it spins, hit when a free hole is under the marker at the top. Every pole speeds it up. */
+  crown({ title, holes = 6, speed = 0.55, misses = 2, time = 14 } = {}) {
+    const de = getLang() === 'de';
+    const dots = Array.from({ length: holes }, (_, i) => `<i class="mg-hole" style="transform:rotate(${(i / holes) * 360}deg) translateY(-62px)"></i>`).join('');
+    const el = this.frame(title || (de ? 'Dachstangen rein!' : 'Poles in!'), de ? '<b>E</b> / Leertaste / Tippen, wenn ein freies Loch oben am Pfeil ist' : '<b>E</b> / Space / tap when a free hole is at the arrow',
+      `<div class="mg-crown"><div class="mg-arrowdown">▼</div><div class="mg-ring">${dots}</div></div><div class="mg-sub"><div class="mg-subfill"></div></div>`);
+    const ring = el.querySelector('.mg-ring'), crownEl = el.querySelector('.mg-crown'), hs = [...el.querySelectorAll('.mg-hole')], sub = el.querySelector('.mg-subfill');
+    return new Promise((resolve) => {
+      let a = Math.random(), v = speed, last = performance.now(), raf = 0, done = 0, bad = 0, left = time;
+      const filled = new Set();
+      const finish = this.finisher(el, resolve, () => { cancelAnimationFrame(raf); off(); });
+      const tick = (now) => {
+        const dt = Math.min(0.05, (now - last) / 1000); last = now; left -= dt;
+        a = (a + v * dt) % 1;
+        ring.style.transform = `rotate(${a * 360}deg)`;
+        sub.style.width = `${Math.max(0, left / time) * 100}%`;
+        if (left <= 0) return finish(false);
+        raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+      const off = this.listen(el, () => {
+        // which hole is at the top right now? hole i sits at angle i/holes + a (turns)
+        let best = -1, bestD = 1;
+        for (let i = 0; i < holes; i++) {
+          let d = ((i / holes + a) % 1 + 1) % 1; d = Math.min(d, 1 - d);
+          if (d < bestD) { bestD = d; best = i; }
+        }
+        if (bestD < 0.05 && !filled.has(best)) {
+          filled.add(best); hs[best].classList.add('in'); this.game.audio.hammer?.();
+          v *= 1.12;
+          if (++done >= holes) finish(true);
+        } else {
+          crownEl.classList.remove('shake'); void crownEl.offsetWidth; crownEl.classList.add('shake');
+          if (++bad > misses) finish(false);
+        }
+      }, () => finish(false));
+    });
+  }
+
+  /** Pump in turns (left / right). Each stroke adds pressure, it leaks away; only pressure in the green empties the tank. Over the top = splash. */
+  pump({ title, need = 4, time = 12, stroke = 0.12, leak = 0.3 } = {}) {
+    const de = getLang() === 'de';
+    const body = `<div class="mg-pumpwrap"><div class="mg-gauge"><div class="mg-gz"></div><div class="mg-gred"></div><div class="mg-gneedle"></div></div>
+      <div class="mg-tank"><div class="mg-tankfill"></div><span>💩</span></div></div>
+      <div class="mg-pad"><button class="mg-btn mg-arrow mg-pumpbtn" data-i="0">⬅</button><button class="mg-btn mg-arrow mg-pumpbtn" data-i="1">➡</button></div>`;
+    const el = this.frame(title || (de ? 'Pumpen!' : 'Pump!'), de ? 'Abwechselnd ← → (A/D oder Tippen). Druck im Grünen halten!' : 'Alternate ← → (A/D or tap). Keep the pressure in the green!', body);
+    const needle = el.querySelector('.mg-gneedle'), tank = el.querySelector('.mg-tankfill'), btns = [...el.querySelectorAll('.mg-pumpbtn')];
+    const G0 = 0.45, G1 = 0.82;
+    return new Promise((resolve) => {
+      let p = 0, got = 0, left = time, side = -1, last = performance.now(), raf = 0;
+      const finish = this.finisher(el, resolve, () => { cancelAnimationFrame(raf); off(); });
+      const tick = (now) => {
+        const dt = Math.min(0.05, (now - last) / 1000); last = now; left -= dt;
+        p = Math.max(0, p - leak * dt);
+        if (p >= G0 && p <= G1) got += dt;
+        needle.style.bottom = `${Math.min(1, p) * 100}%`;
+        needle.classList.toggle('in', p >= G0 && p <= G1);
+        tank.style.height = `${Math.max(0, 1 - got / need) * 100}%`;
+        if (got >= need) return finish(true);
+        if (left <= 0) return finish(false);
+        raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+      const keyMap = { ArrowLeft: 0, KeyA: 0, ArrowRight: 1, KeyD: 1 };
+      const off = this.listenButtons(el, (i) => {
+        if (i > 1) return;
+        btns[i].classList.add('lit'); setTimeout(() => btns[i].classList.remove('lit'), 110);
+        if (i === side) { p = Math.max(0, p - 0.05); return; } // same side twice: the pump just wheezes
+        side = i;
+        p += stroke;
+        this.game.audio.click?.();
+        if (p > 1) { el.querySelector('.mg-panel').classList.add('splash'); finish(false); }
       }, () => finish(false), keyMap);
     });
   }

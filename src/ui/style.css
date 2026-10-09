@@ -583,3 +583,25 @@ body.touch #dialog-choices .btn { min-height: 44px; }
 #minigame .mg-cancel { width: 44px; height: 44px; font-size: 18px; top: 4px; right: 4px; }
 /* desktop: toasts below the Volunteers button */
 body:not(.touch) #toasts { top: 62px; }
+
+/* minigame: yurt roof ring */
+#minigame .mg-crown { position: relative; width: 160px; height: 160px; margin: 4px auto 6px; }
+#minigame .mg-arrowdown { position: absolute; left: 50%; top: -6px; transform: translateX(-50%); color: var(--gold); font-size: 18px; z-index: 2; }
+#minigame .mg-ring { position: absolute; inset: 14px; border-radius: 50%; border: 10px solid #8a6a3a; box-shadow: inset 0 0 0 3px #5a4224, 0 0 0 3px #5a4224; }
+#minigame .mg-crown.shake { animation: mgShake 0.3s; }
+#minigame .mg-crown.shake .mg-ring { border-color: #a84a3a; }
+#minigame .mg-hole { position: absolute; left: 50%; top: 50%; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; background: #1b1206; box-shadow: 0 0 0 2px #c9a26a; }
+#minigame .mg-hole.in { background: #ffd21f; box-shadow: 0 0 10px #ffd21f; }
+/* minigame: poo pump */
+#minigame .mg-pumpwrap { display: flex; justify-content: center; gap: 28px; margin-bottom: 10px; }
+#minigame .mg-gauge { position: relative; width: 26px; height: 120px; border-radius: 13px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
+#minigame .mg-gz { position: absolute; left: 0; right: 0; bottom: 45%; height: 37%; background: rgba(90, 220, 110, 0.55); }
+#minigame .mg-gred { position: absolute; left: 0; right: 0; top: 0; height: 9%; background: rgba(255, 90, 74, 0.6); }
+#minigame .mg-gneedle { position: absolute; left: -2px; right: -2px; height: 5px; margin-bottom: -2px; background: #fff; box-shadow: 0 0 8px #fff; border-radius: 3px; }
+#minigame .mg-gneedle.in { background: #8dff9e; box-shadow: 0 0 10px #8dff9e; }
+#minigame .mg-tank { position: relative; width: 70px; height: 120px; border-radius: 10px; border: 2px solid rgba(255, 255, 255, 0.25); overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 30px; }
+#minigame .mg-tankfill { position: absolute; left: 0; right: 0; bottom: 0; height: 100%; background: linear-gradient(#7a5a2a, #4a3418); transition: height 0.1s linear; }
+#minigame .mg-tank span { position: relative; }
+#minigame .mg-pumpbtn { width: 84px; height: 60px; }
+#minigame .mg-panel.splash { animation: mgShake 0.4s; background: rgba(90, 60, 20, 0.95); }
+@media (max-height: 520px) { #minigame .mg-crown { width: 130px; height: 130px; } #minigame .mg-gauge, #minigame .mg-tank { height: 90px; } }

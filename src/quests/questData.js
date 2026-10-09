@@ -263,14 +263,11 @@ export const QUESTS = [
         type: 'work', text: { de: 'Schließ die Kackepumpe an', en: 'Connect the poo pump' },
         targets: ['wc_pump'], workTime: 4, progress: 'pump', costEach: 450,
         label: { de: 'Hebepumpe anschließen', en: 'Connect lifting pump' },
-        minigame: 'match', minigameTitle: { de: 'Kackepumpe anschließen: Was kommt wohin?', en: 'Connect the poo pump: what goes where?' },
-        minigameOpts: { pairs: [
-          [{ de: '🟤 Abwasserschlauch', en: '🟤 Waste hose' }, { de: 'Abwassertank', en: 'Waste tank' }],
-          [{ de: '⚡ Stromkabel', en: '⚡ Power cable' }, { de: 'Steckdose am Verteiler', en: 'Socket on the distributor' }],
-          [{ de: '🔵 Spülwasser', en: '🔵 Flush water' }, { de: 'Wasserhahn', en: 'Water tap' }],
-          [{ de: '🎚️ Schwimmerschalter', en: '🎚️ Float switch' }, { de: 'In den Pumpenschacht', en: 'Into the pump shaft' }],
-        ] },
-        minigameFail: { de: 'Spülwasser in der Steckdose. Felix hat es gespürt. Nochmal, bevor er herkommt.', en: 'Flush water in the socket. Felix felt it. Again, before he comes over.' },
+        minigame: [
+          { kind: 'mash', title: { de: 'Schlauch auf den Stutzen drücken!', en: 'Push the hose onto the nozzle!' }, need: 12, time: 4.5 },
+          { kind: 'pump', title: { de: 'Anpumpen! Nicht zu wild…', en: 'Prime it! Not too wild…' }, need: 4, time: 12 },
+        ],
+        minigameFail: { de: 'SPLATSCH. Du riechst jetzt wie der Klowagen. Juli lacht. Nochmal.', en: 'SPLAT. You now smell like the toilet trailer. Juli laughs. Again.' },
       },
       {
         type: 'ride', npc: 'juli', at: 'wc_pump', radius: 9, toLabel: { de: 'Kackepumpe', en: 'Poo pump' },
@@ -346,15 +343,10 @@ export const QUESTS = [
       {
         type: 'deliver', text: { de: 'Bau das Awareness-Zelt auf', en: 'Build the awareness tent' },
         items: ['awareness_bag'], plot: 'awareness', buildTime: 4,
-        minigame: 'order', minigameTitle: { de: 'Jurte aufbauen: in welcher Reihenfolge?', en: 'Put up the yurt: in which order?' },
-        minigameOpts: { items: [
-          { de: 'Scherengitter im Kreis aufstellen', en: 'Stand the lattice walls in a circle' },
-          { de: 'Türrahmen einbinden', en: 'Tie in the door frame' },
-          { de: 'Dachkranz hochstemmen', en: 'Lift the roof ring' },
-          { de: 'Dachstangen einhängen', en: 'Hook in the roof poles' },
-          { de: 'Plane drüberziehen', en: 'Pull the cover over it' },
-          { de: 'Kissen und Decken rein', en: 'Cushions and blankets in' },
-        ] },
+        minigame: [
+          { kind: 'balance', title: { de: 'Dachkranz hochstemmen, nicht kippen!', en: 'Lift the roof ring, don\'t tip it!' }, need: 2, time: 7 },
+          { kind: 'crown', title: { de: 'Dachstangen in den Kranz!', en: 'Poles into the ring!' }, holes: 6 },
+        ],
         minigameFail: { de: 'Die Plane liegt auf dem Gitter, das Gitter liegt auf dir. Franzi hilft dir raus. Nochmal von vorn.', en: 'The cover is on the lattice, the lattice is on you. Franzi helps you out. Start again.' },
         build: { id: 'awareness', type: 'awareness_tent', plot: 'awareness', rotation: 0.6, cost: 1900 },
       },

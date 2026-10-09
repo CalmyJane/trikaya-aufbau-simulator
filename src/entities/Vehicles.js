@@ -124,7 +124,11 @@ class Vehicle {
       if (input.down('KeyA', 'ArrowLeft')) steerIn += 1;
       if (input.down('KeyD', 'ArrowRight')) steerIn -= 1;
       if (Math.abs(input.axis.y) > 0.15) throttle += -input.axis.y;
-      if (Math.abs(input.axis.x) > 0.15) steerIn += -input.axis.x;
+      const soft = input.touch && this.id === 'quad'; // phone joystick: finer steering near the middle
+      if (Math.abs(input.axis.x) > 0.15) {
+        const x = -input.axis.x;
+        steerIn += soft ? Math.sign(x) * Math.pow(Math.min(1, (Math.abs(x) - 0.15) / 0.85), 1.6) : x;
+      }
       throttle = Math.max(-1, Math.min(1, throttle));
       // after a few beers the steering has a mind of its own
       if (this.wobble > 0 && Math.abs(this.speed) > 0.5) {
@@ -147,8 +151,11 @@ class Vehicle {
     // above the cap (e.g. Shift released): roll back down smoothly instead of snapping
     if (this.speed > maxSp) this.speed = Math.max(maxSp, Math.min(this.speed, sp0 - 4 * dt));
     // steering
-    this.steer += (steerIn * o.maxSteer - this.steer) * Math.min(1, dt * 6);
-    const turn = this.steer * (this.speed / o.maxSpeed) * o.turnRate * (Math.abs(this.speed) > 0.3 ? 1 : 0);
+    const softSteer = input?.touch && this.id === 'quad';
+    this.steer += (steerIn * o.maxSteer - this.steer) * Math.min(1, dt * (softSteer ? 4 : 6));
+    // phone quad: still nimble when slow, a bit calmer at full speed
+    const calm = softSteer ? 1 - 0.3 * Math.min(1, Math.abs(this.speed) / o.maxSpeed) : 1;
+    const turn = this.steer * (this.speed / o.maxSpeed) * o.turnRate * calm * (Math.abs(this.speed) > 0.3 ? 1 : 0);
     this.root.rotation.y += turn * dt;
     // move
     const p = this.root.position;

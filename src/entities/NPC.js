@@ -328,7 +328,7 @@ export class NPC {
 
   finish(dt) {
     const p = this.root.position;
-    p.y = heightAt(p.x, p.z) + (this.party ? this.bob || 0 : 0);
+    p.y = heightAt(p.x, p.z) + (this.party ? this.bob || 0 : 0) + (this.emoteY || 0);
     this.char.update(dt);
   }
 
@@ -540,8 +540,90 @@ export class NPC {
     }
   }
 
+  /** May this person stop and stand with the player? (only two at a time) */
+  canAttend() {
+    const m = this.manager;
+    if (!m) return true;
+    m.attending ||= new Set();
+    if (m.attending.has(this)) return true;
+    if (m.attending.size >= 2) return false;
+    m.attending.add(this);
+    return true;
+  }
+
+  /** Walk over, wave like mad, maybe hop, say something, walk off again. */
+  runVisit(dt, player) {
+    const v = this.visit;
+    v.t += dt;
+    if (v.t > 25 || this.toPlayer > 45) { this.visit = null; return false; }
+    if (!v.at) {
+      const d = this.position.clone().sub(player.position).setY(0);
+      if (d.lengthSq() < 0.01) d.set(1, 0, 0);
+      const goal = player.position.clone().add(d.normalize().multiplyScalar(2.8));
+      if (this.walkTo(goal, dt, this.speed * 1.4) && this.toPlayer < 5) { v.at = true; v.wave = 2.6; this.startEmote('bigwave', 2.6); if (!this.bubble) this.say(this.line(), 3); }
+      else if (this.toPlayer < 3.2) { v.at = true; v.wave = 2.6; this.startEmote('bigwave', 2.6); }
+      return true;
+    }
+    this.char.faceTowards(player.position, dt);
+    if ((v.wave -= dt) > 0) { this.runEmote(dt); return true; }
+    this.visit = null; this.emote = null; this.emoteY = 0;
+    this.target = this.pickWanderTarget(); // and back to whatever they were doing
+    return false;
+  }
+
+  /** Little moments: dancing near music, a big wave, a hop, very rarely a somersault. */
+  startEmote(kind, dur) {
+    this.emote = { kind, t: 0, dur, ph: Math.random() * 6 };
+    if (kind === 'roll') this.char.play('roll', 0.15, { once: true });
+  }
+
+  runEmote(dt) {
+    const e = this.emote;
+    if (!e) return false;
+    e.t += dt;
+    const t = e.t;
+    if (t >= e.dur) { this.emote = null; this.emoteY = 0; this.char.play('idle', 0.3); return false; }
+    if (e.kind === 'dance') {
+      // bounce to the beat, sway, throw an arm up now and then
+      this.emoteY = Math.abs(Math.sin(t * 6.2 + e.ph)) * 0.09;
+      this.root.rotation.y += Math.sin(t * 1.9 + e.ph) * dt * 1.6;
+      this.char.play(Math.sin(t * 0.9 + e.ph) > 0.55 ? 'wave' : 'idle', 0.25, { timeScale: 1.9 });
+    } else if (e.kind === 'bigwave') {
+      this.emoteY = Math.max(0, Math.sin(t * 7)) * 0.12; // waving with little jumps
+      this.char.play('wave', 0.2, { timeScale: 1.6 });
+    } else if (e.kind === 'hop') {
+      const k = (t % 0.55) / 0.55;
+      this.emoteY = Math.sin(Math.PI * k) * 0.35;
+      this.char.play('idle', 0.2);
+    } else if (e.kind === 'roll') {
+      // somersault: the roll clip, moving forward a bit
+      const h = this.root.rotation.y, s = t < 1 ? 1.8 : 0;
+      this.root.position.x += Math.sin(h) * s * dt;
+      this.root.position.z += Math.cos(h) * s * dt;
+      this.world.colliders?.resolve?.(this.root.position, 0.4);
+    }
+    return true;
+  }
+
+  /** Is live music playing close by? (the mainstage, the Forest Dome once it stands) */
+  nearMusic(game) {
+    const p = this.position, st = game?.world?.structures;
+    const near = (o, r) => o && Math.hypot(o.position.x - p.x, o.position.z - p.z) < r;
+    return near(st?.mainstage?.object, 30) || near(st?.forest_dome?.object, 24);
+  }
+
+  /** After arriving somewhere: maybe do something fun instead of just standing. */
+  maybeEmote(game) {
+    if (this.toPlayer > 60 || this.char.sitting) return;
+    const r = Math.random();
+    if (this.nearMusic(game) && r < 0.4) this.startEmote('dance', 4 + Math.random() * 5);
+    else if (this.toPlayer < 18 && r < 0.06) this.startEmote('bigwave', 2.2);
+    else if (r < 0.1) this.startEmote('hop', 1.1 + Math.random() * 0.6);
+    else if (r < 0.115) this.startEmote('roll', 1.4);
+  }
+
   greetCheck(dt, player) {
-    if (this.toPlayer < 5 && !this.greeted) {
+    if (this.toPlayer < 5 && !this.greeted && this.canAttend()) {
       this.greeted = true;
       this.waveT = 1.8;
       this.char.play('wave', 0.2, { once: true });
@@ -585,14 +667,19 @@ const BEHAVIORS = {
     n.char.play('idle');
   },
 
-  wander(n, t, dt, { player }) {
+  wander(n, t, dt, { player, game }) {
+    if (n.visit && n.runVisit(dt, player)) return;
+    if (n.emote) { if (n.toPlayer < 2.2) { n.emote = null; n.emoteY = 0; } else if (n.runEmote(dt)) return; }
     if (n.greetCheck(dt, player)) return;
-    if (n.toPlayer < 3.5) { n.char.faceTowards(player.position, dt); n.char.play('idle'); return; }
+    if (n.toPlayer < 3.5 && n.canAttend()) { n.char.faceTowards(player.position, dt); n.char.play('idle'); return; }
     if (n.wait > 0) { n.wait -= dt; n.char.play(n.workAnim ? 'interact' : 'idle'); return; }
+    // don't settle right next to the player unless you're one of the two who stopped
+    if (n.target && n.toPlayer < 6 && Math.hypot(n.target.x - player.position.x, n.target.z - player.position.z) < 3.5) n.target = null;
     if (!n.target) n.target = n.pickWanderTarget();
     const r = n.walkTo(n.target, dt);
     if (r) {
       n.target = null; n.workAnim = Math.random() < 0.5; n.wait = 2 + Math.random() * 5;
+      n.maybeEmote(game);
       // roamers move on to another part of the camp / festival now and then
       if (n.def.roam && Math.random() < 0.3) { const h = n.resolveSpot(n.def.roam); if (h) n.home = h; }
     }
@@ -604,7 +691,7 @@ const BEHAVIORS = {
 
   route(n, dt, { player }, running, working) {
     if (!running && n.greetCheck(dt, player)) return;
-    if (!running && n.toPlayer < 3.5) { n.char.faceTowards(player.position, dt); n.char.play('idle'); return; }
+    if (!running && n.toPlayer < 3.5 && n.canAttend()) { n.char.faceTowards(player.position, dt); n.char.play('idle'); return; }
     if (n.wait > 0) { n.wait -= dt; n.char.play(working ? 'interact' : 'idle'); return; }
     if (!n.target) {
       n.routeIdx = (n.routeIdx + 1) % n.def.route.length;
@@ -955,8 +1042,22 @@ export class NPCManager {
     }
   }
 
+  /** Now and then someone walks over just to say hi (wave, hop) and then goes back to work. */
+  updateVisitor(dt, ctx) {
+    this.visitT = (this.visitT ?? 40) - dt;
+    if (this.visitT > 0 || [...this.map.values()].some((n) => n.visit)) return;
+    this.visitT = 70 + Math.random() * 80;
+    const g = ctx.game;
+    if (!g?.registered || g.ui?.dialogOpen || ctx.player.vehicle) return;
+    const cands = [...this.map.values()].filter((n) => n.def.behavior === 'wander' && !n.hidden && !n.task && !n.incident && !n.talking && !n.party && !n.char.sitting && n.toPlayer > 8 && n.toPlayer < 30);
+    if (cands.length) cands[Math.floor(Math.random() * cands.length)].visit = { t: 0 };
+  }
+
   update(t, dt, ctx) {
     this.playerPos = ctx.player.position;
+    // at most two people stop and stand with you – no crowd
+    this.attending = new Set([...(this.attending || [])].filter((n) => n.toPlayer < 4.5 && !n.hidden && !n.task && !n.incident));
+    this.updateVisitor(dt, ctx);
     let nb = 0;
     for (const n of this.map.values()) if (n.bubble && n.toPlayer < 18) nb++;
     this.nearBubbles = nb;

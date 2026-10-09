@@ -207,7 +207,7 @@ export const QUESTS = [
       {
         type: 'talk', npc: 'fabi', text: { de: 'Frag Fabi nach Diesel', en: 'Ask Fabi about diesel' },
         dialog: [
-          { who: 'fabi', text: { de: 'Diesel? Kanister steht beim Pickup, vorne am Tor. Der große Tank steht beim Generator, damit kannst du später nachtanken.', en: 'Diesel? A canister is by the pickup, near the gate. The big tank is next to the generator, use it to refuel later.' } },
+          { who: 'fabi', text: { de: 'Diesel? Kanister steht beim blauen Bauwagen. Der große Tank steht beim Generator, damit kannst du später nachtanken.', en: 'Diesel? A canister is by the blue site trailer. The big tank is next to the generator, use it to refuel later.' } },
         ],
       },
       { type: 'pickup', text: { de: 'Hol den Dieselkanister', en: 'Get the diesel canister' }, items: [{ item: 'diesel_can', at: 'diesel_spot' }] },

@@ -287,7 +287,7 @@ export const NPCS = [
       { de: 'Bruno. BRUNO. Das ist die falsche Schraube. …Danke trotzdem! 💛', en: 'Bruno. BRUNO. That\'s the wrong screw. …Thanks anyway! 💛' },
       { de: 'Daniel, wenn du die Palette noch einmal fallen lässt, bau ich dich in den Boden ein. Mit Liebe.', en: 'Daniel, if you drop that pallet one more time, I\'ll build you into the floor. With love.' },
       { de: 'Lenny! Nicht tanzen, SCHRAUBEN! …Okay, ein bisschen tanzen.', en: 'Lenny! Not dancing, SCREWING! …Okay, a little dancing.' },
-      { de: 'Hinter dem Schrank beginnt Narnia. Also bald. Wenn der Schrank da ist.', en: 'Narnia begins behind the wardrobe. Soon. Once the wardrobe is here.' },
+      { de: 'Hinter dem Schrank beginnt Narnia. Also bald. Wenn der Schrank da ist.', en: 'Narnia begins behind the wardrobe. Soon. Once the wardrobe is here.', until: 'n2_narnia' },
       { de: 'Ich bin gar nicht genervt. Ich lächle nur sehr fest.', en: 'I\'m not annoyed at all. I\'m just smiling very firmly.' },
     ],
   },
@@ -534,7 +534,7 @@ export const NPCS = [
     look: { base: 'f_casual', skin: SKIN.light, hair: '#3a2416', brows: '#2e1c10', hairStyle: 'long', hairStyleColor: '#3a2416', hairLength: 0.45, shirt: '#e8d8b8', pants: '#3a4a5a', patchwork: true, shirtPatch: ['#e8d8b8', '#c87a4a', '#6a8aa8'], height: 1.56, width: 0.92 },
     behavior: 'wander', home: 'plot_kuenstlergasse', offset: [3, -2], radius: 9,
     lines: [
-      { de: 'Hi! Ich bin Stella. Fabis Tochter. Ja, genau DER Fabi. Ich weiß auch nicht, wo die Spezial-Nuss ist.', en: 'Hi! I\'m Stella. Fabi\'s daughter. Yes, THAT Fabi. I don\'t know where the special nut is either.' },
+      { de: 'Hi! Ich bin Stella. Fabis Tochter. Ja, genau DER Fabi. Ich weiß auch nicht, wo die Spezial-Nuss ist.', en: 'Hi! I\'m Stella. Fabi\'s daughter. Yes, THAT Fabi. I don\'t know where the special nut is either.', until: 'x1_nuss' },
       { de: '*kichert* Entschuldigung. Ich hab grad Matze zugeschaut, wie er einen Kaffee sucht, den er in der Hand hält.', en: '*giggles* Sorry. I was just watching Matze look for a coffee he\'s holding.' },
       { de: 'Ich mal die Schilder für die Künstlergasse. Und manchmal halt ich Felix eine Lampe. Er erklärt mir dann sehr lange, warum ich sie falsch halte.', en: 'I\'m painting the signs for the artists\' alley. And sometimes I hold a lamp for Felix. Then he explains at length why I\'m holding it wrong.' },
       { de: 'Papa sagt, er weiß, wo alles ist. Ich kenn ihn seit zwanzig Jahren. Er weiß, wo FAST alles ist.', en: 'Dad says he knows where everything is. I\'ve known him for twenty years. He knows where ALMOST everything is.' },

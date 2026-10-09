@@ -1789,7 +1789,8 @@ export class Game {
       if (hornBtn && hornBtn._on !== horn) { hornBtn._on = horn; hornBtn.classList.toggle('hidden', !horn); }
     }
     // interaction prompt
-    if (playing && !this.ui.dialogOpen && !this.building) this.safe(() => {
+    // frozen = a scripted bit is playing (cameo run-in, minigame, fail dialog) – no second interaction meanwhile
+    if (playing && !this.ui.dialogOpen && !this.building && !this.player.frozen) this.safe(() => {
       const best = this.interactionCandidates()[0];
       this.ui.prompt(best?.label, best?.disabled);
       this.touch?.setAction(best?.label, best?.disabled);

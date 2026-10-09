@@ -13,6 +13,7 @@ export function install(g) {
   T.best = () => { const c = g.interactionCandidates()[0]; return c ? (c.disabled ? '[x] ' : '') + c.label.replace(/<[^>]+>/g, '') : 'none'; };
   T.fin = async (choice) => {
     await T.sleep(40);
+    for (let i = 0; i < 60 && !g.ui.dialogOpen && g.player.frozen; i++) await T.sleep(100); // cameo run-in
     for (let i = 0; i < 60 && g.ui.dialogOpen; i++) {
       T.key('KeyE'); await T.sleep(35);
       if (choice && document.getElementById('dialog-choices').children.length) { T.key('Digit' + choice); await T.sleep(60); }
@@ -83,6 +84,17 @@ export function install(g) {
         if (!g.player.vehicle) g.enterVehicle(T.L);
         T.L.root.rotation.y = st.heading || 0; T.L.root.position.set(sp.x, 0, sp.z); T.L.speed = 0; T.L.syncCollider(); T.step(60);
         if (g.quests.currentStep(qid) === st) log.push('  PARK FAIL');
+      } else if (st.type === 'trailer') {
+        const q = g.vehicles.quad, tr = g.trailer, a = tr.active;
+        if (q.broken) q.broken = false;
+        if (!g.player.vehicle) g.enterVehicle(q);
+        q.root.position.set(a.meet.x + 2, 0, a.meet.z); q.speed = 0;
+        for (const n of tr.people()) n.root.position.set(a.meet.x + 3, 0, a.meet.z + 1);
+        T.step(4); const b = T.best(); T.pressE(); T.step(10); await T.fin();
+        if (!a.boarded) { log.push(`  BOARD FAIL best=${b}`); continue; }
+        q.root.position.set(a.goal.x + 1, 0, a.goal.z + 1); q.speed = 0; T.step(6); await T.sleep(300); await T.fin(); T.step(4);
+        if (g.player.vehicle) g.exitVehicle();
+        if (g.quests.currentStep(qid) === st) log.push('  TRAILER FAIL');
       } else if (st.type === 'karma') {
         g.quests.state.karma += g.quests.state.active[qid].need;
         if (g.player.vehicle) g.exitVehicle();
@@ -106,7 +118,7 @@ export function install(g) {
     ['corni', 'q3_toilets'], ['sabse', 's1_veggies'], ['franzi', 'q6_awareness'], ['mia', 'n1_narnia'], ['wiesel', 'h1_hammocks'], ['cosma', 'k1_kuenstlergasse'], ['flo', 's3_quad'], ['georg', 'fs1_tribuenen'],
     ['corni', 's2_storm'],
     // day 3 · night 3
-    ['jan', 'e1_entrance'], ['annika', 'm1_shops'], ['matze', 'q7_dome'], ['mia', 'n2_narnia'], ['cosma', 'k2_kunst'], ['andi', 'r1_wassertank'], ['fabbe', 'q8_forestdome'],
+    ['jan', 'e1_entrance'], ['annika', 'm1_shops'], ['matze', 'q7_dome'], ['mia', 'n2_narnia'], ['cosma', 'k2_kunst'], ['andi', 'r1_wassertank'], ['fabbe', 'q8_forestdome'], ['corni', 't1_trailer'],
     ['fabbe', 'f1_fabbe_tools'],
     // day 4 · night 4
     ['schwarzhuber', 'g1_genehmigung'], ['corni', 'q9_festzelt'], ['mia', 'n3_narnia'], ['jonas', 'q11_straw'], ['krygo', 'kr1_sauna'],

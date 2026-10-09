@@ -13,7 +13,7 @@ export const CHATS = {
     ] },
     // running gag: the rigging material
     { needs: 'q1_rigging', line: C('Sag mal… hast du eigentlich das Rigging-Material? Die Stahlseile für die Mainstage?', 'Say… have you actually got the rigging material? The steel wires for the mainstage?'), options: [
-      { text: C('Die hängen doch schon seit Montag!', 'They\'ve been up since Monday!'), karma: 1, reply: C('Ach ja. …Und die ANDEREN Stahlseile?', 'Oh right. …And the OTHER steel wires?') },
+      { text: C('Die hängen doch längst!', 'They\'re already up!'), karma: 1, reply: C('Ach ja. …Und die ANDEREN Stahlseile?', 'Oh right. …And the OTHER steel wires?') },
       { text: C('Ich schau gleich nochmal nach.', 'I\'ll check again in a sec.'), karma: 2, reply: C('Super. Das brauchen wir DRINGEND.', 'Great. We need that URGENTLY.') },
       { text: C('Frag doch Leo.', 'Ask Leo.'), karma: -1, reply: C('Hab ich. Leo meinte, ich soll dich fragen.', 'I did. Leo said to ask you.') },
     ] },

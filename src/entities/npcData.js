@@ -441,7 +441,7 @@ export const NPCS = [
     id: 'verena', name: 'Verena', role: { de: 'Bar-Chefin (organisiert die Barcrew)', en: 'Bar boss (runs the bar crew)' }, portrait: '🍹',
     look: { base: 'f_formal', skin: SKIN.light, hair: '#5a2a1a', shirt: '#1f6fc9', pants: '#1f6fc9', patchwork: true, shirtPatch: ['#1f6fc9', '#ffffff', '#1f4f99'] },
     behavior: 'wander', home: 'base_yard', offset: [3, -3], radius: 6,
-    homeAfter: { quest: 'q9_festzelt', spot: 'plot_biergarten', offset: [7.6, 2], radius: 1.5 }, // behind her bar at the Techno Floor once it stands
+    homeAfter: { quest: 'q9_festzelt', spot: 'techno_barkeeper', radius: 1.5 }, // behind her bar at the Techno Floor once it stands
     lines: [
       { de: 'Meine Bar steht noch nicht. Meine Barcrew schon. Ist ja auch was.', en: 'My bar isn\'t up yet. My bar crew is. That\'s something.', until: 'q9_festzelt' },
       { de: 'Ich steh nicht hinter der Bar. Ich sorg dafür, dass da immer wer steht.', en: 'I don\'t stand behind the bar. I make sure someone always does.' },

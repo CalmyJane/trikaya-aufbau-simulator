@@ -1015,7 +1015,7 @@ export function buildTechnoFloor() {
   const bar = signPost('BAR', { width: 1.4, height: 0.7, bg: '#0a0a0a', fg: '#ffd24a' });
   bar.position.set(8.6, 0, 4.4);
   g.add(bar);
-  g.userData.spots = { techno_bar: [7.2, 2.6], techno_dj: [0, -2.4] };
+  g.userData.spots = { techno_bar: [7.2, 2.6], techno_barkeeper: [7.6, 2.0], techno_dj: [0, -2.4] };
   g.userData.animate = (t) => {
     lasers.forEach((p, i) => { p.rotation.z = Math.sin(t * 0.9 + i * 2) * 0.9; p.rotation.x = 0.5 + Math.sin(t * 0.6 + i) * 0.35; });
     const on = Math.floor(t * 8) % 5 === 0;

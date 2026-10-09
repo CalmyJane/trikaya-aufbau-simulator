@@ -107,7 +107,6 @@ export const LANDMARKS = {
   festival_generator: P(585, 615),
   bar_tent: P(358, 740),       // the red & black round bar tent at the south fence
   east_gate: P(612, 728),     // gate in the east fence: deliveries come in here (the entrance tent stands further inside)
-  beer_garden: P(594, 676),    // small beige stretch tent with beer table sets (east, middle)
   chill: P(680, 316), // Zdenko & Thompsen's beer bench, middle of the crew & artist camp
 };
 
@@ -118,14 +117,14 @@ export const PLOTS = {
   // the firespace with the wooden Shiva statue is already standing too
   firespace:    { pos: P(295, 734), size: 18, flatRadius: 13, label: 'Firespace', prebuilt: true }, // south-west of the dancefloor, where the dragon looks
   hammocks:     { pos: P(215, 728), size: 18, label: 'Hängemattenwald' },                         // between the Forest Dome and the statue
-  chai_lounge:  { pos: P(442, 653), size: 16, label: 'Chai Lounge', prebuilt: true },               // right below the mainstage – eternal construction site
-  planetarium:  { pos: P(503, 580), size: 18, label: 'Planetarium' },                               // the rectangle at the far east, up towards the hedge
-  biergarten:   { pos: P(492, 666), size: 18, label: 'Techno Floor' },                              // the two tents, right next to the entrance (west of it)
-  awareness:    { pos: P(554, 622), size: 12, label: 'Awareness' },                                 // green & light green, between the planetarium and the generator
+  chai_lounge:  { pos: P(405, 655), size: 16, label: 'Chai Lounge', prebuilt: true },               // below the mainstage, in the middle of the ground – eternal construction site
+  planetarium:  { pos: P(514, 556), size: 18, label: 'Planetarium' },                               // the rectangle at the far east, right along the north-east fence
+  biergarten:   { pos: P(420, 724), size: 15, label: 'Techno Floor', rotation: -0.45, scale: 0.82 }, // the two tents near the bar, a bit smaller, turned like the Forest Dome
+  awareness:    { pos: P(565, 590), size: 12, label: 'Awareness' },                                 // green & light green, at the north-east fence next to the planetarium (generator south of it)
   // future plots - marked in the dirt until a quest builds them
   narnia_floor: { pos: P(262, 655), size: 16, label: 'Narnia Floor', prebuilt: true }, // the pentagon tent + the white one next to it – Mia's crew builds it in stages
   forest_dome:  { pos: P(140, 692), size: 16, label: 'Forest Dome', clearRadius: 19 },  // two half-round tents in the south-west, stage in the gap
-  shops:        { pos: P(480, 723), size: 14, label: 'Shops' },          // market alley south of the techno floor
+  shops:        { pos: P(494, 664), size: 14, label: 'Shops' },          // market stalls between the planetarium, the techno floor and the entrance
   kuenstlergasse: { pos: P(276, 545), size: 18, label: 'Künstlergasse' }, // Cosma & Mathias, at the north hedge west of the dragon
   entrance:     { pos: P(557, 666), size: 12, label: 'Eingang' },          // the white tent, east side of the festival ground (techno floor left of it)
 };

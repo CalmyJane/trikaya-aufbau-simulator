@@ -328,7 +328,6 @@ export class World {
     this.placeStructure('chai_lounge', 'chai_tent', 'chai_lounge', { animate: false, rotation: Math.atan2(ms.x - cl.x, ms.z - cl.z) });
     // decoration that is simply there: the bar tent and the little beer garden
     this.placeStructure('bar_tent', 'bar_tent', null, { animate: false, at: LANDMARKS.bar_tent, rotation: Math.PI - 0.1 });
-    this.placeStructure('beer_garden', 'beer_garden', null, { animate: false, at: LANDMARKS.beer_garden, rotation: -0.5 });
     this.kitchenZone = { x: LANDMARKS.kitchen.x, z: LANDMARKS.kitchen.z, r: k.zone?.r || 5.5 };
     this.buildStrawWalls();
     this.buildChillCorner();
@@ -600,18 +599,21 @@ export class World {
   placeStructure(id, type, plotId, { animate = true, rotation = 0, params, at, blocker = true, growTime = 1.6 } = {}) {
     if (this.structures[id]) return this.structures[id];
     const plot = plotId ? PLOTS[plotId] : { pos: at, size: 10 };
+    if (plot.rotation !== undefined) rotation = plot.rotation; // the plot decides (also for structures in old saves)
+    const sc = plot.scale || 1;
     const { object, colliders, api, zone } = buildStructure(type, params);
     object.position.set(plot.pos.x, heightAt(plot.pos.x, plot.pos.z), plot.pos.z);
     object.rotation.y = rotation;
+    object.scale.setScalar(sc);
     this.scene.add(object);
     if (blocker && type !== 'shade_sails') this.cameraBlockers.push(object);
     // colliders to world
     const cos = Math.cos(rotation), sin = Math.sin(rotation);
     for (const c of colliders) {
-      const wx = plot.pos.x + c.x * cos + c.z * sin;
-      const wz = plot.pos.z - c.x * sin + c.z * cos;
-      if (c.type === 'circle') this.colliders.addCircle(wx, wz, c.r, `struct_${id}`);
-      else this.colliders.addBox(wx, wz, c.hw, c.hd, (c.rot || 0) + rotation, `struct_${id}`);
+      const wx = plot.pos.x + (c.x * cos + c.z * sin) * sc;
+      const wz = plot.pos.z + (-c.x * sin + c.z * cos) * sc;
+      if (c.type === 'circle') this.colliders.addCircle(wx, wz, c.r * sc, `struct_${id}`);
+      else this.colliders.addBox(wx, wz, c.hw * sc, c.hd * sc, (c.rot || 0) + rotation, `struct_${id}`);
     }
     if (this.plotMarkers[plotId]) this.plotMarkers[plotId].visible = false;
     if (plotId) setPlotMarked(plotId, false); // the sprayed outline disappears under the new structure
@@ -619,13 +621,13 @@ export class World {
     this.onPlaced?.(object);
     // named spots authored in the structure's local space
     for (const [name, [lx, lz]] of Object.entries(object.userData.spots || {})) {
-      this.spots[name] = new THREE.Vector3(plot.pos.x + lx * cos + lz * sin, 0, plot.pos.z - lx * sin + lz * cos);
+      this.spots[name] = new THREE.Vector3(plot.pos.x + (lx * cos + lz * sin) * sc, 0, plot.pos.z + (-lx * sin + lz * cos) * sc);
     }
     const rec = { object, type, plotId, api, zone };
     this.structures[id] = rec;
 
     if (animate) {
-      object.scale.set(1, 0.001, 1);
+      object.scale.set(sc, 0.001, sc);
       this.spawnDust(plot.pos, plot.size * 0.6);
       if (growTime < 3) this.spawnConfetti(plot.pos);
       else setTimeout(() => this.spawnConfetti(plot.pos), growTime * 1000);
@@ -634,7 +636,7 @@ export class World {
         t += dt / growTime;
         const k = Math.min(1, t);
         const e = 1 + 2.2 * Math.pow(k - 1, 3) + 1.2 * Math.pow(k - 1, 2); // ease out back
-        object.scale.set(1 + Math.sin(k * Math.PI) * 0.05, Math.max(0.001, e), 1 + Math.sin(k * Math.PI) * 0.05);
+        object.scale.set(sc * (1 + Math.sin(k * Math.PI) * 0.05), sc * Math.max(0.001, e), sc * (1 + Math.sin(k * Math.PI) * 0.05));
         return k >= 1;
       };
       this.effects.push(tick);
@@ -661,7 +663,7 @@ export class World {
   /** Remove every built structure (new game). */
   clearStructures() {
     for (const [id, rec] of Object.entries(this.structures)) {
-      if (['mainstage', 'kitchen', 'firespace', 'narnia_floor', 'chai_lounge', 'bar_tent', 'beer_garden'].includes(id)) continue;
+      if (['mainstage', 'kitchen', 'firespace', 'narnia_floor', 'chai_lounge', 'bar_tent'].includes(id)) continue;
       this.scene.remove(rec.object);
       this.cameraBlockers = this.cameraBlockers.filter((o) => o !== rec.object);
       this.colliders.removeTag(`struct_${id}`);

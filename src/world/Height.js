@@ -10,7 +10,6 @@ const FLAT = [
   ...Object.values(PLOTS).map((p) => ({ x: p.pos.x, z: p.pos.z, r: (p.flatRadius || p.size * 0.7) })),
   { ...LANDMARKS.kitchen, r: 8 }, // kitchen
   { ...LANDMARKS.bar_tent, r: 8 },
-  { ...LANDMARKS.beer_garden, r: 6 },
 ];
 
 function hash(x, z) {

@@ -51,6 +51,14 @@ export function install(g) {
       } else if (st.type === 'talk') {
         const n = g.npcs.get(st.npc); T.goto(n.position, 1.2, 0.5); const b = T.best(); T.pressE(); await T.fin();
         if (g.quests.currentStep(qid) === st) log.push(`  TALK FAIL ${st.npc} best=${b}`);
+      } else if (st.type === 'ride') {
+        const n = g.npcs.get(st.npc), q = g.vehicles.quad;
+        if (q.broken) q.broken = false;
+        g.enterVehicle(q); q.root.position.set(n.position.x + 2, 0, n.position.z); q.speed = 0; T.step(2);
+        const b = T.best(); T.pressE(); T.step(2);
+        const s = g.world.spots[st.at]; q.root.position.set(s.x + 1, 0, s.z + 1); q.speed = 0; T.step(4); await T.fin(); T.step(2);
+        if (g.player.vehicle) g.exitVehicle();
+        if (g.quests.currentStep(qid) === st) log.push(`  RIDE FAIL ${st.npc} best=${b}`);
       } else if (st.type === 'reach') { T.goto(g.world.spots[st.at], 0.3, 0.3); T.step(2); await T.fin(); }
       else if (st.type === 'night') T.step(30 * 14);
       else if (st.type === 'wait') { for (let i = 0; i < 30 * 60 && g.quests.currentStep(qid) === st; i++) g.frame(); await T.fin(); }

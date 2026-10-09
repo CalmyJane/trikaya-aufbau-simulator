@@ -85,6 +85,15 @@ const COMMENTS = {
 
 const pick = (a) => a[Math.floor(Math.random() * a.length)];
 
+// people jumping aside for the horn (a little annoyed)
+const HORN_LINES = [
+  { de: 'Ja ja, ich geh ja schon!', en: 'Yeah yeah, I\'m moving!' },
+  { de: 'Ich hab dich GESEHEN. Und GEHÖRT.', en: 'I SAW you. And HEARD you.' },
+  { de: 'Hup nicht so! Hier ist ein Festival, keine Autobahn.', en: 'Stop honking! This is a festival, not a motorway.' },
+  { de: '*springt zur Seite* Mein Herz!', en: '*jumps aside* My heart!' },
+  { de: 'Schon gut, Rennfahrer.', en: 'Alright, racing driver.' },
+];
+
 // people stepping aside for the palo santo smoke
 const PALO_LINES = [
   { de: 'Oh, Palo Santo! Bitte, nach dir.', en: 'Oh, palo santo! After you, please.' },
@@ -246,23 +255,25 @@ export class Effects {
   updatePalo(dt) {
     const g = this.game;
     this.updateSmoke(dt);
-    if (this.paloT <= 0) return;
+    this.hornT = Math.max(0, (this.hornT || 0) - dt);
+    if (this.paloT <= 0 && this.hornT <= 0) return;
     const veh = g.player.vehicle;
-    if (!veh || (veh !== g.vehicles.quad && veh !== g.vehicles.radlader) || Math.abs(veh.speed) < 0.3) return;
+    const horn = this.hornT > 0;
+    if (!veh || (veh !== g.vehicles.quad && veh !== g.vehicles.radlader) || (!horn && Math.abs(veh.speed) < 0.3)) return;
     const vp = veh.position, dir = Math.sign(veh.speed) || 1;
     const fx = Math.sin(veh.heading) * dir, fz = Math.cos(veh.heading) * dir;
-    const look = 4 + Math.abs(veh.speed) * 0.9;            // the faster you go, the earlier they react
-    const half = (veh.o?.radius || 1.5) + 1.2;
+    const look = horn ? 13 : 4 + Math.abs(veh.speed) * 0.9; // the faster you go, the earlier they react
+    const half = horn ? 6 : (veh.o?.radius || 1.5) + 1.2;   // the horn clears a wider lane
     for (const n of g.npcs.all) {
-      if (n.hidden || n.talking || n.char?.sitting) continue;
+      if (n.hidden || n.talking || n.char?.sitting || n.riding) continue;
       const dx = n.position.x - vp.x, dz = n.position.z - vp.z;
       const ahead = dx * fx + dz * fz, side = dx * fz - dz * fx;
-      if (ahead < -1 || ahead > look || Math.abs(side) > half) continue;
+      if (ahead < (horn ? -3 : -1) || ahead > look || Math.abs(side) > half) continue;
       const s = side === 0 ? (n._paloSide ||= Math.random() < 0.5 ? -1 : 1) : Math.sign(side);
       const push = Math.min(half - Math.abs(side), 7 * dt);  // a calm, quick side step
       n.root.position.x += fz * s * push;
       n.root.position.z += -fx * s * push;
-      if (!n.bubble && (n._paloT ?? -99) < g.time - 20) { n._paloT = g.time; n.say(pick(PALO_LINES), 2.5); }
+      if (!n.bubble && (n._paloT ?? -99) < g.time - (horn ? 8 : 20)) { n._paloT = g.time; n.say(pick(horn && this.paloT <= 0 ? HORN_LINES : PALO_LINES), 2.5); }
     }
   }
 

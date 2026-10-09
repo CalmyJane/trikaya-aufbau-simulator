@@ -91,6 +91,7 @@ export class UI {
   }
 
   tracker(qs, playerPos, drama) {
+    if (document.body.classList.contains('touch')) { this.trackerCompact(qs, playerPos, drama); return; }
     const el = $('tracker');
     const active = Object.keys(qs.state.active);
     let html = '';
@@ -166,6 +167,57 @@ export class UI {
     if (el._last !== html) { el.innerHTML = html; el._last = html; }
   }
 
+  /**
+   * Phones: one slim line per task (colour = kind: job / timed / favour / emergency), the details inline:
+   * ⏱ time left · distance to the next target · progress. Tap the list to fold / unfold it.
+   */
+  trackerCompact(qs, playerPos, drama) {
+    const el = $('tracker');
+    if (!el._tap) { el._tap = true; el.classList.add('compact'); el.addEventListener('pointerdown', (e) => { e.stopPropagation(); el.classList.toggle('folded'); }); }
+    const clock = (sec) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
+    const strip = (s) => String(s || '').replace(/<[^>]+>/g, '');
+    const dist = (objs) => (objs.length ? `${Math.round(Math.min(...objs.map((o) => Math.hypot(o.pos.x - playerPos.x, o.pos.z - playerPos.z))))} m` : '');
+    const row = (kind, icon, text, meta, dim) => `<div class="trow k-${kind}${dim ? ' dim' : ''}"><span class="ti">${icon}</span><span class="tx">${text}</span>${meta ? `<span class="tm">${meta}</span>` : ''}</div>`;
+    const rows = [];
+    const timedQid = qs.timer?.qid;
+    // emergencies first
+    for (const e of drama?.events || []) {
+      if (!e.discovered) continue;
+      const left = Math.max(0, Math.ceil(e.deadline - e.t));
+      const waiting = e.blocked && !drama.tent;
+      const meta = [e.pos() ? `${Math.round(Math.hypot(e.pos().x - playerPos.x, e.pos().z - playerPos.z))} m` : '', e.helping ? '🏃' : waiting ? '⛺' : `⏱ ${clock(left)}`].filter(Boolean).join(' · ');
+      rows.push(row('drama', '⚠️', strip(e.helping ? `${L(e.def.title)}: ${e.helping.def.name} ${L({ de: 'kommt', en: 'is coming' })}` : drama.taskText(e)), meta));
+    }
+    const active = Object.keys(qs.state.active).sort((a, b) => (b === timedQid) - (a === timedQid));
+    for (const qid of active) {
+      const q = qs.quests[qid], step = qs.currentStep(qid), a = qs.state.active[qid];
+      if (!step) continue;
+      const timed = qid === timedQid;
+      const meta = [];
+      if (timed) meta.push(`⏱ ${clock(Math.ceil(qs.timer.left))}`);
+      if (step.type === 'wait' && a.waitLeft > 0) meta.push(`⏳ ${Math.ceil(a.waitLeft)} s`);
+      if (step.type === 'work') meta.push(`${a.done.length}/${step.targets.length}`);
+      if (step.type === 'pickup' && step.items.length > 1) meta.push(`${step.items.filter((it) => qs.state.inventory.includes(it.item)).length}/${step.items.length}`);
+      const d = dist(qs.objectives(qid));
+      if (d) meta.push(d);
+      const kind = timed ? 'timed' : q.errand ? 'fav' : 'job';
+      rows.push(row(kind, timed ? '⏱' : q.errand ? '💚' : '★', strip(qs.stepText(qid)), meta.join(' · '), !timed && qs.state.tracked !== qid));
+    }
+    // what's waiting: one dim line
+    const avail = qs.available();
+    const jobs = [...new Set(avail.filter((q) => !q.errand).map((q) => q.giver))].map((g) => qs.game.npcs.get(g)?.def.name).filter(Boolean);
+    const favs = [...new Set(avail.filter((q) => q.errand).map((q) => q.giver))].map((g) => qs.game.npcs.get(g)?.def.name).filter(Boolean);
+    const days = qs.game.days;
+    const left = days ? days.jobs(days.day, days.isNight).filter((q) => !qs.isDone(q.id)).length : 0;
+    const bits = [];
+    if (jobs.length) bits.push(`<b>!</b> ${jobs.join(', ')}`);
+    if (favs.length) bits.push(`<b class="g">!</b> ${favs.join(', ')}`);
+    if (bits.length || left) rows.push(row('hint', days?.isNight ? '🌙' : '☀️', bits.join(' · ') || L({ de: 'Weiter so', en: 'Keep going' }), left ? `${left} ${L({ de: 'bis Feierabend', en: 'left today' })}` : '', active.length > 0));
+    if (!rows.length && qs.state.completed.length) rows.push(row('hint', '🎉', strip(t('hud.allDone')), ''));
+    const html = rows.join('');
+    if (el._last !== html) { el.innerHTML = html; el._last = html; }
+  }
+
   effects(list) {
     const el = $('effects');
     const html = list.map((x) => `<span>${x}</span>`).join('');
@@ -197,7 +249,9 @@ export class UI {
     const d = document.createElement('div');
     d.className = 'toast';
     d.innerHTML = text;
-    $('toasts').appendChild(d);
+    const box = $('toasts');
+    box.appendChild(d);
+    if (document.body.classList.contains('touch')) while (box.children.length > 2) box.firstChild.remove(); // phones: max two at once
     setTimeout(() => d.remove(), 3800);
   }
 

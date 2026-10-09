@@ -253,6 +253,16 @@ export class NPC {
     }
 
     if (this.hidden) return;
+    // passenger on the quad: sit behind the driver and ride along
+    if (this.riding) {
+      const q = this.riding;
+      if (!this.char.sitting) this.char.setSitting(true);
+      const back = new THREE.Vector3(0, 0, -0.62).applyAxisAngle(new THREE.Vector3(0, 1, 0), q.heading);
+      this.root.position.set(q.position.x + back.x, q.position.y + 0.55, q.position.z + back.z);
+      this.root.rotation.y = q.heading;
+      this.char.update(dt);
+      return;
+    }
     if (this.def.soapBubbles) this.updateSoapBubbles(dt, t);
 
     // run over by a vehicle: fly, lie there, get up and complain

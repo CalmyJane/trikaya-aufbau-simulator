@@ -149,7 +149,7 @@ export const QUESTS = [
         items: [{ item: 'steel_wire_rusty', at: 'kuenstler_front' }, { item: 'shackles', at: 'kuenstler_front' }],
       },
       {
-        type: 'talk', npc: 'corni', text: { de: 'Zeig Corni die Stahlseile', en: 'Show Corni the steel wires' }, consumes: ['steel_wire_rusty'],
+        type: 'talk', npc: 'corni', text: { de: 'Zeig Corni die Stahlseile', en: 'Show Corni the steel wires' }, consumes: ['steel_wire_rusty'], cameo: 'leo',
         dialog: [
           { who: 'corni', text: { de: 'Zeig mal. …Die sind ja komplett VERROSTET. Damit hängen wir keinen Drachen auf. Und keine Menschen drunter. Und zum Baumarkt fahr ich heute nicht NOCHMAL.', en: 'Let me see. …They\'re completely RUSTED. We\'re not hanging a dragon on those. Or having people underneath. And I\'m NOT driving to the DIY store AGAIN today.' } },
           { who: 'leo', text: { de: 'Stahlseile? Hab ich! Neue! Im Bus, seit letztem Jahr. Wollt ich euch immer sagen. Ich hol sie!', en: 'Steel wires? I\'ve got some! New ones! In the van, since last year. Always meant to tell you. I\'ll get them!' } },
@@ -281,6 +281,12 @@ export const QUESTS = [
           [{ de: '🎚️ Schwimmerschalter', en: '🎚️ Float switch' }, { de: 'In den Pumpenschacht', en: 'Into the pump shaft' }],
         ] },
         minigameFail: { de: 'Spülwasser in der Steckdose. Felix hat es gespürt. Nochmal, bevor er herkommt.', en: 'Flush water in the socket. Felix felt it. Again, before he comes over.' },
+      },
+      {
+        type: 'ride', npc: 'juli', at: 'wc_pump', radius: 9, toLabel: { de: 'Kackepumpe', en: 'Poo pump' },
+        text: { de: 'Hol Juli mit dem Quad ab und fahr sie zur Kackepumpe', en: 'Pick Juli up with the quad and drive her to the poo pump' },
+        hopOn: { de: 'Quad? Ich lauf eigentlich. …Na gut. Aber du fährst ordentlich.', en: 'Quad? I usually walk. …Fine. But you drive properly.' },
+        dialog: [{ who: 'juli', text: { de: 'Hm. Ordentlich gefahren. Fast. Jetzt zeig mal die Pumpe.', en: 'Hm. Drove properly. Almost. Now show me the pump.' } }],
       },
       {
         type: 'talk', npc: 'juli', text: { de: 'Lass Juli die Pumpe prüfen', en: 'Let Juli check the pump' },
@@ -871,6 +877,12 @@ export const QUESTS = [
         ],
       },
       {
+        type: 'ride', npc: 'schwarzhuber', at: 'parking', radius: 12, toLabel: { de: 'Parkwiese', en: 'Parking meadow' },
+        text: { de: 'Schwarzhuber will die Parkwiese sehen. Fahr ihn mit dem Quad hin', en: 'Schwarzhuber wants to see the parking meadow. Drive him there on the quad' },
+        hopOn: { de: 'Mit dem Quad? I bin scho Bulldog gfahrn, da warst du no ned auf da Welt. Fahr zua.', en: 'On the quad? I was driving tractors before you were born. Go on.' },
+        dialog: [{ who: 'schwarzhuber', text: { de: 'Do kemman de Autos hi. Ordentlich in Reih und Glied. Und koana in mei Mais. Passt.', en: 'That\'s where the cars go. Neatly in rows. And nobody in my corn. Fine.' } }],
+      },
+      {
         type: 'talk', npc: 'jan', text: { de: 'Sag Jan, dass ihr den Gästeparkplatz kriegt', en: 'Tell Jan you get the guest parking' },
         dialog: [
           { who: 'jan', text: { de: 'Er hat JA gesagt? Schwarzhuber? Zum Parkplatz? Ich schreib dich auf die Liste. Ganz oben. Mit Stern.', en: 'He said YES? Schwarzhuber? To the parking? I\'m putting you on the list. At the top. With a star.' } },
@@ -949,6 +961,11 @@ export const QUESTS = [
         ] },
         minigameFail: { de: 'Der Hund hat jetzt ein Artist-Bändchen und eine Spielzeit. Nochmal.', en: 'The dog now has an artist wristband and a slot. Again.' },
         build: { id: 'entrance', type: 'entrance_tent', plot: 'entrance', rotation: 0.6, cost: 2100 },
+      },
+      {
+        type: 'ride', npc: 'jan', at: 'plot_entrance', radius: 10, toLabel: { de: 'Eingang', en: 'Entrance' },
+        text: { de: 'Jan will den Eingang sehen. Hol ihn mit dem Quad am Büro ab', en: 'Jan wants to see the entrance. Pick him up at the office with the quad' },
+        hopOn: { de: 'Ich darf mit? Auf dem QUAD? Moment, ich nehm die Liste mit. Man weiß ja nie.', en: 'I get to come? On the QUAD? Wait, I\'m bringing the list. You never know.' },
       },
       {
         type: 'talk', npc: 'jan', text: { de: 'Sag Jan Bescheid', en: 'Tell Jan' },

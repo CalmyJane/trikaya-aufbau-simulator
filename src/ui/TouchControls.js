@@ -27,6 +27,7 @@ export class TouchControls {
       <button class="t-btn" id="t-act" data-code="KeyE"><span>E</span></button>
       <button class="t-btn small" id="t-jump" data-code="Space">⤒</button>
       <button class="t-btn small" id="t-sprint">»</button>
+      <button class="t-btn small hidden" id="t-horn" data-code="KeyH">📯</button>
       <div id="t-top">
         <button class="t-top" data-code="KeyM">🗺️</button>
         <button class="t-top" data-code="KeyJ">📋</button>

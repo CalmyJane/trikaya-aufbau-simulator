@@ -357,7 +357,7 @@ export class DramaSystem {
     const e = { id: ++this.seq, type, def, t: 0, deadline: 120 + Math.random() * 40, victims: [], helping: null, vi: Math.floor(Math.random() * 6) };
     if (def.victims) {
       const busy = new Set(this.events.flatMap((x) => x.victims.map((v) => v.def.id)));
-      const free = (n) => n.root.visible && !n.hidden && !busy.has(n.def.id) && !n.task && !n.incident && !n.talking &&
+      const free = (n) => n.root.visible && !n.hidden && !n.riding && !busy.has(n.def.id) && !n.task && !n.incident && !n.talking &&
         !NEVER.includes(n.def.id) && !(def.exclude || []).includes(n.def.id) &&
         !g.quests.npcMarker(n.def.id); // never someone you currently need for a job
       // without the awareness tent Franzi can't care for story people – they'd be stuck forever

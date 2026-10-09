@@ -88,8 +88,8 @@ export const NPCS = [
       { de: 'Chai ist fertig, wenn er fertig ist.', en: 'Chai is ready when it\'s ready.' },
       { de: 'Schuhe aus in der Lounge. Ach, du hast eh keine.', en: 'Shoes off in the lounge. Oh, you don\'t have any anyway.' },
       { de: 'Kardamom ist die Antwort. Egal auf welche Frage.', en: 'Cardamom is the answer. Whatever the question.' },
-      { de: 'Mein Zelt steht noch nicht, aber Mate gibt\'s trotzdem. Campingkocher, Baby.', en: 'My tent isn\'t up yet, but there\'s mate anyway. Camping stove, baby.', until: 'q9_festzelt' },
-      { de: 'Wir sind fünfundzwanzig Leute am Chai-Zelt. Und ein Zelt. Das liegt noch.', en: 'There are twenty-five of us at the chai tent. And one tent. It\'s still lying down.', until: 'q9_festzelt' },
+      { de: 'Mein Zelt steht noch nicht, aber Mate gibt\'s trotzdem. Campingkocher, Baby.', en: 'My tent isn\'t up yet, but there\'s mate anyway. Camping stove, baby.', until: 'day4' },
+      { de: 'Wir sind fünfundzwanzig Leute am Chai-Zelt. Und ein Zelt. Das liegt noch.', en: 'There are twenty-five of us at the chai tent. And one tent. It\'s still lying down.', until: 'day4' },
       { de: 'Heute haben wir am Chai-Zelt richtig was geschafft. Wir wissen jetzt, wo vorne ist.', en: 'We got a lot done at the chai tent today. We now know where the front is.' },
     ],
   },
@@ -197,7 +197,7 @@ export const NPCS = [
     look: { base: 'm_hoodie', skin: SKIN.light, hair: '#4a3420', shirt: '#b8483a', pants: '#3a4a2a', patchwork: true, height: 1.97 },
     behavior: 'worker', route: ['plot_mainstage', 'base_yard', 'plot_chai_lounge', 'plot_forest_dome', 'plot_planetarium'],
     lines: [
-      { de: 'Brauchst du Hilfe? Ich helf dir. Ich helf allen. Ich helf mir sogar selbst!', en: 'Need help? I\'ll help. I help everyone. I even help myself!' },
+      { de: 'Ich hab heute schon die Bühne gefegt, Kabel sortiert und Fabbe einen Witz erzählt. Der Witz war das Anstrengendste.', en: 'I\'ve already swept the stage today, sorted cables and told Fabbe a joke. The joke was the hardest part.' },
       { de: 'Boah… die Wolken heute. Sorry. Was tragen wir?', en: 'Whoa… the clouds today. Sorry. What are we carrying?' },
       { de: 'Noch drei Paletten, dann Pause. Hab ich vor drei Paletten auch gesagt.', en: 'Three more pallets, then a break. Said that three pallets ago.' },
     ],
@@ -644,7 +644,7 @@ export const NPCS = [
     look: { base: 'f_casual', skin: SKIN.fair, hair: '#8a3a1e', brows: '#6a2a14', hairStyle: 'long', hairStyleColor: '#8a3a1e', hairLength: 0.4, headband: '#e0a030', shirt: '#d9803c', pants: '#5b3a73', patchwork: true, shirtPatch: ['#d9803c', '#8e2b3a', '#2e5d7a'], height: 1.7 },
     behavior: 'builder', home: 'plot_chai_lounge', offset: [-2, -2], radius: 5,
     lines: [
-      { de: 'Morgen steht das Chai-Zelt. Ganz sicher. Spätestens übermorgen.', en: 'The chai tent will be up tomorrow. Definitely. The day after at the latest.', until: 'q9_festzelt' },
+      { de: 'Morgen steht das Chai-Zelt. Ganz sicher. Spätestens übermorgen.', en: 'The chai tent will be up tomorrow. Definitely. The day after at the latest.', until: 'day4' },
       { de: 'Wir sind gerade in der Konzeptphase. Seit Montag. Es ist ein sehr gutes Konzept.', en: 'We\'re in the concept phase. Since Monday. It\'s a very good concept.' },
       { de: 'Alle helfen mit! Wirklich alle! Wir sind die größte Crew vom ganzen Festival.', en: 'Everyone\'s helping! Really everyone! We\'re the biggest crew of the whole festival.' },
       { de: 'Wir haben das Zelt heute einmal ausgerollt. Dann war Chai-Pause. Dann war Mittag.', en: 'We unrolled the tent once today. Then there was a chai break. Then lunch.' },
@@ -664,7 +664,7 @@ export const NPCS = [
       { de: 'Eine Strohwand ist wie ein Wikingerschild. Nur gelber. Und weicher. Und es piekst.', en: 'A straw wall is like a viking shield. Just yellower. And softer. And it itches.' },
       { de: 'Wenn die Nachbarn aus Karlsfeld anrufen, sag ich: mehr Stroh! Und dann: Bier.', en: 'When the neighbours from Karlsfeld call, I say: more straw! And then: beer.' },
       { de: 'Ich hab heute schon 80 Ballen bewegt. Also, gedanklich. Mit Bier.', en: 'Already moved 80 bales today. Mentally. With beer.' },
-      { de: 'Die Chai-Crew wollte mir Stroh fürs Zelt abkaufen. Das Zelt gibt\'s ja noch nicht. HAHA. Skål!', en: 'The chai crew wanted to buy straw for their tent. There is no tent yet. HAHA. Skål!', until: 'q9_festzelt' },
+      { de: 'Die Chai-Crew wollte mir Stroh fürs Zelt abkaufen. Das Zelt gibt\'s ja noch nicht. HAHA. Skål!', en: 'The chai crew wanted to buy straw for their tent. There is no tent yet. HAHA. Skål!', until: 'day4' },
     ],
   },
   {
@@ -801,9 +801,9 @@ const CAMPER_LINES = [
 
 // Running gag: half the volunteers are "chai crew". The chai tent never gets finished.
 export const CHAI_CREW_LINES = [
-  { de: 'Ich bin beim Chai-Zelt. Wir sind vierzig Leute. Das Zelt ist… in Planung.', en: 'I\'m on the chai tent. There are forty of us. The tent is… in planning.', until: 'q9_festzelt' },
+  { de: 'Ich bin beim Chai-Zelt. Wir sind vierzig Leute. Das Zelt ist… in Planung.', en: 'I\'m on the chai tent. There are forty of us. The tent is… in planning.', until: 'day4' },
   { de: 'Heute haben wir am Chai-Zelt richtig viel geschafft. Wir haben besprochen, wo die Kissen hinkommen.', en: 'We got so much done at the chai tent today. We discussed where the cushions go.' },
-  { de: 'Chai-Crew! Wir bauen gerade die Vision. Das Zelt kommt dann später.', en: 'Chai crew! We\'re building the vision right now. The tent comes later.', until: 'q9_festzelt' },
+  { de: 'Chai-Crew! Wir bauen gerade die Vision. Das Zelt kommt dann später.', en: 'Chai crew! We\'re building the vision right now. The tent comes later.', until: 'day4' },
   { de: 'Ich hab heute drei Stunden am Chai-Zelt gearbeitet. Also, ich war dort. Es war sehr intensiv.', en: 'I worked three hours at the chai tent today. Well, I was there. It was very intense.' },
   { de: 'Wir haben das Chai-Zelt einmal aufgebaut und wieder abgebaut. Die Energie hat nicht gestimmt.', en: 'We put the chai tent up once and took it down again. The energy wasn\'t right.' },
   { de: 'Bei uns am Chai ist immer was los! Was genau, weiß keiner.', en: 'There\'s always something going on at the chai! Nobody knows what exactly.' },

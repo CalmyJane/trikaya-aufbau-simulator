@@ -376,7 +376,7 @@ export class Game {
     $('btn-resume').onclick = () => this.resume();
     $('bigmap').addEventListener('pointerdown', () => { if (this.mode === 'map') this.resume(); });
     $('btn-log').onclick = () => this.openQuestLog();
-    $('btn-vol').onclick = () => this.openVolunteers();
+    $('hud-vol').onclick = (e) => { e.stopPropagation(); this.openVolunteers(); };
     $('btn-map').onclick = $('pmap-btn').onclick = () => { this.ui.showPause(false); this.openMap(); };
     $('btn-psettings').onclick = () => this.openSettings();
     $('btn-pcontrols').onclick = () => this.ui.modal(this.controlsHtml());
@@ -715,7 +715,16 @@ export class Game {
             const de = getLang() === 'de';
             this.ui.toast(de ? `🚗 ${driver.def.name}: „Bin in ${data.step.seconds} Sekunden zurück. Mach solange einfach was anderes!“` : `🚗 ${driver.def.name}: "Back in ${data.step.seconds} seconds. Just do something else meanwhile!"`);
           }
-          for (const id of data.step.away || []) { const n = this.npcs.get(id); if (n) { n.away = true; n.task = null; } }
+          for (const id of data.step.away || []) {
+            const n = this.npcs.get(id);
+            if (!n) continue;
+            n.scenePose = null;
+            if (!n.hidden && n.toPlayer < 40) { // in sight: run off towards the gate first, then gone
+              const gate = this.world.spots.registration;
+              n.task = { phase: 'go', pos: () => gate, arriveDist: 3, workTime: 0.1, speed: 6, anim: 'run', arriveLine: { de: 'Bin gleich zurück!', en: 'Back in a sec!' }, then: () => { n.away = true; this.npcs.refreshAppear(this.quests); } };
+              setTimeout(() => { if (!n.away && this.quests.currentStep(data.qid) === data.step) { n.task = null; n.away = true; this.npcs.refreshAppear(this.quests); } }, 6000);
+            } else { n.away = true; n.task = null; }
+          }
           if (this.world.crewPickup) this.world.crewPickup.visible = false;
           this.npcs.refreshAppear(this.quests);
           break;
@@ -1065,7 +1074,9 @@ export class Game {
     // 1) a quest step wants us to talk to this NPC
     const talk = qs.consumeTalk(id);
     if (talk) {
+      if (talk.cameo) await this.playCameo(talk.cameo, npc);
       await this.runDialog(talk.dialog, null, npc);
+      if (talk.cameo) { const c = this.npcs.get(talk.cameo); if (c) c.scenePose = null; }
       talk.onDone();
       return;
     }
@@ -1441,6 +1452,78 @@ export class Game {
   }
 
   // ------------------------------------------------------------------ loop
+  /** Quad / wheel loader horn: people nearby jump out of the way – and are a tiny bit annoyed (−1 karma). */
+  honk(veh) {
+    if ((this._hornCD || 0) > this.time) return;
+    this._hornCD = this.time + 0.9;
+    const low = veh.id === 'radlader';
+    this.audio.tone?.(low ? 220 : 392, 0.16, { type: 'square', vol: 0.16 });
+    this.audio.tone?.(low ? 196 : 349, 0.22, { type: 'square', vol: 0.16, delay: 0.18 });
+    this.effects.hornT = 1.6;
+    const near = this.npcs.all.filter((n) => !n.hidden && !n.riding && n.position.distanceTo(veh.position) < 14).length;
+    if (!near) return;
+    this.quests.state.karma = Math.max(0, this.quests.state.karma - 1);
+    if ((this._hornToastT || 0) < this.time) {
+      this._hornToastT = this.time + 12;
+      this.ui.toast(getLang() === 'de' ? '📯 Tröööt! Alle springen zur Seite. −1 ✺ (leicht genervt)' : '📯 Honk! Everyone jumps aside. −1 ✺ (slightly annoyed)');
+    }
+    this.refreshHUD();
+  }
+
+  /** Ride step: the passenger hops onto the quad behind you. */
+  startRide(qid, step) {
+    const n = this.npcs.get(step.npc), q = this.vehicles.quad;
+    const a = this.quests.state.active[qid];
+    if (!n || !a) return;
+    n.task = null; n.visit = null; n.emote = null; n.emoteY = 0;
+    n.riding = q;
+    a.riding = true;
+    if (step.hopOn) n.say(L(step.hopOn), 4);
+    this.audio.accept?.();
+    this.quests.refreshMarkers();
+    this.refreshHUD();
+  }
+
+  /** Arrived: the passenger gets off next to the quad, maybe says something, next step. */
+  async endRide(qid, step) {
+    const n = this.npcs.get(step.npc), q = this.vehicles.quad;
+    if (n) {
+      n.riding = null;
+      n.char.setSitting(false);
+      const side = new THREE.Vector3(1.4, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), q.heading);
+      n.root.position.set(q.position.x + side.x, 0, q.position.z + side.z);
+      this.world.colliders.resolve(n.root.position, 0.4);
+      n.target = null;
+      n.wait = 6; // look around for a moment before walking back
+    }
+    if (step.dialog) await this.runDialog(step.dialog, null, n);
+    const a = this.quests.state.active[qid];
+    if (a) a.riding = false;
+    this.quests.advance(qid);
+  }
+
+  /** A little scene: someone runs in from off-screen before the dialog (instead of popping up in the text). */
+  async playCameo(id, host) {
+    const n = this.npcs.get(id);
+    if (!n) return;
+    const hp = host?.position || this.player.position;
+    const dir = new THREE.Vector3().subVectors(this.player.position, hp).setY(0);
+    if (dir.lengthSq() < 0.01) dir.set(1, 0, 0);
+    dir.normalize();
+    const side = new THREE.Vector3(-dir.z, 0, dir.x);
+    const goal = hp.clone().addScaledVector(side, 1.8).addScaledVector(dir, 0.6);
+    n.away = false; n.gone = false; n.hidden = false; n.root.visible = true; n.incident = null; n.scenePose = null;
+    n.root.position.copy(goal).addScaledVector(side, 13).addScaledVector(dir, -4);
+    this.world.colliders.resolve(n.root.position, 0.4);
+    this.player.frozen = true;
+    let arrived = false;
+    n.task = { phase: 'go', pos: () => goal, arriveDist: 0.9, workTime: 0.1, speed: 6.5, anim: 'run', arriveLine: { de: 'Hiii!', en: 'Hiii!' }, then: () => { arrived = true; } };
+    for (let i = 0; i < 50 && !arrived; i++) await new Promise((r) => setTimeout(r, 100));
+    n.task = null;
+    n.scenePose = this.player.position.clone();
+    this.player.frozen = false;
+  }
+
   /** Run one system's per-frame update; if it throws, keep the game running and show the error once (so it can be reported). */
   safe(fn) {
     try { fn(); } catch (e) {
@@ -1493,6 +1576,7 @@ export class Game {
       if (inp.hit('KeyM')) { this._mapKeyReady = false; this.openMap(); }
       if (inp.hit('KeyJ')) this.openQuestLog();
       if (inp.hit('KeyV')) this.openVolunteers();
+      if (inp.hit('KeyH') && this.player.vehicle && this.player.vehicle.id !== 'bike') this.honk(this.player.vehicle);
       if (inp.hit('KeyN')) this.ui.toast(this.toggleMute() ? t('t.mute') : t('t.unmute'));
       if (inp.hit('KeyF') && !this.player.vehicle) this.player.wave();
       if (inp.hit('KeyT')) {
@@ -1554,6 +1638,9 @@ export class Game {
     if (this.touch) {
       const want = playing && !this.ui.dialogOpen;
       if (want !== this._touchShown) { this._touchShown = want; this.touch.show(want); }
+      const hornBtn = this.touch.el?.querySelector('#t-horn');
+      const horn = !!(veh && veh.id !== 'bike');
+      if (hornBtn && hornBtn._on !== horn) { hornBtn._on = horn; hornBtn.classList.toggle('hidden', !horn); }
     }
     // interaction prompt
     if (playing && !this.ui.dialogOpen && !this.building) this.safe(() => {
@@ -1694,7 +1781,7 @@ export class Game {
     const reach = (veh.o.radius || 1.5) * 0.8 + 0.45;
     const fwd = new THREE.Vector3(Math.sin(veh.heading), 0, Math.cos(veh.heading)).multiplyScalar(Math.sign(veh.speed));
     for (const n of this.npcs.all) {
-      if (n.hidden || n.knocked || n.talking || n.def.id === 'leo') continue;
+      if (n.hidden || n.knocked || n.talking || n.riding || n.def.id === 'leo') continue;
       const dx = n.position.x - vp.x, dz = n.position.z - vp.z;
       const d = Math.hypot(dx, dz);
       if (d > reach) continue;

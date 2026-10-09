@@ -183,6 +183,8 @@ html, body { touch-action: none; overscroll-behavior: none; -webkit-tap-highligh
 @keyframes pulseBtn { 50% { transform: scale(1.07); } }
 #t-jump { right: calc(118px + env(safe-area-inset-right)); bottom: 26px; width: 60px; height: 60px; font-size: 24px; }
 #t-sprint { right: calc(38px + env(safe-area-inset-right)); bottom: 132px; width: 56px; height: 56px; font-size: 26px; }
+#t-horn { right: calc(108px + env(safe-area-inset-right)); bottom: 104px; width: 54px; height: 54px; font-size: 24px; }
+#t-horn.hidden { display: none; }
 #t-top { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; }
 .t-top { width: 44px; height: 40px; border-radius: 10px; border: 1px solid rgba(232, 163, 58, 0.4); background: rgba(16, 24, 18, 0.75);
   font-size: 18px; color: #fff; touch-action: none; }
@@ -198,6 +200,24 @@ body.touch .track { padding: 6px 10px; }
 body.touch .track .tt { font-size: 14px; }
 body.touch .track .ts { font-size: 13px; }
 body.touch .track ul { font-size: 12px; }
+/* phones: compact task lines – one per task, colour = kind, details inline */
+#tracker.compact { width: min(250px, 46vw); gap: 3px; pointer-events: auto; }
+#tracker.compact .trow { display: flex; align-items: center; gap: 5px; background: rgba(14, 18, 24, 0.78); border-left: 3px solid var(--gold); border-radius: 8px; padding: 3px 7px; font-size: 12px; line-height: 1.25; }
+#tracker.compact .trow .ti { flex: 0 0 auto; font-size: 11px; }
+#tracker.compact .trow .tx { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#tracker.compact .trow .tm { flex: 0 0 auto; color: var(--muted); font-size: 11px; white-space: nowrap; }
+#tracker.compact .trow.dim { opacity: 0.7; }
+#tracker.compact .k-job { border-left-color: var(--gold); }
+#tracker.compact .k-timed { border-left-color: #5ad1ff; background: rgba(10, 30, 45, 0.88); }
+#tracker.compact .k-timed .tm { color: #9fe3ff; font-weight: 700; }
+#tracker.compact .k-fav { border-left-color: #6fdc6a; }
+#tracker.compact .k-drama { border-left-color: #ff4a3a; background: rgba(60, 14, 10, 0.85); }
+#tracker.compact .k-drama .tm { color: #ff9a8a; font-weight: 700; }
+#tracker.compact .k-hint { border-left-color: var(--blue); }
+#tracker.compact .k-hint b { color: #ffd21f; } #tracker.compact .k-hint b.g { color: #6fdc6a; }
+#tracker.compact.folded .trow:nth-child(n+2) { display: none; } /* tap: fold down to the most important line */
+body.touch #toasts { max-width: 62vw; }
+body.touch .toast { font-size: 12px; padding: 4px 10px; border-radius: 12px; text-align: center; }
 body.touch #toasts { top: 56px; }
 body.touch .toast { font-size: 13px; padding: 5px 12px; }
 body.touch #prompt { bottom: 128px; pointer-events: auto; font-size: 15px; max-width: 60vw; }

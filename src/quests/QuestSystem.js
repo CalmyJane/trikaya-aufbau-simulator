@@ -202,7 +202,7 @@ export class QuestSystem {
   consumeTalk(npcId) {
     const hit = this.talkStepsFor(npcId)[0];
     if (!hit) return null;
-    return { qid: hit.qid, dialog: hit.step.dialog || [], onDone: () => this.advance(hit.qid) };
+    return { qid: hit.qid, dialog: hit.step.dialog || [], cameo: hit.step.cameo, onDone: () => this.advance(hit.qid) };
   }
 
   // ------------------------------------------------------------ items
@@ -460,6 +460,22 @@ export class QuestSystem {
           if (missing.length) out.push({ d, label: t('p.missing', { items: missing.map((m) => this.itemName(m)).join(', ') }), disabled: true });
           else out.push({ d: d - 1, label: t('p.fillFuel'), action: () => this.game.startFuel(qid) });
         }
+      } else if (step.type === 'ride') {
+        const a = this.state.active[qid];
+        const quad = this.game.vehicles.quad, n = this.game.npcs.get(step.npc);
+        if (!n) continue;
+        if (a.riding && n.riding !== quad) a.riding = false; // e.g. after loading a save: pick them up again
+        if (!a.riding) {
+          const dn = Math.hypot(n.position.x - p.x, n.position.z - p.z);
+          if (vehicle === quad && dn < 7.5) out.push({ d: 0.2, label: L({ de: `${n.def.name} aufsitzen lassen`, en: `Let ${n.def.name} hop on` }), action: () => this.game.startRide(qid, step) });
+          else if (!vehicle && dn < 3) out.push({ d: 2, label: L({ de: 'Hol erst das Quad', en: 'Get the quad first' }), disabled: true });
+        } else if (vehicle === quad && !this._riding) {
+          const s = this.world.spots[step.at];
+          if (s && Math.hypot(s.x - p.x, s.z - p.z) < (step.radius || 8) && Math.abs(quad.speed) < 3) {
+            this._riding = true;
+            this.game.endRide(qid, step).finally(() => { this._riding = false; });
+          }
+        }
       } else if (step.type === 'reach' && !this._reaching) {
         const s = this.world.spots[step.at];
         if (s && Math.hypot(s.x - p.x, s.z - p.z) < (step.radius || 6)) {
@@ -488,6 +504,12 @@ export class QuestSystem {
     }
     if (this.quests[qid].noRunOver && step.type === 'pickup' && this.game.player.vehicle !== this.game.vehicles.quad) {
       return [{ pos: this.game.vehicles.quad.position, label: 'Quad' }];
+    }
+    if (step.type === 'ride') {
+      const a = this.state.active[qid], quad = this.game.vehicles.quad, n = this.game.npcs.get(step.npc);
+      if (a.riding) { const s = this.world.spots[step.at]; return s ? [{ pos: s, radius: step.radius || 8, label: L(step.toLabel) || '' }] : []; }
+      if (this.game.player.vehicle !== quad) return [{ pos: quad.position, label: 'Quad' }];
+      return n ? [{ pos: n.position, label: n.def.name }] : [];
     }
     switch (step.type) {
       case 'talk': {

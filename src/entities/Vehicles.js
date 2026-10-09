@@ -360,9 +360,10 @@ export class Radlader extends Vehicle {
 // ------------------------------------------------------------------ Franzi's bike (with a witch's broom strapped on)
 export class Bike extends Vehicle {
   constructor(world) {
-    super(world, { maxSpeed: 9, accel: 6, brake: 12, drag: 1.1, maxSteer: 1, turnRate: 2.4, radius: 0.7, bodyRadius: 0.32, bodyOffset: 0.4, length: 1.7, width: 0.55, boost: 1.25 });
+    super(world, { maxSpeed: 10.5, accel: 6.8, brake: 12, drag: 1.1, maxSteer: 1, turnRate: 2.4, radius: 0.7, bodyRadius: 0.32, bodyOffset: 0.4, length: 1.7, width: 0.55, boost: 1.25 });
     this.id = 'bike';
     this.name = { de: 'Franzis Hexenrad', en: 'Franzi\'s witch bike' };
+    this.quiet = true; // no engine, no horn, doesn't run people over
     const b = this.body;
     const frame = mat('#3aa0a0', { roughness: 0.5 });
     const dark = mat('#222');
@@ -415,5 +416,39 @@ export class Bike extends Vehicle {
   syncCollider() {
     if (this.ghost) { for (const pt of this.parts) pt.c.x = 1e6; return; }
     super.syncCollider();
+  }
+}
+
+// ------------------------------------------------------------------ Fabi's e-scooter (you ride it standing)
+export class Scooter extends Vehicle {
+  constructor(world) {
+    super(world, { maxSpeed: 11, accel: 5.5, brake: 12, drag: 1.1, maxSteer: 1, turnRate: 2.6, radius: 0.6, bodyRadius: 0.3, bodyOffset: 0.3, length: 1.2, width: 0.5, boost: 1.2 });
+    this.id = 'scooter';
+    this.name = { de: 'Fabis E-Scooter', en: 'Fabi\'s e-scooter' };
+    this.quiet = true;
+    this.standing = true; // the rider stands on the deck
+    const b = this.body;
+    const dark = mat('#1e1e1e', { roughness: 0.6 });
+    const grey = mat('#5a5f66', { metalness: 0.5, roughness: 0.4 });
+    b.add(box(0.2, 0.06, 0.85, dark, 0, 0.14, -0.05));                                 // deck
+    b.add(box(0.16, 0.012, 0.6, mat('#3a3a3a', { roughness: 1 }), 0, 0.176, -0.08));   // grip tape
+    b.add(box(0.06, 0.05, 0.16, mat('#ff8a2a', { emissive: '#ff6a00', emissiveIntensity: 0.4 }), 0, 0.2, -0.5)); // rear light
+    const stem = cyl(0.03, 0.03, 1.0, grey, 8, 0, 0.62, 0.42);
+    stem.rotation.x = -0.12;
+    b.add(stem);
+    const bar = cyl(0.022, 0.022, 0.5, dark, 6, 0, 1.1, 0.36);
+    bar.rotation.z = Math.PI / 2;
+    b.add(bar);
+    for (const x of [0.24, -0.24]) {
+      const grip = cyl(0.03, 0.03, 0.1, mat('#2a2a2a'), 6, x, 1.1, 0.36);
+      grip.rotation.z = Math.PI / 2;
+      b.add(grip);
+    }
+    b.add(box(0.08, 0.06, 0.04, mat('#f5f0d0', { emissive: '#fff4c0', emissiveIntensity: 0.6 }), 0, 0.92, 0.47)); // headlight
+    b.add(box(0.07, 0.02, 0.05, mat('#7fd0ff', { emissive: '#3a9aff', emissiveIntensity: 0.5 }), 0, 1.12, 0.33));  // little display
+    this.wheel(0.11, 0.06, 0, 0.11, 0.5);
+    this.wheel(0.11, 0.06, 0, 0.11, -0.45);
+    this.seat.position.set(0, 0.17, -0.12);
+    this.cargo.position.set(0, 0.95, 0.5);
   }
 }

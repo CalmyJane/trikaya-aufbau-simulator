@@ -51,7 +51,7 @@ export class Player {
     vehicle.seat.add(this.root);
     this.root.position.set(0, 0, 0);
     this.root.rotation.set(0, 0, 0);
-    this.char.setSitting(true);
+    this.char.setSitting(!vehicle.standing);
     this.vel.set(0, 0, 0);
   }
 

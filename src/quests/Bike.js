@@ -1,53 +1,59 @@
 import { getLang } from '../i18n.js';
 
-// Franzi's bike (with a witch's broom strapped on). You can borrow it for karma; leave it lying around
-// for a while and she fetches it back. When Franzi rushes to an emergency she rides it herself.
+// Borrowable vehicles: Franzi's bike (with a witch's broom strapped on, on the festival ground) and Fabi's
+// e-scooter (crew camp). You borrow them for karma and promise to bring them back – you don't have to:
+// leave one lying around for a while and its owner quietly fetches it back. So you can cross the site
+// in both directions when the quad isn't around. When Franzi rushes to an emergency she rides her bike herself.
 
-const RENT = 10;          // karma
-const IDLE_BACK = 75;     // seconds lying around before Franzi takes it back
+const IDLE_BACK = 75;     // seconds lying around before the owner takes it back
 
-export class FranziBike {
-  constructor(game, bike) {
+class Rental {
+  constructor(game, vehicle, { owner, cost, park }) {
     this.game = game;
-    this.bike = bike;
+    this.vehicle = vehicle;
+    this.ownerId = owner;
+    this.price = cost;
+    this.park = park; // [dx, dz, heading] next to the owner's home
     this.reset();
   }
 
-  get franzi() { return this.game.npcs.get('franzi'); }
-  get cost() { return RENT; }
+  get owner() { return this.game.npcs.get(this.ownerId); }
+  get cost() { return this.price; }
+  /** Toast texts: { rentedDe, rentedEn, fetchedDe, fetchedEn }. */
+  text() { return {}; }
 
   reset() {
     this.rented = false;
     this.idleT = 0;
     this.rider = null;
-    this.parkAtFranzi();
+    this.parkAtOwner();
   }
 
-  /** Next to Franzi's current home (her tent once it stands). */
-  parkAtFranzi() {
-    const f = this.franzi;
+  /** Next to the owner's current home. */
+  parkAtOwner() {
+    const f = this.owner;
     if (!f) return;
-    const h = f.home;
-    this.bike.place({ x: h.x + 1.6, z: h.z - 1.2 }, 0.6);
-    this.bike.speed = 0;
-    this.bike.unstick(null, 0.1);
+    const h = f.home, [dx, dz, hd] = this.park;
+    this.vehicle.place({ x: h.x + dx, z: h.z + dz }, hd);
+    this.vehicle.speed = 0;
+    this.vehicle.unstick(null, 0.1);
   }
 
-  nearFranzi(dist = 14) {
-    const f = this.franzi;
-    return !!f && !f.hidden && this.bike.position.distanceTo(f.position) < dist;
+  nearOwner(dist = 14) {
+    const f = this.owner;
+    return !!f && !f.hidden && this.vehicle.position.distanceTo(f.position) < dist;
   }
 
-  /** Small-talk option at Franzi's. */
-  canRent() { return !this.rented && !this.rider && this.nearFranzi(); }
+  /** Small-talk option at the owner's. */
+  canRent() { return !this.rented && !this.rider && this.nearOwner(); }
 
   rent() {
     const g = this.game, de = getLang() === 'de';
-    if (g.quests.state.karma < RENT) return false;
-    g.quests.state.karma -= RENT;
+    if (g.quests.state.karma < this.cost) return false;
+    g.quests.state.karma -= this.cost;
     this.rented = true;
     this.idleT = 0;
-    g.ui.toast(de ? `🚲 Franzis Hexenrad gehört dir (−${RENT} ✺). Steht neben ihr, E zum Aufsteigen. Lässt du es länger liegen, holt sie es sich zurück.` : `🚲 Franzi's witch bike is yours (−${RENT} ✺). It's next to her, E to get on. Leave it lying around too long and she takes it back.`);
+    g.ui.toast(this.text()[de ? 'rentedDe' : 'rentedEn']);
     g.refreshHUD();
     return true;
   }
@@ -56,12 +62,49 @@ export class FranziBike {
 
   update(dt) {
     const g = this.game;
-    const f = this.franzi;
+    const f = this.owner;
+    if (!f) return;
+    if (g.player.vehicle === this.vehicle) { this.idleT = 0; return; }
+    // lying around: after a while the owner fetches it back (when nobody's looking)
+    const pp = g.player.position;
+    const unseen = this.vehicle.position.distanceTo(pp) > 25;
+    if (this.rented) {
+      this.idleT += dt;
+      if (this.idleT > IDLE_BACK && unseen && !f.task) {
+        this.rented = false;
+        this.parkAtOwner();
+        g.ui.toast(this.text()[getLang() === 'de' ? 'fetchedDe' : 'fetchedEn']);
+      }
+    } else if (!this.nearOwner(12) && unseen && f.position.distanceTo(pp) > 25 && !f.task) {
+      this.parkAtOwner(); // owner moved (or rode somewhere and came back on foot) – the vehicle follows "later"
+    }
+  }
+}
+
+export class FranziBike extends Rental {
+  constructor(game, bike) {
+    super(game, bike, { owner: 'franzi', cost: 10, park: [1.6, -1.2, 0.6] });
+  }
+
+  get bike() { return this.vehicle; }
+
+  text() {
+    return {
+      rentedDe: `🚲 Franzis Hexenrad gehört dir (−${this.cost} ✺). Steht neben ihr, E zum Aufsteigen. Du hast versprochen, es zurückzubringen – lässt du es länger liegen, holt sie es sich.`,
+      rentedEn: `🚲 Franzi's witch bike is yours (−${this.cost} ✺). It's next to her, E to get on. You promised to bring it back – leave it lying around too long and she fetches it.`,
+      fetchedDe: '🚲 Franzi hat ihr Hexenrad wieder abgeholt.',
+      fetchedEn: '🚲 Franzi fetched her witch bike back.',
+    };
+  }
+
+  update(dt) {
+    const g = this.game;
+    const f = this.owner;
     if (!f) return;
     const driven = g.player.vehicle === this.bike;
     // Franzi rushing to an emergency takes her bike along
     const tk = f.task;
-    if (!this.rider && tk && tk.phase === 'go' && (tk.speed || 0) >= 5 && !this.rented && !driven && this.nearFranzi(8)) {
+    if (!this.rider && tk && tk.phase === 'go' && (tk.speed || 0) >= 5 && !this.rented && !driven && this.nearOwner(8)) {
       this.rider = f;
       f.ridingBike = this.bike;
       this.bike.ghost = true;
@@ -72,20 +115,7 @@ export class FranziBike {
       this.bike.place({ x: f.position.x, z: f.position.z }, f.root.rotation.y);
       return;
     }
-    if (driven) { this.idleT = 0; return; }
-    // lying around: after a while Franzi fetches it back (when nobody's looking)
-    const pp = g.player.position;
-    const unseen = this.bike.position.distanceTo(pp) > 25;
-    if (this.rented) {
-      this.idleT += dt;
-      if (this.idleT > IDLE_BACK && unseen && !f.task) {
-        this.rented = false;
-        this.parkAtFranzi();
-        g.ui.toast(getLang() === 'de' ? '🚲 Franzi hat ihr Hexenrad wieder abgeholt.' : '🚲 Franzi fetched her witch bike back.');
-      }
-    } else if (!this.nearFranzi(12) && unseen && f.position.distanceTo(pp) > 25 && !f.task) {
-      this.parkAtFranzi(); // she rode somewhere and came back on foot – the bike follows "later"
-    }
+    super.update(dt);
   }
 
   dismount() {
@@ -100,5 +130,20 @@ export class FranziBike {
     this.bike.place({ x: f.position.x + Math.cos(h) * 1.2, z: f.position.z - Math.sin(h) * 1.2 }, h);
     this.bike.speed = 0;
     this.bike.unstick(null, 0.1);
+  }
+}
+
+export class FabiScooter extends Rental {
+  constructor(game, scooter) {
+    super(game, scooter, { owner: 'fabi', cost: 10, park: [-1.8, 1.4, -0.8] });
+  }
+
+  text() {
+    return {
+      rentedDe: `🛴 Fabis E-Scooter gehört dir (−${this.cost} ✺). Steht bei ihm im Crew Camp, E zum Aufsteigen. Versprochen, du bringst ihn zurück? Sonst holt er ihn sich irgendwann.`,
+      rentedEn: `🛴 Fabi's e-scooter is yours (−${this.cost} ✺). It's next to him in the crew camp, E to get on. You promised to bring it back? Otherwise he'll fetch it at some point.`,
+      fetchedDe: '🛴 Fabi hat seinen E-Scooter wieder eingesammelt.',
+      fetchedEn: '🛴 Fabi collected his e-scooter again.',
+    };
   }
 }

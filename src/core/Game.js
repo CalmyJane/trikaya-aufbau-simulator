@@ -8,8 +8,8 @@ import { Player, CameraRig } from '../entities/Player.js';
 import { FlyCam } from './FlyCam.js';
 import { Trigel } from '../world/Trigel.js';
 import { NPCManager } from '../entities/NPC.js';
-import { Quad, Radlader, Bike } from '../entities/Vehicles.js';
-import { FranziBike } from '../quests/Bike.js';
+import { Quad, Radlader, Bike, Scooter } from '../entities/Vehicles.js';
+import { FranziBike, FabiScooter } from '../quests/Bike.js';
 import { Services, HIRE_COST } from '../quests/Services.js';
 import { TOKEN_TRADERS } from '../quests/Shop.js';
 import { PLAYER_LOOK } from '../entities/npcData.js';
@@ -103,8 +103,9 @@ export class Game {
     await this.npcs.populate(breathe);
     this.trigel = new Trigel(this.world);
     this.npcs.game = this;
-    this.vehicles = { quad: new Quad(this.world), radlader: new Radlader(this.world), bike: new Bike(this.world) };
+    this.vehicles = { quad: new Quad(this.world), radlader: new Radlader(this.world), bike: new Bike(this.world), scooter: new Scooter(this.world) };
     this.bikeSys = new FranziBike(this, this.vehicles.bike);
+    this.scooterSys = new FabiScooter(this, this.vehicles.scooter);
     this.services = new Services(this);
     this.quests = new QuestSystem(this);
     this.economy = new Economy(this);
@@ -189,6 +190,7 @@ export class Game {
     this.vehicles.radlader.place(vs.radlader.pos, vs.radlader.heading);
     this.vehicles.radlader.fuel = 0;
     this.bikeSys?.reset();
+    this.scooterSys?.reset();
     if (this.player.char.look !== PLAYER_LOOK) { this.player.setLook(PLAYER_LOOK); this.updateCarried(); }
     this.drama?.clearAll();
     this.trigel?.reset();
@@ -1033,6 +1035,7 @@ export class Game {
     this.vehicles.quad.setCargo(veh === this.vehicles.quad ? light() : []);
     this.vehicles.radlader.setCargo(veh === this.vehicles.radlader ? light() : []);
     this.vehicles.bike.setCargo(veh === this.vehicles.bike ? light() : []);
+    this.vehicles.scooter.setCargo(veh === this.vehicles.scooter ? light() : []);
     this.vehicles.radlader.setLoad(inv.filter(isHeavy).map((id) => createItemMesh(id)));
   }
 
@@ -1218,6 +1221,7 @@ export class Game {
     if (fx.tokens > 0 && TOKEN_TRADERS.includes(id) && (id !== 'verena' || qs.isDone('q9_festzelt'))) extra.push([de ? `🎟️ Getränk gegen Marke (du hast ${fx.tokens})` : `🎟️ A drink for a token (you have ${fx.tokens})`, () => fx.tokenShop(npc)]);
     if (this.services.canHire(npc)) extra.push([de ? `🤝 Kannst du mir was holen? (✺ ${HIRE_COST})` : `🤝 Could you fetch something for me? (✺ ${HIRE_COST})`, () => this.services.hire(npc)]);
     if (id === 'franzi' && this.bikeSys.canRent()) extra.push([de ? `🚲 Hexenrad leihen (✺ ${this.bikeSys.cost})` : `🚲 Borrow the witch bike (✺ ${this.bikeSys.cost})`, async () => { if (this.bikeSys.rent()) await this.reply(npc, de ? 'Aber bring\'s heil zurück! Der Besen ist handgebunden.' : 'Bring it back in one piece! The broom is hand-tied.'); else await this.reply(npc, de ? 'Ein bisschen Karma brauch ich schon. Für die Kette. Und den Besen.' : 'I do need a little karma. For the chain. And the broom.'); }]);
+    if (id === 'fabi' && this.scooterSys.canRent()) extra.push([de ? `🛴 E-Scooter leihen (✺ ${this.scooterSys.cost})` : `🛴 Borrow the e-scooter (✺ ${this.scooterSys.cost})`, async () => { if (this.scooterSys.rent()) await this.reply(npc, de ? 'Bringst du ihn wieder? Versprochen? …Ich weiß eh, wo er ist. Meistens.' : 'You\'ll bring it back? Promise? …I know where it is anyway. Mostly.'); else await this.reply(npc, de ? 'Ohne Karma kein Akku. So ist das.' : 'No karma, no battery. That\'s how it is.'); }]);
     if (this.services.canStyle(npc)) extra.push([de ? '💇 Stylen lassen' : '💇 Get styled', () => this.services.styling(npc)]);
     const ask = fx.canAsk(npc);
     const opts = [de ? 'Bis später!' : 'See you!', ...extra.map((x) => x[0]), ...(ask ? [de ? '👀 Hast du was dabei?' : '👀 Got anything on you?'] : [])];
@@ -1391,6 +1395,14 @@ export class Game {
         if (this.bikeSys.canRide()) list.push({ d: bd + 0.5, label: de ? '🚲 Hexenrad fahren' : '🚲 Ride the witch bike', action: () => this.enterVehicle(bike) });
         else list.push({ d: bd + 2, label: de ? `🚲 Franzis Hexenrad, bei Franzi leihen (✺ ${this.bikeSys.cost})` : `🚲 Franzi's witch bike, borrow it from Franzi (✺ ${this.bikeSys.cost})`, disabled: true });
       }
+      // Fabi's e-scooter: same deal
+      const sc = this.vehicles.scooter;
+      const sd = sc.position.distanceTo(p);
+      if (sd < 2) {
+        const de = getLang() === 'de';
+        if (this.scooterSys.canRide()) list.push({ d: sd + 0.5, label: de ? '🛴 E-Scooter fahren' : '🛴 Ride the e-scooter', action: () => this.enterVehicle(sc) });
+        else list.push({ d: sd + 2, label: de ? `🛴 Fabis E-Scooter, bei Fabi leihen (✺ ${this.scooterSys.cost})` : `🛴 Fabi's e-scooter, borrow it from Fabi (✺ ${this.scooterSys.cost})`, disabled: true });
+      }
       // broken generator / poo pump: pro gaffa lets you patch it yourself
       if (this.effects.gaffa > 0) {
         for (const e of this.drama.events) {
@@ -1510,6 +1522,7 @@ export class Game {
       this.applyProgressLevel();
       if (this.quests.state.flags.look) { this.player.setLook(this.quests.state.flags.look); this.updateCarried(); }
       this.bikeSys.reset();
+      this.scooterSys.reset();
       return true;
     } catch (e) {
       console.warn('Save broken, starting fresh', e);
@@ -1642,7 +1655,7 @@ export class Game {
       if (inp.hit('KeyM')) { this._mapKeyReady = false; this.openMap(); }
       if (inp.hit('KeyJ')) this.openQuestLog();
       if (inp.hit('KeyV')) this.openVolunteers();
-      if (inp.hit('KeyH') && this.player.vehicle && this.player.vehicle.id !== 'bike') this.honk(this.player.vehicle);
+      if (inp.hit('KeyH') && this.player.vehicle && !this.player.vehicle.quiet) this.honk(this.player.vehicle);
       if (inp.hit('KeyN')) this.ui.toast(this.toggleMute() ? t('t.mute') : t('t.unmute'));
       if (inp.hit('KeyF') && !this.player.vehicle) this.player.wave();
       if (inp.hit('KeyT')) {
@@ -1665,12 +1678,12 @@ export class Game {
     else this.player.char.update(dt);
 
     if (!veh && this.player.moved - (this._lastStep || 0) > 1.4) { this._lastStep = this.player.moved; this.audio.step(); }
-    const motor = veh && veh.id !== 'bike';
+    const motor = veh && !veh.quiet;
     this.safe(() => this.audio.engine(motor ? veh.kmh / 50 : 0, !!motor && veh.canDrive()));
 
     this.safe(() => this.npcs.update(time, dt, ctx));
-    if (playing && veh && veh.id !== 'bike') this.safe(() => this.checkRunOver(veh));
-    if (playing) this.safe(() => this.bikeSys.update(dt));
+    if (playing && veh && !veh.quiet) this.safe(() => this.checkRunOver(veh));
+    if (playing) this.safe(() => { this.bikeSys.update(dt); this.scooterSys.update(dt); });
     this.safe(() => this.quests.update(time, dt, this.player.position));
     this.safe(() => this.world.update(time, dt, this.player.position));
     this.safe(() => this.trigel.update(dt, time, this.player.vehicle ? this.player.vehicle.position : this.player.position, this.world.night));
@@ -1706,7 +1719,7 @@ export class Game {
       const want = playing && !this.ui.dialogOpen;
       if (want !== this._touchShown) { this._touchShown = want; this.touch.show(want); }
       const hornBtn = this.touch.el?.querySelector('#t-horn');
-      const horn = !!(veh && veh.id !== 'bike');
+      const horn = !!(veh && !veh.quiet);
       if (hornBtn && hornBtn._on !== horn) { hornBtn._on = horn; hornBtn.classList.toggle('hidden', !horn); }
     }
     // interaction prompt

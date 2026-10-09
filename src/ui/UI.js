@@ -6,8 +6,8 @@ import { L, t } from '../i18n.js';
 const $ = (id) => document.getElementById(id);
 
 // vehicles on the maps
-const VEH_ICON = { quad: '🏍️', radlader: '🚜', bike: '🚲' };
-const VEH_COL = (v) => (v.id === 'quad' ? (v.broken ? '#ff5a4a' : '#ff9a4a') : v.id === 'bike' ? '#7fd0d0' : '#f2b319');
+const VEH_ICON = { quad: '🏍️', radlader: '🚜', bike: '🚲', scooter: '🛴' };
+const VEH_COL = (v) => (v.id === 'quad' ? (v.broken ? '#ff5a4a' : '#ff9a4a') : v.id === 'bike' ? '#7fd0d0' : v.id === 'scooter' ? '#c0c8d0' : '#f2b319');
 
 export class UI {
   constructor() {

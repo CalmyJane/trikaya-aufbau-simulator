@@ -111,6 +111,30 @@ export class DaySystem {
     } else if (this.day < LAST_BUILD_DAY && this.jobs(this.day, true).every(done)) this.sleep();
   }
 
+  /** Morning/evening talk: whoever speaks (except Leo, he only sends voice messages) is actually there –
+   *  anyone far away or hidden pops up in a half circle in front of the player behind a short fade. */
+  async scene(lines) {
+    const g = this.game, p = g.player.position;
+    const ids = [...new Set(lines.map((l) => l.who))].filter((id) => id !== 'leo' && id !== 'you' && g.npcs.get(id));
+    const far = ids.filter((id) => { const n = g.npcs.get(id); return !n.riding && !n.ridingBike && (n.hidden || n.gone || n.away || !n.root.visible || n.position.distanceTo(p) > 10); });
+    if (far.length) { g.ui.fade(true); await this.wait(700); }
+    const yaw = g.player.root.rotation.y;
+    ids.forEach((id, i) => {
+      const n = g.npcs.get(id);
+      if (far.includes(id)) {
+        n.task = null; n.incident = null; n.away = false; n.gone = false; n.hidden = false; n.root.visible = true;
+        if (n.char.sitting) n.standUp();
+        const a = yaw + (i - (ids.length - 1) / 2) * 0.55;
+        n.root.position.set(p.x + Math.sin(a) * 2.6, 0, p.z + Math.cos(a) * 2.6);
+        g.world.colliders.resolve(n.root.position, 0.4);
+      }
+      n.scenePose = p.clone();
+    });
+    if (far.length) { g.ui.fade(false); await this.wait(500); }
+    await g.runDialog(lines);
+    for (const id of ids) g.npcs.get(id).scenePose = null;
+  }
+
   wait(ms) { return new Promise((r) => setTimeout(r, this.game.devFast ? 30 : ms)); }
 
   async evening() {
@@ -127,9 +151,9 @@ export class DaySystem {
     await this.wait(3500);
     if (MEETING[this.day] && !g.devFast) {
       g.ui.toast(de ? '📋 Teammeeting im Büro-Container! …theoretisch.' : '📋 Team meeting in the office container! …in theory.');
-      await g.runDialog(MEETING[this.day].map(fix));
+      await this.scene(MEETING[this.day].map(fix));
     }
-    if (EVENING[this.day] && !g.devFast) await g.runDialog(EVENING[this.day].map(fix));
+    if (EVENING[this.day] && !g.devFast) await this.scene(EVENING[this.day].map(fix));
     this.busy = false;
   }
 
@@ -138,7 +162,7 @@ export class DaySystem {
     this.busy = true;
     const d = this.day;
     await this.wait(3000);
-    if (NIGHT_END[d] && !g.devFast) await g.runDialog(NIGHT_END[d].map(fix));
+    if (NIGHT_END[d] && !g.devFast) await this.scene(NIGHT_END[d].map(fix));
     g.ui.toast(de ? '😴 Ab ins Zelt…' : '😴 Off to the tent…');
     await this.wait(1500);
     g.ui.fade(true);
@@ -158,7 +182,7 @@ export class DaySystem {
     this.qs.refreshMarkers();
     g.refreshHUD();
     await this.wait(3000);
-    if (MORNING[d + 1] && !g.devFast) await g.runDialog(MORNING[d + 1].map(fix));
+    if (MORNING[d + 1] && !g.devFast) await this.scene(MORNING[d + 1].map(fix));
     this.busy = false;
   }
 

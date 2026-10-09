@@ -102,13 +102,14 @@ const TOKEN_THANKS = [
 ];
 
 // "Got anything?" – you can ask (almost) anyone. These never have anything and never sell.
-export const NO_STASH = ['fabi', 'jan', 'leo', 'franzi', 'isi', 'verena', 'mia', 'daniel', 'delsin', 'aylien', 'sabse'];
+export const NO_STASH = ['stella', 'fabi', 'jan', 'leo', 'franzi', 'isi', 'verena', 'mia', 'daniel', 'delsin', 'aylien', 'sabse'];
 // crew members with a known stash; everyone else is random (most have nothing)
 const STASH_FIXED = { strom_andi: ['beer', 'schnaps'], juli: ['beer'], estenko: ['schnaps'], rocky: ['weed'], mehdi: ['weed'], schwarzhuber: ['schnaps'], lenny: ['energy', 'weed'], mux: ['weed'], leocitas: ['weed'] };
 const STASH_POOL = ['weed', 'weed', 'schnaps', 'energy', 'energy', 'beer'];
 const STASH_CD = 240; // seconds until someone has something again after selling
 
 const NO_STASH_LINES = {
+  stella: { de: '*lacht* Ich? Ich hab Pinsel und Gaffa. Und einen Papa, der in der Werkstatt steht. Nein danke.', en: '*laughs* Me? I have brushes and gaffa. And a dad standing in the workshop. No thanks.' },
   fabi: { de: 'Gaffa? Ja. Das andere? Nein. Ich weiß, wo alles ist, aber DAS nicht.', en: 'Gaffa? Yes. The other stuff? No. I know where everything is, but not THAT.' },
   jan: { de: 'Ich hab Bändchen, Listen und kalten Kaffee. Willst du ein zweites Bändchen?', en: 'I have wristbands, lists and cold coffee. Want a second wristband?' },
   franzi: { de: 'Ich hab Wasser, Kekse und ein offenes Ohr. Mehr gibt\'s bei mir nicht. Und das ist gut so.', en: 'I have water, cookies and an open ear. That\'s all you get from me. And that\'s a good thing.' },
@@ -129,7 +130,7 @@ const NOTHING_LINES = [
   { de: 'Was soll ich haben? Ich hab Sonnenbrand.', en: 'What would I have? I have sunburn.' },
   { de: 'Ich hab Hustenbonbons. Die sind… sehr intensiv. Eukalyptus. Willst du?', en: 'I\'ve got cough drops. They\'re… very intense. Eucalyptus. Want one?' },
   { de: 'Ich hab einen Kabelbinder und ein gutes Gefühl. Reicht dir das?', en: 'I\'ve got a cable tie and a good feeling. Is that enough?' },
-  { de: 'Nur Globuli. Gegen Muskelkater. Wirkt nicht, aber ich glaub dran.', en: 'Just homeopathic pills. For sore muscles. Doesn\'t work, but I believe in it.' },
+  { de: 'Nur Traubenzucker. Für die Nerven. Wirkt sofort, sagt zumindest die Packung.', en: 'Just glucose tablets. For the nerves. Works instantly, says the packet at least.' },
   { de: 'Ich hab Mate. Also hatte. Jetzt hab ich Herzrasen.', en: 'I had mate. Well, had. Now I have palpitations.' },
   { de: 'Nee. Aber ich hab Sonnencreme mit LSF 50. Das ist quasi auch ein Trip, wenn man\'s vergisst.', en: 'Nope. But I\'ve got SPF 50 sunscreen. Forgetting it is basically a trip too.' },
   { de: 'Ich hab eine Banane. Die ist allerdings schon seit Dienstag in meiner Hosentasche.', en: 'I\'ve got a banana. It\'s been in my trouser pocket since Tuesday, though.' },

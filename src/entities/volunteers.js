@@ -2,11 +2,6 @@
 // model, a short role/quirk and their own lines). They appear in this order as the camp fills up.
 
 export const VOLUNTEERS = [
-  { name: 'Stella', f: true, role: { de: 'Astrologin', en: 'Astrologer' }, lines: [
-    { de: 'Du bist eindeutig Skorpion. Das erklärt, wie du Kabel aufrollst.', en: 'You\'re definitely a Scorpio. That explains how you coil cables.' },
-    { de: 'Merkur ist rückläufig. Deshalb ist der Akkuschrauber leer.', en: 'Mercury is in retrograde. That\'s why the drill is flat.' },
-    { de: 'Heute ist ein guter Tag für Zelte. Morgen eher für Dixis.', en: 'Today is a good day for tents. Tomorrow more for portaloos.' },
-  ] },
   { name: 'Kai', f: false, role: { de: 'Slackliner', en: 'Slackliner' }, lines: [
     { de: 'Zwischen den zwei Pfosten wäre eine perfekte Slackline. …Die Mainstage? Egal.', en: 'Those two posts would make a perfect slackline. …The mainstage? Whatever.' },
     { de: 'Balance ist alles. Auch beim Paletten tragen.', en: 'Balance is everything. Also when carrying pallets.' },

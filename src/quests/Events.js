@@ -20,7 +20,7 @@ const pick = (a) => a[Math.floor(Math.random() * a.length)];
 // people whose absence hurts the story
 const STORY = ['corni', 'matze', 'fabi', 'mark', 'felix', 'fabbe', 'harry', 'niklas', 'flo', 'andi', 'estenko', 'rocky', 'thompsen', 'strom_andi'];
 // never victims (they're needed as helpers or it wouldn't make sense)
-const NEVER = ['leo', 'franzi', 'sabse', 'jan', 'juli', 'verena', 'fabi', 'isi', 'mia', 'daniel', 'delsin'];
+const NEVER = ['stella', 'leo', 'franzi', 'sabse', 'jan', 'juli', 'verena', 'fabi', 'isi', 'mia', 'daniel', 'delsin'];
 
 // Juli vs. a volunteer. {a} = the volunteer.
 export const JULI_FIGHTS = [

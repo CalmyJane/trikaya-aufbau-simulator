@@ -530,6 +530,21 @@ export const NPCS = [
     ],
   },
   {
+    id: 'stella', name: 'Stella', role: { de: 'Fabis Tochter · Kreatives, ein bisschen Licht', en: 'Fabi\'s daughter · creative stuff, a bit of lighting' }, portrait: '🎨',
+    look: { base: 'f_casual', skin: SKIN.light, hair: '#3a2416', brows: '#2e1c10', hairStyle: 'long', hairStyleColor: '#3a2416', hairLength: 0.45, shirt: '#e8d8b8', pants: '#3a4a5a', patchwork: true, shirtPatch: ['#e8d8b8', '#c87a4a', '#6a8aa8'], height: 1.56, width: 0.92 },
+    behavior: 'wander', home: 'plot_kuenstlergasse', offset: [3, -2], radius: 9,
+    lines: [
+      { de: 'Hi! Ich bin Stella. Fabis Tochter. Ja, genau DER Fabi. Ich weiß auch nicht, wo die Spezial-Nuss ist.', en: 'Hi! I\'m Stella. Fabi\'s daughter. Yes, THAT Fabi. I don\'t know where the special nut is either.' },
+      { de: '*kichert* Entschuldigung. Ich hab grad Matze zugeschaut, wie er einen Kaffee sucht, den er in der Hand hält.', en: '*giggles* Sorry. I was just watching Matze look for a coffee he\'s holding.' },
+      { de: 'Ich mal die Schilder für die Künstlergasse. Und manchmal halt ich Felix eine Lampe. Er erklärt mir dann sehr lange, warum ich sie falsch halte.', en: 'I\'m painting the signs for the artists\' alley. And sometimes I hold a lamp for Felix. Then he explains at length why I\'m holding it wrong.' },
+      { de: 'Papa sagt, er weiß, wo alles ist. Ich kenn ihn seit zwanzig Jahren. Er weiß, wo FAST alles ist.', en: 'Dad says he knows where everything is. I\'ve known him for twenty years. He knows where ALMOST everything is.' },
+      { de: 'Die Leute hier sind alle ein bisschen verrückt. Also, im besten Sinn. Ich hab heute schon dreimal Tränen gelacht.', en: 'Everyone here is a bit crazy. In the best way. I\'ve already cried laughing three times today.' },
+      { de: 'Ähm… brauchst du was? Ich hab Pinsel, Gaffa und ein Verlängerungskabel. Eins davon hilft bestimmt.', en: 'Um… need anything? I have brushes, gaffa and an extension cable. One of those will help.' },
+      { de: 'Zdenko hat mir gerade Kung Fu erklärt. Dann ist er in die Hecke gefallen. Ich durfte nicht lachen. Ich hab gelacht.', en: 'Zdenko just explained kung fu to me. Then he fell into the hedge. I wasn\'t supposed to laugh. I laughed.' },
+      { de: 'Wenn abends die Lichterketten angehen, die hab ich mit aufgehängt. Nicht weitersagen, sonst will Felix sie umhängen.', en: 'When the fairy lights come on in the evening: I helped hang those. Don\'t tell, or Felix will want to rehang them.' },
+    ],
+  },
+  {
     id: 'shifa', name: 'Shifa', role: { de: 'Neu dabei, überfordert', en: 'New here, overwhelmed' }, portrait: '🤓',
     look: { base: 'f_casual', skin: SKIN.fair, hair: '#b0402a', brows: '#8a3220', hairStyle: 'long', hairStyleColor: '#b0402a', hairLength: 0.3, glasses: '#3a2a22', glassesSpecial: '#2affd0', shirt: '#e0e0d0', pants: '#7a4a8a', patchwork: true, shirtPatch: ['#e0e0d0', '#2a8a7a', '#c9b24a'], height: 1.62 },
     behavior: 'wander', home: 'camp_random', roam: 'camp_random', radius: 8,

@@ -9,11 +9,12 @@ import { getLang } from '../i18n.js';
 const IDLE_BACK = 75;     // seconds lying around before the owner takes it back
 
 class Rental {
-  constructor(game, vehicle, { owner, cost, park }) {
+  constructor(game, vehicle, { owner, cost, park, refund = false }) {
     this.game = game;
     this.vehicle = vehicle;
     this.ownerId = owner;
     this.price = cost;
+    this.refund = refund; // bring it back to the owner → the karma you paid comes back
     this.park = park; // [dx, dz, heading] next to the owner's home
     this.reset();
   }
@@ -69,10 +70,26 @@ class Rental {
     const g = this.game;
     if (g.quests.state.karma < this.cost) return false;
     g.quests.state.karma -= this.cost;
+    this.paid = this.cost;
     this.rented = true;
     this.idleT = 0;
     g.refreshHUD();
     return true;
+  }
+
+  /** Player got off: right next to the owner = brought back (refund if this rental has one). */
+  onExit(v) {
+    const f = this.owner, g = this.game;
+    if (v !== this.vehicle || !this.rented || !this.refund || !f || f.hidden) return;
+    if (this.vehicle.position.distanceTo(f.position) > 10) return;
+    const back = this.paid || 0;
+    g.quests.state.karma += back;
+    this.rented = false;
+    this.paid = 0;
+    this.idleT = 0;
+    g.ui.toast(this.text().returned.replace('{n}', back));
+    if (!f.bubble) f.say(this.text().thanks, 3.5);
+    g.refreshHUD();
   }
 
   update(dt) {
@@ -87,6 +104,7 @@ class Rental {
       this.idleT += dt;
       if (this.idleT > IDLE_BACK && unseen && !f.task) {
         this.rented = false;
+        this.paid = 0; // too late: the karma stays with her
         this.parkAtOwner();
         g.ui.toast(this.text().fetched);
       }
@@ -98,7 +116,7 @@ class Rental {
 
 export class FranziBike extends Rental {
   constructor(game, bike) {
-    super(game, bike, { owner: 'franzi', cost: 5, park: [1.6, -1.2, 0.6] });
+    super(game, bike, { owner: 'franzi', cost: 5, park: [1.6, -1.2, 0.6], refund: true });
   }
 
   get bike() { return this.vehicle; }
@@ -109,24 +127,28 @@ export class FranziBike extends Rental {
       ask: `🚲 Darf ich mir dein Hexenrad ausleihen? (✺ ${c})`,
       yes: 'Klar! Nimm es, wann immer du magst. Aber bring\'s heil zurück – der Besen ist handgebunden.',
       noKarma: 'Ein bisschen Karma brauch ich schon. Für die Kette. Und den Besen.',
-      firstToast: `🚲 Franzis Hexenrad gehört dir (−${c} ✺). Ab jetzt darfst du es immer nehmen, jede Fahrt kostet ✺ ${c}. Lässt du es liegen, holt Franzi es sich.`,
-      takeToast: `🚲 Hexenrad geliehen (−${c} ✺). Versprochen, du bringst es zurück!`,
+      firstToast: `🚲 Franzis Hexenrad gehört dir (−${c} ✺). Ab jetzt darfst du es immer nehmen. Bringst du es ihr zurück, kriegst du das Karma wieder. Holt sie es selbst, ist es weg.`,
+      takeToast: `🚲 Hexenrad geliehen (−${c} ✺). Bring es zu Franzi zurück, dann kriegst du das Karma wieder!`,
+      returned: '🚲 Hexenrad zurückgebracht. Franzi gibt dir dein Karma wieder: +{n} ✺',
+      thanks: 'Danke! Heil und ganz. Der Besen auch.',
       noKarmaToast: `🚲 Zu wenig Karma fürs Hexenrad (✺ ${c}).`,
       ride: '🚲 Hexenrad fahren',
       take: `🚲 Hexenrad nehmen (✺ ${c})`,
       needAsk: '🚲 Frag Franzi, ob du dir ihr Hexenrad ausleihen darfst',
-      fetched: '🚲 Franzi hat ihr Hexenrad wieder abgeholt.',
+      fetched: '🚲 Franzi hat ihr Hexenrad selbst abgeholt. Das Karma behält sie.',
     } : {
       ask: `🚲 Can I borrow your witch bike? (✺ ${c})`,
       yes: 'Sure! Take it whenever you like. But bring it back in one piece – the broom is hand-tied.',
       noKarma: 'I do need a little karma. For the chain. And the broom.',
-      firstToast: `🚲 Franzi's witch bike is yours (−${c} ✺). From now on you may always take it, each ride costs ✺ ${c}. Leave it lying around and Franzi fetches it.`,
-      takeToast: `🚲 Witch bike borrowed (−${c} ✺). You promised to bring it back!`,
+      firstToast: `🚲 Franzi's witch bike is yours (−${c} ✺). From now on you may always take it. Bring it back to her and you get the karma back. If she has to fetch it, it's gone.`,
+      takeToast: `🚲 Witch bike borrowed (−${c} ✺). Bring it back to Franzi and you get the karma back!`,
+      returned: '🚲 Witch bike returned. Franzi gives you your karma back: +{n} ✺',
+      thanks: 'Thanks! Safe and sound. The broom too.',
       noKarmaToast: `🚲 Not enough karma for the witch bike (✺ ${c}).`,
       ride: '🚲 Ride the witch bike',
       take: `🚲 Take the witch bike (✺ ${c})`,
       needAsk: '🚲 Ask Franzi if you may borrow her witch bike',
-      fetched: '🚲 Franzi fetched her witch bike back.',
+      fetched: '🚲 Franzi fetched her witch bike herself. She keeps the karma.',
     };
   }
 

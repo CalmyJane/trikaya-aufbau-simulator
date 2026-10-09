@@ -239,7 +239,13 @@ export class Game {
 
   // ------------------------------------------------------------------ vehicles (cargo follows you)
   enterVehicle(v) { this.player.enter(v); this.updateCarried(); }
-  exitVehicle() { this.player.exit(); this.updateCarried(); }
+  exitVehicle() {
+    const v = this.player.vehicle;
+    this.player.exit();
+    this.updateCarried();
+    this.bikeSys?.onExit(v);
+    this.scooterSys?.onExit(v);
+  }
 
   // ------------------------------------------------------------------ menus
   controlsHtml() {

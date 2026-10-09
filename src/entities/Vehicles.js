@@ -430,7 +430,7 @@ export class Bike extends Vehicle {
     bristles.rotation.x = Math.PI / 2;
     bristles.position.z = -1.0;
     broom.add(bristles);
-    broom.position.set(0.16, 0.74, 0.05);
+    broom.position.set(0, 0.72, 0.05); // centred, strapped under the top tube
     b.add(broom);
     for (const z of [0.55, -0.55]) this.spokeWheel(0.34, 0, 0.34, z);
     this.seat.position.set(0, 0.45, -0.3);

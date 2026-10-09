@@ -66,6 +66,28 @@ html, body {
 .qlog-item .t { font-weight: 800; color: var(--gold-2); }
 .qlog-item .s { color: var(--muted); font-size: 14px; }
 .qlog-item.locked { opacity: 0.4; font-style: italic; }
+.qlog-sum { color: var(--muted); font-size: 14px; margin-top: -8px; }
+.qlog-h { color: var(--gold); font-weight: 800; font-size: 15px; margin: 4px 0 -6px; letter-spacing: 0.02em; }
+.qlog-item { position: relative; }
+.qlog-item .qr { float: right; color: var(--muted); font-weight: 700; font-size: 13px; }
+.qlog-item .now { color: #fff; font-weight: 700; margin: 3px 0; }
+.qlog-item .qa { color: var(--gold-2); font-size: 13px; margin-top: 4px; opacity: 0.85; }
+.qlog-item.act, .qlog-item.new { cursor: pointer; border-left: 4px solid rgba(232, 163, 58, 0.5); }
+.qlog-item.act.tracked { border-left-color: var(--gold); background: rgba(232, 163, 58, 0.12); }
+.qlog-item.new { border-left-color: #ffd21f; }
+.qlog-item.act:active, .qlog-item.new:active { background: rgba(255, 255, 255, 0.1); }
+.qlog-locked { color: var(--muted); font-size: 14px; font-style: italic; opacity: 0.75; padding: 0 4px; }
+.qlog-done summary { cursor: pointer; color: var(--muted); font-weight: 700; padding: 6px 4px; }
+.qlog-done .dl { color: var(--muted); font-size: 14px; padding: 3px 12px; opacity: 0.8; }
+/* the close button stays reachable at the bottom of long lists */
+#modal #modal-close { position: sticky; bottom: 0; flex-shrink: 0; background: rgb(34, 56, 42); box-shadow: 0 -12px 14px 2px rgb(16, 24, 18), 0 18px 0 8px rgb(16, 24, 18); text-align: center; }
+#modal #modal-close:hover { transform: none; background: rgb(46, 74, 54); }
+@media (max-height: 520px) {
+  #modal .modal-panel { padding: 14px 16px; gap: 10px; max-height: 94vh; }
+  #modal .modal-panel h2 { font-size: 24px; }
+  .qlog-item { padding: 8px 10px; margin-bottom: 6px; }
+  .qlog-item .s { font-size: 13px; }
+}
 
 /* ---------------------------------------------------------------- HUD */
 #hud { position: fixed; inset: 0; pointer-events: none; z-index: 10; }

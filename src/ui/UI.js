@@ -210,9 +210,9 @@ export class UI {
     const days = qs.game.days;
     const left = days ? days.jobs(days.day, days.isNight).filter((q) => !qs.isDone(q.id)).length : 0;
     const bits = [];
-    if (jobs.length) bits.push(`<b>!</b> ${jobs.join(', ')}`);
-    if (favs.length) bits.push(`<b class="g">!</b> ${favs.join(', ')}`);
-    if (bits.length || left) rows.push(row('hint', days?.isNight ? '🌙' : '☀️', bits.join(' · ') || L({ de: 'Weiter so', en: 'Keep going' }), left ? `${left} ${L({ de: 'bis Feierabend', en: 'left today' })}` : '', active.length > 0));
+    if (jobs.length) bits.push(`<b>!</b> ${L({ de: 'Neue Jobs', en: 'New jobs' })}: ${jobs.join(', ')}`);
+    if (favs.length) bits.push(`<b class="g">!</b> ${L({ de: 'Gefallen', en: 'Favours' })}: ${favs.join(', ')}`);
+    if (bits.length || left) rows.push(row('hint', days?.isNight ? '🌙' : '☀️', bits.join(' · ') || L({ de: 'Weiter so', en: 'Keep going' }), left ? L({ de: `noch ${left} heute`, en: `${left} left today` }) : '', active.length > 0));
     if (!rows.length && qs.state.completed.length) rows.push(row('hint', '🎉', strip(t('hud.allDone')), ''));
     const html = rows.join('');
     if (el._last !== html) { el.innerHTML = html; el._last = html; }

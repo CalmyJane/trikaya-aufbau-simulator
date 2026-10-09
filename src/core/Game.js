@@ -660,25 +660,65 @@ export class Game {
     b.userData.arrow.rotation.y = time * 2;
   }
 
+  /**
+   * Quest log, sorted by what matters now: running jobs first (tap = show it on map & compass),
+   * then new jobs (tap = purple beam over the person who gives it), finished ones folded away,
+   * all locked ones in a single line.
+   */
   openQuestLog() {
-    const qs = this.quests;
-    const all = Object.values(qs.quests).filter((q) => !q.errand || qs.isActive(q.id));
-    const html = `<h2>${t('q.title')}</h2>` + all.map((q) => {
-      const done = qs.isDone(q.id), active = qs.isActive(q.id);
-      const avail = qs.available().includes(q);
-      if (!done && !active && !avail) return `<div class="qlog-item locked"><div class="t">???</div><div class="s">${t('q.locked')}</div></div>`;
-      const step = qs.currentStep(q.id);
-      const giver = this.npcs.get(q.giver)?.def.name;
-      return `<div class="qlog-item ${done ? 'done' : ''}"><div class="t">${done ? '✔ ' : active ? '▶ ' : '! '}${L(q.title)}</div>
-        <div class="s">${L(q.summary)}</div>
-        <div class="s">${done ? t('q.done') : active ? `${t('q.current')}: <b>${active ? this.quests.stepText(q.id) : L(step?.text)}</b>` : t('q.talkTo', { name: giver })} · ${t('q.reward')}: ${q.reward?.karma || 0} Karma</div></div>`;
-    }).join('') + (qs.state.day < 4 ? `<div class="qlog-item locked"><div class="t">${t('q.more')}</div></div>` : '');
+    const qs = this.quests, de = getLang() === 'de';
+    const all = Object.values(qs.quests);
+    const avail = qs.available();
+    const active = Object.keys(qs.state.active).map((id) => qs.quests[id]).filter(Boolean);
+    const done = all.filter((q) => !q.errand && qs.isDone(q.id));
+    const locked = all.filter((q) => !q.errand && !qs.isDone(q.id) && !qs.isActive(q.id) && !avail.includes(q));
+    const mainTotal = all.filter((q) => !q.errand).length;
+    const name = (id) => this.npcs.get(id)?.def.name || '?';
+    const kar = (q) => `<span class="qr">✺ ${q.reward?.karma || 0}</span>`;
+    const days = this.days;
+    const left = days ? days.jobs(days.day, days.isNight).filter((q) => !qs.isDone(q.id)).length : 0;
+    let html = `<h2>${t('q.title')}</h2><div class="qlog-sum">${de ? `Tag ${qs.state.day}` : `Day ${qs.state.day}`} · ${done.length}/${mainTotal} ${de ? 'erledigt' : 'done'}${left ? ` · ${de ? `noch <b>${left}</b> bis Feierabend` : `<b>${left}</b> left today`}` : ''}</div>`;
+    const sec = (title) => `<div class="qlog-h">${title}</div>`;
+    if (active.length) {
+      html += sec(de ? '▶ Läuft gerade' : '▶ In progress');
+      html += active.map((q) => {
+        const tracked = qs.state.tracked === q.id;
+        return `<div class="qlog-item act ${tracked ? 'tracked' : ''}" data-track="${q.id}"><div class="t">${q.errand ? '💚 ' : ''}${L(q.title)} ${kar(q)}</div>
+          <div class="now">➜ ${qs.stepText(q.id)}</div><div class="s">${L(q.summary)}</div>
+          <div class="qa">${tracked ? (de ? '📍 Wird auf Karte & Kompass angezeigt' : '📍 Shown on map & compass') : (de ? '👆 Antippen: auf Karte & Kompass zeigen' : '👆 Tap: show on map & compass')}</div></div>`;
+      }).join('');
+    }
+    if (avail.length) {
+      html += sec(de ? '! Neue Jobs – sprich mit der Person' : '! New jobs – talk to the person');
+      html += avail.map((q) => `<div class="qlog-item new" data-npc="${q.giver}"><div class="t">${q.errand ? '💚 ' : ''}${L(q.title)} ${kar(q)}${q.timeLimit ? ' ⏱' : ''}</div>
+          <div class="now">${t('q.talkTo', { name: name(q.giver) })}${q.errand ? (de ? ' (freiwilliger Gefallen)' : ' (optional favour)') : ''}</div><div class="s">${L(q.summary)}</div>
+          <div class="qa">${de ? `📍 Antippen: Wo ist ${name(q.giver)}?` : `📍 Tap: where is ${name(q.giver)}?`}</div></div>`).join('');
+    }
+    if (!active.length && !avail.length) html += `<div class="qlog-item"><div class="t">${t('hud.allDone')}</div><div class="s">${t('hud.allDoneSub')}</div></div>`;
+    if (locked.length) html += `<div class="qlog-locked">🔒 ${de ? `${locked.length} weitere Jobs werden frei, wenn du frühere erledigst` : `${locked.length} more jobs unlock as you finish earlier ones`}${qs.state.day < 4 ? (de ? ' – und an den nächsten Aufbautagen.' : ' – and on the next build days.') : '.'}</div>`;
+    if (done.length) {
+      html += `<details class="qlog-done"><summary>✔ ${de ? 'Erledigt' : 'Done'} (${done.length})</summary>${done.map((q) => `<div class="dl">✔ ${L(q.title)} <span class="qr">✺ ${q.reward?.karma || 0}</span></div>`).join('')}</details>`;
+    }
     if (this.mode === 'play') {
       this.ignoreUnlock = true; this.input.unlock(); setTimeout(() => (this.ignoreUnlock = false), 100);
       this.input.enabled = false;
       this.ui.onModalClose = () => { this.ui.onModalClose = null; this.resume(); };
     }
     this.ui.modal(html);
+    const close = () => { if (this.mode === 'pause') this.resume(); else this.ui.closeModal(); };
+    document.querySelectorAll('#modal-body [data-track]').forEach((el) => {
+      el.onclick = () => {
+        this.audio.click();
+        qs.state.tracked = el.dataset.track;
+        qs.refreshMarkers?.();
+        this.refreshHUD();
+        this.ui.toast(`📍 ${L(qs.quests[el.dataset.track].title)}: ${de ? 'wird auf Karte & Kompass angezeigt' : 'shown on map & compass'}`);
+        close();
+      };
+    });
+    document.querySelectorAll('#modal-body [data-npc]').forEach((el) => {
+      el.onclick = () => { this.audio.click(); this.setVolTarget(el.dataset.npc); close(); this.startVolCine(el.dataset.npc); };
+    });
   }
 
   /** fromPause: opened from the pause menu – closing it goes back there, not into the game. */

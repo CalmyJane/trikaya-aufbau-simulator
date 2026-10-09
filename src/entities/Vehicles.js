@@ -136,7 +136,9 @@ class Vehicle {
         steerIn += this.wobble * (Math.sin(this.wobT * 1.3) * 0.8 + Math.sin(this.wobT * 3.7 + 1) * 0.35);
       }
       steerIn = Math.max(-1, Math.min(1, steerIn));
-      brake = input.down('Space');
+      // bike & scooter: Space hops (S brakes); everything else: handbrake
+      brake = !o.hop && input.down('Space');
+      if (o.hop && input.hit?.('Space') && !(this.hopY > 0)) { this.hopV = o.hop; this.hopY = 0.001; }
       // Shift (or the touch sprint toggle): full throttle
       this.boosting = !!o.boost && throttle > 0 && (input.down('ShiftLeft', 'ShiftRight') || input.sprintToggle);
     } else this.boosting = false;
@@ -172,7 +174,7 @@ class Vehicle {
       for (const pt of this.parts) {
         const q = { x: p.x + sx * pt.z, z: p.z + sz * pt.z };
         const qx = q.x, qz = q.z;
-        if (this.world.colliders.resolve(q, pt.r)) { hit = true; p.x += q.x - qx; p.z += q.z - qz; }
+        if (this.world.colliders.resolve(q, pt.r, this.hopY || 0)) { hit = true; p.x += q.x - qx; p.z += q.z - qz; }
       }
     }
     if (hit) {
@@ -188,6 +190,11 @@ class Vehicle {
     const moved = Math.hypot(p.x - bx, p.z - bz);
     this.odometer += moved;
     this.syncCollider();
+    if (this.hopY > 0) { // in the air: up and down again, small bump on landing
+      this.hopV -= 16 * dt;
+      this.hopY += this.hopV * dt;
+      if (this.hopY <= 0) { this.hopY = 0; this.hopV = 0; this.landT = 0.18; }
+    }
     // bikes & scooters lean into the curve (positive steer = left turn = top tilts to +x)
     if (o.lean) this.leanZ = (this.leanZ || 0) + (-this.steer * Math.min(1, Math.abs(this.speed) / o.maxSpeed) * o.lean - (this.leanZ || 0)) * Math.min(1, dt * 5);
     this.settle(dt);
@@ -205,9 +212,11 @@ class Vehicle {
   settle(dt) {
     const p = this.root.position;
     const t = tiltAt(p.x, p.z, this.heading, this.o.length, this.o.width);
-    p.y = t.y;
+    if (this.landT > 0) this.landT -= dt;
+    p.y = t.y + (this.hopY || 0) - (this.landT > 0 ? Math.sin(this.landT / 0.18 * Math.PI) * 0.05 : 0);
     const k = dt ? Math.min(1, dt * 8) : 1;
-    this.body.rotation.x += (t.pitch - this.body.rotation.x) * k;
+    // hopping: the front wheel comes up first
+    this.body.rotation.x += (t.pitch - (this.hopV > 0 ? Math.min(0.35, this.hopY * 0.9) : 0) - this.body.rotation.x) * k;
     this.body.rotation.z += (-t.roll + (this.leanZ || 0) - this.body.rotation.z) * k;
   }
 
@@ -377,7 +386,7 @@ export class Radlader extends Vehicle {
 // ------------------------------------------------------------------ Franzi's bike (with a witch's broom strapped on)
 export class Bike extends Vehicle {
   constructor(world) {
-    super(world, { maxSpeed: 10.5, accel: 6.8, brake: 12, drag: 1.1, maxSteer: 1, turnRate: 2.4, lean: 0.32, radius: 0.7, bodyRadius: 0.32, bodyOffset: 0.4, length: 1.7, width: 0.55, boost: 1.25 });
+    super(world, { maxSpeed: 10.5, accel: 6.8, brake: 12, drag: 1.1, maxSteer: 1, turnRate: 2.4, lean: 0.32, hop: 4.4, radius: 0.7, bodyRadius: 0.32, bodyOffset: 0.4, length: 1.7, width: 0.55, boost: 1.25 });
     this.id = 'bike';
     this.name = { de: 'Franzis Hexenrad', en: 'Franzi\'s witch bike' };
     this.quiet = true; // no engine, no horn, doesn't run people over
@@ -473,7 +482,7 @@ export class Bike extends Vehicle {
 // ------------------------------------------------------------------ Fabi's e-scooter (you ride it standing)
 export class Scooter extends Vehicle {
   constructor(world) {
-    super(world, { maxSpeed: 11, accel: 5.5, brake: 12, drag: 1.1, maxSteer: 1, turnRate: 2.6, lean: 0.26, radius: 0.6, bodyRadius: 0.3, bodyOffset: 0.3, length: 1.2, width: 0.5, boost: 1.2 });
+    super(world, { maxSpeed: 11, accel: 5.5, brake: 12, drag: 1.1, maxSteer: 1, turnRate: 2.6, lean: 0.26, hop: 4.0, radius: 0.6, bodyRadius: 0.3, bodyOffset: 0.3, length: 1.2, width: 0.5, boost: 1.2 });
     this.id = 'scooter';
     this.name = { de: 'Fabis E-Scooter', en: 'Fabi\'s e-scooter' };
     this.quiet = true;

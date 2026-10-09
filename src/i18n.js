@@ -85,6 +85,7 @@ const STRINGS = {
   'hud.ready': { de: 'Festival bereit', en: 'Festival ready' },
   'hud.day': { de: 'Aufbau-Tag 1 · noch 4 Tage', en: 'Build day 1 · 4 days left' },
   'hud.hint': { de: 'Klick = Maus fangen · WASD laufen · Shift sprinten · E interagieren · J Aufgaben · M Karte · Esc Pause', en: 'Click to capture mouse · WASD move · Shift sprint · E interact · J quests · M map · Esc pause' },
+  'hud.hintRide': { de: 'W/S Gas/Bremse · A/D lenken · Leertaste lupfen · E absteigen', en: 'W/S throttle/brake · A/D steer · Space hop · E get off' },
   'hud.hintDrive': { de: 'W/S Gas/Bremse · A/D lenken · Leertaste Handbremse · E aussteigen', en: 'W/S throttle/brake · A/D steer · Space handbrake · E exit' },
   'hud.newJob': { de: 'Neuer Job', en: 'New job' },
   'hud.jobAvail': { de: 'Neuer Job verfügbar', en: 'New job available' },

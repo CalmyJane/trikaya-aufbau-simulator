@@ -266,8 +266,13 @@ export class NPC {
     if (this.riding) {
       const q = this.riding;
       if (!this.char.sitting) this.char.setSitting(true);
-      const back = new THREE.Vector3(0, 0, -0.62).applyAxisAngle(new THREE.Vector3(0, 1, 0), q.heading);
-      this.root.position.set(q.position.x + back.x, q.position.y + 0.55, q.position.z + back.z);
+      if (this.rideSeat) { // a seat on the trailer bench
+        q.body.updateMatrixWorld(true);
+        this.rideSeat.getWorldPosition(this.root.position);
+      } else {
+        const back = new THREE.Vector3(0, 0, -0.62).applyAxisAngle(new THREE.Vector3(0, 1, 0), q.heading);
+        this.root.position.set(q.position.x + back.x, q.position.y + 0.55, q.position.z + back.z);
+      }
       this.root.rotation.y = q.heading;
       this.char.update(dt);
       return;

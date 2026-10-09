@@ -289,7 +289,7 @@ export class UI {
     const el = $('vehicle-hud');
     if (!v) { if (!el.classList.contains('hidden')) el.classList.add('hidden'); $('hint').textContent = t('hud.hint'); return; }
     el.classList.remove('hidden');
-    $('hint').textContent = t('hud.hintDrive');
+    $('hint').textContent = t(v.o?.hop ? 'hud.hintRide' : 'hud.hintDrive');
     let html = `<div class="vh-name">${L(v.name)}</div><div class="vh-speed">${Math.round(v.kmh)} <span>${t('hud.speed')}</span></div>`;
     if (v.fuel !== undefined) html += `<div class="vh-fuel"><span>${t('hud.fuel')}</span><div class="bar"><div style="width:${Math.round(v.fuel * 100)}%"></div></div></div>`;
     if (v.broken) html += `<div class="vh-broken">💥 ${t('p.quadBroken')}</div>`;

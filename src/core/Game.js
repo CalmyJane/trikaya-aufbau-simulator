@@ -22,6 +22,7 @@ import { Soundboxes } from '../quests/Soundbox.js';
 import { Finale } from '../quests/Finale.js';
 import { DaySystem } from '../quests/Days.js';
 import { Parking } from '../quests/Parking.js';
+import { TrailerRide } from '../quests/Trailer.js';
 import { Minigame } from '../ui/Minigame.js';
 import { Errands } from '../quests/Errands.js';
 import { NPC } from '../entities/NPC.js';
@@ -132,6 +133,7 @@ export class Game {
     this.finaleSys = new Finale(this);
     this.days = new DaySystem(this);
     this.parking = new Parking(this);
+    this.trailer = new TrailerRide(this);
     this.minigame = new Minigame(this);
     this.errands = new Errands(this);
     this.npcs.partyLine = () => this.soundbox.partyLine();
@@ -201,6 +203,7 @@ export class Game {
     this.errandTents = [];
     this.days?.reset();
     this.parking?.stop();
+    this.trailer?.stop();
     this.errands?.reset();
     this.clearRouteWalkers?.();
     // nobody is still off at the DIY store in a fresh game
@@ -808,6 +811,9 @@ export class Game {
           break;
         case 'delivery':
           this.deliveryTruck(data.qid, data.step);
+          break;
+        case 'trailerStart':
+          this.trailer.start(data.qid, data.step);
           break;
         case 'parkStart':
           this.parking.start(data.qid, data.step);
@@ -1754,6 +1760,7 @@ export class Game {
       this.safe(() => this.errands.update(dt));
       this.safe(() => this.days.update());
       this.safe(() => this.parking.update(dt));
+      this.safe(() => this.trailer.update(dt));
       // safety net: vehicles wedged into something (new stage, posts, masts…) get freed
       this._unstickT = (this._unstickT || 0) - dt;
       if (this._unstickT <= 0) {

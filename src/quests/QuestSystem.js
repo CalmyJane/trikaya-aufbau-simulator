@@ -64,6 +64,7 @@ export class QuestSystem {
   /** The current step's text, with live numbers filled in ({have}/{need} for karma steps). */
   stepText(qid) {
     const step = this.currentStep(qid), a = this.state.active[qid];
+    if (step?.type === 'trailer' && this.game.trailer) return this.game.trailer.stepText(qid, step);
     return (L(step?.text) || '').replace('{need}', a?.need ?? '').replace('{have}', Math.floor(this.state.karma));
   }
 
@@ -140,6 +141,7 @@ export class QuestSystem {
     }
     if (step.type === 'night') this.emit('nightStep', { step });
     if (step.type === 'park') this.emit('parkStart', { qid, step });
+    if (step.type === 'trailer') this.emit('trailerStart', { qid, step });
     if (step.type === 'karma' && a.need == null) a.need = Math.max(step.min || 100, Math.ceil((this.state.karma + (step.extra || 80)) / 10) * 10);
     if (step.type === 'soundbox') this.game.soundbox?.spawn(true);
     if (step.type === 'wait') {
@@ -476,6 +478,8 @@ export class QuestSystem {
             this.game.endRide(qid, step).finally(() => { this._riding = false; });
           }
         }
+      } else if (step.type === 'trailer') {
+        out.push(...(this.game.trailer?.interactables(qid, step, p, vehicle) || []));
       } else if (step.type === 'reach' && !this._reaching) {
         const s = this.world.spots[step.at];
         if (s && Math.hypot(s.x - p.x, s.z - p.z) < (step.radius || 6)) {
@@ -498,6 +502,7 @@ export class QuestSystem {
       return giver ? [{ pos: giver.position, label: giver.def.name, npc: true }] : [];
     }
     if (step.type === 'park') return [{ pos: this.world.spots[step.at], label: '🅿️' }];
+    if (step.type === 'trailer') return this.game.trailer?.objectives(qid, step) || [];
     if (step.type === 'karma') {
       const giver = this.game.npcs.get(this.quests[qid].giver);
       return this.state.karma >= (this.state.active[qid].need || 0) && giver ? [{ pos: giver.position, label: giver.def.name, npc: true }] : [];

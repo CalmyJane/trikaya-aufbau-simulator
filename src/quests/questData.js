@@ -1051,6 +1051,47 @@ export const QUESTS = [
     reward: { karma: 40 },
   },
 
+  // ------------------------------------------------------------------ T1 — trailer taxi (Corni): drive three people, don't lose two
+  {
+    id: 't1_trailer',
+    title: { de: 'Hänger-Taxi', en: 'Trailer Taxi' },
+    giver: 'corni',
+    day: 3,
+    requires: ['q8_forestdome'],
+    summary: { de: 'Fabi hat einen Hänger fürs Quad gefunden. Fahr Juli, Julez und Corni vom Crew Camp zum Forest Dome. Über Kabelbrücken langsam, keine Vollbremsung – fallen zwei raus, geht\'s von vorne los.', en: 'Fabi found a trailer for the quad. Drive Juli, Julez and Corni from the crew camp to the Forest Dome. Slow over cable bridges, no emergency stops – if two fall out, you start over.' },
+    offer: [
+      { who: 'corni', text: { de: 'Fabi hat im Hühnercontainer einen Hänger gefunden. Fürs Quad! Unter einem Zelt. Unter einem anderen Zelt.', en: 'Fabi found a trailer in the chicken container. For the quad! Under a tent. Under another tent.' } },
+      { who: 'corni', text: { de: 'Juli, Julez und ich müssen rüber zum Forest Dome, Traversen nachziehen. Fährst du uns? Aber vorsichtig, überall liegen Kabelbrücken.', en: 'Juli, Julez and I need to get over to the Forest Dome, tighten the trusses. Will you drive us? But carefully, there are cable bridges everywhere.' } },
+    ],
+    accept: { de: 'Bitte einsteigen!', en: 'All aboard!' },
+    decline: { de: 'Lauft lieber.', en: 'Better walk.' },
+    failDialog: [
+      { who: 'corni', text: { de: 'Stopp! STOPP! Das ist ein Hänger, kein Katapult!', en: 'Stop! STOP! It\'s a trailer, not a catapult!' } },
+      { who: 'juli', text: { de: 'Ich hab Gras in den Haaren. Und in den Ohren.', en: 'I have grass in my hair. And in my ears.' } },
+      { who: 'corni', text: { de: 'Alle zurück ins Crew Camp. Nochmal von vorn, und diesmal mit Gefühl.', en: 'Everyone back to the crew camp. Once more from the start, and this time gently.' } },
+    ],
+    steps: [
+      {
+        type: 'trailer', npcs: ['juli', 'julez', 'corni'], meet: 'quad', at: 'plot_forest_dome', radius: 12, maxFalls: 2, obstacles: 7,
+        text: { de: 'Steig aufs Quad und lade Juli, Julez & Corni im Crew Camp in den Hänger', en: 'Get on the quad and load Juli, Julez & Corni into the trailer at the crew camp' },
+        driveText: { de: 'Fahr Juli, Julez & Corni zum Forest Dome, vorsichtig!', en: 'Drive Juli, Julez & Corni to the Forest Dome, carefully!' },
+        toLabel: { de: 'Forest Dome', en: 'Forest Dome' },
+        boardLine: { de: 'Alle drin? Alle drin. Fahr los, aber mit Gefühl!', en: 'Everyone in? Everyone in. Go, but gently!' },
+        fallLines: {
+          juli: { de: 'Na super. Ich lauf. Ich bin eh schneller als du fährst.', en: 'Great. I\'ll walk. I\'m faster than you drive anyway.' },
+          julez: { de: 'Siehste! Hab ich doch gesagt, das hält nicht. Hört ja keiner auf mich.', en: 'See! I told you that wouldn\'t hold. Nobody ever listens to me.' },
+          corni: { de: 'Mein Zollstock! …Und ich. Hauptsache, der Zollstock lebt.', en: 'My folding rule! …And me. As long as the rule survives.' },
+        },
+        dialog: [
+          { who: 'corni', text: { de: 'Da wären wir. Alle Knochen noch dran? Gut. Dann ziehen wir jetzt die Traversen nach.', en: 'Here we are. All bones still attached? Good. Now let\'s tighten the trusses.' } },
+          { who: 'julez', text: { de: 'Ich hätte ja eine andere Route genommen. Aber gut.', en: 'I\'d have taken a different route. But fine.' } },
+          { who: 'juli', text: { de: '*springt runter* Ging doch.', en: '*jumps down* See, that worked.' } },
+        ],
+      },
+    ],
+    reward: { karma: 35 },
+  },
+
   // ================================================================== crews that build on their own
   // ------------------------------------------------------------------ N1 — Narnia Floor: screws & cable (Mia)
   {

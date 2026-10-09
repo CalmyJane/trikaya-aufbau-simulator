@@ -368,7 +368,7 @@ export class DramaSystem {
       let nVictims = def.victims;
       if (def.juli) {
         const juli = g.npcs.get('juli');
-        if (!juli || juli.hidden || juli.incident || juli.task || juli.talking || busy.has('juli')) return null;
+        if (!juli || juli.hidden || juli.incident || juli.task || juli.talking || juli.riding || juli.scenePose || busy.has('juli') || g.quests.npcMarker('juli')) return null;
         const pp = g.player.position;
         const near = campers.filter((n) => n.position.distanceTo(juli.position) < 25);
         const other = near.length ? near[Math.floor(Math.random() * near.length)] : campers.find((n) => n.position.distanceTo(pp) > 35);

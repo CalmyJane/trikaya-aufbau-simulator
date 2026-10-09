@@ -1,7 +1,8 @@
 import { getLang } from '../i18n.js';
 
 // Borrowable vehicles: Franzi's bike (with a witch's broom strapped on, on the festival ground) and Fabi's
-// e-scooter (crew camp). You borrow them for karma and promise to bring them back – you don't have to:
+// e-scooter (crew camp). Ask the owner once (small talk) – from then on you may just take it, every ride
+// costs a little karma (saved in flags.rentOk_<owner>). You promise to bring it back – you don't have to:
 // leave one lying around for a while and its owner quietly fetches it back. So you can cross the site
 // in both directions when the quad isn't around. When Franzi rushes to an emergency she rides her bike herself.
 
@@ -19,7 +20,9 @@ class Rental {
 
   get owner() { return this.game.npcs.get(this.ownerId); }
   get cost() { return this.price; }
-  /** Toast texts: { rentedDe, rentedEn, fetchedDe, fetchedEn }. */
+  /** Asked the owner once? Then you may take it whenever it's free. */
+  get allowed() { return !!this.game.quests.state.flags['rentOk_' + this.ownerId]; }
+  /** Texts in one language: ask, yes, noKarma, firstToast, takeToast, ride, take, needAsk, fetched. */
   text() { return {}; }
 
   reset() {
@@ -44,21 +47,33 @@ class Rental {
     return !!f && !f.hidden && this.vehicle.position.distanceTo(f.position) < dist;
   }
 
-  /** Small-talk option at the owner's. */
-  canRent() { return !this.rented && !this.rider && this.nearOwner(); }
+  /** Small-talk option at the owner's (only until you've asked once). */
+  canAsk() { return !this.allowed && !this.rider; }
 
-  rent() {
-    const g = this.game, de = getLang() === 'de';
+  /** Asking the owner: permission for good + the first ride. */
+  ask() {
+    if (!this.pay()) return false;
+    this.game.quests.state.flags['rentOk_' + this.ownerId] = true;
+    this.game.ui.toast(this.text().firstToast);
+    return true;
+  }
+
+  /** At the vehicle, after you've asked once: just take it (costs a little karma). */
+  take() {
+    if (!this.pay()) { this.game.ui.toast(this.text().noKarmaToast); return false; }
+    this.game.ui.toast(this.text().takeToast);
+    return true;
+  }
+
+  pay() {
+    const g = this.game;
     if (g.quests.state.karma < this.cost) return false;
     g.quests.state.karma -= this.cost;
     this.rented = true;
     this.idleT = 0;
-    g.ui.toast(this.text()[de ? 'rentedDe' : 'rentedEn']);
     g.refreshHUD();
     return true;
   }
-
-  canRide() { return this.rented && !this.rider; }
 
   update(dt) {
     const g = this.game;
@@ -73,7 +88,7 @@ class Rental {
       if (this.idleT > IDLE_BACK && unseen && !f.task) {
         this.rented = false;
         this.parkAtOwner();
-        g.ui.toast(this.text()[getLang() === 'de' ? 'fetchedDe' : 'fetchedEn']);
+        g.ui.toast(this.text().fetched);
       }
     } else if (!this.nearOwner(12) && unseen && f.position.distanceTo(pp) > 25 && !f.task) {
       this.parkAtOwner(); // owner moved (or rode somewhere and came back on foot) – the vehicle follows "later"
@@ -83,17 +98,35 @@ class Rental {
 
 export class FranziBike extends Rental {
   constructor(game, bike) {
-    super(game, bike, { owner: 'franzi', cost: 10, park: [1.6, -1.2, 0.6] });
+    super(game, bike, { owner: 'franzi', cost: 5, park: [1.6, -1.2, 0.6] });
   }
 
   get bike() { return this.vehicle; }
 
   text() {
-    return {
-      rentedDe: `🚲 Franzis Hexenrad gehört dir (−${this.cost} ✺). Steht neben ihr, E zum Aufsteigen. Du hast versprochen, es zurückzubringen – lässt du es länger liegen, holt sie es sich.`,
-      rentedEn: `🚲 Franzi's witch bike is yours (−${this.cost} ✺). It's next to her, E to get on. You promised to bring it back – leave it lying around too long and she fetches it.`,
-      fetchedDe: '🚲 Franzi hat ihr Hexenrad wieder abgeholt.',
-      fetchedEn: '🚲 Franzi fetched her witch bike back.',
+    const c = this.cost;
+    return getLang() === 'de' ? {
+      ask: `🚲 Darf ich mir dein Hexenrad ausleihen? (✺ ${c})`,
+      yes: 'Klar! Nimm es, wann immer du magst. Aber bring\'s heil zurück – der Besen ist handgebunden.',
+      noKarma: 'Ein bisschen Karma brauch ich schon. Für die Kette. Und den Besen.',
+      firstToast: `🚲 Franzis Hexenrad gehört dir (−${c} ✺). Ab jetzt darfst du es immer nehmen, jede Fahrt kostet ✺ ${c}. Lässt du es liegen, holt Franzi es sich.`,
+      takeToast: `🚲 Hexenrad geliehen (−${c} ✺). Versprochen, du bringst es zurück!`,
+      noKarmaToast: `🚲 Zu wenig Karma fürs Hexenrad (✺ ${c}).`,
+      ride: '🚲 Hexenrad fahren',
+      take: `🚲 Hexenrad nehmen (✺ ${c})`,
+      needAsk: '🚲 Frag Franzi, ob du dir ihr Hexenrad ausleihen darfst',
+      fetched: '🚲 Franzi hat ihr Hexenrad wieder abgeholt.',
+    } : {
+      ask: `🚲 Can I borrow your witch bike? (✺ ${c})`,
+      yes: 'Sure! Take it whenever you like. But bring it back in one piece – the broom is hand-tied.',
+      noKarma: 'I do need a little karma. For the chain. And the broom.',
+      firstToast: `🚲 Franzi's witch bike is yours (−${c} ✺). From now on you may always take it, each ride costs ✺ ${c}. Leave it lying around and Franzi fetches it.`,
+      takeToast: `🚲 Witch bike borrowed (−${c} ✺). You promised to bring it back!`,
+      noKarmaToast: `🚲 Not enough karma for the witch bike (✺ ${c}).`,
+      ride: '🚲 Ride the witch bike',
+      take: `🚲 Take the witch bike (✺ ${c})`,
+      needAsk: '🚲 Ask Franzi if you may borrow her witch bike',
+      fetched: '🚲 Franzi fetched her witch bike back.',
     };
   }
 
@@ -135,15 +168,33 @@ export class FranziBike extends Rental {
 
 export class FabiScooter extends Rental {
   constructor(game, scooter) {
-    super(game, scooter, { owner: 'fabi', cost: 10, park: [-1.8, 1.4, -0.8] });
+    super(game, scooter, { owner: 'fabi', cost: 5, park: [-1.8, 1.4, -0.8] });
   }
 
   text() {
-    return {
-      rentedDe: `🛴 Fabis E-Scooter gehört dir (−${this.cost} ✺). Steht bei ihm im Crew Camp, E zum Aufsteigen. Versprochen, du bringst ihn zurück? Sonst holt er ihn sich irgendwann.`,
-      rentedEn: `🛴 Fabi's e-scooter is yours (−${this.cost} ✺). It's next to him in the crew camp, E to get on. You promised to bring it back? Otherwise he'll fetch it at some point.`,
-      fetchedDe: '🛴 Fabi hat seinen E-Scooter wieder eingesammelt.',
-      fetchedEn: '🛴 Fabi collected his e-scooter again.',
+    const c = this.cost;
+    return getLang() === 'de' ? {
+      ask: `🛴 Darf ich mir deinen E-Scooter ausleihen? (✺ ${c})`,
+      yes: 'Klar, nimm ihn, wann du willst. Bringst du ihn wieder? Versprochen? …Ich weiß eh, wo er ist. Meistens.',
+      noKarma: 'Ohne Karma kein Akku. So ist das.',
+      firstToast: `🛴 Fabis E-Scooter gehört dir (−${c} ✺). Ab jetzt darfst du ihn immer nehmen, jede Fahrt kostet ✺ ${c}. Lässt du ihn liegen, holt Fabi ihn sich.`,
+      takeToast: `🛴 E-Scooter geliehen (−${c} ✺). Versprochen, du bringst ihn zurück!`,
+      noKarmaToast: `🛴 Zu wenig Karma für den E-Scooter (✺ ${c}).`,
+      ride: '🛴 E-Scooter fahren',
+      take: `🛴 E-Scooter nehmen (✺ ${c})`,
+      needAsk: '🛴 Frag Fabi, ob du dir seinen E-Scooter ausleihen darfst',
+      fetched: '🛴 Fabi hat seinen E-Scooter wieder eingesammelt.',
+    } : {
+      ask: `🛴 Can I borrow your e-scooter? (✺ ${c})`,
+      yes: 'Sure, take it whenever you want. You\'ll bring it back? Promise? …I know where it is anyway. Mostly.',
+      noKarma: 'No karma, no battery. That\'s how it is.',
+      firstToast: `🛴 Fabi's e-scooter is yours (−${c} ✺). From now on you may always take it, each ride costs ✺ ${c}. Leave it lying around and Fabi fetches it.`,
+      takeToast: `🛴 E-scooter borrowed (−${c} ✺). You promised to bring it back!`,
+      noKarmaToast: `🛴 Not enough karma for the e-scooter (✺ ${c}).`,
+      ride: '🛴 Ride the e-scooter',
+      take: `🛴 Take the e-scooter (✺ ${c})`,
+      needAsk: '🛴 Ask Fabi if you may borrow his e-scooter',
+      fetched: '🛴 Fabi collected his e-scooter again.',
     };
   }
 }

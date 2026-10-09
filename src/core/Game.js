@@ -1220,8 +1220,8 @@ export class Game {
     if (fx.tokens > 0 && npc.def.tokenAsker && !npc.gotToken) extra.push([de ? `🎟️ Getränkemarke schenken (du hast ${fx.tokens})` : `🎟️ Give a drink token (you have ${fx.tokens})`, () => fx.giftToken(npc)]);
     if (fx.tokens > 0 && TOKEN_TRADERS.includes(id) && (id !== 'verena' || qs.isDone('q9_festzelt'))) extra.push([de ? `🎟️ Getränk gegen Marke (du hast ${fx.tokens})` : `🎟️ A drink for a token (you have ${fx.tokens})`, () => fx.tokenShop(npc)]);
     if (this.services.canHire(npc)) extra.push([de ? `🤝 Kannst du mir was holen? (✺ ${HIRE_COST})` : `🤝 Could you fetch something for me? (✺ ${HIRE_COST})`, () => this.services.hire(npc)]);
-    if (id === 'franzi' && this.bikeSys.canRent()) extra.push([de ? `🚲 Hexenrad leihen (✺ ${this.bikeSys.cost})` : `🚲 Borrow the witch bike (✺ ${this.bikeSys.cost})`, async () => { if (this.bikeSys.rent()) await this.reply(npc, de ? 'Aber bring\'s heil zurück! Der Besen ist handgebunden.' : 'Bring it back in one piece! The broom is hand-tied.'); else await this.reply(npc, de ? 'Ein bisschen Karma brauch ich schon. Für die Kette. Und den Besen.' : 'I do need a little karma. For the chain. And the broom.'); }]);
-    if (id === 'fabi' && this.scooterSys.canRent()) extra.push([de ? `🛴 E-Scooter leihen (✺ ${this.scooterSys.cost})` : `🛴 Borrow the e-scooter (✺ ${this.scooterSys.cost})`, async () => { if (this.scooterSys.rent()) await this.reply(npc, de ? 'Bringst du ihn wieder? Versprochen? …Ich weiß eh, wo er ist. Meistens.' : 'You\'ll bring it back? Promise? …I know where it is anyway. Mostly.'); else await this.reply(npc, de ? 'Ohne Karma kein Akku. So ist das.' : 'No karma, no battery. That\'s how it is.'); }]);
+    const rs = [this.bikeSys, this.scooterSys].find((r) => r.ownerId === id);
+    if (rs?.canAsk()) { const tx = rs.text(); extra.push([tx.ask, async () => await this.reply(npc, rs.ask() ? tx.yes : tx.noKarma)]); }
     if (this.services.canStyle(npc)) extra.push([de ? '💇 Stylen lassen' : '💇 Get styled', () => this.services.styling(npc)]);
     const ask = fx.canAsk(npc);
     const opts = [de ? 'Bis später!' : 'See you!', ...extra.map((x) => x[0]), ...(ask ? [de ? '👀 Hast du was dabei?' : '👀 Got anything on you?'] : [])];
@@ -1387,21 +1387,14 @@ export class Game {
           if (!this.trigel.petted) { this.trigel.petted = true; this.quests.state.karma += 1; this.refreshHUD(); }
         } });
       }
-      // Franzi's bike: only if you borrowed it
-      const bike = this.vehicles.bike;
-      const bd = bike.position.distanceTo(p);
-      if (bd < 2.2 && !this.bikeSys.rider) {
-        const de = getLang() === 'de';
-        if (this.bikeSys.canRide()) list.push({ d: bd + 0.5, label: de ? '🚲 Hexenrad fahren' : '🚲 Ride the witch bike', action: () => this.enterVehicle(bike) });
-        else list.push({ d: bd + 2, label: de ? `🚲 Franzis Hexenrad, bei Franzi leihen (✺ ${this.bikeSys.cost})` : `🚲 Franzi's witch bike, borrow it from Franzi (✺ ${this.bikeSys.cost})`, disabled: true });
-      }
-      // Fabi's e-scooter: same deal
-      const sc = this.vehicles.scooter;
-      const sd = sc.position.distanceTo(p);
-      if (sd < 2) {
-        const de = getLang() === 'de';
-        if (this.scooterSys.canRide()) list.push({ d: sd + 0.5, label: de ? '🛴 E-Scooter fahren' : '🛴 Ride the e-scooter', action: () => this.enterVehicle(sc) });
-        else list.push({ d: sd + 2, label: de ? `🛴 Fabis E-Scooter, bei Fabi leihen (✺ ${this.scooterSys.cost})` : `🛴 Fabi's e-scooter, borrow it from Fabi (✺ ${this.scooterSys.cost})`, disabled: true });
+      // Franzi's bike & Fabi's e-scooter: ask once, then take it whenever (costs a little karma per ride)
+      for (const rs of [this.bikeSys, this.scooterSys]) {
+        const v = rs.vehicle, d = v.position.distanceTo(p);
+        if (d > 2.2 || rs.rider) continue;
+        const tx = rs.text();
+        if (rs.rented) list.push({ d: d + 0.5, label: tx.ride, action: () => this.enterVehicle(v) });
+        else if (rs.allowed) list.push({ d: d + 0.5, label: tx.take, action: () => { if (rs.take()) this.enterVehicle(v); } });
+        else list.push({ d: d + 2, label: tx.needAsk, disabled: true });
       }
       // broken generator / poo pump: pro gaffa lets you patch it yourself
       if (this.effects.gaffa > 0) {

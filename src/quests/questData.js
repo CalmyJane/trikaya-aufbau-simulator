@@ -132,18 +132,13 @@ export const QUESTS = [
     summary: { de: 'Stahlseile zwischen die 6 Pfosten der Mainstage spannen. Fabi weiß, wo das Material ist. Ob es noch taugt, weiß keiner.', en: 'Rig steel wires between the 6 mainstage posts. Fabi knows where the gear is. Whether it\'s still any good, nobody knows.' },
     offer: [
       { who: 'corni', text: { de: 'Jetzt die Stahlseile. Die tragen später die Sonnensegel. Erst die Seile, dann die Deko. NIE andersrum.', en: 'Now the steel wires. They carry the shade sails later. Wires first, then deco. NEVER the other way round.' } },
-      { who: 'corni', text: { de: 'Material hat Fabi. Also, Fabi weiß wo. Frag Fabi im Crew Camp.', en: 'Fabi has the gear. Well, Fabi knows where. Ask Fabi at the crew camp.' } },
+      { who: 'corni', text: { de: 'Material hat Fabi. Also, Fabi weiß wo. *drückt aufs Funkgerät* Fabi? Stahlseile?', en: 'Fabi has the gear. Well, Fabi knows where. *presses the radio* Fabi? Steel wires?' } },
+      { who: 'fabi', text: { de: '*über Funk* Stahlseile? Künstlergasse-Container, unter den Kabeltrommeln. Die Schäkel hat sich Mathias ausgeliehen, liegen gleich daneben. Wahrscheinlich.', en: '*over the radio* Steel wires? Künstlergasse container, under the cable drums. Mathias borrowed the shackles, they\'re right next to it. Probably.' } },
+      { who: 'fabi', text: { de: '*über Funk* Die Seile sind vom letzten Jahr. Oder vorletzten. Die sind bestimmt noch gut.', en: '*over the radio* The wires are from last year. Or the year before. I\'m sure they\'re still fine.' } },
     ],
     accept: { de: 'Ich spann das!', en: 'I\'ll rig it!' },
     decline: { de: 'Gleich, nach dem Chai.', en: 'Right after chai.' },
     steps: [
-      {
-        type: 'talk', npc: 'fabi', text: { de: 'Frag Fabi nach Stahlseilen', en: 'Ask Fabi about steel wires' },
-        dialog: [
-          { who: 'fabi', text: { de: 'Stahlseile? Künstlergasse-Container, unter den Kabeltrommeln. Die Schäkel hat sich Mathias ausgeliehen, liegen gleich daneben. Wahrscheinlich.', en: 'Steel wires? Künstlergasse container, under the cable drums. Mathias borrowed the shackles, they\'re right next to it. Probably.' } },
-          { who: 'fabi', text: { de: 'Die Seile sind vom letzten Jahr. Oder vorletzten. Die sind bestimmt noch gut.', en: 'The wires are from last year. Or the year before. I\'m sure they\'re still fine.' } },
-        ],
-      },
       {
         type: 'pickup', text: { de: 'Hol die Stahlseile und die Schäkel am Künstlergasse-Container', en: 'Get the steel wires and the shackles at the Künstlergasse container' },
         items: [{ item: 'steel_wire_rusty', at: 'kuenstler_front' }, { item: 'shackles', at: 'kuenstler_front' }],
@@ -199,18 +194,13 @@ export const QUESTS = [
     offer: [
       { who: 'matze', text: { de: 'Hi! Du bist… der Neue? Ich bin Matze. Ich mach die… Moment… genau, die Sonnensegel!', en: 'Hi! You\'re… the new one? I\'m Matze. I do the… wait… right, the shade sails!' } },
       { who: 'matze', text: { de: 'Die Kiste war ganz hinten im Hühnercontainer. Jetzt steht sie davor, bei den Hühnern. Irgendwie. Die ist aber zu schwer zum Tragen, da brauchen wir den Radlader.', en: 'The crate was at the back of the chicken container. Now it\'s standing in front of it, next to the chickens. Somehow. It\'s too heavy to carry, we need the wheel loader.' } },
-      { who: 'matze', text: { de: 'Der Radlader hat keinen Diesel. Oder doch? …Nein. Fabi weiß, wo Kanister sind.', en: 'The wheel loader has no diesel. Or does it? …No. Fabi knows where the canisters are.' } },
+      { who: 'matze', text: { de: 'Der Radlader hat keinen Diesel. Oder doch? …Nein. Fabi weiß, wo Kanister sind. *funkt* Fabi? Diesel?', en: 'The wheel loader has no diesel. Or does it? …No. Fabi knows where the canisters are. *radios* Fabi? Diesel?' } },
+      { who: 'fabi', text: { de: '*über Funk* Diesel? Kanister steht beim blauen Bauwagen. Der große Tank steht beim Generator, damit kannst du später nachtanken.', en: '*over the radio* Diesel? A canister is by the blue site trailer. The big tank is next to the generator, use it to refuel later.' } },
     ],
     accept: { de: 'Ich fahr Radlader!', en: 'I\'ll drive the loader!' },
     decline: { de: 'Später, Matze.', en: 'Later, Matze.' },
     steps: [
-      {
-        type: 'talk', npc: 'fabi', text: { de: 'Frag Fabi nach Diesel', en: 'Ask Fabi about diesel' },
-        dialog: [
-          { who: 'fabi', text: { de: 'Diesel? Kanister steht beim blauen Bauwagen. Der große Tank steht beim Generator, damit kannst du später nachtanken.', en: 'Diesel? A canister is by the blue site trailer. The big tank is next to the generator, use it to refuel later.' } },
-        ],
-      },
-      { type: 'pickup', text: { de: 'Hol den Dieselkanister', en: 'Get the diesel canister' }, items: [{ item: 'diesel_can', at: 'diesel_spot' }] },
+      { type: 'pickup', text: { de: 'Hol den Dieselkanister beim blauen Bauwagen', en: 'Get the diesel canister by the blue site trailer' }, items: [{ item: 'diesel_can', at: 'diesel_spot' }] },
       { type: 'fuel', vehicle: 'radlader', items: ['diesel_can'], text: { de: 'Tank den Radlader auf', en: 'Fuel the wheel loader' } },
       { type: 'pickup', text: { de: 'Lade die Sonnensegel-Kiste mit dem Radlader auf', en: 'Load the shade-sail crate with the wheel loader' }, items: [{ item: 'sail_crate', at: 'C4_front' }] },
       {
@@ -240,23 +230,23 @@ export const QUESTS = [
     giver: 'corni',
     day: 2,
     requires: ['q2_sails'],
-    summary: { de: 'Zwei Dixi-Paletten vom Crew-Camp mit dem Radlader aufs Gelände bringen. Der Klowagen wird geliefert, dann die Kackepumpe anschließen.', en: 'Bring two Dixi pallets from the crew camp onto the site with the loader. The toilet trailer gets delivered, then connect the poo pump.' },
+    summary: { de: 'Zwei Dixi-Paletten vom Campingplatz mit dem Radlader aufs Gelände bringen. Der Klowagen wird geliefert, dann die Kackepumpe anschließen.', en: 'Bring two Dixi pallets from the camping onto the site with the loader. The toilet trailer gets delivered, then connect the poo pump.' },
     offer: [
       { who: 'corni', text: { de: 'Wichtigste Infrastruktur auf jedem Festival? Genau: Klos. Nicht die Bühne. Die Klos.', en: 'Most important infrastructure at any festival? Exactly: toilets. Not the stage. Toilets.' } },
-      { who: 'corni', text: { de: 'Die Dixis wurden vorne am Crew-Camp angeliefert, auf zwei Paletten. Die müssen mit dem Radlader nach hinten aufs Gelände.', en: 'The Dixis were delivered at the front of the crew camp, on two pallets. They need to go back onto the site with the loader.' } },
+      { who: 'corni', text: { de: 'Die Dixis wurden vorne am Campingplatz angeliefert, auf zwei Paletten. Die müssen mit dem Radlader nach hinten aufs Gelände.', en: 'The Dixis were delivered at the front of the camping, on two pallets. They need to go back onto the site with the loader.' } },
       { who: 'corni', text: { de: 'Der Klowagen kommt heute noch, der Fahrer stellt ihn direkt aufs Gelände. Dann musst du nur noch die Hebepumpe anschließen. Wir sagen Kackepumpe. Juli prüft das.', en: 'The toilet trailer arrives today, the driver puts it straight onto the site. Then you just connect the lifting pump. We call it the poo pump. Juli checks it.' } },
     ],
     accept: { de: 'Klo-Mission, los!', en: 'Toilet mission, go!' },
     decline: { de: 'Muss erst mal selbst.', en: 'Need to go first myself.' },
     steps: [
-      { type: 'pickup', text: { de: 'Lade die erste Dixi-Palette vorne am Crew-Camp auf (Radlader)', en: 'Load the first Dixi pallet at the front of the crew camp (loader)' }, items: [{ item: 'dixi_pallet_1', at: 'dixi_delivery' }] },
+      { type: 'pickup', text: { de: 'Lade die erste Dixi-Palette vorne am Campingplatz auf (Radlader)', en: 'Load the first Dixi pallet at the front of the camping (loader)' }, items: [{ item: 'dixi_pallet_1', at: 'dixi_delivery' }] },
       {
         type: 'deliver', text: { de: 'Stell die Dixis am Nordzaun auf', en: 'Set up the Dixis at the north fence' },
         items: ['dixi_pallet_1'], at: 'dixi_row_1', radius: 9, buildTime: 3,
         buildLabel: { de: 'Dixis aufstellen', en: 'Set up Dixis' },
         build: { id: 'dixis_1', type: 'dixi_row', at: 'dixi_row_1_pos', rotation: 0.17, params: { n: 6 }, cost: 1900 },
       },
-      { type: 'pickup', text: { de: 'Hol die zweite Dixi-Palette am Crew-Camp (Radlader)', en: 'Get the second Dixi pallet at the crew camp (loader)' }, items: [{ item: 'dixi_pallet_2', at: 'dixi_delivery' }] },
+      { type: 'pickup', text: { de: 'Hol die zweite Dixi-Palette am Campingplatz (Radlader)', en: 'Get the second Dixi pallet at the camping (loader)' }, items: [{ item: 'dixi_pallet_2', at: 'dixi_delivery' }] },
       {
         type: 'deliver', text: { de: 'Stell die Dixis im Süden des Geländes auf', en: 'Set up the Dixis in the south of the site' },
         items: ['dixi_pallet_2'], at: 'dixi_row_2', radius: 9, buildTime: 3,
@@ -284,7 +274,7 @@ export const QUESTS = [
       },
       {
         type: 'ride', npc: 'juli', at: 'wc_pump', radius: 9, toLabel: { de: 'Kackepumpe', en: 'Poo pump' },
-        text: { de: 'Hol Juli mit dem Quad ab und fahr sie zur Kackepumpe', en: 'Pick Juli up with the quad and drive her to the poo pump' },
+        text: { de: 'Hol Juli mit dem Quad ab und fahr ihn zur Kackepumpe', en: 'Pick Juli up with the quad and drive him to the poo pump' },
         hopOn: { de: 'Quad? Ich lauf eigentlich. …Na gut. Aber du fährst ordentlich.', en: 'Quad? I usually walk. …Fine. But you drive properly.' },
         dialog: [{ who: 'juli', text: { de: 'Hm. Ordentlich gefahren. Fast. Jetzt zeig mal die Pumpe.', en: 'Hm. Drove properly. Almost. Now show me the pump.' } }],
       },
@@ -430,14 +420,14 @@ export const QUESTS = [
     summary: { de: 'Fabbe baut die zweite Bühne selbst, du bringst ihm das Material.', en: 'Fabbe builds the second stage himself, you bring him the material.' },
     offer: [
       { who: 'fabbe', text: { de: 'Hey, schön dich zu sehen! Ich bin Fabbe. Ich bau den Forest Dome, unsere zweite Bühne, direkt am Waldrand.', en: 'Hey, great to see you! I\'m Fabbe. I\'m building the Forest Dome, our second stage, right at the forest edge.' } },
-      { who: 'fabbe', text: { de: 'Bauen tu ich ihn selbst, mit Niklas. Aber das Holz liegt am Parkplatz, viel Holz, Radlader. Und aus der Werkstatt bräuchte ich den Seilsack.', en: 'I\'ll build it myself, with Niklas. But the timber is at the parking, lots of it, loader. And from the workshop I\'d need the rope bag.' } },
+      { who: 'fabbe', text: { de: 'Bauen tu ich ihn selbst, mit Niklas. Aber das Holz liegt am Osttor, viel Holz, Radlader. Und aus der Werkstatt bräuchte ich den Seilsack.', en: 'I\'ll build it myself, with Niklas. But the timber is at the east gate, lots of it, loader. And from the workshop I\'d need the rope bag.' } },
     ],
     accept: { de: 'Lass uns bauen!', en: 'Let\'s build!' },
     decline: { de: 'Später, Fabbe.', en: 'Later, Fabbe.' },
     steps: [
       {
-        type: 'pickup', text: { de: 'Hol Holz (Parkplatz, Radlader) und Seile (Werkstatt)', en: 'Get timber (parking, loader) and ropes (workshop)' },
-        items: [{ item: 'dome_wood', at: 'parking' }, { item: 'rope_bag', at: 'C1_front' }],
+        type: 'pickup', text: { de: 'Hol Holz (Osttor, Radlader) und Seile (Werkstatt)', en: 'Get timber (east gate, loader) and ropes (workshop)' },
+        items: [{ item: 'dome_wood', at: 'gate_drop' }, { item: 'rope_bag', at: 'C1_front' }],
       },
       {
         type: 'deliver', text: { de: 'Bring das Material zu Fabbe an den Waldrand', en: 'Bring the material to Fabbe at the forest edge' },
@@ -474,18 +464,13 @@ export const QUESTS = [
     summary: { de: 'Der Techno Floor braucht sein dunkellila Stretchzelt. Das ist weg. Fabi hat eine Ahnung.', en: 'The Techno Floor needs its dark purple stretch tent. It\'s gone. Fabi has a hunch.' },
     offer: [
       { who: 'corni', text: { de: 'Der Techno Floor. Dunkellila Stretchzelt, Laser, Stroboskop, Bass bis zum Morgengrauen. Und eine kleine Bar für Verena.', en: 'The Techno Floor. Dark purple stretch tent, lasers, strobes, bass until dawn. And a little bar for Verena.' } },
-      { who: 'corni', text: { de: 'Nur: Das Zelt ist weg. Frag Fabi.', en: 'Only: the tent is gone. Ask Fabi.' } },
+      { who: 'corni', text: { de: 'Nur: Das Zelt ist weg. *funkt* Fabi? Das lila Zelt?', en: 'Only: the tent is gone. *radios* Fabi? The purple tent?' } },
+      { who: 'fabi', text: { de: '*über Funk* Das Techno-Zelt? Hmm… Zdenko und Tinyhaus Thompsen wollten „nur kurz Schatten testen“. Beim Hängemattenwald.', en: '*over the radio* The techno tent? Hmm… Zdenko and Tinyhaus Thompsen wanted to "just test some shade". At the hammock forest.' } },
+      { who: 'fabi', text: { de: '*über Funk* Und nimm Heringe aus der Werkstatt mit. Die kommen nie zurück. Nie.', en: '*over the radio* And grab pegs from the workshop. They never come back. Never.' } },
     ],
     accept: { de: 'Jawoll!', en: 'Jawoll!' },
     decline: { de: 'Später.', en: 'Later.' },
     steps: [
-      {
-        type: 'talk', npc: 'fabi', text: { de: 'Frag Fabi nach dem Zelt', en: 'Ask Fabi about the tent' },
-        dialog: [
-          { who: 'fabi', text: { de: 'Das Techno-Zelt? Hmm… Zdenko und Tinyhaus Thompsen wollten „nur kurz Schatten testen“. Beim Hängemattenwald.', en: 'The techno tent? Hmm… Zdenko and Tinyhaus Thompsen wanted to "just test some shade". At the hammock forest.' } },
-          { who: 'fabi', text: { de: 'Und nimm Heringe aus der Werkstatt mit. Die kommen nie zurück. Nie.', en: 'And grab pegs from the workshop. They never come back. Never.' } },
-        ],
-      },
       {
         type: 'pickup', text: { de: 'Hol das Zelt (Hängemattenwald, Radlader!) und Heringe (Werkstatt)', en: 'Get the tent (hammock forest, loader!) and pegs (workshop)' },
         items: [{ item: 'festzelt_bag', at: 'hammock_forest', search: 18 }, { item: 'tent_pegs', at: 'C1_front' }],
@@ -527,12 +512,12 @@ export const QUESTS = [
     offer: [
       { who: 'harry', text: { de: 'Endlich! Morgen ist Festival, jetzt ist Deko-Zeit. Deko kommt immer ganz zum Schluss. Ich bin Harry.', en: 'Finally! The festival is tomorrow, deco time. Deco always comes last. I\'m Harry.' } },
       { who: 'harry', text: { de: 'In die Lücke zwischen den zwei Zelten vom Forest Dome kommt meine Holzskulptur. Riesig. Und heute Nacht projizieren wir ein 3D-Mapping drauf.', en: 'My wooden sculpture goes into the gap between the two Forest Dome tents. Huge. And tonight we project a 3D mapping onto it.' } },
-      { who: 'harry', text: { de: 'Die Holzplatten liegen am Parkplatz. Bring sie mit dem Radlader, dann werfen wir die Beamer an. Dunkel genug ist es ja.', en: 'The wooden panels are at the parking. Bring them with the loader, then we fire up the projectors. It\'s dark enough.' } },
+      { who: 'harry', text: { de: 'Die Holzplatten liegen am Osttor. Bring sie mit dem Radlader, dann werfen wir die Beamer an. Dunkel genug ist es ja.', en: 'The wooden panels are at the east gate. Bring them with the loader, then we fire up the projectors. It\'s dark enough.' } },
     ],
     accept: { de: 'Mapping-Zeit!', en: 'Mapping time!' },
     decline: { de: 'Später, Harry.', en: 'Later, Harry.' },
     steps: [
-      { type: 'pickup', text: { de: 'Lade die Holzplatten am Parkplatz auf (Radlader)', en: 'Load the wooden panels at the parking (loader)' }, items: [{ item: 'wood_panels', at: 'parking' }] },
+      { type: 'pickup', text: { de: 'Lade die Holzplatten am Osttor auf (Radlader)', en: 'Load the wooden panels at the east gate (loader)' }, items: [{ item: 'wood_panels', at: 'gate_drop' }] },
       {
         type: 'deliver', text: { de: 'Bau die Skulptur am Forest Dome', en: 'Build the sculpture at the Forest Dome' },
         items: ['wood_panels'], plot: 'forest_dome', buildTime: 6,
@@ -591,12 +576,12 @@ export const QUESTS = [
     summary: { de: 'Wiesel baut zwischen Narnia Floor und Forest Dome den Hängemattenwald. Du bringst ihm Pfosten und Hängematten.', en: 'Wiesel builds the hammock forest between the Narnia Floor and the Forest Dome. You bring him posts and hammocks.' },
     offer: [
       { who: 'wiesel', text: { de: 'Servus! Wiesel. Ich bau hier den Hängemattenwald. Also… sobald ich Pfosten hab. Und Hängematten.', en: 'Hi! Wiesel. I\'m building the hammock forest here. Well… as soon as I have posts. And hammocks.' } },
-      { who: 'wiesel', text: { de: 'Die Pfosten liegen am Parkplatz, schwer, nimm den Radlader. Die Hängematten sind im Hühnercontainer. Den Rest mach ich.', en: 'The posts are at the parking, heavy, take the loader. The hammocks are in the chicken container. I\'ll do the rest.' } },
+      { who: 'wiesel', text: { de: 'Die Pfosten liegen am Osttor, schwer, nimm den Radlader. Die Hängematten sind im Hühnercontainer. Den Rest mach ich.', en: 'The posts are at the east gate, heavy, take the loader. The hammocks are in the chicken container. I\'ll do the rest.' } },
     ],
     accept: { de: 'Bring ich dir!', en: 'I\'ll bring them!' },
     decline: { de: 'Später, Wiesel.', en: 'Later, Wiesel.' },
     steps: [
-      { type: 'pickup', text: { de: 'Hol die Pfosten (Parkplatz, Radlader) und die Hängematten (Hühnercontainer)', en: 'Get the posts (parking, loader) and the hammocks (chicken container)' }, items: [{ item: 'hammock_posts', at: 'parking' }, { item: 'hammock_bag', at: 'huehner_front' }] },
+      { type: 'pickup', text: { de: 'Hol die Pfosten (Osttor, Radlader) und die Hängematten (Hühnercontainer)', en: 'Get the posts (east gate, loader) and the hammocks (chicken container)' }, items: [{ item: 'hammock_posts', at: 'gate_drop' }, { item: 'hammock_bag', at: 'huehner_front' }] },
       {
         type: 'deliver', text: { de: 'Bring alles zu Wiesel zwischen Narnia und Forest Dome', en: 'Bring it all to Wiesel between Narnia and the Forest Dome' },
         items: ['hammock_posts', 'hammock_bag'], plot: 'hammocks', buildTime: 2,
@@ -691,12 +676,12 @@ export const QUESTS = [
     summary: { de: 'Die Statue und die vier selbstgebauten Holztribünen am Firespace stehen noch vom Vorjahr, und wackeln. Alles muss verstärkt werden.', en: 'The statue and the four home-made wooden grandstands at the Firespace are still standing from last year, and wobbling. Everything needs reinforcing.' },
     offer: [
       { who: 'georg', text: { de: 'Schön, dass du da bist! Die Statue und die Tribünen stehen noch vom letzten Jahr. Wunderschön. …Und ein bisschen wackelig. Also, sehr wackelig.', en: 'Lovely that you\'re here! The statue and the grandstands are still standing from last year. Beautiful. …And a little wobbly. Well, very wobbly.' } },
-      { who: 'georg', text: { de: 'Dennis hat sich gestern auf die zweite Tribüne gesetzt. Sie hat geknarzt. Dennis auch. Wir brauchen Kanthölzer vom Parkplatz, nimm den Radlader, und die Schraubenkiste aus der Werkstatt.', en: 'Dennis sat on the second grandstand yesterday. It creaked. So did Dennis. We need timber beams from the parking, take the loader, and the screw box from the workshop.' } },
+      { who: 'georg', text: { de: 'Dennis hat sich gestern auf die zweite Tribüne gesetzt. Sie hat geknarzt. Dennis auch. Wir brauchen Kanthölzer vom Osttor, nimm den Radlader, und die Schraubenkiste aus der Werkstatt.', en: 'Dennis sat on the second grandstand yesterday. It creaked. So did Dennis. We need timber beams from the east gate, take the loader, and the screw box from the workshop.' } },
     ],
     accept: { de: 'Ich verstärk das!', en: 'I\'ll reinforce it!' },
     decline: { de: 'Später, Georg.', en: 'Later, Georg.' },
     steps: [
-      { type: 'pickup', text: { de: 'Hol die Kanthölzer (Parkplatz, Radlader) und die Schraubenkiste (Werkstatt)', en: 'Get the timber beams (parking, loader) and the screw box (workshop)' }, items: [{ item: 'fs_beams', at: 'parking' }, { item: 'fs_screws', at: 'werkstatt_inside' }] },
+      { type: 'pickup', text: { de: 'Hol die Kanthölzer (Osttor, Radlader) und die Schraubenkiste (Werkstatt)', en: 'Get the timber beams (east gate, loader) and the screw box (workshop)' }, items: [{ item: 'fs_beams', at: 'gate_drop' }, { item: 'fs_screws', at: 'werkstatt_inside' }] },
       {
         type: 'deliver', text: { de: 'Bring alles zum Firespace', en: 'Bring everything to the Firespace' },
         items: ['fs_beams', 'fs_screws'], plot: 'firespace', buildTime: 1.5,
@@ -725,7 +710,7 @@ export const QUESTS = [
     id: 'kr1_sauna',
     title: { de: 'Krygos Sauna', en: 'Krygo\'s Sauna' },
     giver: 'krygo',
-    day: 4,
+    day: 2,
     requires: ['q0_leo'],
     summary: { de: 'Krygo baut im Crew Camp eine Sauna für die Crew. Seit Jahren. Dieses Jahr wird sie fertig. Sagt er.', en: 'Krygo is building a sauna for the crew in the crew camp. For years. This year it\'ll be done. He says.' },
     offer: [
@@ -862,13 +847,13 @@ export const QUESTS = [
     summary: { de: 'Für den Gästeparkplatz auf seiner zweiten Wiese will Schwarzhuber sehen, dass ihr anständige Leute seid. Das sieht er am Karma: hilf Leuten, kümmer dich um Notfälle, sei nett.', en: 'For the guest parking on his other meadow, Schwarzhuber wants to see you\'re decent people. He can tell by your karma: help people, handle emergencies, be nice.' },
     offer: [
       { who: 'schwarzhuber', text: { de: 'Ihr wollts morgen tausend Autos auf mei ander Wiesn stellen. Mei. Des hab i mir überlegt.', en: 'You want to park a thousand cars on my other meadow tomorrow. Well. I\'ve been thinking about that.' } },
-      { who: 'schwarzhuber', text: { de: 'I mach des nur für anständige Leit. Und ob einer anständig is, des siag i am Karma. Bring ma ordentlich Karma, dann gibt\'s a Handschlag. Und des Karma bleibt dann bei mir. Als Pfand.', en: 'I only do it for decent folk. And whether somebody\'s decent, I can see from their karma. Bring me proper karma, then we shake hands. And the karma stays with me. As a deposit.' } },
+      { who: 'schwarzhuber', text: { de: 'I mach des nur für anständige Leit. Und ob einer anständig is, des siag i am Karma. Bring ma ordentlich Karma, dann gibt\'s a Handschlag. A Sechzgerl davo bleibt dann bei mir. Als Pfand.', en: 'I only do it for decent folk. And whether somebody\'s decent, I can see from their karma. Bring me proper karma, then we shake hands. Sixty of it stays with me. As a deposit.' } },
     ],
     accept: { de: 'Ich bin anständig!', en: 'I\'m decent!' },
     decline: { de: 'Gleich.', en: 'In a bit.' },
     steps: [
       {
-        type: 'karma', min: 120, extra: 90,
+        type: 'karma', min: 80, extra: 60, pay: 60, // collect 60 more than you had; he keeps those 60 as a deposit
         text: { de: 'Sammle Karma für Schwarzhuber: ✺ {have} / {need}, hilf bei Notfällen, mach Gefallen, red nett mit Leuten', en: 'Collect karma for Schwarzhuber: ✺ {have} / {need}, help in emergencies, do favours, be nice to people' },
         notYet: { de: 'Na. ✺ {have}? Da fehln no {missing}. Hilf a bissl wo mit, kümmer di um die Leit, red nett mit ihnen. Dann schaun ma.', en: 'Nah. ✺ {have}? That\'s {missing} short. Help out a bit, look after people, be nice to them. Then we\'ll see.' },
         okDialog: [
@@ -1139,15 +1124,15 @@ export const QUESTS = [
     giver: 'mia',
     day: 3,
     requires: ['n1_narnia', 'q2_sails'],
-    summary: { de: 'Der Eingang zum Narnia Floor ist ein alter Kleiderschrank. Er steht am Parkplatz und ist schwer.', en: 'The entrance to the Narnia Floor is an old wardrobe. It\'s at the parking and it\'s heavy.' },
+    summary: { de: 'Der Eingang zum Narnia Floor ist ein alter Kleiderschrank. Er steht am Osttor und ist schwer.', en: 'The entrance to the Narnia Floor is an old wardrobe. It\'s at the east gate and it\'s heavy.' },
     offer: [
       { who: 'mia', text: { de: 'Der Boden steht! Jetzt fehlt der Eingang: ein alter Kleiderschrank. Da geht man rein, und ist in Narnia. Magisch, oder?', en: 'The floor is done! Now the entrance is missing: an old wardrobe. You walk in, and you\'re in Narnia. Magical, right?' } },
-      { who: 'mia', text: { de: 'Er steht am Parkplatz. Daniel wollte ihn tragen. Daniel liegt jetzt im Schatten. Nimm lieber den Radlader.', en: 'It\'s at the parking. Daniel wanted to carry it. Daniel is now lying in the shade. Better take the loader.' } },
+      { who: 'mia', text: { de: 'Er steht am Osttor. Daniel wollte ihn tragen. Daniel liegt jetzt im Schatten. Nimm lieber den Radlader.', en: 'It\'s at the east gate. Daniel wanted to carry it. Daniel is now lying in the shade. Better take the loader.' } },
     ],
     accept: { de: 'Ich hol den Schrank!', en: 'I\'ll get the wardrobe!' },
     decline: { de: 'Später.', en: 'Later.' },
     steps: [
-      { type: 'pickup', text: { de: 'Lade den Kleiderschrank am Parkplatz auf (Radlader)', en: 'Load the wardrobe at the parking (loader)' }, items: [{ item: 'wardrobe', at: 'parking' }] },
+      { type: 'pickup', text: { de: 'Lade den Kleiderschrank am Osttor auf (Radlader)', en: 'Load the wardrobe at the east gate (loader)' }, items: [{ item: 'wardrobe', at: 'gate_drop' }] },
       {
         type: 'deliver', text: { de: 'Bring den Schrank zum Narnia Floor', en: 'Bring the wardrobe to the Narnia Floor' },
         items: ['wardrobe'], plot: 'narnia_floor', buildTime: 2,

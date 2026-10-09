@@ -115,13 +115,13 @@ export function install(g) {
     ['jan', 'q0_leo'], ['jan', 's0_soundbox'], ['corni', 'q1a_posts'], ['corni', 'q1_rigging'], ['matze', 'q2_sails'], ['felix', 'q4_lights'],
     ['corni', 'x1_nuss'],
     // day 2 · night 2
-    ['corni', 'q3_toilets'], ['sabse', 's1_veggies'], ['franzi', 'q6_awareness'], ['mia', 'n1_narnia'], ['wiesel', 'h1_hammocks'], ['cosma', 'k1_kuenstlergasse'], ['flo', 's3_quad'], ['georg', 'fs1_tribuenen'],
+    ['corni', 'q3_toilets'], ['sabse', 's1_veggies'], ['franzi', 'q6_awareness'], ['mia', 'n1_narnia'], ['wiesel', 'h1_hammocks'], ['cosma', 'k1_kuenstlergasse'], ['flo', 's3_quad'], ['georg', 'fs1_tribuenen'], ['krygo', 'kr1_sauna'],
     ['corni', 's2_storm'],
     // day 3 · night 3
     ['jan', 'e1_entrance'], ['annika', 'm1_shops'], ['matze', 'q7_dome'], ['mia', 'n2_narnia'], ['cosma', 'k2_kunst'], ['andi', 'r1_wassertank'], ['fabbe', 'q8_forestdome'], ['corni', 't1_trailer'],
     ['fabbe', 'f1_fabbe_tools'],
     // day 4 · night 4
-    ['schwarzhuber', 'g1_genehmigung'], ['corni', 'q9_festzelt'], ['mia', 'n3_narnia'], ['jonas', 'q11_straw'], ['krygo', 'kr1_sauna'],
+    ['schwarzhuber', 'g1_genehmigung'], ['corni', 'q9_festzelt'], ['mia', 'n3_narnia'], ['jonas', 'q11_straw'],
     ['harry', 'q10_mapping'],
   ];
   T.runJobs = async (from, to, failLights) => { for (const [npc, q] of T.jobs.slice(from, to)) { g.drama.clearAll(); g.drama.nextT = 9999; await T.accept(npc); await T.run(q, failLights && q === 'q4_lights'); } return T.log; };

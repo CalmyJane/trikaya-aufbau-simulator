@@ -23,6 +23,16 @@ function canister(color) {
 
 // giver, item (id, name, icon, mesh), where it is, what they say
 const TEMPLATES = [
+  // Krygo's sauna never gets finished – but he keeps needing "just one more thing"
+  { giver: 'krygo', needs: 'kr1_sauna', item: ['err_sauna_stones', C('Saunasteine', 'Sauna stones'), '🪨', () => crate('#8a8a8a')], at: 'werkstatt_inside',
+    ask: C('Mir fehlen nur noch die Saunasteine. Liegen in der Werkstatt. Dann ist sie fertig. Also, fast.', 'I just need the sauna stones. They\'re in the workshop. Then it\'s done. Well, almost.'),
+    thanks: C('Perfekt! Jetzt fehlt nur noch… der Ofen. Der richtige. Und ein Dach. Morgen.', 'Perfect! Now all that\'s missing is… the stove. The real one. And a roof. Tomorrow.') },
+  { giver: 'krygo', needs: 'kr1_sauna', item: ['err_sauna_towels', C('Stapel Handtücher', 'Stack of towels'), '🧺', () => crate('#e8e4d8')], at: 'huehner_front',
+    ask: C('Ohne Handtücher keine Sauna. Am Hühnercontainer liegt ein Stapel. Der ist von… irgendwem.', 'No towels, no sauna. There\'s a stack at the chicken container. It belongs to… somebody.'),
+    thanks: C('Super. Die Handtücher sind fertig. Jetzt fehlt nur noch die Sauna.', 'Great. The towels are ready. Now all that\'s missing is the sauna.') },
+  { giver: 'krygo', needs: 'kr1_sauna', item: ['err_sauna_thermo', C('Saunathermometer', 'Sauna thermometer'), '🌡️', () => crate('#c0392b')], at: 'kuenstler_front',
+    ask: C('Ich brauch das Thermometer vom Künstlergasse-Container. Damit ich weiß, wie heiß sie wird. Wenn sie fertig ist.', 'I need the thermometer from the Künstlergasse container. So I know how hot it gets. Once it\'s done.'),
+    thanks: C('*hängt es auf* 14 Grad. Läuft. Aufguss ist dann morgen.', '*hangs it up* 14 degrees. Going well. Sauna session tomorrow, then.') },
   { giver: 'sabse', item: ['err_water', C('Wasserkanister', 'Water canister'), '💧', () => canister('#3a7bd5')], at: 'kuenstler_front',
     ask: C('Ich brauch Wasser. Viel Wasser. Für 200 Portionen Linsen. Der Kanister steht am Künstlergasse-Container.', 'I need water. Lots of water. For 200 portions of lentils. The canister is at the Künstlergasse container.'),
     thanks: C('Na endlich. …Danke. Wirklich.', 'Finally. …Thanks. Really.') },
@@ -195,16 +205,15 @@ export class Errands {
     if (Object.keys(qs.state.active).some((id) => id.startsWith('err_diesel'))) return;
     const qid = `err_diesel_${++this.seq}`;
     const where = [
-      C('Diesel? Ich hab dir einen Kanister beim blauen Bauwagen hingestellt. Vorne am Tor. Ich weiß immer, wo Diesel ist. Fast immer.', 'Diesel? I put a canister for you by the blue site trailer. Near the gate. I always know where diesel is. Almost always.'),
+      C('Diesel? Ich hab dir einen Kanister beim blauen Bauwagen hingestellt. Ich weiß immer, wo Diesel ist. Fast immer.', 'Diesel? I put a canister for you by the blue site trailer. I always know where diesel is. Almost always.'),
       C('Radlader leer? Klassiker. Kanister steht beim blauen Bauwagen. Ich hab ihn mit „NICHT ANFASSEN“ beschriftet. Du darfst trotzdem.', 'Loader empty? Classic. Canister\'s by the blue site trailer. I labelled it "DON\'T TOUCH". You\'re allowed anyway.'),
       C('Diesel liegt beim blauen Bauwagen. Woher ich das weiß? Ich hab eine Liste. Die Liste ist weg, aber ich weiß es trotzdem.', 'Diesel is by the blue site trailer. How do I know? I have a list. The list is gone, but I know anyway.'),
     ];
     const q = {
       id: qid, giver: 'fabi', requires: [], errand: true,
       title: C('Diesel für den Radlader', 'Diesel for the wheel loader'),
-      summary: C('Der Radlader ist leer. Fabi weiß, wo ein Kanister steht.', 'The wheel loader is empty. Fabi knows where there\'s a canister.'),
+      summary: C('Der Radlader ist leer. Fabi hat gefunkt: Kanister beim blauen Bauwagen.', 'The wheel loader is empty. Fabi radioed: canister by the blue site trailer.'),
       steps: [
-        { type: 'talk', npc: 'fabi', text: C('Frag Fabi nach Diesel', 'Ask Fabi about diesel'), dialog: [{ who: 'fabi', text: where[this.seq % where.length] }] },
         { type: 'pickup', text: C('Hol den Dieselkanister beim blauen Bauwagen', 'Get the diesel canister by the blue site trailer'), items: [{ item: 'diesel_can', at: 'diesel_spot' }] },
         { type: 'fuel', vehicle: 'radlader', items: ['diesel_can'], text: C('Tank den Radlader auf', 'Fuel the wheel loader') },
       ],
@@ -212,7 +221,8 @@ export class Errands {
     };
     qs.quests[qid] = q;
     qs.accept(qid);
-    g.ui.toast(getLang() === 'de' ? '⛽ Der Radlader ist leer! Fabi weiß, wo Diesel ist.' : '⛽ The wheel loader is empty! Fabi knows where there\'s diesel.');
+    const tip = where[this.seq % where.length];
+    g.ui.toast(getLang() === 'de' ? `⛽ Der Radlader ist leer! 📻 Fabi: ${tip.de}` : `⛽ The wheel loader is empty! 📻 Fabi: ${tip.en}`, 9000);
     g.refreshHUD();
   }
 
@@ -266,7 +276,7 @@ export class Errands {
     const ok = TEMPLATES.filter((t) => this.free(t.giver) && t.giver !== this.lastGiver && g.world.spots[t.at] && (!t.needs || g.quests.isDone(t.needs)));
     if (!ok.length) return null;
     const t = ok[Math.floor(Math.random() * ok.length)];
-    const urgent = Math.random() < 0.3;
+    const urgent = !g.quests.timedBusy() && Math.random() < 0.3;
     const name = t.item[1], itemId = t.item[0];
     const giverName = g.npcs.get(t.giver).def.name;
     const ask = urgent ? C(URGENT[this.seq % URGENT.length].de + t.ask.de, URGENT[this.seq % URGENT.length].en + t.ask.en) : t.ask;

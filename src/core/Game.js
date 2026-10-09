@@ -1168,11 +1168,11 @@ export class Game {
     const kq = Object.keys(qs.state.active).find((qid) => qs.currentStep(qid)?.type === 'karma' && qs.quests[qid].giver === id);
     if (kq) {
       const st = qs.currentStep(kq), a = qs.state.active[kq];
-      const have = Math.floor(qs.state.karma), need = a.need;
+      const have = Math.floor(qs.state.karma), need = qs.karmaNeed(kq), pay = st.pay ?? need;
       if (have >= need) {
         await this.runDialog(st.okDialog || [{ who: id, text: { de: 'Passt. Respekt.', en: 'Fine. Respect.' } }], null, npc);
-        qs.state.karma -= need;
-        this.ui.toast(`✺ −${need}`);
+        qs.state.karma -= pay;
+        this.ui.toast(`✺ −${pay}`);
         qs.advance(kq);
       } else {
         await this.runDialog([{ who: id, text: L(st.notYet).replace('{need}', need).replace('{have}', have).replace('{missing}', need - have) }], null, npc);

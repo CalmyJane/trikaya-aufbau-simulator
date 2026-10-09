@@ -36,6 +36,8 @@ New step types: `park` (wheel loader precision parking through a cone lane, `src
 - Festival layout (Oct 2026, after drone photos): long strip, hedge north, Enterstraße north-east, straight fence to the ploughed field (tyre-track pictures) south. W→E: Forest Dome (two half-round tents, stage + Harry's plywood mapping lens in the gap) SW, hammocks NW, Künstlergasse, dragon mid-north with kitchen + bale stack right of it, Narnia (pentagon) & Firespace west, chai below the dragon, red-black bar tent (`bar_tent`, deco) at the south fence, shops scattered between chai/planetarium/techno floor, planetarium far east, awareness, beer garden (`beer_garden`, deco), entrance at the east gate.
 - World: `src/world/World.js` (layout in `layout.js`, crew camp `CrewBase.js`, structures `Structures.js`/`Structures2.js`/`Mainstage.js`, ground `Terrain.js`).
 
+- Only one timed job at a time (`QuestSystem.timedBusy/isTimed`): other timed offers are hidden meanwhile, urgent favours not generated. Heavy material for the western stages lies at `gate_drop` (inside the east gate), not the parking. Krygo keeps asking for sauna bits (errand templates). Karma step (g1): need sinks if you lose karma, `pay` = what is actually taken.
+
 ## Open / ideas
 - Geist's profile link unknown (search link used) – ask the user.
-- Suggested but not built: "Spezial-Nuss" quest (Schwarzhuber has it), cable laying with Felix & Thomas, water tank timed job.
+- Suggested but not built: cable laying with Felix & Thomas.

@@ -65,14 +65,24 @@ export class QuestSystem {
   stepText(qid) {
     const step = this.currentStep(qid), a = this.state.active[qid];
     if (step?.type === 'trailer' && this.game.trailer) return this.game.trailer.stepText(qid, step);
+    if (step?.type === 'karma') this.karmaNeed(qid);
     return (L(step?.text) || '').replace('{need}', a?.need ?? '').replace('{have}', Math.floor(this.state.karma));
+  }
+
+  /** Karma a karma step asks for: what you had + step.extra (rounded), at least step.min. Sinks again when you lose karma meanwhile. */
+  karmaNeed(qid) {
+    const step = this.currentStep(qid), a = this.state.active[qid];
+    if (step?.type !== 'karma' || !a) return 0;
+    const fresh = Math.max(step.min || 100, Math.ceil((this.state.karma + (step.extra || 80)) / 10) * 10);
+    if (a.need == null || fresh < a.need) a.need = fresh;
+    return a.need;
   }
 
   /** Karma step whose giver you can talk to now (enough karma collected). */
   karmaReady(npcId) {
     return Object.keys(this.state.active).find((qid) => {
       const st = this.currentStep(qid);
-      return st?.type === 'karma' && this.quests[qid].giver === npcId && this.state.karma >= (this.state.active[qid].need || 0);
+      return st?.type === 'karma' && this.quests[qid].giver === npcId && this.state.karma >= this.karmaNeed(qid);
     });
   }
 
@@ -93,9 +103,15 @@ export class QuestSystem {
   }
 
   available() {
-    const days = this.game.days;
-    return Object.values(this.quests).filter((q) => !this.isDone(q.id) && !this.isActive(q.id) && (q.requires || []).every((r) => this.isDone(r)) && (!days || days.allows(q)));
+    const days = this.game.days, busy = this.timedBusy();
+    return Object.values(this.quests).filter((q) => !this.isDone(q.id) && !this.isActive(q.id) && (q.requires || []).every((r) => this.isDone(r)) && (!days || days.allows(q)) && !(busy && this.isTimed(q)));
   }
+
+  /** A job against the clock (whole job or one of its steps). */
+  isTimed(q) { return !!(q.timeLimit || q.steps?.some((s) => s.timeLimit)); }
+
+  /** A timed job is running (or accepted and still waiting for its timed step) – only one at a time, others aren't offered meanwhile. */
+  timedBusy() { return !!this.timer || Object.keys(this.state.active).some((id) => this.quests[id] && this.isTimed(this.quests[id])); }
 
   offeredBy(npcId) { return this.available().filter((q) => q.giver === npcId); }
 
@@ -142,7 +158,7 @@ export class QuestSystem {
     if (step.type === 'night') this.emit('nightStep', { step });
     if (step.type === 'park') this.emit('parkStart', { qid, step });
     if (step.type === 'trailer') this.emit('trailerStart', { qid, step });
-    if (step.type === 'karma' && a.need == null) a.need = Math.max(step.min || 100, Math.ceil((this.state.karma + (step.extra || 80)) / 10) * 10);
+    if (step.type === 'karma') this.karmaNeed(qid);
     if (step.type === 'soundbox') this.game.soundbox?.spawn(true);
     if (step.type === 'wait') {
       if (a.waitLeft == null) a.waitLeft = step.seconds;
@@ -505,7 +521,7 @@ export class QuestSystem {
     if (step.type === 'trailer') return this.game.trailer?.objectives(qid, step) || [];
     if (step.type === 'karma') {
       const giver = this.game.npcs.get(this.quests[qid].giver);
-      return this.state.karma >= (this.state.active[qid].need || 0) && giver ? [{ pos: giver.position, label: giver.def.name, npc: true }] : [];
+      return this.state.karma >= this.karmaNeed(qid) && giver ? [{ pos: giver.position, label: giver.def.name, npc: true }] : [];
     }
     if (this.quests[qid].noRunOver && step.type === 'pickup' && this.game.player.vehicle !== this.game.vehicles.quad) {
       return [{ pos: this.game.vehicles.quad.position, label: 'Quad' }];

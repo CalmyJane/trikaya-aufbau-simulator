@@ -106,7 +106,8 @@ export const LANDMARKS = {
   wc_container: P(604, 760),   // the toilet trailer is delivered straight onto the festival ground
   festival_generator: P(585, 615),
   bar_tent: P(358, 740),       // the red & black round bar tent at the south fence
-  east_gate: P(612, 728),     // gate in the east fence: deliveries come in here (the entrance tent stands further inside)
+  east_gate: P(612, 728),
+  gate_drop: P(594, 706),     // just inside the east gate: suppliers drop heavy material for the western stages here     // gate in the east fence: deliveries come in here (the entrance tent stands further inside)
   chill: P(680, 316), // Zdenko & Thompsen's beer bench, middle of the crew & artist camp
 };
 

@@ -168,8 +168,8 @@ export class UI {
   }
 
   /**
-   * Phones: a small header (tap = quest log), then one slim line per running job (tap = show it on map &
-   * compass) and one per job/favour waiting to be picked up (tap = purple beam over the person).
+   * Phones: one slim line per running job and per job/favour waiting to be picked up. Tap the list to
+   * unfold it (full text: job title + current step, who to talk to, jobs left today) or fold it back.
    * Colour = kind: job / timed / favour / emergency / new.
    */
   trackerCompact(qs, playerPos, drama) {
@@ -178,27 +178,13 @@ export class UI {
       el._tap = true;
       el.classList.add('compact');
       el.addEventListener('pointerdown', (e) => e.stopPropagation()); // not the joystick / camera
-      el.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const r = e.target.closest('.trow');
-        const g = qs.game;
-        if (!r || !g) return;
-        g.audio?.click?.();
-        if (r.dataset.q && qs.state.active[r.dataset.q]) {
-          qs.state.tracked = r.dataset.q;
-          qs.refreshMarkers?.();
-          el._last = null;
-          this.toast(`📍 ${L(qs.quests[r.dataset.q].title)}: ${L({ de: 'wird auf Karte & Kompass angezeigt', en: 'shown on map & compass' })}`);
-        } else if (r.dataset.npc) {
-          g.setVolTarget(r.dataset.npc);
-          g.startVolCine(r.dataset.npc);
-        } else if (r.dataset.log) g.openQuestLog();
-      });
+      el.addEventListener('click', (e) => { e.stopPropagation(); el.classList.toggle('open'); el.scrollTop = 0; el._last = null; }); // click: not when scrolling
     }
+    const open = el.classList.contains('open');
     const clock = (sec) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
     const strip = (s) => String(s || '').replace(/<[^>]+>/g, '');
     const dist = (objs) => (objs.length ? `${Math.round(Math.min(...objs.map((o) => Math.hypot(o.pos.x - playerPos.x, o.pos.z - playerPos.z))))} m` : '');
-    const row = (kind, icon, text, meta, extra = '', attrs = '') => `<div class="trow k-${kind} ${extra}" ${attrs}><span class="ti">${icon}</span><span class="tx">${text}</span>${meta ? `<span class="tm">${meta}</span>` : ''}</div>`;
+    const row = (kind, icon, text, meta, extra = '') => `<div class="trow k-${kind} ${extra}"><span class="ti">${icon}</span><span class="tx">${text}</span>${meta ? `<span class="tm">${meta}</span>` : ''}</div>`;
     const rows = [];
     const timedQid = qs.timer?.qid;
     // emergencies first
@@ -207,7 +193,8 @@ export class UI {
       const left = Math.max(0, Math.ceil(e.deadline - e.t));
       const waiting = e.blocked && !drama.tent;
       const meta = [e.pos() ? `${Math.round(Math.hypot(e.pos().x - playerPos.x, e.pos().z - playerPos.z))} m` : '', e.helping ? '🏃' : waiting ? '⛺' : `⏱ ${clock(left)}`].filter(Boolean).join(' · ');
-      rows.push(row('drama', '⚠️', strip(e.helping ? `${L(e.def.title)}: ${e.helping.def.name} ${L({ de: 'kommt', en: 'is coming' })}` : drama.taskText(e)), meta));
+      const txt = strip(e.helping ? `${L(e.def.title)}: ${e.helping.def.name} ${L({ de: 'kommt', en: 'is coming' })}` : drama.taskText(e));
+      rows.push(row('drama', '⚠️', open ? `<b>${L(e.def.title)}</b><br>${txt}` : txt, meta));
     }
     // running jobs
     const active = Object.keys(qs.state.active).sort((a, b) => (b === timedQid) - (a === timedQid));
@@ -221,26 +208,25 @@ export class UI {
       if (step.type === 'work') meta.push(`${a.done.length}/${step.targets.length}`);
       if (step.type === 'pickup' && step.items.length > 1) meta.push(`${step.items.filter((it) => qs.state.inventory.includes(it.item)).length}/${step.items.length}`);
       const tracked = qs.state.tracked === qid;
-      const d = tracked || timed ? dist(qs.objectives(qid)) : '';
-      if (d) meta.push(d);
+      const d = dist(qs.objectives(qid));
+      if (d && (tracked || timed || open)) meta.push(d);
       const kind = timed ? 'timed' : q.errand ? 'fav' : 'job';
-      rows.push(row(kind, timed ? '⏱' : q.errand ? '💚' : tracked ? '📍' : '★', strip(qs.stepText(qid)), meta.join(' · '), tracked || timed ? 'on' : 'dim', `data-q="${qid}"`));
+      const txt = strip(qs.stepText(qid));
+      rows.push(row(kind, timed ? '⏱' : q.errand ? '💚' : '★', open ? `<b>${L(q.title)}</b><br>${txt}` : txt, meta.join(' · '), tracked || timed ? 'on' : 'dim'));
     }
     // waiting to be picked up: one line each, with who gives it
     for (const q of qs.available()) {
       const n = qs.game.npcs.get(q.giver);
       if (!n) continue;
-      rows.push(row(q.errand ? 'fav' : 'new', q.errand ? '💚' : '<b>!</b>', `${n.def.name}: ${L(q.title)}`, q.timeLimit ? '⏱' : '', 'dim', `data-npc="${q.giver}"`));
+      const txt = open ? `<b>${L(q.title)}</b><br>${L({ de: `Sprich mit ${n.def.name}`, en: `Talk to ${n.def.name}` })}${q.errand ? L({ de: ' (freiwillig)', en: ' (optional)' }) : ''}` : `${n.def.name}: ${L(q.title)}`;
+      rows.push(row(q.errand ? 'fav' : 'new', q.errand ? '💚' : '<b>!</b>', txt, q.timeLimit ? '⏱' : '', 'dim'));
     }
-    // header: how many jobs until evening, tap = full quest log
+    if (!rows.length && qs.state.completed.length) rows.push(row('hint', '🎉', strip(t('hud.allDone')), ''));
+    // unfolded: how many jobs are left today
     const days = qs.game.days;
     const left = days ? days.jobs(days.day, days.isNight).filter((q) => !qs.isDone(q.id)).length : 0;
-    const head = row('head', '📋', L({ de: 'Aufgaben', en: 'Jobs' }), left ? (days.isNight ? L({ de: `🌙 noch ${left} bis Schlafen`, en: `🌙 ${left} before bed` }) : L({ de: `☀️ noch ${left} heute`, en: `☀️ ${left} left today` })) : '', '', 'data-log="1"');
-    const MAX = 7;
-    const shown = rows.slice(0, MAX);
-    if (rows.length > MAX) shown.push(row('head', '…', L({ de: `${rows.length - MAX} weitere – alle anzeigen`, en: `${rows.length - MAX} more – show all` }), '', '', 'data-log="1"'));
-    if (!rows.length) shown.push(row('hint', '🎉', strip(qs.state.completed.length ? t('hud.allDone') : L({ de: 'Sprich mit den Leuten mit !', en: 'Talk to people with a !' })), '', '', 'data-log="1"'));
-    const html = head + shown.join('');
+    if (open && left) rows.push(row('hint', days.isNight ? '🌙' : '☀️', days.isNight ? L({ de: `Noch ${left} Nacht-Job${left > 1 ? 's' : ''} bis zum Schlafen`, en: `${left} night job${left > 1 ? 's' : ''} left before bed` }) : L({ de: `Noch ${left} Job${left > 1 ? 's' : ''} bis Feierabend`, en: `${left} job${left > 1 ? 's' : ''} left until evening` }), '', 'dim'));
+    const html = rows.join('');
     if (el._last !== html) { el.innerHTML = html; el._last = html; }
   }
 

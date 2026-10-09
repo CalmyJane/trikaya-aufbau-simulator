@@ -234,7 +234,7 @@ export const NPCS = [
       { de: 'Das ist Starkstrom. Nicht anfassen. Also… du nicht.', en: 'That\'s high voltage. Don\'t touch. Well… not you.' },
       { de: 'Ich hab das Lichtkonzept gemacht. Ja, das ganze.', en: 'I did the lighting concept. Yes, all of it.' },
       { de: 'Hmm. Okay. Kann man so machen. Ist halt falsch.', en: 'Hmm. Okay. You could do it like that. It\'s just wrong.' },
-      { de: 'Strom Andi! Das Kabel! Nicht das Bier, das KABEL!', en: 'Strom Andi! The cable! Not the beer, the CABLE!' },
+      { de: 'Andi! Das Kabel! Nicht das Bier, das KABEL!', en: 'Andi! The cable! Not the beer, the CABLE!' },
       { de: 'Julez sagt, mein Lichtkonzept ist falsch. Julez sagt das zu allem. Auch zu Licht.', en: 'Julez says my lighting concept is wrong. Julez says that about everything. Even about light.' },
     ],
   },
@@ -484,7 +484,7 @@ export const NPCS = [
     ],
   },
   {
-    id: 'strom_andi', name: 'Strom Andi', role: { de: 'Strom (eigentlich Bier)', en: 'Power (actually beer)' }, portrait: '🍻',
+    id: 'strom_andi', name: 'Andi', role: { de: 'Strom (eigentlich Bier)', en: 'Power (actually beer)' }, portrait: '🍻',
     look: { base: 'm_casual', skin: SKIN.light, hair: '#e6c870', brows: '#c8a85a', hairCut: [0.95, 0.55, 0.95], beard: 'short', beardColor: '#d8b860', shirt: '#c0602a', pants: '#3a4a5a', patchwork: true, shirtPatch: ['#c0602a', '#e0a030', '#3a4a5a'], height: 1.93, width: 1.1, extras: ['bottle'] },
     behavior: 'wander', home: 'generator', offset: [3, -2], radius: 4,
     lines: [
@@ -833,11 +833,8 @@ export const NUT_LINES = [
   { de: 'Die Spezial-Nuss… Fabi sagt Künstlergasse. Im Künstlergasse-Container ist sie nicht. Sie ist nirgends.', en: 'The special nut… Fabi says Künstlergasse. It\'s not in the Künstlergasse container. It\'s nowhere.' },
 ];
 
-// camper index → [seat, look-at] – they sit in Matze's cabin or at the beer benches in the Aufenthaltszelt
-const HANGOUTS = {
-  1: ['matze_seat1', 'matze_face'], 2: ['tent_seat1', 'tent_table1'], 4: ['tent_seat2', 'tent_table1'],
-  5: ['matze_seat2', 'matze_face'], 8: ['tent_seat3', 'tent_table2'], 11: ['tent_seat5', 'tent_table3'], 14: ['tent_seat4', 'tent_table2'],
-};
+// chai crew on a break from the break: a couple of them sit at the beer benches in the Aufenthaltszelt
+const HANGOUTS = { 2: ['tent_seat1', 'tent_table1'], 5: ['tent_seat2', 'tent_table1'] };
 
 export function makeCamper(i, rng = Math.random) {
   const pick = (a) => a[Math.floor(rng() * a.length)];
@@ -858,13 +855,12 @@ export function makeCamper(i, rng = Math.random) {
       extras: rng() < 0.3 ? ['scarf'] : [], scarf: pick(HIPPIE_SHIRTS),
       height: female ? 1.65 + rng() * 0.12 : 1.72 + rng() * 0.16,
     },
+    // the only nameless-ish volunteers left are the chai crew: if you don't know someone, they're probably chai
     ...(HANGOUTS[i] ? { behavior: 'sitter', home: HANGOUTS[i][0], face: HANGOUTS[i][1] }
-      : i % 2 ? { behavior: 'wander', home: 'camp_random', roam: 'camp_random', radius: 10 }
-      : i % 4 === 0 ? { behavior: 'builder', home: 'plot_chai_lounge', radius: 7 } // the chai site is always busy
-      : { behavior: 'wander', home: 'festival_random', roam: 'festival_random', radius: 14 }), // half of them hang out on the festival ground
-    // half of all volunteers are chai crew – and they love talking about it
-    ...(i % 2 === 0 ? { role: { de: `${persona.role.de} · Chai-Crew`, en: `${persona.role.en} · chai crew` }, chaiCrew: true } : {}),
-    lines: [...persona.lines, pick(CAMPER_LINES), ...(i % 2 === 0 ? [...CHAI_CREW_LINES].sort(() => Math.random() - 0.5).slice(0, 2) : [])],
+      : i % 3 === 0 ? { behavior: 'builder', home: 'plot_chai_lounge', radius: 7 } // "building" the chai tent
+      : { behavior: 'wander', home: 'plot_chai_lounge', radius: 13 }),            // hanging around it
+    role: { de: `${persona.role.de} · Chai-Crew`, en: `${persona.role.en} · chai crew` }, chaiCrew: true,
+    lines: [...persona.lines, pick(CAMPER_LINES), ...[...CHAI_CREW_LINES].sort(() => Math.random() - 0.5).slice(0, 2)],
     tokenAsker: rng() < 0.6, // most (not all) keep asking about food/drink tokens
   };
 }

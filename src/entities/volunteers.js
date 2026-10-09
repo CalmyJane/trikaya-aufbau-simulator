@@ -97,7 +97,7 @@ export const VOLUNTEERS = [
     { de: 'Ich war schon oben auf dem Drachenkopf. Nicht Corni sagen.', en: 'I\'ve been on top of the dragon\'s head. Don\'t tell Corni.' },
     { de: 'Höhenangst ist nur Bodenliebe.', en: 'Fear of heights is just love of the ground.' },
   ] },
-  { name: 'Mika', f: false, role: { de: 'Frisbee-Profi', en: 'Frisbee pro' }, lines: [
+  { name: 'Tilda', f: false, role: { de: 'Frisbee-Profi', en: 'Frisbee pro' }, lines: [
     { de: 'Kurze Frisbee-Pause? Nur fünf Würfe. Oder fünfzig.', en: 'Quick frisbee break? Just five throws. Or fifty.' },
     { de: 'Die Frisbee ist auf dem Container gelandet. Auf dem Hühnercontainer. Natürlich.', en: 'The frisbee landed on the container. On the chicken container. Of course.' },
     { de: 'Aufbau ist auch nur Sport mit Werkzeug.', en: 'Building is just sports with tools.' },

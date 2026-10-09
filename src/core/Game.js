@@ -226,7 +226,7 @@ export class Game {
     this.world.setStructureStage('kuenstlergasse', kunst ? 2 : 1);
     this.npcs.setWorkshop?.(kunst && !!this.world.spots.kg_seat1);
     // volunteers keep arriving; fewer on phones for performance
-    this.npcs.setCrowd(Math.min(this.input.touch ? 16 : 30, 3 + lvl * 3));
+    this.npcs.setCrowd(Math.min(this.input.touch ? 6 : 8, 3 + lvl)); // only the chai crew is random
     if (this.quests) this.npcs.refreshAppear(this.quests);
   }
 
@@ -921,7 +921,7 @@ export class Game {
     const stops = ['plot_mainstage', 'kitchen', 'plot_narnia_floor', 'plot_chai_lounge', 'plot_hammocks', 'plot_biergarten'];
     const n = this.input.touch ? 8 : 14;
     for (let i = 0; i < n; i++) {
-      const def = makeCamper(500 + i);
+      const def = makeCamper(10 + i); // other personas than the chai crew at the site (no doubled names)
       def.id = `walker_${i}`;
       def.behavior = 'wander';
       def.home = stops[i % stops.length];

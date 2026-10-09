@@ -58,6 +58,7 @@ export class Finale {
       const def = makeCamper(300 + i);
       def.id = `guest_${i}`;
       def.role = { de: 'Festivalgast', en: 'Festival guest' };
+      def.name = getLang() === 'de' ? 'Festivalgast' : 'Festival guest'; // guests aren't crew: no names
       def.behavior = 'wander';
       def.home = stages[i % stages.length];
       def.radius = 9;

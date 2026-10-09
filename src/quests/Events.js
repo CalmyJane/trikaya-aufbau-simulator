@@ -8,7 +8,7 @@ import { L, getLang } from '../i18n.js';
 //   passedout    – someone passed out                         → Franzi wakes them & takes them to awareness
 //   drunk/high/keta – too drunk / too high / completely wasted → Franzi takes them to the awareness tent
 //   kitchenfight – fight in the kitchen                       → Fabi or Jan (Leo, good luck)
-//   generator    – power generator broke                      → Felix, Thompsen, Andi, Strom Andi, Juli (or buy a new one)
+//   generator    – power generator broke                      → Felix, Thompsen, either Andi, Juli (or buy a new one)
 //   julifight    – Juli gets into it with a volunteer          → Jan or Fabi (Leo, good luck)
 //   pump         – the WC "Kackepumpe" (lifting pump)         → Juli, Andi
 //
@@ -262,7 +262,7 @@ export const EVENT_TYPES = {
   generator: {
     weight: 2, helpers: ['felix', 'thomas', 'andi', 'strom_andi', 'juli'], victims: 0, cost: 150, penalty: 1500, karma: 15,
     title: { de: 'Generator kaputt!', en: 'Generator broke!' },
-    task: { de: 'Hol Felix, Thompsen (Strom & Licht), Strom Andi, Andi oder Juli, sonst neuer Generator (1.500 €)', en: 'Get Felix, Thompsen (power & light), Strom Andi, Andi or Juli, or buy a new generator (€1,500)' },
+    task: { de: 'Hol Felix, Thompsen (Strom & Licht), einen der beiden Andis oder Juli, sonst neuer Generator (1.500 €)', en: 'Get Felix, Thompsen (power & light), either Andi or Juli, or buy a new generator (€1,500)' },
     helperDialog: [
       { de: 'Der Generator? *seufz* Hab ich doch gesagt, dass der raucht. Ich schau\'s mir an.', en: 'The generator? *sigh* Told you it was smoking. I\'ll look at it.' },
       { de: 'Gerhard schon wieder? Ich komm. Er braucht nur ein bisschen Zuwendung. Und einen Tritt.', en: 'Gerhard again? I\'m coming. He just needs a little attention. And a kick.' },

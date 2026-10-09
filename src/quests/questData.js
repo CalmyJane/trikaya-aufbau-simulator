@@ -1027,7 +1027,7 @@ export const QUESTS = [
     noRunOver: true,
     summary: { de: 'Das Diagnosegerät liegt am Firespace, am anderen Ende des Geländes. Mit dem Quad hin und zurück, schnell. Wer jemanden umfährt, muss von vorn anfangen.', en: 'The diagnostic tool is at the Firespace, at the other end of the site. There and back on the quad, fast. Run anyone over and you start again.' },
     offer: [
-      { who: 'flo', text: { de: 'Der Generator spinnt. GERADE. Und Strom Andi hat das Diagnosegerät am Firespace liegen lassen. Ganz am anderen Ende.', en: 'The generator is acting up. RIGHT NOW. And Strom Andi left the diagnostic tool at the Firespace. At the very other end.' } },
+      { who: 'flo', text: { de: 'Der Generator spinnt. GERADE. Und Andi, der blonde, hat das Diagnosegerät am Firespace liegen lassen. Ganz am anderen Ende.', en: 'The generator is acting up. RIGHT NOW. And Andi, the blond one, left the diagnostic tool at the Firespace. At the very other end.' } },
       { who: 'flo', text: { de: 'Nimm das Quad, Shift gibt Gas. Aber da laufen überall Leute rum. Fährst du einen um, ist Franzi sauer und wir fangen von vorne an.', en: 'Take the quad, Shift is full throttle. But there are people everywhere. Run one over and Franzi gets mad and we start over.' } },
     ],
     accept: { de: 'Vollgas, aber vorsichtig!', en: 'Full throttle, but carefully!' },

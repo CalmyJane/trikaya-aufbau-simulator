@@ -1441,6 +1441,19 @@ export class Game {
   }
 
   // ------------------------------------------------------------------ loop
+  /** Run one system's per-frame update; if it throws, keep the game running and show the error once (so it can be reported). */
+  safe(fn) {
+    try { fn(); } catch (e) {
+      const msg = `${e?.message || e}`;
+      this._errSeen ||= new Set();
+      if (this._errSeen.has(msg)) return;
+      this._errSeen.add(msg);
+      console.error(e);
+      const where = (e?.stack || '').split('\n').find((l) => /\.js/.test(l))?.replace(/^\s*at\s*/, '').replace(/https?:\/\/[^/]+\//, '').slice(0, 90) || '';
+      this.ui?.toast?.(`⚠️ Fehler: ${msg.slice(0, 80)}${where ? ` (${where})` : ''}`, 9000);
+    }
+  }
+
   frame() {
     const dt = Math.min(this.clock.getDelta(), 0.05);
     this.time += dt;
@@ -1453,10 +1466,10 @@ export class Game {
       this.fly.active = this.mode === 'menu' && !this.ui.modalOpen;
       this.fly.update(dt, time, { controls: this.fly.active, menu: true });
       this.fly.apply(this.camera, dt);
-      this.world.update(time, dt, this.player.position);
-      this.npcs.update(time, dt, ctx);
+      this.safe(() => this.world.update(time, dt, this.player.position));
+      this.safe(() => this.npcs.update(time, dt, ctx));
       this.world.followSun(this.fly.focus(this._sunFocus ||= new THREE.Vector3()));
-      this.music.update(this.camera.position, this.camera);
+      this.safe(() => this.music.update(this.camera.position, this.camera));
       this.renderer.render(this.scene, this.camera);
       inp.endFrame();
       return;
@@ -1503,36 +1516,36 @@ export class Game {
 
     if (!veh && this.player.moved - (this._lastStep || 0) > 1.4) { this._lastStep = this.player.moved; this.audio.step(); }
     const motor = veh && veh.id !== 'bike';
-    this.audio.engine(motor ? veh.kmh / 50 : 0, !!motor && veh.canDrive());
+    this.safe(() => this.audio.engine(motor ? veh.kmh / 50 : 0, !!motor && veh.canDrive()));
 
-    this.npcs.update(time, dt, ctx);
-    if (playing && veh && veh.id !== 'bike') this.checkRunOver(veh);
-    if (playing) this.bikeSys.update(dt);
-    this.quests.update(time, dt, this.player.position);
-    this.world.update(time, dt, this.player.position);
-    this.trigel.update(dt, time, this.player.vehicle ? this.player.vehicle.position : this.player.position, this.world.night);
-    this.updateBuilding(dt);
+    this.safe(() => this.npcs.update(time, dt, ctx));
+    if (playing && veh && veh.id !== 'bike') this.safe(() => this.checkRunOver(veh));
+    if (playing) this.safe(() => this.bikeSys.update(dt));
+    this.safe(() => this.quests.update(time, dt, this.player.position));
+    this.safe(() => this.world.update(time, dt, this.player.position));
+    this.safe(() => this.trigel.update(dt, time, this.player.vehicle ? this.player.vehicle.position : this.player.position, this.world.night));
+    this.safe(() => this.updateBuilding(dt));
     if (playing) {
-      this.checkKitchen(dt);
-      this.economy.update(dt, this.readiness || 0);
-      this.drama.update(dt);
-      this.updateNight(dt);
-      this.shoutWristband(dt);
+      this.safe(() => this.checkKitchen(dt));
+      this.safe(() => this.economy.update(dt, this.readiness || 0));
+      this.safe(() => this.drama.update(dt));
+      this.safe(() => this.updateNight(dt));
+      this.safe(() => this.shoutWristband(dt));
       if (inp.hit('F9')) this.world.toggleColliderDebug();
-      this.effects.update(dt);
-      this.police.update(dt);
-      this.soundbox.update(dt);
-      this.updateThomas(dt);
-      this.errands.update(dt);
-      this.days.update();
-      this.parking.update(dt);
+      this.safe(() => this.effects.update(dt));
+      this.safe(() => this.police.update(dt));
+      this.safe(() => this.soundbox.update(dt));
+      this.safe(() => this.updateThomas(dt));
+      this.safe(() => this.errands.update(dt));
+      this.safe(() => this.days.update());
+      this.safe(() => this.parking.update(dt));
       // safety net: vehicles wedged into something (new stage, posts, masts…) get freed
       this._unstickT = (this._unstickT || 0) - dt;
       if (this._unstickT <= 0) {
         this._unstickT = 1;
         for (const v of Object.values(this.vehicles)) if (Math.abs(v.speed) < 0.5) v.unstick(null, 0.6);
       }
-      this.updateVolTarget(this.time);
+      this.safe(() => this.updateVolTarget(this.time));
       this._markerT = (this._markerT || 0) - dt;
       if (this._markerT <= 0) { this._markerT = 0.5; this.updateMarkers(); }
     }
@@ -1543,16 +1556,16 @@ export class Game {
       if (want !== this._touchShown) { this._touchShown = want; this.touch.show(want); }
     }
     // interaction prompt
-    if (playing && !this.ui.dialogOpen && !this.building) {
+    if (playing && !this.ui.dialogOpen && !this.building) this.safe(() => {
       const best = this.interactionCandidates()[0];
       this.ui.prompt(best?.label, best?.disabled);
       this.touch?.setAction(best?.label, best?.disabled);
       if (best && !best.disabled && inp.hit('KeyE') && performance.now() - this.ui.dialogClosedAt > 250) best.action();
-    } else this.ui.prompt(null);
+    }); else this.ui.prompt(null);
 
     const indoor = this.world.isInside(this.player.position);
     const moving = veh ? Math.min(1, Math.abs(veh.speed) / 4) : Math.min(1, Math.hypot(this.player.vel.x, this.player.vel.z) / 4);
-    if (this.volCine) this.updateVolCine(dt);
+    if (this.volCine) this.safe(() => this.updateVolCine(dt));
     if (this.sceneCam) { // cut scene camera (finale)
       this.camera.position.copy(this.sceneCam.pos);
       this.camera.lookAt(this.sceneCam.look);
@@ -1566,22 +1579,21 @@ export class Game {
     this.world.followSun(paused ? this.fly.focus(this._sunFocus ||= new THREE.Vector3()) : this.player.position);
 
     // HUD
-    this.ui.tracker(this.quests, this.player.position, this.drama);
+    this.safe(() => this.ui.tracker(this.quests, this.player.position, this.drama));
     this.ui.stamina(veh ? 1 : this.player.stamina, veh ? 1 : this.player.staminaMax || 1);
-    this.ui.vehicleHud(veh);
-    const objectives = [...this.quests.trackedObjectives(), ...this.drama.objectives(), ...this.soundbox.objectives()];
+    this.safe(() => this.ui.vehicleHud(veh));
+    let objectives = [];
+    this.safe(() => { objectives = [...this.quests.trackedObjectives(), ...this.drama.objectives(), ...this.soundbox.objectives()]; });
     const visibleNpcs = this.npcs.all.filter((n) => !n.hidden);
-    if (this.mode === 'pause') {
+    if (this.mode === 'pause') this.safe(() => {
       // pause: the minimap glides along under the drone camera; the white dot is you
       const f = this.camera.getWorldDirection(this._pmapDir ||= new THREE.Vector3());
       const range = THREE.MathUtils.clamp(this.camera.position.y * 1.4, 70, 220);
       const c = this.fly.focus(this._pmapC ||= new THREE.Vector3()); // the spot the drone looks at
       this.ui.drawMinimap(c, Math.atan2(f.x, f.z), Math.atan2(-f.x, -f.z), objectives, visibleNpcs, this.quests, this.vehicles, { ctx: this.ui.pmap, range, mark: this.player.position, arrow: '#ffd27a' });
-    } else {
-      this.ui.drawMinimap(this.player.position, this.headingOf(), this.cam.yaw, objectives, visibleNpcs, this.quests, this.vehicles);
-    }
-    this.ui.overlays(this.npcs.all.filter((n) => !n.hidden), this.camera, this.player.position);
-    this.music.update(paused ? this.camera.position : this.player.position, this.camera);
+    }); else this.safe(() => this.ui.drawMinimap(this.player.position, this.headingOf(), this.cam.yaw, objectives, visibleNpcs, this.quests, this.vehicles));
+    this.safe(() => this.ui.overlays(this.npcs.all.filter((n) => !n.hidden), this.camera, this.player.position));
+    this.safe(() => this.music.update(paused ? this.camera.position : this.player.position, this.camera));
 
     this.renderMain();
     inp.endFrame();

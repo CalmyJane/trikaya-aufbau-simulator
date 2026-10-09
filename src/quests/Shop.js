@@ -1,9 +1,11 @@
+import * as THREE from 'three';
 import { L, getLang } from '../i18n.js';
 
 // Karma economy on the site: people sell you things for karma.
 //  - Mark (once the chai tent stands): cheap mate, chai
 //  - Fabi: pro gaffa
 //  - "Hast du was dabei?" in small talk: some people carry weed, energy drinks, beer…
+//  - Cosma: palo santo (people step aside for your quad / wheel loader, a thin smoke trail follows you)
 //  - Mux: bananas (free) · Sabse & Verena's bar: drinks for drink tokens
 
 export const SHOP = [
@@ -43,6 +45,11 @@ export const SHOP = [
     desc: { de: '60 Sekunden rennen wie der Radlader. Zu viele, und dein Herz macht Techno.', en: 'Run like the wheel loader for 60 seconds. Too many and your heart goes techno.' },
   },
   {
+    id: 'palo', icon: '🪵', cost: 18, vendor: 'cosma',
+    name: { de: 'Palo Santo', en: 'Palo santo' },
+    desc: { de: '2 Minuten lang gehen dir die Leute von selbst aus dem Weg, wenn du Quad oder Radlader fährst. Riecht nach Wald und Weisheit.', en: 'For 2 minutes people step out of your way when you drive the quad or wheel loader. Smells of forest and wisdom.' },
+  },
+  {
     id: 'banana', icon: '🍌', cost: 0, vendor: 'mux',
     name: { de: 'Banane', en: 'Banana' },
     desc: { de: '3 Minuten lang längere Ausdauer (der Balken wird 1,5× so lang).', en: 'Longer stamina for 3 minutes (the bar gets 1.5× as long).' },
@@ -77,6 +84,25 @@ const COMMENTS = {
 };
 
 const pick = (a) => a[Math.floor(Math.random() * a.length)];
+
+// people stepping aside for the palo santo smoke
+const PALO_LINES = [
+  { de: 'Oh, Palo Santo! Bitte, nach dir.', en: 'Oh, palo santo! After you, please.' },
+  { de: '*schnuppert* Ah. Heilig. Ich geh mal zur Seite.', en: '*sniffs* Ah. Holy. I\'ll step aside.' },
+  { de: 'Ein Radlader, der nach Räucherwerk riecht. Jetzt hab ich alles gesehen.', en: 'A wheel loader that smells of incense. Now I\'ve seen everything.' },
+  { de: 'Die Energie sagt: Platz machen. Mach ich.', en: 'The energy says: make way. I will.' },
+  { de: 'Hmm, Wald und Weisheit. Fahr ruhig vorbei.', en: 'Mmm, forest and wisdom. Go ahead.' },
+];
+let SMOKE_TEX = null;
+function smokeTexture() {
+  if (SMOKE_TEX) return SMOKE_TEX;
+  const c = document.createElement('canvas'); c.width = c.height = 64;
+  const x = c.getContext('2d'), gr = x.createRadialGradient(32, 32, 2, 32, 32, 31);
+  gr.addColorStop(0, 'rgba(235,232,225,1)'); gr.addColorStop(0.5, 'rgba(225,222,215,0.5)'); gr.addColorStop(1, 'rgba(220,220,215,0)');
+  x.fillStyle = gr; x.fillRect(0, 0, 64, 64);
+  SMOKE_TEX = new THREE.CanvasTexture(c);
+  return SMOKE_TEX;
+}
 
 // what you get for a drink token at Sabse's kitchen and Verena's bar
 export const TOKEN_DRINKS = ['beer', 'schnaps', 'energy', 'mate'];
@@ -153,6 +179,7 @@ export class Effects {
     this.chaiT = 0;
     this.gaffa = 0;
     this.bananaT = 0;
+    this.paloT = 0;
     this.ketaT = 0; // (keta is gone – kept so the render trails stay off)
     this.speedT = 0;
     this.speedLevel = 0;
@@ -183,6 +210,7 @@ export class Effects {
     if (id === 'chai') { this.chaiT = 90; g.player.stamina = 1; }
     if (id === 'gaffa') this.gaffa += 3;
     if (id === 'banana') this.bananaT = 180;
+    if (id === 'palo') { this.paloT = 120; g.ui.toast(de ? '🪵 Palo Santo brennt. Die Leute machen dir Platz. Ehrfürchtig.' : '🪵 Palo santo is burning. People make way for you. In awe.'); }
     if (id === 'weed') this.weedT = 90;
     if (id === 'beer' || id === 'schnaps') {
       this.beerLevel += id === 'schnaps' ? 2 : 1;
@@ -212,6 +240,57 @@ export class Effects {
   get high() { return this.speedT > 0 ? 'energy' : this.weedT > 0 ? 'weed' : this.beerLevel >= 2 ? 'beer' : null; }
   get tipsy() { return this.beerLevel > 0; }
 
+  /** Palo santo: on the quad / wheel loader people ahead step aside; a thin smoke trail follows you. */
+  updatePalo(dt) {
+    const g = this.game;
+    this.updateSmoke(dt);
+    if (this.paloT <= 0) return;
+    const veh = g.player.vehicle;
+    if (!veh || (veh !== g.vehicles.quad && veh !== g.vehicles.radlader) || Math.abs(veh.speed) < 0.3) return;
+    const vp = veh.position, dir = Math.sign(veh.speed) || 1;
+    const fx = Math.sin(veh.heading) * dir, fz = Math.cos(veh.heading) * dir;
+    const look = 4 + Math.abs(veh.speed) * 0.9;            // the faster you go, the earlier they react
+    const half = (veh.o?.radius || 1.5) + 1.2;
+    for (const n of g.npcs.all) {
+      if (n.hidden || n.talking || n.char?.sitting) continue;
+      const dx = n.position.x - vp.x, dz = n.position.z - vp.z;
+      const ahead = dx * fx + dz * fz, side = dx * fz - dz * fx;
+      if (ahead < -1 || ahead > look || Math.abs(side) > half) continue;
+      const s = side === 0 ? (n._paloSide ||= Math.random() < 0.5 ? -1 : 1) : Math.sign(side);
+      const push = Math.min(half - Math.abs(side), 7 * dt);  // a calm, quick side step
+      n.root.position.x += fz * s * push;
+      n.root.position.z += -fx * s * push;
+      if (!n.bubble && (n._paloT ?? -99) < g.time - 20) { n._paloT = g.time; n.say(pick(PALO_LINES), 2.5); }
+    }
+  }
+
+  /** Thin smoke puffs that rise and fade behind you while palo santo burns. */
+  updateSmoke(dt) {
+    const g = this.game;
+    this.puffs ||= [];
+    if (this.paloT > 0 && (this.puffT = (this.puffT || 0) - dt) <= 0) {
+      this.puffT = 0.14;
+      const veh = g.player.vehicle, p = g.player.position;
+      let x = p.x, z = p.z, y = 1.3;
+      if (veh) { const back = (veh.o?.radius || 1.5) * 0.9; x = veh.position.x - Math.sin(veh.heading) * back; z = veh.position.z - Math.cos(veh.heading) * back; y = 1.1; }
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: smokeTexture(), transparent: true, opacity: 0, depthWrite: false, fog: true }));
+      sp.position.set(x + (Math.random() - 0.5) * 0.3, (g.player.root.position.y || 0) + y, z + (Math.random() - 0.5) * 0.3);
+      sp.scale.setScalar(0.5);
+      g.scene.add(sp);
+      this.puffs.push({ sp, t: 0, drift: (Math.random() - 0.5) * 0.4 });
+    }
+    for (let i = this.puffs.length - 1; i >= 0; i--) {
+      const f = this.puffs[i];
+      f.t += dt;
+      const k = f.t / 2.6;
+      if (k >= 1) { g.scene.remove(f.sp); f.sp.material.dispose(); this.puffs.splice(i, 1); continue; }
+      f.sp.position.y += dt * 0.45;
+      f.sp.position.x += f.drift * dt;
+      f.sp.scale.setScalar(0.5 + k * 1.6);
+      f.sp.material.opacity = 0.16 * Math.sin(Math.PI * Math.min(1, k * 1.4)) * (1 - k);
+    }
+  }
+
   /** Something people say when you're obviously on something. */
   comment() { const h = this.high; return h ? pick(COMMENTS[h]) : null; }
 
@@ -220,6 +299,8 @@ export class Effects {
     this.mateT = Math.max(0, this.mateT - dt);
     this.chaiT = Math.max(0, this.chaiT - dt);
     this.bananaT = Math.max(0, this.bananaT - dt);
+    this.paloT = Math.max(0, this.paloT - dt);
+    this.updatePalo(dt);
     this.speedT = Math.max(0, this.speedT - dt);
     this.weedT = Math.max(0, this.weedT - dt);
     if (this.beerLevel > 0 && (this.beerDecay += dt) > 150) { this.beerDecay = 0; this.beerLevel--; }
@@ -371,6 +452,7 @@ export class Effects {
     if (this.weedT > 0) out.push(`🌿 ${Math.ceil(this.weedT)}s`);
     if (this.beerLevel > 0) out.push(`🍺 ${'●'.repeat(this.beerLevel)}`);
     if (this.bananaT > 0) out.push(`🍌 ${Math.ceil(this.bananaT)}s`);
+    if (this.paloT > 0) out.push(`🪵 ${Math.ceil(this.paloT)}s`);
     if (this.speedT > 0 || this.speedLevel > 0) out.push(`🥤${this.speedT > 0 ? ' ' + Math.ceil(this.speedT) + 's' : ''}${this.speedLevel ? ' ' + '●'.repeat(this.speedLevel) : ''}`);
     return out;
   }

@@ -1677,7 +1677,7 @@ export class Game {
 
   /** Quad / wheel loader vs. people: they fly, get up and let you know what they think. */
   checkRunOver(veh) {
-    if (Math.abs(veh.speed) < 2.2) return;
+    if (Math.abs(veh.speed) < 2.2 || this.effects.paloT > 0) return; // palo santo: everybody steps aside
     const vp = veh.position;
     const reach = (veh.o.radius || 1.5) * 0.8 + 0.45;
     const fwd = new THREE.Vector3(Math.sin(veh.heading), 0, Math.cos(veh.heading)).multiplyScalar(Math.sign(veh.speed));

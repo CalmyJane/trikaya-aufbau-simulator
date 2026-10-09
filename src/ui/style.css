@@ -69,6 +69,9 @@ html, body {
 
 /* ---------------------------------------------------------------- HUD */
 #hud { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
+#hud-vol { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); pointer-events: auto; cursor: pointer; padding: 6px 12px; border-radius: 12px; border: 1px solid rgba(232, 163, 58, 0.4); background: var(--panel); color: #fff; font: 700 14px 'Baloo 2', sans-serif; }
+#hud-vol:hover { border-color: var(--gold); }
+body.touch #hud-vol { display: none; } /* phones: the 👥 button sits in the touch bar */
 #stats { position: absolute; top: 16px; left: 16px; background: var(--panel); padding: 10px 14px; border-radius: 14px; min-width: 190px; border: 1px solid rgba(232, 163, 58, 0.25); }
 .stat-row { font-size: 18px; }
 .stat-row.small { font-size: 14px; color: var(--muted); }

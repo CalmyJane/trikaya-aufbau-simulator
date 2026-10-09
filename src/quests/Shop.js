@@ -3,7 +3,7 @@ import { L, getLang } from '../i18n.js';
 // Karma economy on the site: people sell you things for karma.
 //  - Mark (once the chai tent stands): cheap mate, chai
 //  - Fabi: pro gaffa
-//  - random volunteers with a blue "!": weed or energy drinks – buy it or say no.
+//  - "Hast du was dabei?" in small talk: some people carry weed, energy drinks, beer…
 //  - Mux: bananas (free) · Sabse & Verena's bar: drinks for drink tokens
 
 export const SHOP = [
@@ -73,17 +73,6 @@ const COMMENTS = {
     { de: 'Chill mal. Es ist ein Festival, kein Formel-1-Rennen.', en: 'Chill. It\'s a festival, not a Formula 1 race.' },
     { de: 'Du blinzelst gar nicht mehr. Ist das Absicht?', en: 'You stopped blinking. On purpose?' },
     { de: 'Du hast gerade drei Leuten gleichzeitig deine Lebensgeschichte erzählt.', en: 'You just told three people your life story at the same time.' },
-  ],
-};
-
-const DEALER_LINES = {
-  weed: [
-    { de: 'Psst. Willst du was Grünes? Dann springst du über jeden Bauzaun. Fast.', en: 'Psst. Want something green? You\'ll jump over every fence. Almost.' },
-    { de: 'Hey, entspann mal. Ich hab Weed. Bio. Selbst gezogen. Im Zelt.', en: 'Hey, relax. I\'ve got weed. Organic. Home-grown. In my tent.' },
-  ],
-  energy: [
-    { de: 'Psst. Energydrink? Hab noch welche aus dem Kofferraum. Warm, aber wirkt.', en: 'Psst. Energy drink? Got some left in my car boot. Warm, but it works.' },
-    { de: 'Ey, du willst schneller aufbauen? Energydrink! Dann rennst du wie der Radlader.', en: 'Hey, want to build faster? Energy drink! You\'ll run like the wheel loader.' },
   ],
 };
 
@@ -173,8 +162,6 @@ export class Effects {
     this.beerDecay = 0;
     this.collapsed = false;
     this.commentT = 3;
-    this.clearDealer();
-    this.dealerCD = 60;
     document.body.classList.remove('weed');
   }
 
@@ -252,7 +239,6 @@ export class Effects {
     else if (this.weedT > 0) fov = 62 + Math.sin(g.time * 0.5) * 2.5;
     if (Math.abs(cam.fov - fov) > 0.01) { cam.fov = fov; cam.updateProjectionMatrix(); }
     this.updateComments(dt);
-    this.updateDealer(dt);
     g.ui.effects(this.list());
   }
 
@@ -267,66 +253,6 @@ export class Effects {
     if (!near.length) { this.commentT = 1.5; return; }
     near[Math.floor(Math.random() * near.length)].say(this.comment(), 3.8);
     this.commentT = 6 + Math.random() * 5;
-  }
-
-  // ------------------------------------------------------------ dealers (blue "!")
-  clearDealer() {
-    this.dealer = null;
-    this.game?.updateMarkers?.();
-  }
-
-  isDealer(npc) { return this.dealer?.npc === npc; }
-
-  updateDealer(dt) {
-    const g = this.game;
-    if (this.dealer) {
-      const d = this.dealer;
-      d.t += dt;
-      if (d.t > 160 || d.npc.hidden || d.npc.incident) this.clearDealer();
-      return;
-    }
-    if (!g.quests.isDone('q1_rigging') || this.collapsed) return;
-    this.dealerCD -= dt;
-    if (this.dealerCD > 0) return;
-    this.dealerCD = 80 + Math.random() * 80;
-    const pp = g.player.position;
-    const pool = [...g.npcs.campers, g.npcs.get('rocky')].filter((n) => n && !NO_STASH.includes(n.def.id) && n.def.id !== 'leocitas' && !n.hidden && !n.incident && !n.task && !n.talking);
-    const cands = pool.filter((n) => { const d = n.position.distanceTo(pp); return d > 10 && d < 70; });
-    if (!cands.length) { this.dealerCD = 15; return; }
-    const npc = cands[Math.floor(Math.random() * cands.length)];
-    this.dealer = { npc, item: pick(['energy', 'weed', 'weed']), t: 0 };
-    if (!this.dealerHinted) {
-      this.dealerHinted = true;
-      g.ui.toast(L({ de: '🔵 Blaues ! da will dir jemand was anbieten. Nein sagen ist auch okay.', en: '🔵 Blue ! someone wants to offer you something. Saying no is fine too.' }));
-    }
-    g.updateMarkers();
-  }
-
-  async dealerTalk(npc) {
-    const g = this.game;
-    const d = this.dealer;
-    const it = this.item(d.item);
-    const de = getLang() === 'de';
-    const karma = g.quests.state.karma;
-    const choice = await g.runDialog(
-      [{ who: npc.def.id, text: `${L(pick(DEALER_LINES[d.item]))} ${de ? `${it.cost} Karma.` : `${it.cost} karma.`}` }],
-      [de ? `${it.icon} Her damit (✺ ${it.cost})` : `${it.icon} Hand it over (✺ ${it.cost})`, de ? 'Nee, lass mal.' : 'Nah, I\'m good.'],
-      npc,
-    );
-    this.clearDealer();
-    if (choice === 0) {
-      if (karma < it.cost) {
-        await g.reply(npc, de ? 'Kein Karma, kein Stoff. So ist das Universum.' : 'No karma, no stuff. That\'s the universe.');
-        return;
-      }
-      this.buy(it.id);
-      await g.reply(npc, de ? 'Viel Spaß. Und… trink Wasser, ja?' : 'Have fun. And… drink some water, yeah?');
-    } else {
-      g.quests.state.karma += 2;
-      await g.reply(npc, de ? 'Auch okay. Mehr für mich.' : 'Fair enough. More for me.');
-      g.ui.toast(de ? '✺ +2, gute Entscheidung, sagt dein Karma.' : '✺ +2, good call, says your karma.');
-      g.refreshHUD();
-    }
   }
 
   /** Can you ask this person whether they have something? */

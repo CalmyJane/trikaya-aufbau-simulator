@@ -250,6 +250,7 @@ export class Game {
       [k('F'), 'Winken'],
       [k('J'), `Aufgaben · ${k('T')} Job wechseln`],
       [k('M'), 'Lageplan'],
+      [k('V'), 'Volunteers: jemanden suchen'],
       [k('N'), 'Ton an/aus'],
       [k('Esc'), 'Pause'],
     ] : [
@@ -263,6 +264,7 @@ export class Game {
       [k('F'), 'Wave'],
       [k('J'), `Quest log · ${k('T')} switch job`],
       [k('M'), 'Site map'],
+      [k('V'), 'Volunteers: find someone'],
       [k('N'), 'Mute'],
       [k('Esc'), 'Pause'],
     ];
@@ -522,6 +524,11 @@ export class Game {
   openVolunteers() {
     const sel = this.volTarget;
     const list = this.npcs.all.filter((n) => n.def.look && !n.def.hiddenFromList).sort((a, b) => a.def.name.localeCompare(b.def.name, 'de', { sensitivity: 'base' }));
+    if (this.mode === 'play') { // opened from the game (button / V): back into the game afterwards
+      this.ignoreUnlock = true; this.input.unlock(); setTimeout(() => (this.ignoreUnlock = false), 100);
+      this.input.enabled = false;
+      this.ui.onModalClose = () => { this.ui.onModalClose = null; this.resume(); };
+    }
     const html = `<h2>${t('vol.title')}</h2>` + list.map((n) => `<div class="qlog-item vol-item" data-id="${n.def.id}" style="cursor:pointer"><div class="t">${n.def.portrait || ''} ${n.def.name}${sel === n.def.id ? ' · ' + t('vol.marked') : ''}</div></div>`).join('');
     this.ui.modal(html);
     document.querySelectorAll('#modal-body .vol-item').forEach((el) => {
@@ -957,7 +964,6 @@ export class Game {
   updateMarkers() {
     for (const n of this.npcs.all) {
       if (this.drama.isRedMarked(n)) n.setMarker('red');
-      else if (this.effects?.isDealer(n)) n.setMarker('blue');
       else n.setMarker(n.incident && BUSY_MODES.includes(n.incident.mode) ? null : this.quests.npcMarker(n.def.id));
     }
   }
@@ -1030,8 +1036,6 @@ export class Game {
     if (this.drama.victimTalk(npc)) return;
     // 0a) illegal soundbox → tell them off
     if (this.soundbox.isOwner(npc)) { await this.soundbox.scold(npc); return; }
-    // 0a) blue "!": someone wants to sell you something
-    if (this.effects.isDealer(npc)) { await this.effects.dealerTalk(npc); return; }
     // 0b2) a job that needs karma
     const kq = Object.keys(qs.state.active).find((qid) => qs.currentStep(qid)?.type === 'karma' && qs.quests[qid].giver === id);
     if (kq) {
@@ -1311,8 +1315,7 @@ export class Game {
           // quest-relevant people first; plain small talk loses against jobs nearby
           const relevant = mk || this.drama.events.some((e) => e.victims.includes(n) || (e.discovered && !e.helping && e.def.helpers.includes(n.def.id)));
           const red = this.drama.isRedMarked(n);
-          const blue = this.effects.isDealer(n);
-          list.push({ d: d + (relevant || blue ? -1 : 1.8), label: `${t('p.talk', { name: n.def.name })}${red ? ' <b style="color:#ff3b30">!</b>' : blue ? ' <b style="color:#3aa0ff">!</b>' : mk ? ` <b style="color:${mk === '!' ? '#ffd21f' : mk === 'fav' ? '#6fdc6a' : '#7fe0ff'}">${mk === 'fav' ? '!' : mk}</b>` : ''}`, action: () => this.talkTo(n) });
+          list.push({ d: d + (relevant ? -1 : 1.8), label: `${t('p.talk', { name: n.def.name })}${red ? ' <b style="color:#ff3b30">!</b>' : mk ? ` <b style="color:${mk === '!' ? '#ffd21f' : mk === 'fav' ? '#6fdc6a' : '#7fe0ff'}">${mk === 'fav' ? '!' : mk}</b>` : ''}`, action: () => this.talkTo(n) });
         }
       }
       // the Trigel (hedgehog) looking for crumbs in the Aufenthaltszelt
@@ -1476,6 +1479,7 @@ export class Game {
       if (this.minigame.open) inp.pressed.clear();
       if (inp.hit('KeyM')) { this._mapKeyReady = false; this.openMap(); }
       if (inp.hit('KeyJ')) this.openQuestLog();
+      if (inp.hit('KeyV')) this.openVolunteers();
       if (inp.hit('KeyN')) this.ui.toast(this.toggleMute() ? t('t.mute') : t('t.unmute'));
       if (inp.hit('KeyF') && !this.player.vehicle) this.player.wave();
       if (inp.hit('KeyT')) {

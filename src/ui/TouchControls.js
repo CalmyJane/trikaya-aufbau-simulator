@@ -30,6 +30,7 @@ export class TouchControls {
       <div id="t-top">
         <button class="t-top" data-code="KeyM">🗺️</button>
         <button class="t-top" data-code="KeyJ">📋</button>
+        <button class="t-top" data-code="KeyV">👥</button>
         <button class="t-top" data-code="Escape">☰</button>
       </div>`;
     document.body.appendChild(el);

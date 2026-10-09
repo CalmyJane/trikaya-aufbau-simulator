@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { mat, box, cyl, strut, signPost, textPlane, dixi } from './Props.js';
+import { mat, box, cyl, strut, signPost, textPlane, dixi, bwFabric } from './Props.js';
 import { woodMat } from './Mainstage.js';
 
 // More buildables: awareness tent, Forest Dome stage, Harry's mapping sculpture, WC container.
@@ -773,13 +773,13 @@ export function buildNarniaFloor() {
     const mx = (x0 + x1) / 2, mz = (z0 + z1) / 2;
     if (mx > RX * 0.55) continue; // open side towards the dance floor (+x)
     const len = Math.hypot(x1 - x0, z1 - z0);
-    const panel = box(len + 0.03, TH, 0.06, mat(i % 2 ? '#b8283a' : '#f0d27a'), mx, TH / 2, mz);
+    const panel = box(len + 0.03, TH, 0.06, bwFabric(i % 2 ? 'dark' : 'light'), mx, TH / 2, mz);
     panel.rotation.y = -Math.atan2(z1 - z0, x1 - x0);
     tent.add(panel);
     col({ type: 'circle', x: -11 + mx, z: -0.5 + mz, r: 0.4 }, 3);
   }
   // roof: two cones on the two poles, joined over the middle
-  const roofM = mat('#b8283a', { side: THREE.DoubleSide });
+  const roofM = bwFabric('roof'); // black & white with patterns
   for (const pz of [-P2, P2]) {
     const cone = new THREE.Mesh(new THREE.ConeGeometry(RX + 0.35, 2.2, 18, 1, true), roofM);
     cone.scale.z = 1.15;
@@ -1101,7 +1101,8 @@ export function buildEntranceTent() {
 }
 
 // ------------------------------------------------------------------ shops: a little market street
-const STALLS = [[-6.5, -2.5, 0.5], [-1.5, 4.5, -0.3], [4, -5, 0.9], [6.5, 2.5, -1.3], [0, -1, Math.PI + 0.2]];
+// a tidy market street along x: three stalls on the north side facing south, two (+ Juliie's) opposite
+const STALLS = [[-4.6, -3.6, 0], [0, -3.6, 0], [4.6, -3.6, 0], [0, 3.6, Math.PI], [4.6, 3.6, Math.PI]];
 export function buildMarket() {
   const g = new THREE.Group();
   const colliders = [];
@@ -1109,7 +1110,7 @@ export function buildMarket() {
   const goods = [['#e84a8a', '#f1c40f', '#3ad1ff'], ['#7fb040', '#c0602a'], ['#f4f1ea', '#b8283a', '#d6a21e'], ['#2a2a2a', '#9a6a3a'], ['#ff7a1a', '#35ff6a', '#b07aff']];
   const wood = woodMat('#8a6a42');
   roofs.forEach((rc, i) => {
-    const [x, z, rot] = STALLS[i]; // scattered, not in a row
+    const [x, z, rot] = STALLS[i];
     const st = new THREE.Group();
     for (const dx of [-1.4, 1.4]) for (const dz of [-0.9, 0.9]) st.add(cyl(0.05, 0.05, 2.4, wood, 5, dx, 1.2, dz));
     const roof = box(3.2, 0.05, 2.2, mat(rc), 0, 2.45, 0);
@@ -1128,17 +1129,18 @@ export function buildMarket() {
   for (let i = 0; i < 24; i++) {
     const t = i / 23;
     const b = new THREE.Mesh(new THREE.SphereGeometry(0.06, 5, 4), new THREE.MeshBasicMaterial({ color: ['#ffd24a', '#ff6ab4', '#5ad1ff'][i % 3] }));
-    const k = Math.min(3, Math.floor(t * 4)), f = t * 4 - k, a = STALLS[[0, 4, 2, 3][k]], b2 = STALLS[[4, 2, 3, 1][k]];
-    b.position.set(a[0] + (b2[0] - a[0]) * f, 2.9 - Math.sin(f * Math.PI) * 0.3, a[1] + (b2[1] - a[1]) * f);
+    // two sagging spans down the middle of the street
+    const f = (t * 2) % 1;
+    b.position.set(-7 + t * 14, 2.9 - Math.sin(f * Math.PI) * 0.35, 0);
     g.add(b);
   }
   const sign = signPost('SHOPS', { width: 2.0, height: 0.8, bg: '#2a1a3a', fg: '#ffd24a' });
-  sign.position.set(2, 0, 8);
+  sign.position.set(-8.2, 0, 1.6); // at the start of the street
   g.add(sign);
   // Juliie's art stall: her own shirts on a line, a sticker wall, a sketchbook on the counter
   const J = new THREE.Group();
-  J.position.set(-5, 0, 5.5);
-  J.rotation.y = 0.6;
+  J.position.set(-4.6, 0, 3.6); // in the south row, facing the street
+  J.rotation.y = Math.PI;
   g.add(J);
   const jw = woodMat('#9a6a3a');
   for (const dx of [-1.5, 1.5]) for (const dz of [-0.8, 0.8]) J.add(cyl(0.05, 0.05, 2.5, jw, 5, dx, 1.25, dz));

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { mat, box, cyl, strut, signPost, beerBench } from './Props.js';
+import { mat, box, cyl, strut, signPost, beerBench, bwFabric } from './Props.js';
 
 // ------------------------------------------------------------------ Künstlergasse
 /**
@@ -52,7 +52,7 @@ export function buildKuenstlergasse() {
     g.add(flag);
   }
 
-  // ---- royal tent (west): oval, red & gold, open towards the stretch tent (+x)
+  // ---- royal tent (west): oval, black & white with patterns, open towards the stretch tent (+x)
   const tent = new THREE.Group();
   const RX = 2.4, RZ = 3.4, TH = 2.1, P2 = 1.2;
   const TX = -5.2;
@@ -65,14 +65,14 @@ export function buildKuenstlergasse() {
     const mx = (x0 + x1) / 2, mz = (z0 + z1) / 2;
     if (mx > RX * 0.55) continue; // entrance towards the stretch tent
     const len = Math.hypot(x1 - x0, z1 - z0);
-    const panel = box(len + 0.03, TH, 0.06, mat(i % 2 ? '#a8233a' : '#e8c46a'), mx, TH / 2, mz);
+    const panel = box(len + 0.03, TH, 0.06, bwFabric(i % 2 ? 'dark' : 'light'), mx, TH / 2, mz);
     const rot = -Math.atan2(z1 - z0, x1 - x0);
     panel.rotation.y = rot;
     tent.add(panel);
     wallSegs.push({ mx, mz, rot, len });
     colliders.push({ type: 'circle', x: TX + mx, z: mz, r: 0.35 });
   }
-  const roofM = mat('#a8233a', { side: THREE.DoubleSide });
+  const roofM = bwFabric('roof');
   for (const pz of [-P2, P2]) {
     const cone = new THREE.Mesh(new THREE.ConeGeometry(RX + 0.3, 2.0, 18, 1, true), roofM);
     cone.scale.z = 1.15;
@@ -85,7 +85,7 @@ export function buildKuenstlergasse() {
   ridge.scale.set(1, 1, 0.55);
   ridge.position.y = TH + 0.02;
   tent.add(ridge);
-  const gold = mat('#e0b030', { metalness: 0.5, roughness: 0.35 });
+  const gold = mat('#efeae0', { metalness: 0.3, roughness: 0.4 }); // white finials
   for (const pz of [-P2, P2]) {
     tent.add(cyl(0.07, 0.08, TH + 2.8, mat('#6b4a2a'), 6, 0, (TH + 2.8) / 2, pz));
     tent.add(new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 6), gold).translateY(TH + 2.9).translateZ(pz));

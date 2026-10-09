@@ -2,6 +2,47 @@ import * as THREE from 'three';
 
 // Small procedural props + helpers shared by the world and structure builders.
 
+const bwCache = {};
+/**
+ * Black & white patterned tent fabric (royal tents): 'dark' = black with white ornaments,
+ * 'light' = cream with black ornaments, 'roof' = black with white rays and zigzag borders.
+ */
+export function bwFabric(kind = 'dark') {
+  if (bwCache[kind]) return bwCache[kind];
+  const W = 128, H = 256;
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const x = c.getContext('2d');
+  const light = kind === 'light';
+  const bg = light ? '#efeae0' : '#141414', fg = light ? '#141414' : '#efeae0';
+  x.fillStyle = bg; x.fillRect(0, 0, W, H);
+  x.strokeStyle = fg; x.fillStyle = fg; x.lineWidth = 4; x.lineJoin = 'round';
+  const zigzag = (y0, amp) => { x.beginPath(); for (let i = 0; i <= 8; i++) x.lineTo(i * 16, y0 + (i % 2 ? -amp : amp)); x.stroke(); };
+  if (kind === 'roof') {
+    // rays running up to the pole, zigzag at the rim, dots between
+    for (let i = 0; i < 4; i++) { x.fillRect(i * 32 + 13, 0, 6, H); }
+    zigzag(H - 18, 9); zigzag(H - 40, 6);
+    for (let i = 0; i < 4; i++) for (let k = 0; k < 5; k++) { x.beginPath(); x.arc(i * 32 + 29, 30 + k * 38, 3.5, 0, 7); x.fill(); }
+  } else {
+    zigzag(16, 9); zigzag(H - 16, 9);
+    x.fillRect(0, 34, W, 3); x.fillRect(0, H - 37, W, 3);
+    // a column of diamonds with eyes, little dots at the sides
+    for (let k = 0; k < 4; k++) {
+      const cy = 64 + k * 44;
+      x.beginPath(); x.moveTo(64, cy - 19); x.lineTo(90, cy); x.lineTo(64, cy + 19); x.lineTo(38, cy); x.closePath(); x.stroke();
+      x.beginPath(); x.arc(64, cy, 6, 0, 7); x.fill();
+      for (const sx of [14, 114]) { x.beginPath(); x.arc(sx, cy, 4, 0, 7); x.fill(); }
+      for (const sx of [14, 114]) { x.beginPath(); x.moveTo(sx, cy + 10); x.lineTo(sx, cy + 30); x.stroke(); }
+    }
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  if (kind === 'roof') tex.repeat.set(6, 1);
+  bwCache[kind] = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.9, side: kind === 'roof' ? THREE.DoubleSide : THREE.FrontSide });
+  return bwCache[kind];
+}
+
 const matCache = new Map();
 /** Cached flat-shaded standard material by colour. */
 export function mat(color, opts = {}) {

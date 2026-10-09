@@ -696,8 +696,28 @@ export class Character {
     } else if (this.standY != null) this.model.position.y = this.standY;
   }
 
+  /** A short nod (layered over whatever animation runs). */
+  nod() { this.nodT = 0.7; }
+
+  /** Tilt the head forward/back by `ang` after the mixer ran (restores itself if the clip doesn't key the head). */
+  headTilt(ang) {
+    const h = this.bones.Head;
+    if (!h) return;
+    const st = (this._headOv ||= { set: new THREE.Quaternion(), base: new THREE.Quaternion(), on: false });
+    if (st.on && h.quaternion.equals(st.set)) h.quaternion.copy(st.base);
+    else st.base.copy(h.quaternion);
+    st.on = ang !== 0;
+    if (!st.on) return;
+    h.rotateX(ang);
+    st.set.copy(h.quaternion);
+  }
+
   update(dt) {
     this.mixer.update(dt);
+    if (this.nodT > 0 || this._headOv?.on) {
+      this.nodT = Math.max(0, (this.nodT || 0) - dt);
+      this.headTilt(this.nodT > 0 ? Math.sin((1 - this.nodT / 0.7) * Math.PI * 2) * 0.28 : 0);
+    }
     if (!this.ride && this._torsoSet) { // got off: straighten up again
       const torso = this.bones.Torso;
       if (torso?.quaternion.equals(this._torsoSet)) torso.quaternion.copy(this._torsoBase);

@@ -37,6 +37,15 @@ function markerTexture(ch, color) {
 }
 const MARKERS = {};
 const pick = (a) => a[Math.floor(Math.random() * a.length)];
+
+// quick greetings when you walk past someone (NPC.greetReact)
+const G = (de, en) => ({ de, en });
+const GREET_HI = [G('Hey!', 'Hey!'), G('Na du?', 'Hey you!'), G('Moin!', 'Morning!'), G('Servus!', 'Hiya!'), G('Hi hi!', 'Hi hi!'), G('Yo!', 'Yo!'),
+  G('Na, alles fit?', 'All good?'), G('Grüß dich!', 'Hello there!'), G('Ah, du! Hi!', 'Oh, you! Hi!'), G('Hallöchen!', 'Hellooo!'), G('Heyho!', 'Heyho!'), G('Na, fleißig?', 'Busy busy?')];
+const GREET_PASSING = [G('Hey! Muss weiter!', 'Hey! Gotta go!'), G('Hi! Kann grad nicht, später!', 'Hi! Can\'t right now, later!'), G('Bin gleich wieder da!', 'Back in a sec!'),
+  G('Hey, sorry, eilig!', 'Hey, sorry, in a hurry!'), G('Hi! Muss da rüber!', 'Hi! Need to get over there!'), G('Na? Bis gleich!', 'Hey! See you!')];
+const GREET_BUSY = [G('Moment, bin grad dran!', 'One sec, I\'m on it!'), G('Keine Hand frei, sorry!', 'No hands free, sorry!'), G('Mmh. Hi.', 'Mmh. Hi.'),
+  G('Gleich, gleich!', 'In a minute!'), G('Nicht jetzt, sonst verzähl ich mich!', 'Not now, I\'ll lose count!'), G('Hi! *hämmert weiter*', 'Hi! *keeps hammering*')];
 const SOAP = {}; // shared soap bubble geometry & materials
 // care lines are written for Franzi – use whoever actually helps (e.g. Delsin)
 const helperLine = (line, helper) => {
@@ -632,19 +641,63 @@ export class NPC {
     else if (r < 0.115) this.startEmote('roll', 1.4);
   }
 
-  greetCheck(dt, player) {
-    if (this.toPlayer < 5 && !this.greeted && this.canAttend()) {
+  /**
+   * Someone walks up (within 5 m): each encounter gets its own reaction – a wave, a nod, a quick "hey!",
+   * a big happy wave, or nothing at all because they're busy, on their way somewhere or just in their own
+   * world. `friendly` (per person) tilts the odds. ctx: { busy, going } from the behaviour.
+   * Returns true while the reaction holds the NPC in place.
+   */
+  greetCheck(dt, player, ctx = {}) {
+    if (this.toPlayer < 5 && !this.greeted) {
       this.greeted = true;
-      this.waveT = 1.8;
-      this.char.play('wave', 0.2, { once: true });
+      this.greetReact(ctx);
     }
-    if (this.toPlayer > 14) this.greeted = false;
+    if (this.toPlayer > 14) { this.greeted = false; this.snub = false; }
     if (this.waveT > 0) {
       this.waveT -= dt;
       this.char.faceTowards(player.position, dt);
+      if (this.waveIdle) this.char.play('idle', 0.2);
       return true;
     }
     return false;
+  }
+
+  greetReact({ busy = false, going = false } = {}) {
+    const f = this.friendly ??= 0.35 + Math.random() * 0.65;
+    const r = Math.random();
+    const talkFree = !this.bubble;
+    const stop = (secs, anim) => {
+      if (!this.canAttend()) return false;
+      this.waveT = secs;
+      this.waveIdle = anim !== 'wave';
+      if (anim === 'wave') this.char.play('wave', 0.2, { once: true });
+      else this.char.nod?.();
+      return true;
+    };
+    this.snub = false;
+    if (busy) {
+      // hands full: mostly they keep working, sometimes a quick word or a short nod
+      if (r < 0.45) { this.snub = true; return; }
+      if (r < 0.75 && talkFree) { this.say(pick(GREET_BUSY), 2.2); this.snub = true; return; }
+      if (!stop(0.9, 'nod')) this.snub = true;
+      return;
+    }
+    if (going) {
+      // on the way somewhere: a "hey!" in passing, a nod – or they just walk on
+      if (r < 0.35 * (1.3 - f)) { this.snub = true; return; }
+      if (r < 0.7 && talkFree) { this.say(pick(Math.random() < 0.5 ? GREET_PASSING : GREET_HI), 2); this.snub = true; return; }
+      if (r < 0.85) { this.snub = true; this.char.nod?.(); return; } // nod while walking on
+      if (!stop(1.6, 'wave')) this.snub = true;
+      return;
+    }
+    // standing around: the full range
+    const ignore = 0.25 * (1.3 - f);
+    if (r < ignore) { this.snub = true; return; }
+    if (r < ignore + 0.3 * f) { if (!stop(1.8, 'wave')) this.snub = true; else if (talkFree && Math.random() < 0.4) this.say(pick(GREET_HI), 2); return; }
+    if (r < ignore + 0.3 * f + 0.2) { if (!stop(1.0, 'nod')) this.snub = true; return; }
+    if (r < 0.93 && talkFree) { this.say(pick(GREET_HI), 2.2); stop(1.2, 'nod'); return; }
+    if (this.toPlayer > 2.5) { this.startEmote('bigwave', 2); this.snub = true; return; } // very happy to see you
+    if (!stop(1.8, 'wave')) this.snub = true;
   }
 
   inTalkRange(player) {
@@ -673,15 +726,15 @@ export class NPC {
 const BEHAVIORS = {
   stationary(n, t, dt, { player }) {
     if (n.greetCheck(dt, player)) return;
-    if (n.toPlayer < 8) n.char.faceTowards(player.position, dt, 4);
+    if (n.toPlayer < 8 && !n.snub) n.char.faceTowards(player.position, dt, 4);
     n.char.play('idle');
   },
 
   wander(n, t, dt, { player, game }) {
     if (n.visit && n.runVisit(dt, player)) return;
     if (n.emote) { if (n.toPlayer < 2.2) { n.emote = null; n.emoteY = 0; } else if (n.runEmote(dt)) return; }
-    if (n.greetCheck(dt, player)) return;
-    if (n.toPlayer < 3.5 && n.canAttend()) { n.char.faceTowards(player.position, dt); n.char.play('idle'); return; }
+    if (n.greetCheck(dt, player, { busy: n.wait > 0 && n.workAnim, going: !!n.target && !(n.wait > 0) })) return;
+    if (n.toPlayer < 3.5 && !n.snub && n.canAttend()) { n.char.faceTowards(player.position, dt); n.char.play('idle'); return; }
     if (n.wait > 0) { n.wait -= dt; n.char.play(n.workAnim ? 'interact' : 'idle'); return; }
     // don't settle right next to the player unless you're one of the two who stopped
     if (n.target && n.toPlayer < 6 && Math.hypot(n.target.x - player.position.x, n.target.z - player.position.z) < 3.5) n.target = null;
@@ -700,8 +753,8 @@ const BEHAVIORS = {
   worker(n, t, dt, ctx) { BEHAVIORS.route(n, dt, ctx, false, true); },
 
   route(n, dt, { player }, running, working) {
-    if (!running && n.greetCheck(dt, player)) return;
-    if (!running && n.toPlayer < 3.5 && n.canAttend()) { n.char.faceTowards(player.position, dt); n.char.play('idle'); return; }
+    if (!running && n.greetCheck(dt, player, { busy: working && n.wait > 0, going: !!n.target && !(n.wait > 0) })) return;
+    if (!running && n.toPlayer < 3.5 && !n.snub && n.canAttend()) { n.char.faceTowards(player.position, dt); n.char.play('idle'); return; }
     if (n.wait > 0) { n.wait -= dt; n.char.play(working ? 'interact' : 'idle'); return; }
     if (!n.target) {
       n.routeIdx = (n.routeIdx + 1) % n.def.route.length;
@@ -884,8 +937,8 @@ const BEHAVIORS = {
 
   // Schwarzhuber: strolls across his meadow, stops at Zdenko & Thompsen's bench for a while
   farmer(n, t, dt, { player }) {
-    if (n.greetCheck(dt, player)) return;
-    if (n.toPlayer < 3.5) { n.char.faceTowards(player.position, dt); n.char.play('idle'); return; }
+    if (n.greetCheck(dt, player, { going: !!n.target && !(n.wait > 0) })) return;
+    if (n.toPlayer < 3.5 && !n.snub) { n.char.faceTowards(player.position, dt); n.char.play('idle'); return; }
     if (n.wait > 0) {
       n.wait -= dt;
       if (n.atBench) {
@@ -909,8 +962,8 @@ const BEHAVIORS = {
 
   // Narnia crew: busy on their plot, hammering most of the time
   builder(n, t, dt, { player }) {
-    if (n.greetCheck(dt, player)) return;
-    if (n.toPlayer < 3) { n.char.faceTowards(player.position, dt); n.char.play('idle'); return; }
+    if (n.greetCheck(dt, player, { busy: n.wait > 0 })) return;
+    if (n.toPlayer < 3 && !n.snub) { n.char.faceTowards(player.position, dt); n.char.play('idle'); return; }
     if (n.wait > 0) {
       n.wait -= dt;
       if (n.lookAt) n.char.faceTowards(n.lookAt, dt, 4);

@@ -560,6 +560,36 @@ export const NPCS = [
     ],
   },
   {
+    id: 'lara', name: 'Lara', role: { de: 'DJ Kaliiraa: Nightpsy', en: 'DJ Kaliiraa: night psy' }, portrait: '😁',
+    look: { base: 'f_casual', skin: SKIN.fair, hair: '#ecd38a', brows: '#c8a85a', bangs: true, grin: true, shirt: '#2a1446', pants: '#1e1e2a', patchwork: true, shirtPatch: ['#2a1446', '#ff2bd6', '#2ad1ff'], height: 1.68 },
+    behavior: 'wander', home: 'plot_forest_dome', offset: [6, -9], radius: 9,
+    lines: [
+      { de: 'Hiii! *grinst* Ich bin Lara. Also, nachts bin ich Kaliiraa. Nightpsy. Dunkel, schnell, wunderschön.', en: 'Hiii! *grins* I\'m Lara. Well, at night I\'m Kaliiraa. Night psy. Dark, fast, beautiful.' },
+      { de: 'Mein Set fängt um drei an. Da wird\'s düster. Und ich grins trotzdem. Kann nicht anders.', en: 'My set starts at three. It gets dark. And I\'m still grinning. Can\'t help it.' },
+      { de: '150 BPM sind für mich Entspannung. Darunter schlaf ich ein.', en: '150 BPM is relaxing for me. Below that I fall asleep.' },
+      { de: '*grinst breit* Was? Nix. Ich freu mich einfach. Auf alles.', en: '*grins widely* What? Nothing. I\'m just happy. About everything.' },
+      { de: 'Harry hat mir versprochen, dass die Visuals bei meinem Set extra verstörend werden. Ich kann\'s kaum erwarten!', en: 'Harry promised me the visuals will be extra disturbing during my set. I can\'t wait!' },
+      { de: 'Nightpsy ist wie ein Wald bei Nacht. Gruselig, aber du willst nicht raus.', en: 'Night psy is like a forest at night. Creepy, but you don\'t want to leave.' },
+      { de: 'Leute fragen mich, warum ich beim Auflegen immer grinse. Weil der Bass grinst!', en: 'People ask me why I always grin when I play. Because the bass grins!' },
+      { de: 'Kaliiraa mit zwei i und zwei a. Nicht vergessen. Steht nirgends richtig auf dem Timetable.', en: 'Kaliiraa with two i\'s and two a\'s. Don\'t forget. It\'s spelled wrong on every timetable.' },
+    ],
+  },
+  {
+    id: 'juliie', name: 'Juliie', role: { de: 'Künstlerin: Shirts & Sticker', en: 'Artist: shirts & stickers' }, portrait: '🎨',
+    look: { base: 'f_casual', skin: SKIN.light, hair: '#5a3a1e', brows: '#4a2e16', hairCut: [0.92, 0.45, 0.92], hairStyle: 'dreads', hairStyleColor: '#6a4626', dreadLength: 0.58, beads: true, grin: true, extras: ['pendant'], shirt: '#e07a2a', pants: '#5a2a6a', patchwork: true, shirtPatch: ['#e07a2a', '#7a2aa8', '#2ad1a0'], pantsPatch: ['#5a2a6a', '#ff2bd6', '#2a6a8a'], width: 0.86, height: 1.7 },
+    behavior: 'wander', home: 'plot_shops', offset: [-3, 4], radius: 6,
+    homeAfter: { quest: 'm1_shops', spot: 'juliie_stall', radius: 0.4 }, // her stall in the market alley
+    lines: [
+      { de: '*grinst* Hallo, schönes Wesen! Magst du einen Sticker? Der ist mit Liebe gezeichnet. Und mit Edding.', en: '*grins* Hello, beautiful being! Want a sticker? It\'s drawn with love. And a Sharpie.' },
+      { de: 'Jedes Shirt hier hab ich selbst gezeichnet. Das mit dem dritten Auge war ein Traum. Also wirklich, ich hab\'s geträumt.', en: 'I drew every shirt here myself. The one with the third eye was a dream. Literally, I dreamed it.' },
+      { de: 'Ich zeichne gerade die Energie vom Festival. Sie sieht aus wie ein Pilz. Ein freundlicher Pilz.', en: 'I\'m drawing the festival\'s energy right now. It looks like a mushroom. A friendly mushroom.' },
+      { de: 'Stell dich mal kurz hin. Nicht bewegen. Ich zeichne deine Aura. …Oh. Viel Orange. Arbeitest du zu viel?', en: 'Stand still for a sec. Don\'t move. I\'m drawing your aura. …Oh. Lots of orange. Are you working too much?' },
+      { de: 'Sticker gegen Karma, Shirts gegen Euro. Umarmungen gratis.', en: 'Stickers for karma, shirts for euros. Hugs are free.' },
+      { de: 'Die Sonne, der Mond, die Dixis, alles ist verbunden. *grinst noch breiter*', en: 'The sun, the moon, the portaloos, everything is connected. *grins even wider*' },
+      { de: 'Mein Stand ist mein Tempel. Mit Klebeband zusammengehalten, aber ein Tempel.', en: 'My stall is my temple. Held together with tape, but a temple.' },
+    ],
+  },
+  {
     id: 'krygo', name: 'Krygo', role: { de: 'Baut eine Sauna. Seit Jahren.', en: 'Building a sauna. For years.' }, portrait: '🧖',
     look: { base: 'm_casual', skin: SKIN.light, hair: '#3a2a1a', brows: '#3a2a1a', hairCut: [0.9, 0.45, 0.9], beard: 'full', beardColor: '#4a3220', shirt: '#c0602a', pants: '#4a5a3a', patchwork: true, shirtPatch: ['#c0602a', '#e0e0d0', '#8a3a3a'], height: 1.85, width: 1.12 },
     behavior: 'stationary', home: 'sauna_site', offset: [-1.5, 3],

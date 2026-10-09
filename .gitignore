@@ -21,3 +21,6 @@ promo/*.mp4
 
 # local Claude Code settings
 .claude/settings.local.json
+
+# rendered promo frames (hundreds of MB, backed up via ProtonDrive)
+promo/tools/shots*_land/

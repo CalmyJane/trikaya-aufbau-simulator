@@ -208,6 +208,8 @@ export class Character {
     if ((look.sunglasses || look.glasses) && this.bones.Head) this.addSunglasses(look);
     if (look.vikingHat && this.bones.Head) this.addVikingHat(look);
     if (look.tattoos) this.addTattoos(look);
+    if (look.grin && this.bones.Head) this.addGrin(look);
+    if (!look.hairStyle && look.bangs && this.bones.Head) look = { ...look, hairStyle: 'model' }; // just the fringe
     if (!look.hairStyle || !this.bones.Head) return;
     this.root.updateMatrixWorld(true);
     const { len } = this.headInfo();
@@ -347,6 +349,13 @@ export class Character {
       cap.position.set(0, len * 0.5, -r * 0.05);
       g.add(cap);
     }
+    if (look.bangs) { // a fringe across the forehead, ending just above the eyes
+      const fr = new THREE.Mesh(new THREE.BoxGeometry(r * 1.6, r * 0.34, r * 0.3), hm);
+      fr.position.set(0, len * 0.6, r * 0.88);
+      fr.rotation.x = 0.25;
+      fr.castShadow = true;
+      g.add(fr);
+    }
     if (look.headband) {
       const hb = new THREE.Mesh(new THREE.TorusGeometry(r * 1.02, 0.012, 4, 16), new THREE.MeshStandardMaterial({ color: look.headband }));
       hb.rotation.x = Math.PI / 2;
@@ -407,6 +416,31 @@ export class Character {
   }
 
   /** Dark sunglasses: two lenses and a bridge in front of the eyes. */
+  /** A big, permanent grin: teeth in a wide smile, rosy cheeks. */
+  addGrin(look) {
+    this.root.updateMatrixWorld(true);
+    const { len } = this.headInfo();
+    const r = len * 0.42;
+    const g = new THREE.Group();
+    const y = len * (look.grinY ?? 0.2), z = r * (look.grinZ ?? 1.12);
+    const teeth = new THREE.Mesh(new THREE.CircleGeometry(r * 0.42, 14, Math.PI, Math.PI), new THREE.MeshStandardMaterial({ color: '#fbf6ee', roughness: 0.5, side: THREE.DoubleSide }));
+    teeth.position.set(0, y + r * 0.06, z);
+    teeth.scale.y = 0.6;
+    g.add(teeth);
+    const lip = new THREE.Mesh(new THREE.TorusGeometry(r * 0.42, r * 0.05, 4, 16, Math.PI), new THREE.MeshStandardMaterial({ color: '#b04a4a', roughness: 0.7 }));
+    lip.rotation.z = Math.PI; // lower half = smile
+    lip.scale.y = 0.6;
+    lip.position.set(0, y + r * 0.06, z + r * 0.01);
+    g.add(lip);
+    for (const s of [-1, 1]) {
+      const cheek = new THREE.Mesh(new THREE.SphereGeometry(r * 0.17, 8, 6), new THREE.MeshStandardMaterial({ color: '#f0a0a0', roughness: 0.9 }));
+      cheek.scale.set(1, 0.7, 0.35);
+      cheek.position.set(s * r * 0.55, y + r * 0.32, z - r * 0.12);
+      g.add(cheek);
+    }
+    this.attachToBone('Head', g);
+  }
+
   addSunglasses(look) {
     this.root.updateMatrixWorld(true);
     const { len } = this.headInfo();

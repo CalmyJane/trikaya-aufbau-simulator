@@ -566,9 +566,6 @@ export function buildFirespace() {
   for (const dx of [-0.35, 0.35]) g.add(cyl(0.22, 0.18, 0.4, steel, 10, RACK.x + 2.2 + dx, 0.2, RACK.z + 1.2));
   g.add(cyl(0.1, 0.1, 0.55, mat('#c0392b'), 8, RACK.x + 3.0, 0.28, RACK.z + 0.5));
   g.add(box(0.5, 0.08, 0.4, mat('#2f6fb3'), RACK.x + 1.4, 0.04, RACK.z + 1.6));
-  const safety = signPost('Feuerinsel', { width: 2.2, height: 0.8, bg: '#1a1a1a', fg: '#ff9a2a' });
-  safety.position.set(RACK.x + 1.8, 0, RACK.z - 0.9);
-  g.add(safety);
   spots.fire_rack = [RACK.x + 1.2, RACK.z + 2.2];
 
   // ---- the wooden Shiva (like the real one): a giant built from raw boards, sitting cross-legged on a
@@ -601,7 +598,7 @@ export function buildFirespace() {
   fixParts[0] = [sfix];
   spots.fire_fix_1 = [1.6, -4.3];
 
-  const sign = signPost('FIRESPACE', { width: 3.0, height: 1.0, bg: '#3a1a0a', fg: '#ffb060' });
+  const sign = signPost('FIRESPACE · FEUERINSEL', { width: 3.6, height: 1.0, bg: '#3a1a0a', fg: '#ffb060' });
   sign.position.set(-5, 0, 6.8);
   g.add(sign);
 
@@ -865,20 +862,19 @@ export function buildHammockForest() {
   const g = new THREE.Group();
   const colliders = [];
   const wood = woodMat('#7a5534');
-  const rows = [-3.2, 3.2], xs = [-7.5, -2.5, 2.5, 7.5];
-  const posts = [];
-  for (const z of rows) for (const x of xs) {
-    const jitter = (Math.sin(x * 3.1 + z) * 0.4);
-    const px = x + jitter, pz = z + Math.cos(x + z) * 0.3;
-    g.add(cyl(0.12, 0.15, 2.6, wood, 7, px, 1.3, pz));
+  // posts scattered like tree trunks (not a grid)
+  const POSTS = [[-8, -2], [-5.5, -5.6], [-4.4, 0.6], [-1.4, -3.6], [-1.2, 3.2], [2.1, -6.2], [2.6, 0.2], [4.6, 4.1], [5.6, -3.2], [8.2, 1.2], [-6.6, 4.6], [1.2, 6.8]];
+  const posts = POSTS.map(([px, pz], i) => {
+    const h = 2.4 + (i % 3) * 0.15;
+    g.add(cyl(0.11 + (i % 2) * 0.03, 0.16, h, wood, 7, px, h / 2, pz));
     colliders.push({ type: 'circle', x: px, z: pz, r: 0.25 });
-    posts.push(new THREE.Vector3(px, 0, pz));
-  }
+    return new THREE.Vector3(px, 0, pz);
+  });
   const cols = ['#e84a8a', '#2a8a7a', '#f1c40f', '#6a3d9a', '#e67e22', '#1a8aa8', '#c0392b', '#7fb040'];
   const rope = new THREE.LineBasicMaterial({ color: '#d8ccb0' });
   const hammock = (a, b, i) => {
     const len = a.distanceTo(b), ang = Math.atan2(b.z - a.z, b.x - a.x);
-    const nu = 16, nv = 6, W = 0.9, sag = 0.75, top = 1.55, inset = 0.45;
+    const nu = 16, nv = 6, W = 0.9, sag = 0.65 + (i % 3) * 0.08, top = 1.45 + (i % 4) * 0.07, inset = 0.45;
     const pos = [], idx = [];
     for (let iu = 0; iu <= nu; iu++) {
       const u = iu / nu;
@@ -910,11 +906,31 @@ export function buildHammockForest() {
     g.add(holder);
     return holder;
   };
+  // hang hammocks between neighbouring posts – shortest first, never crossing another one or
+  // brushing past a third post, at most three per post
+  const cross = (a, b, c, d) => {
+    const o = (p, q, r) => Math.sign((q.x - p.x) * (r.z - p.z) - (q.z - p.z) * (r.x - p.x));
+    return o(a, b, c) * o(a, b, d) < 0 && o(c, d, a) * o(c, d, b) < 0;
+  };
+  const distToSeg = (p, a, b) => {
+    const dx = b.x - a.x, dz = b.z - a.z, t = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.z - a.z) * dz) / (dx * dx + dz * dz)));
+    return Math.hypot(p.x - a.x - t * dx, p.z - a.z - t * dz);
+  };
+  const pairs = [];
+  for (let i = 0; i < posts.length; i++) for (let j = i + 1; j < posts.length; j++) {
+    const d = posts[i].distanceTo(posts[j]);
+    if (d >= 3.5 && d <= 5.2) pairs.push([d, i, j]);
+  }
+  pairs.sort((a, b) => a[0] - b[0]);
+  const used = [], deg = posts.map(() => 0);
+  for (const [, i, j] of pairs) {
+    if (deg[i] >= 3 || deg[j] >= 3) continue;
+    if (used.some(([a, b]) => a !== i && a !== j && b !== i && b !== j && cross(posts[i], posts[j], posts[a], posts[b]))) continue;
+    if (posts.some((p, k) => k !== i && k !== j && distToSeg(p, posts[i], posts[j]) < 1.0)) continue;
+    used.push([i, j]); deg[i]++; deg[j]++;
+  }
   let n = 0;
-  const swing = [];
-  for (let r = 0; r < 2; r++) for (let c = 0; c < 3; c++) swing.push(hammock(posts[r * 4 + c], posts[r * 4 + c + 1], n++));
-  swing.push(hammock(posts[1], posts[6], n++)); // two across the rows
-  swing.push(hammock(posts[2], posts[5], n++));
+  const swing = used.map(([i, j]) => hammock(posts[i], posts[j], n++));
   const sign = signPost('HÄNGEMATTENWALD', { width: 3.0, height: 0.9, bg: '#2a3a1a', fg: '#f0e0a0' });
   sign.position.set(-5, 0, 6.5);
   g.add(sign);
@@ -1117,8 +1133,63 @@ export function buildMarket() {
     g.add(b);
   }
   const sign = signPost('SHOPS', { width: 2.0, height: 0.8, bg: '#2a1a3a', fg: '#ffd24a' });
-  sign.position.set(-4, 0, 7.5);
+  sign.position.set(2, 0, 8);
   g.add(sign);
+  // Juliie's art stall: her own shirts on a line, a sticker wall, a sketchbook on the counter
+  const J = new THREE.Group();
+  J.position.set(-5, 0, 5.5);
+  J.rotation.y = 0.6;
+  g.add(J);
+  const jw = woodMat('#9a6a3a');
+  for (const dx of [-1.5, 1.5]) for (const dz of [-0.8, 0.8]) J.add(cyl(0.05, 0.05, 2.5, jw, 5, dx, 1.25, dz));
+  const jRoof = box(3.4, 0.05, 2.0, mat('#7a2aa8'), 0, 2.5, 0);
+  jRoof.rotation.x = 0.1;
+  J.add(jRoof);
+  for (let k = 0; k < 6; k++) J.add(box(0.5, 0.3, 0.04, mat(['#e07a2a', '#2ad1a0', '#ff2bd6'][k % 3]), -1.4 + k * 0.56, 2.32, 1.02)); // valance
+  J.add(box(3.0, 0.06, 0.7, mat('#c9a27a'), 0, 0.9, 0.55));   // counter
+  J.add(box(3.0, 0.85, 0.05, jw, 0, 0.45, 0.9));
+  // shirts on a line at the back
+  const shirtCols = ['#ff7a2a', '#7a2aa8', '#1a1a1a', '#2ad1a0', '#ff2bd6'];
+  J.add(strut(new THREE.Vector3(-1.5, 2.1, -0.75), new THREE.Vector3(1.5, 2.1, -0.75), 0.01, mat('#ddd'), 4));
+  shirtCols.forEach((c, i) => {
+    const sh = new THREE.Group();
+    sh.add(box(0.42, 0.5, 0.02, mat(c), 0, 0, 0));
+    sh.add(box(0.7, 0.16, 0.02, mat(c), 0, 0.17, 0)); // sleeves
+    const print = new THREE.Mesh(new THREE.CircleGeometry(0.09, 8), mat(['#ffe600', '#00f0ff', '#ff2bd6'][i % 3], { emissive: ['#ffe600', '#00f0ff', '#ff2bd6'][i % 3], emissiveIntensity: 0.25 }));
+    print.position.set(0, 0.02, 0.012);
+    sh.add(print);
+    sh.position.set(-1.2 + i * 0.6, 1.8, -0.72);
+    J.add(sh);
+  });
+  // sticker wall at the side
+  const stick = document.createElement('canvas');
+  stick.width = 256; stick.height = 256;
+  const sx = stick.getContext('2d');
+  sx.fillStyle = '#f4ecd8'; sx.fillRect(0, 0, 256, 256);
+  for (let i = 0; i < 26; i++) {
+    const x = 18 + (i % 5) * 50 + (Math.floor(i / 5) % 2) * 12, y = 18 + Math.floor(i / 5) * 48, c = ['#ff2bd6', '#2ad1a0', '#ff7a2a', '#7a2aa8', '#ffd21f', '#00b8ff'][i % 6];
+    sx.fillStyle = c; sx.beginPath(); sx.arc(x, y, 18, 0, 7); sx.fill();
+    sx.strokeStyle = '#1a1a1a'; sx.lineWidth = 2;
+    for (let k = 0; k < 6; k++) { sx.beginPath(); sx.moveTo(x, y); sx.lineTo(x + Math.cos(k + i) * 14, y + Math.sin(k + i) * 14); sx.stroke(); } // little mandalas & eyes
+    sx.fillStyle = '#fff'; sx.beginPath(); sx.arc(x, y, 5, 0, 7); sx.fill();
+  }
+  const stTex = new THREE.CanvasTexture(stick);
+  stTex.colorSpace = THREE.SRGBColorSpace;
+  const wall = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 1.4), new THREE.MeshStandardMaterial({ map: stTex, roughness: 0.8, side: THREE.DoubleSide }));
+  wall.position.set(1.52, 1.45, 0);
+  wall.rotation.y = -Math.PI / 2;
+  J.add(wall);
+  // sketchbook + pens on the counter
+  J.add(box(0.42, 0.03, 0.3, mat('#f8f4ea'), -0.6, 0.95, 0.5));
+  for (let k = 0; k < 4; k++) J.add(box(0.14, 0.015, 0.015, mat(['#ff2bd6', '#2ad1a0', '#1a1a1a', '#ff7a2a'][k]), -0.2 + k * 0.05, 0.94, 0.62));
+  const js = signPost('JULIIE · ART & STICKER', { width: 2.6, height: 0.7, bg: '#2a1446', fg: '#ffd27a' });
+  js.position.set(-2.0, 0, 0.9);
+  js.scale.setScalar(0.85);
+  J.add(js);
+  // collider + her spot behind the counter (in market space)
+  const jc = (lx, lz) => [J.position.x + lx * Math.cos(J.rotation.y) + lz * Math.sin(J.rotation.y), J.position.z - lx * Math.sin(J.rotation.y) + lz * Math.cos(J.rotation.y)];
+  { const [x, z] = jc(0, 0.6); colliders.push({ type: 'box', x, z, hw: 1.55, hd: 0.4, rot: J.rotation.y }); }
+  g.userData.spots = { ...(g.userData.spots || {}), juliie_stall: jc(0, -0.55) }; // far enough behind the counter for the path finder
   return { object: g, colliders };
 }
 

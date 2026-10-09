@@ -365,6 +365,8 @@ export class Game {
     $('btn-continue').onclick = () => { unlockAudio(); this.exitPreview(); this.startPlay(); };
     $('btn-load').onclick = () => { unlockAudio(); this.openLoadMenu(); };
     $('btn-preview').onclick = () => { unlockAudio(); this.togglePreview(); };
+    this.previewLabel();
+    onLangChange(() => this.previewLabel());
     $('btn-controls').onclick = () => { this.audio.click(); this.ui.modal(this.controlsHtml()); };
     $('btn-settings').onclick = () => { this.audio.click(); this.openSettings(); };
     $('btn-credits').onclick = () => { this.audio.click(); this.ui.modal(this.creditsHtml()); };
@@ -378,10 +380,10 @@ export class Game {
     this.muteLabels();
     onLangChange(() => this.muteLabels());
     $('btn-resume').onclick = () => this.resume();
-    $('bigmap').addEventListener('pointerdown', () => { if (this.mode === 'map') this.resume(); });
+    $('bigmap').addEventListener('pointerdown', () => { if (this.mode === 'map') this.closeMap(); });
     $('btn-log').onclick = () => this.openQuestLog();
     $('hud-vol').onclick = (e) => { e.stopPropagation(); this.openVolunteers(); };
-    $('btn-map').onclick = $('pmap-btn').onclick = () => { this.ui.showPause(false); this.openMap(); };
+    $('btn-map').onclick = $('pmap-btn').onclick = () => { this.ui.showPause(false); this.openMap(true); };
     $('btn-psettings').onclick = () => this.openSettings();
     $('btn-pcontrols').onclick = () => this.ui.modal(this.controlsHtml());
     $('btn-quit').onclick = () => { this.save(); this.ui.showPause(false); this.toMenu(); };
@@ -451,8 +453,9 @@ export class Game {
 
   previewLabel() {
     const b = document.getElementById('btn-preview');
-    b.dataset.i18n = this.previewState ? 'menu.previewOff' : 'menu.preview';
-    b.textContent = t(b.dataset.i18n);
+    b.textContent = this.previewState ? '🚧' : '🎪';
+    b.title = t(this.previewState ? 'menu.previewOff' : 'menu.preview');
+    b.classList.toggle('active', !!this.previewState);
   }
 
   /** All saves: the last one plus the minute-autosaves of the last 10 minutes. */
@@ -675,13 +678,23 @@ export class Game {
     this.ui.modal(html);
   }
 
-  openMap() {
+  /** fromPause: opened from the pause menu – closing it goes back there, not into the game. */
+  openMap(fromPause = false) {
+    this.mapFromPause = fromPause;
     this.ignoreUnlock = true;
     this.input.unlock();
     setTimeout(() => (this.ignoreUnlock = false), 100);
     this.mode = 'map';
     this.input.enabled = false;
     this.ui.showBigMap(true);
+  }
+
+  closeMap() {
+    if (!this.mapFromPause) { this.resume(); return; }
+    this.mapFromPause = false;
+    this.ui.showBigMap(false);
+    this.mode = 'pause';
+    this.ui.showPause(true);
   }
 
   // ------------------------------------------------------------------ quest events
@@ -1632,7 +1645,7 @@ export class Game {
 
     if (this.mode === 'map') {
       this.ui.drawBigMap(this.player.position, this.headingOf(), [...this.quests.trackedObjectives(), ...this.drama.objectives(), ...this.soundbox.objectives()], this.npcs.all.filter((n) => !n.hidden), this.quests, this.quests.state.built, this.vehicles);
-      if (this._mapKeyReady && (inp.keys.has('KeyM') || inp.keys.has('Escape'))) { this._mapKeyReady = false; this.resume(); }
+      if (this._mapKeyReady && (inp.keys.has('KeyM') || inp.keys.has('Escape'))) { this._mapKeyReady = false; this.closeMap(); }
       if (!inp.keys.has('KeyM') && !inp.keys.has('Escape')) this._mapKeyReady = true;
       this.renderer.render(this.scene, this.camera);
       return;

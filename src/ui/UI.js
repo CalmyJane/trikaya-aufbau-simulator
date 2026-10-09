@@ -119,7 +119,6 @@ export class UI {
     const days = qs.game.days;
     if (days) {
       const left = days.jobs(days.day, days.isNight).filter((q) => !qs.isDone(q.id)).length;
-      if (left) html += `<div class="track hint dim"><div class="ts">${days.isNight ? L({ de: `🌙 Noch <b>${left}</b> Nacht-Job${left > 1 ? 's' : ''} bis zum Schlafen`, en: `🌙 <b>${left}</b> night job${left > 1 ? 's' : ''} left before bed` }) : L({ de: `☀️ Noch <b>${left}</b> Job${left > 1 ? 's' : ''} bis Feierabend`, en: `☀️ <b>${left}</b> job${left > 1 ? 's' : ''} left until evening` })}</div></div>`;
     }
     if (favs.length) {
       const fn = [...new Set(favs.map((q) => q.giver))].map((g) => qs.game.npcs.get(g)).filter(Boolean);
@@ -222,10 +221,6 @@ export class UI {
       rows.push(row(q.errand ? 'fav' : 'new', q.errand ? '💚' : '<b>!</b>', txt, q.timeLimit ? '⏱' : '', 'dim'));
     }
     if (!rows.length && qs.state.completed.length) rows.push(row('hint', '🎉', strip(t('hud.allDone')), ''));
-    // unfolded: how many jobs are left today
-    const days = qs.game.days;
-    const left = days ? days.jobs(days.day, days.isNight).filter((q) => !qs.isDone(q.id)).length : 0;
-    if (open && left) rows.push(row('hint', days.isNight ? '🌙' : '☀️', days.isNight ? L({ de: `Noch ${left} Nacht-Job${left > 1 ? 's' : ''} bis zum Schlafen`, en: `${left} night job${left > 1 ? 's' : ''} left before bed` }) : L({ de: `Noch ${left} Job${left > 1 ? 's' : ''} bis Feierabend`, en: `${left} job${left > 1 ? 's' : ''} left until evening` }), '', 'dim'));
     const html = rows.join('');
     if (el._last !== html) { el.innerHTML = html; el._last = html; }
   }

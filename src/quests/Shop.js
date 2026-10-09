@@ -396,7 +396,8 @@ export class Effects {
   }
 
   /** Mark & Fabi: a little shop dialog. Returns false if the NPC sells nothing right now. */
-  async vendorTalk(npc) {
+  /** extra: [[label, async fn]] options shown after the items (e.g. borrowing Fabi's scooter). */
+  async vendorTalk(npc, extra = []) {
     const items = this.vendorItems(npc.def.id);
     if (!items.length) return false;
     const g = this.game;
@@ -411,9 +412,10 @@ export class Effects {
     const karma = g.quests.state.karma;
     const choice = await g.runDialog(
       [{ who: npc.def.id, text: `${greet} ${de ? `(Du hast ✺ ${karma})` : `(You have ✺ ${karma})`}` }],
-      [...items.map((it) => `${it.icon} ${L(it.name)} (✺ ${it.cost}), ${L(it.desc)}`), de ? 'Nichts, danke.' : 'Nothing, thanks.'],
+      [...items.map((it) => `${it.icon} ${L(it.name)} (✺ ${it.cost}), ${L(it.desc)}`), ...extra.map((x) => x[0]), de ? 'Nichts, danke.' : 'Nothing, thanks.'],
       npc,
     );
+    if (choice >= items.length && choice < items.length + extra.length) { await extra[choice - items.length][1](); return true; }
     const it = items[choice];
     if (!it) { await g.reply(npc, npc.line()); return true; }
     if (this.buy(it.id)) await g.reply(npc, it.id === 'banana' ? (de ? 'Gern! Pass auf dich auf, ja? 💛' : 'Sure! Take care of yourself, yeah? 💛') : (de ? 'Bitteschön! Karma ist die einzige Währung, die hier noch was wert ist.' : 'There you go! Karma is the only currency still worth anything here.'));

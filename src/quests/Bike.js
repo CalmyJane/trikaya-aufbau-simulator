@@ -140,6 +140,7 @@ export class FranziBike extends Rental {
     if (!this.rider && tk && tk.phase === 'go' && (tk.speed || 0) >= 5 && !this.rented && !driven && this.nearOwner(8)) {
       this.rider = f;
       f.ridingBike = this.bike;
+      f.char.ride = this.bike;
       this.bike.ghost = true;
       tk.speed = 8;
     }
@@ -157,6 +158,7 @@ export class FranziBike extends Rental {
     this.bike.ghost = false;
     if (!f) return;
     f.ridingBike = null;
+    f.char.ride = null;
     f.char.setSitting(false);
     // park the bike next to her
     const h = f.root.rotation.y;

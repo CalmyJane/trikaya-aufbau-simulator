@@ -698,7 +698,13 @@ export class Character {
 
   update(dt) {
     this.mixer.update(dt);
-    if (this.sitting) this.applySitPose();
+    if (!this.ride && this._torsoSet) { // got off: straighten up again
+      const torso = this.bones.Torso;
+      if (torso?.quaternion.equals(this._torsoSet)) torso.quaternion.copy(this._torsoBase);
+      this._torsoSet = null;
+    }
+    if (this.ride) this.applyRidePose();
+    else if (this.sitting) this.applySitPose();
     else if (this.carrying) this.applyCarryPose();
     else if (this.flowToy) this.applyFlowPose(dt);
   }
@@ -823,6 +829,65 @@ export class Character {
     bone.quaternion.copy(pw.invert().multiply(q).multiply(bw));
   }
 
+  /** Two-bone IK for a leg: foot to `target` (world), knee bending towards `pole` (world direction). */
+  reachLeg(side, target, pole) {
+    const b = this.bones;
+    const up = b[`UpperLeg${side}`], low = b[`LowerLeg${side}`], end = low?.children[0];
+    if (!up || !low || !end) return;
+    up.updateWorldMatrix(true, true);
+    const S = up.getWorldPosition(_a1), K0 = low.getWorldPosition(_a2), F0 = end.getWorldPosition(_a3);
+    const l1 = S.distanceTo(K0), l2 = K0.distanceTo(F0);
+    const dir = _a4.subVectors(target, S);
+    const d = Math.max(0.05, Math.min(dir.length(), (l1 + l2) * 0.999));
+    dir.normalize();
+    const pl = _a5.copy(pole);
+    pl.addScaledVector(dir, -pl.dot(dir)).normalize();
+    const a = (l1 * l1 + d * d - l2 * l2) / (2 * d);
+    const hgt = Math.sqrt(Math.max(0, l1 * l1 - a * a));
+    const knee = _a6.copy(S).addScaledVector(dir, a).addScaledVector(pl, hgt);
+    this.aimBone(up, low, _a7.subVectors(knee, S).normalize());
+    low.updateWorldMatrix(true, true);
+    this.aimBone(low, end, _a7.subVectors(target, low.getWorldPosition(_a2)).normalize());
+    // the foot mesh hangs on its own IK bone (child of Root), so carry it along to the ankle
+    const foot = b[`Foot${side}`];
+    if (foot) {
+      low.updateWorldMatrix(true, true);
+      foot.parent.updateWorldMatrix(true, false);
+      foot.position.copy(foot.parent.worldToLocal(end.getWorldPosition(_a3)));
+    }
+  }
+
+  /**
+   * Riding a bike / scooter (`this.ride` = the vehicle): torso leans forward, hands on the grips,
+   * feet on the pedals (they turn) or on the deck. Anchors come from the vehicle (`grips`, `pedals`).
+   */
+  applyRidePose() {
+    const v = this.ride;
+    if (this.sitting) this.model.position.y = this.sitBaseY;
+    else if (this.standY != null) this.model.position.y = this.standY - 0.06; // knees a little soft
+    this.root.updateMatrixWorld(true);
+    v.body.updateMatrixWorld(true);
+    const rq = this.root.getWorldQuaternion(_q4);
+    // lean the upper body forward (about the rider's sideways axis)
+    const torso = this.bones.Torso;
+    if (torso) {
+      // the idle clip doesn't key the torso: start from its own pose each frame, don't stack the lean
+      if (this._torsoSet && torso.quaternion.equals(this._torsoSet)) torso.quaternion.copy(this._torsoBase);
+      else (this._torsoBase ||= new THREE.Quaternion()).copy(torso.quaternion);
+      torso.updateWorldMatrix(true, false);
+      const q = _q1.setFromAxisAngle(_v4.set(1, 0, 0).applyQuaternion(rq), this.sitting ? 0.55 : 0.14);
+      const bw = torso.getWorldQuaternion(_q2), pw = torso.parent.getWorldQuaternion(_q3);
+      torso.quaternion.copy(pw.invert().multiply(q).multiply(bw));
+      (this._torsoSet ||= new THREE.Quaternion()).copy(torso.quaternion);
+    }
+    if (v.grips) { this.reachArm('L', v.grips[0].getWorldPosition(_b1)); this.reachArm('R', v.grips[1].getWorldPosition(_b1)); }
+    if (v.pedals) {
+      const fwd = _b2.set(0, 0, 1).applyQuaternion(rq);
+      this.reachLeg('L', v.pedals[0].getWorldPosition(_b1), fwd);
+      this.reachLeg('R', v.pedals[1].getWorldPosition(_b1), fwd);
+    }
+  }
+
   /** Procedural sitting pose layered on top of the idle animation. */
   applySitPose() {
     const b = this.bones;
@@ -909,6 +974,6 @@ function buildFlowToy(type) {
   return { type, group, rig, wicks, flames, leds, sides, fireOn: false };
 }
 
-const _a1 = new THREE.Vector3(), _a2 = new THREE.Vector3(), _a3 = new THREE.Vector3(), _a4 = new THREE.Vector3(), _a5 = new THREE.Vector3(), _a6 = new THREE.Vector3(), _a7 = new THREE.Vector3(), _b1 = new THREE.Vector3();
+const _a1 = new THREE.Vector3(), _a2 = new THREE.Vector3(), _a3 = new THREE.Vector3(), _a4 = new THREE.Vector3(), _a5 = new THREE.Vector3(), _a6 = new THREE.Vector3(), _a7 = new THREE.Vector3(), _b1 = new THREE.Vector3(), _b2 = new THREE.Vector3();
 const _v1 = new THREE.Vector3(), _v2 = new THREE.Vector3(), _v3 = new THREE.Vector3(), _v4 = new THREE.Vector3();
 const _q1 = new THREE.Quaternion(), _q2 = new THREE.Quaternion(), _q3 = new THREE.Quaternion(), _q4 = new THREE.Quaternion();

@@ -52,6 +52,8 @@ export class Player {
     this.root.position.set(0, 0, 0);
     this.root.rotation.set(0, 0, 0);
     this.char.setSitting(!vehicle.standing);
+    this.char.ride = vehicle.grips ? vehicle : null;
+    if (vehicle.standing) this.char.standY = this.char.model.position.y;
     this.vel.set(0, 0, 0);
   }
 
@@ -66,7 +68,9 @@ export class Player {
     this.world.colliders.resolve(this.root.position, RADIUS);
     this.root.position.y = heightAt(this.root.position.x, this.root.position.z);
     this.root.rotation.set(0, v.heading, 0);
+    this.char.ride = null;
     this.char.setSitting(false);
+    if (v.standing && this.char.standY != null) this.char.model.position.y = this.char.standY;
     v.driver = null;
     v.speed = 0;
     this.vehicle = null;

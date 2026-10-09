@@ -140,6 +140,7 @@ class Vehicle {
       // Shift (or the touch sprint toggle): full throttle
       this.boosting = !!o.boost && throttle > 0 && (input.down('ShiftLeft', 'ShiftRight') || input.sprintToggle);
     } else this.boosting = false;
+    this.throttle = throttle;
     const maxSp = o.maxSpeed * (this.boosting ? o.boost : 1);
     // longitudinal
     const sp0 = this.speed;
@@ -187,7 +188,10 @@ class Vehicle {
     const moved = Math.hypot(p.x - bx, p.z - bz);
     this.odometer += moved;
     this.syncCollider();
+    // bikes & scooters lean into the curve (positive steer = left turn = top tilts to +x)
+    if (o.lean) this.leanZ = (this.leanZ || 0) + (-this.steer * Math.min(1, Math.abs(this.speed) / o.maxSpeed) * o.lean - (this.leanZ || 0)) * Math.min(1, dt * 5);
     this.settle(dt);
+    if (this.steerer) this.steerer.rotation.y = this.steer * 0.8;
     // wheels
     for (const w of this.wheels) {
       w.spin = (w.spin || 0) + (this.speed * dt) / w.r;
@@ -204,8 +208,21 @@ class Vehicle {
     p.y = t.y;
     const k = dt ? Math.min(1, dt * 8) : 1;
     this.body.rotation.x += (t.pitch - this.body.rotation.x) * k;
-    this.body.rotation.z += (-t.roll - this.body.rotation.z) * k;
+    this.body.rotation.z += (-t.roll + (this.leanZ || 0) - this.body.rotation.z) * k;
   }
+
+  /** Handlebar parts that turn with the front wheel, around a vertical axis through `pivot`. */
+  makeSteerer(parts, pivot) {
+    const g = new THREE.Group();
+    g.position.copy(pivot);
+    for (const m of parts) { m.position.sub(pivot); g.add(m); }
+    this.body.add(g);
+    this.steerer = g;
+    return g;
+  }
+
+  /** Invisible anchor the rider's hands/feet reach for (see Character.ride). */
+  anchor(parent, x, y, z) { const o = new THREE.Object3D(); o.position.set(x, y, z); parent.add(o); return o; }
 
   get kmh() { return Math.abs(this.speed) * 3.6; }
 }
@@ -360,7 +377,7 @@ export class Radlader extends Vehicle {
 // ------------------------------------------------------------------ Franzi's bike (with a witch's broom strapped on)
 export class Bike extends Vehicle {
   constructor(world) {
-    super(world, { maxSpeed: 10.5, accel: 6.8, brake: 12, drag: 1.1, maxSteer: 1, turnRate: 2.4, radius: 0.7, bodyRadius: 0.32, bodyOffset: 0.4, length: 1.7, width: 0.55, boost: 1.25 });
+    super(world, { maxSpeed: 10.5, accel: 6.8, brake: 12, drag: 1.1, maxSteer: 1, turnRate: 2.4, lean: 0.32, radius: 0.7, bodyRadius: 0.32, bodyOffset: 0.4, length: 1.7, width: 0.55, boost: 1.25 });
     this.id = 'bike';
     this.name = { de: 'Franzis Hexenrad', en: 'Franzi\'s witch bike' };
     this.quiet = true; // no engine, no horn, doesn't run people over
@@ -372,13 +389,38 @@ export class Bike extends Vehicle {
     tube(0.75, 0, 0.78, 0.05, Math.PI / 2);          // top tube
     tube(0.8, 0, 0.58, 0.22, Math.PI / 2 + 0.75);     // down tube
     tube(0.5, 0, 0.6, -0.2, 0.25);                     // seat tube
-    tube(0.6, 0, 0.55, 0.5, -0.3, dark);               // fork
+    const fork = tube(0.6, 0, 0.55, 0.5, -0.3, dark);  // fork
     tube(0.45, 0, 0.42, -0.38, Math.PI / 2 - 0.9, dark); // chain stay
     b.add(box(0.14, 0.05, 0.24, dark, 0, 0.86, -0.25)); // saddle
     const bar = cyl(0.02, 0.02, 0.55, dark, 6, 0, 0.98, 0.42);
     bar.rotation.z = Math.PI / 2;
-    b.add(bar);
-    b.add(cyl(0.02, 0.02, 0.2, dark, 6, 0, 0.9, 0.44));
+    const stem = cyl(0.02, 0.02, 0.2, dark, 6, 0, 0.9, 0.44);
+    const st = this.makeSteerer([fork, bar, stem], new THREE.Vector3(0, 0.9, 0.46));
+    // rider anchors: hands on the grips, feet on the pedals
+    // swept-back city-bike grips, so the hands reach them
+    this.grips = [1, -1].map((s) => {
+      const g = cyl(0.022, 0.022, 0.22, dark, 6, s * 0.25, 0.08, -0.1);
+      g.rotation.x = Math.PI / 2;
+      st.add(g);
+      return this.anchor(st, s * 0.25, 0.08, -0.19);
+    });
+    // crank: two arms with pedals, turning while you pedal
+    this.crank = new THREE.Group();
+    this.crank.position.set(0, 0.36, 0.02);
+    b.add(this.crank);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.09, 0.012, 4, 14), dark); // chainring
+    ring.rotation.y = Math.PI / 2;
+    ring.position.set(-0.05, 0.36, 0.02);
+    b.add(ring);
+    this.pedals = [1, -1].map((s) => {
+      const arm = new THREE.Group();
+      arm.rotation.x = s > 0 ? 0 : Math.PI;
+      arm.add(box(0.02, 0.16, 0.03, mat('#9a9a9a', { metalness: 0.6 }), s * 0.07, -0.08, 0));
+      arm.add(box(0.09, 0.025, 0.06, dark, s * 0.11, -0.16, 0));
+      this.crank.add(arm);
+      return this.anchor(arm, s * 0.1, -0.15, 0);
+    });
+    this.pedalT = 0;
     // the witch's broom, strapped on horizontally along the bike
     const broom = new THREE.Group();
     const stick = cyl(0.025, 0.03, 1.7, mat('#7a5230', { roughness: 1 }), 6);
@@ -391,9 +433,18 @@ export class Bike extends Vehicle {
     broom.position.set(0.16, 0.74, 0.05);
     b.add(broom);
     for (const z of [0.55, -0.55]) this.spokeWheel(0.34, 0, 0.34, z);
-    this.seat.position.set(0, 0.5, -0.3);
+    this.seat.position.set(0, 0.45, -0.3);
     this.cargo.position.set(0, 1.02, 0.66);
     this.ghost = false; // true while Franzi rides it (no collider in her way)
+  }
+
+  update(dt, input) {
+    const moved = super.update(dt, input);
+    // pedal while accelerating, freewheel when rolling; Franzi pedals all the way to the emergency
+    if (this.ghost) this.pedalT += dt * 6;
+    else if (this.speed > 0.3 && this.throttle > 0) this.pedalT += dt * (2 + this.speed * 0.45);
+    this.crank.rotation.x = this.pedalT;
+    return moved;
   }
 
   /** Thin bicycle wheel: tyre ring + spokes (spins like the others). */
@@ -422,7 +473,7 @@ export class Bike extends Vehicle {
 // ------------------------------------------------------------------ Fabi's e-scooter (you ride it standing)
 export class Scooter extends Vehicle {
   constructor(world) {
-    super(world, { maxSpeed: 11, accel: 5.5, brake: 12, drag: 1.1, maxSteer: 1, turnRate: 2.6, radius: 0.6, bodyRadius: 0.3, bodyOffset: 0.3, length: 1.2, width: 0.5, boost: 1.2 });
+    super(world, { maxSpeed: 11, accel: 5.5, brake: 12, drag: 1.1, maxSteer: 1, turnRate: 2.6, lean: 0.26, radius: 0.6, bodyRadius: 0.3, bodyOffset: 0.3, length: 1.2, width: 0.5, boost: 1.2 });
     this.id = 'scooter';
     this.name = { de: 'Fabis E-Scooter', en: 'Fabi\'s e-scooter' };
     this.quiet = true;
@@ -435,17 +486,20 @@ export class Scooter extends Vehicle {
     b.add(box(0.06, 0.05, 0.16, mat('#ff8a2a', { emissive: '#ff6a00', emissiveIntensity: 0.4 }), 0, 0.2, -0.5)); // rear light
     const stem = cyl(0.03, 0.03, 1.0, grey, 8, 0, 0.62, 0.42);
     stem.rotation.x = -0.12;
-    b.add(stem);
     const bar = cyl(0.022, 0.022, 0.5, dark, 6, 0, 1.1, 0.36);
     bar.rotation.z = Math.PI / 2;
-    b.add(bar);
+    const steer = [stem, bar];
     for (const x of [0.24, -0.24]) {
       const grip = cyl(0.03, 0.03, 0.1, mat('#2a2a2a'), 6, x, 1.1, 0.36);
       grip.rotation.z = Math.PI / 2;
-      b.add(grip);
+      steer.push(grip);
     }
-    b.add(box(0.08, 0.06, 0.04, mat('#f5f0d0', { emissive: '#fff4c0', emissiveIntensity: 0.6 }), 0, 0.92, 0.47)); // headlight
-    b.add(box(0.07, 0.02, 0.05, mat('#7fd0ff', { emissive: '#3a9aff', emissiveIntensity: 0.5 }), 0, 1.12, 0.33));  // little display
+    steer.push(box(0.08, 0.06, 0.04, mat('#f5f0d0', { emissive: '#fff4c0', emissiveIntensity: 0.6 }), 0, 0.92, 0.47)); // headlight
+    steer.push(box(0.07, 0.02, 0.05, mat('#7fd0ff', { emissive: '#3a9aff', emissiveIntensity: 0.5 }), 0, 1.12, 0.33));  // little display
+    const st = this.makeSteerer(steer, new THREE.Vector3(0, 0.6, 0.42));
+    this.grips = [this.anchor(st, 0.22, 0.5, -0.06), this.anchor(st, -0.22, 0.5, -0.06)];
+    // feet on the deck, one in front of the other
+    this.pedals = [this.anchor(b, 0.05, 0.19, 0.12), this.anchor(b, -0.06, 0.19, -0.26)];
     this.wheel(0.11, 0.06, 0, 0.11, 0.5);
     this.wheel(0.11, 0.06, 0, 0.11, -0.45);
     this.seat.position.set(0, 0.17, -0.12);

@@ -1185,7 +1185,9 @@ export class Game {
     // 4a) Thompsen & Zdenko push stuck vehicles back to the base
     if (id === 'thompsen') { await this.thompsenTalk(npc); return; }
     // 4) Mark & Fabi sell things for karma
-    if (await this.effects.vendorTalk(npc)) return;
+    const rental = [this.bikeSys, this.scooterSys].find((r) => r.ownerId === id);
+    const rentOpt = rental?.canAsk() ? [[rental.text().ask, async () => await this.reply(npc, rental.ask() ? rental.text().yes : rental.text().noKarma)]] : [];
+    if (await this.effects.vendorTalk(npc, rentOpt)) return;
     // 5) a little conversation with answer options (karma +/-)
     if (!this.effects.high && await this.chatWith(npc)) return;
     // 6) small talk (context aware for quest givers – and they notice when you're high)

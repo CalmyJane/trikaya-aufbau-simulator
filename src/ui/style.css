@@ -420,6 +420,9 @@ body.police::after { background: radial-gradient(ellipse at center, transparent 
 #minigame .mg-left { padding: 8px 10px; min-height: 40px; display: flex; align-items: center; border-radius: 10px; background: rgba(255, 255, 255, 0.05); font-size: 15px; text-align: left; opacity: 0.55; }
 #minigame .mg-left.cur { opacity: 1; background: rgba(255, 210, 31, 0.3); box-shadow: 0 0 10px rgba(255, 210, 31, 0.5); }
 #minigame .mg-left.good { opacity: 0.8; background: rgba(90, 220, 110, 0.25); box-shadow: none; }
+#minigame .mg-tile { position: relative; }
+#minigame .mg-tile .mg-num { position: absolute; top: 4px; left: 4px; width: 18px; height: 18px; line-height: 18px; font-size: 11px; opacity: 0.7; }
+body.touch #minigame .mg-tile .mg-num { display: none; }
 #minigame .mg-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 260px; margin: 0 auto; }
 #minigame .mg-tile { height: 58px; font-size: 30px; }
 #minigame .mg-tile.wobble { animation: mgWobble 0.5s ease-in-out infinite; }
@@ -560,3 +563,23 @@ body.touch .pmap canvas, .pmap.small canvas { width: 120px; height: 120px; }
 /* phones: the minimap sits next to the pause menu, never on top of it */
 @media (max-height: 520px) { .pmap { left: calc(clamp(16px, 6vw, 110px) + min(340px, 46vw) + 16px + env(safe-area-inset-left)); } }
 @media (orientation: portrait) and (max-width: 640px) { .pmap { top: calc(12px + env(safe-area-inset-top)); bottom: auto; left: calc(12px + env(safe-area-inset-left)); } }
+
+/* ---------- phone polish ---------- */
+/* the prompt sits over the joystick area: only a label, the big E button does the action */
+body.touch #prompt { pointer-events: none; }
+/* smaller speech bubbles so they don't bury the HUD */
+body.touch .bubble { font-size: 12px; max-width: 170px; padding: 4px 9px; border-radius: 12px; }
+body.touch .bubble .bn { font-size: 10px; }
+/* toasts live between the stats panel (left) and the job tracker (right) */
+body.touch #toasts { left: calc(168px + (100vw - 168px - min(250px, 46vw) - 16px) / 2); max-width: calc(100vw - 168px - min(250px, 46vw) - 28px); }
+@media (orientation: portrait) {
+  body.touch #toasts { top: 128px; left: 8px; transform: none; align-items: flex-start; max-width: calc(100vw - min(250px, 46vw) - 24px); }
+}
+/* no keyboard numbers on answer buttons */
+body.touch #dialog-choices .kbd { display: none; }
+/* finger-sized buttons */
+body.touch #pause .btn { min-height: 40px; }
+body.touch #dialog-choices .btn { min-height: 44px; }
+#minigame .mg-cancel { width: 44px; height: 44px; font-size: 18px; top: 4px; right: 4px; }
+/* desktop: toasts below the Volunteers button */
+body:not(.touch) #toasts { top: 62px; }

@@ -85,7 +85,7 @@ export class Minigame {
    * 12 s without any input the game gives up on its own. onRelease (optional) fires when the key / finger lets go.
    */
   listen(el, onPress, onCancel, onRelease) {
-    let idle = 0;
+    let idle = 0, lastPress = performance.now();
     const key = (e) => {
       if (e.code === 'Escape') { e.preventDefault(); onCancel(); return; }
       if ((e.code === 'KeyE' || e.code === 'Space') && !e.repeat) { e.preventDefault(); e.stopPropagation(); idle = 0; onPress(); }
@@ -93,8 +93,8 @@ export class Minigame {
     const keyUp = (e) => { if (e.code === 'KeyE' || e.code === 'Space') { e.preventDefault(); onRelease?.(); } };
     const tap = (e) => {
       e.preventDefault(); e.stopPropagation();
-      if (e.target.closest?.('.mg-cancel')) { onCancel(); return; }
-      idle = 0; onPress();
+      if (e.target.closest?.('.mg-cancel')) { if (performance.now() - lastPress > 1200) onCancel(); return; } // no cancel mid-mash
+      idle = 0; lastPress = performance.now(); onPress();
     };
     const up = () => onRelease?.();
     const timer = setInterval(() => { if (++idle >= 12) onCancel(); }, 1000);
@@ -119,6 +119,7 @@ export class Minigame {
    */
   listenButtons(el, onPick, onCancel, keyMap = {}) {
     let idle = 0;
+    const t0 = performance.now();
     const key = (e) => {
       if (e.code === 'Escape') { e.preventDefault(); onCancel(); return; }
       if (e.repeat) return;
@@ -130,7 +131,7 @@ export class Minigame {
     };
     const tap = (e) => {
       e.preventDefault(); e.stopPropagation();
-      if (e.target.closest?.('.mg-cancel')) { onCancel(); return; }
+      if (e.target.closest?.('.mg-cancel')) { if (performance.now() - t0 > 1000) onCancel(); return; }
       const b = e.target.closest?.('.mg-btn');
       if (b && el.contains(b) && !b.disabled) { idle = 0; onPick(+b.dataset.i); }
     };
@@ -310,12 +311,15 @@ export class Minigame {
     const de = getLang() === 'de';
     const el = this.frame(title || (de ? 'Welches ist es?' : 'Which one is it?'), de ? 'Tippe auf das richtige Feld (oder Zahlentasten 1 bis 9)' : 'Tap the right tile (or number keys 1 to 9)', `<div class="mg-grid"></div><div class="mg-sub"><div class="mg-subfill"></div></div>`);
     const grid = el.querySelector('.mg-grid'), sub = el.querySelector('.mg-subfill');
+    // 3×3 grid: keys follow the numpad layout (7 8 9 on top), every tile shows its number
+    const pad = n === 9, keyMap = {}, num = (i) => (pad ? (2 - Math.floor(i / 3)) * 3 + (i % 3) + 1 : i + 1);
+    for (let i = 0; i < n; i++) keyMap[`Digit${num(i)}`] = keyMap[`Numpad${num(i)}`] = i;
     return new Promise((resolve) => {
       let round = 0, target = 0, left = time, last = performance.now(), raf = 0, dealing = false;
       const deal = () => {
         dealing = false;
         target = Math.floor(Math.random() * n);
-        grid.innerHTML = Array.from({ length: n }, (_, i) => `<button class="mg-btn mg-tile${i === target ? (odd ? '' : ' wobble') : ''}" data-i="${i}">${i === target && odd ? odd : icon}</button>`).join('');
+        grid.innerHTML = Array.from({ length: n }, (_, i) => `<button class="mg-btn mg-tile${i === target ? (odd ? '' : ' wobble') : ''}" data-i="${i}"><span class="mg-num">${num(i)}</span>${i === target && odd ? odd : icon}</button>`).join('');
       };
       deal();
       const finish = this.finisher(el, resolve, () => { cancelAnimationFrame(raf); off(); });
@@ -333,7 +337,7 @@ export class Minigame {
           b.classList.add('good'); this.game.audio.hammer?.();
           if (++round >= rounds) finish(true); else { dealing = true; setTimeout(deal, 220); }
         } else { b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); left -= 1.5; }
-      }, () => finish(false));
+      }, () => finish(false), keyMap);
     });
   }
 }

@@ -364,7 +364,7 @@ export class UI {
           });
           $('dialog-hint').textContent = t(matchMedia('(pointer: coarse)').matches ? 'd.chooseTouch' : 'd.choose');
         } else {
-          $('dialog-hint').textContent = t('d.continue');
+          $('dialog-hint').textContent = t(matchMedia('(pointer: coarse)').matches ? 'd.continueTouch' : 'd.continue');
         }
       };
       const next = () => {

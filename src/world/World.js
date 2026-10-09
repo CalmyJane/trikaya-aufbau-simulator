@@ -224,8 +224,8 @@ export class World {
   // ------------------------------------------------------------------ festival site
   buildFestivalSite() {
     // Bauzaun around the festival area with gaps at entrances
-    const segs = [];
-    const pts = FESTIVAL_FENCE.pts;
+    const segs = [], wob = [];
+    const pts = FESTIVAL_FENCE.pts, wc = FESTIVAL_FENCE.wobbly;
     for (let i = 0; i < pts.length - 1; i++) {
       const a = pts[i], b = pts[i + 1];
       const len = Math.hypot(b.x - a.x, b.z - a.z);
@@ -239,11 +239,29 @@ export class World {
         const mx = (s.ax + s.bx) / 2, mz = (s.az + s.bz) / 2;
         const inGap = FESTIVAL_FENCE.gaps.some((g) => Math.hypot(g.x - mx, g.z - mz) < FESTIVAL_FENCE.gapRadius);
         if (inGap) continue;
-        segs.push(s);
+        (Math.hypot(wc.x - mx, wc.z - mz) < 4.5 ? wob : segs).push(s);
         this.colliders.addWall(s.ax, s.az, s.bx, s.bz, 0.3, 'fence').h = 2.0; // Bauzaun: only a big (weed) jump clears it
       }
     }
     this.scene.add(fenceRun(segs));
+    // the wobbly stretch (special nut): tilts in and out until the nut is on (game sets nutFixed)
+    if (wob.length) {
+      const a = wob[0], b = wob[wob.length - 1];
+      const axis = new THREE.Vector3(b.bx - a.ax, 0, b.bz - a.az).normalize();
+      const pivot = new THREE.Group();
+      pivot.position.set(wc.x, 0, wc.z);
+      const run = fenceRun(wob);
+      run.position.set(-wc.x, 0, -wc.z);
+      pivot.add(run);
+      this.scene.add(pivot);
+      this.nutFixed = false;
+      let tilt = 0;
+      this.animated.push((time, dt) => {
+        const want = this.nutFixed ? 0 : Math.sin(time * 2.6) * 0.07 + Math.sin(time * 6.1) * 0.025;
+        tilt += (want - tilt) * Math.min(1, dt * 6);
+        pivot.quaternion.setFromAxisAngle(axis, tilt);
+      });
+    }
 
     // plots: staked out until built
     for (const [id, plot] of Object.entries(PLOTS)) {
@@ -585,7 +603,10 @@ export class World {
     add('water_tank_spot', { x: LANDMARKS.kitchen.x + 12.5, z: LANDMARKS.kitchen.z + 2 });
     add('water_tank_drop', { x: LANDMARKS.kitchen.x + 8.6, z: LANDMARKS.kitchen.z + 2 });
     // the wobbly Bauzaun field next to the entrance (special nut)
-    add('nut_fence', { x: PLOTS.entrance.pos.x - 6, z: PLOTS.entrance.pos.z - 10 });
+    {
+      const wc = FESTIVAL_FENCE.wobbly, e = PLOTS.entrance.pos, d = Math.hypot(e.x - wc.x, e.z - wc.z) || 1;
+      add('nut_fence', { x: wc.x + (e.x - wc.x) / d * 1.6, z: wc.z + (e.z - wc.z) / d * 1.6 }); // just inside the fence
+    }
     // rigging posts of the mainstage (stand just outside each post)
     const ms = PLOTS.mainstage.pos;
     postPositions().forEach((pp, i) => {

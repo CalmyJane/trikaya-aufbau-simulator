@@ -144,6 +144,7 @@ const STRINGS = {
   // dialog
   'd.continue': { de: '[E] / [Leertaste] / Klick = weiter', en: '[E] / [Space] / click to continue' },
   'd.choose': { de: 'Wähle mit den Zahlentasten oder Klick', en: 'Choose with the number keys or click' },
+  'd.continueTouch': { de: 'Tippen = weiter', en: 'Tap to continue' },
   'd.chooseTouch': { de: 'Tippe auf eine Antwort', en: 'Tap an answer' },
   'd.later': { de: 'Alles klar. Du weißt ja, wo du mich findest.', en: 'Alright. You know where to find me.' },
   'd.howGoing': { de: 'Wie läuft\'s mit „{title}“? {step}.', en: 'How\'s "{title}" going? {step}.' },

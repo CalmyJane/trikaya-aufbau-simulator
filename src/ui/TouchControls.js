@@ -134,8 +134,8 @@ export class TouchControls {
       if (Math.abs(diff) > 12) { this.input.wheel += Math.sign(diff); this.pinch = dist; }
       return;
     }
-    this.input.mouseDX += (e.clientX - l.x) * 1.6;
-    this.input.mouseDY += (e.clientY - l.y) * 1.6;
+    this.input.mouseDX += (e.clientX - l.x) * 2.6;
+    this.input.mouseDY += (e.clientY - l.y) * 2.2;
     l.x = e.clientX; l.y = e.clientY;
   }
 

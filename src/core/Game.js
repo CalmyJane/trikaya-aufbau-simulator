@@ -238,8 +238,14 @@ export class Game {
   get registered() { return this.quests.isActive('q0_leo') || this.quests.isDone('q0_leo'); }
 
   // ------------------------------------------------------------------ vehicles (cargo follows you)
-  enterVehicle(v) { this.player.enter(v); this.updateCarried(); }
+  enterVehicle(v) { this.player.enter(v); this.updateCarried(); this.resetSprint(); }
+  /** The touch sprint toggle would otherwise silently become a boost in the vehicle (and back). */
+  resetSprint() {
+    this.input.sprintToggle = false;
+    document.getElementById('t-sprint')?.classList.remove('on');
+  }
   exitVehicle() {
+    this.resetSprint();
     const v = this.player.vehicle;
     this.player.exit();
     this.updateCarried();
@@ -259,6 +265,7 @@ export class Game {
       ['Mausrad', 'Zoom'],
       [`${k('Q')} / ${k('R')}`, 'Kamera drehen (Tastatur)'],
       [k('E'), 'Reden / Aufheben / Bauen / Ein- & Aussteigen'],
+      [`Im Fahrzeug: ${k('Shift')} / ${k('Leertaste')} / ${k('H')}`, 'Turbo / Handbremse (Rad & Scooter: hüpfen) / Hupe (macht Platz, −1 Karma)'],
       [k('F'), 'Winken'],
       [k('J'), `Aufgaben · ${k('T')} Job wechseln`],
       [k('M'), 'Lageplan'],
@@ -273,6 +280,7 @@ export class Game {
       ['Wheel', 'Zoom'],
       [`${k('Q')} / ${k('R')}`, 'Rotate camera (keyboard)'],
       [k('E'), 'Talk / pick up / build / enter & exit vehicles'],
+      [`In a vehicle: ${k('Shift')} / ${k('Space')} / ${k('H')}`, 'Boost / handbrake (bike & scooter: hop) / horn (clears the way, −1 karma)'],
       [k('F'), 'Wave'],
       [k('J'), `Quest log · ${k('T')} switch job`],
       [k('M'), 'Site map'],
@@ -283,15 +291,17 @@ export class Game {
     const touchRows = de ? [
       ['🕹️ links', 'Daumen auf die linke Bildschirmhälfte = Joystick (laufen / fahren). Ganz raus = sprinten.'],
       ['👆 rechts', 'Wischen = umschauen · zwei Finger = zoomen'],
-      [k('E'), 'Aktion (leuchtet, wenn etwas geht), oder auf den Hinweis tippen'],
-      [k('⤒') + ' ' + k('»'), 'Springen / Sprint an-aus'],
-      ['🗺️ 📋 ☰', 'Karte · Aufgaben · Menü'],
+      [k('E'), 'Aktion (leuchtet, wenn etwas geht)'],
+      [k('⤒') + ' ' + k('»'), 'Springen / Sprint an-aus · im Fahrzeug: Handbremse (Rad & Scooter: hüpfen) / Turbo'],
+      [k('📯'), 'Hupe im Quad & Radlader: macht Platz, −1 Karma'],
+      ['🗺️ 📋 👥 ☰', 'Karte · Aufgaben · Volunteers suchen · Menü'],
     ] : [
       ['🕹️ left', 'Thumb on the left half = joystick (walk / drive). Push to the edge = sprint.'],
       ['👆 right', 'Swipe = look around · two fingers = zoom'],
-      [k('E'), 'Action (glows when something is possible), or tap the hint'],
-      [k('⤒') + ' ' + k('»'), 'Jump / sprint toggle'],
-      ['🗺️ 📋 ☰', 'Map · jobs · menu'],
+      [k('E'), 'Action (glows when something is possible)'],
+      [k('⤒') + ' ' + k('»'), 'Jump / sprint toggle · in a vehicle: handbrake (bike & scooter: hop) / boost'],
+      [k('📯'), 'Horn in the quad & loader: clears the way, −1 karma'],
+      ['🗺️ 📋 👥 ☰', 'Map · jobs · find volunteers · menu'],
     ];
     const table = (r) => `<table>${r.map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table>`;
     if (this.input.touch) return `<h2>${t('menu.controls')}</h2>${table(touchRows)}`;
@@ -407,6 +417,14 @@ export class Game {
     window.addEventListener('pointerdown', firstGesture, { once: true, capture: true });
     window.addEventListener('keydown', firstGesture, { once: true, capture: true });
 
+    document.addEventListener('visibilitychange', () => {
+      if (this.devFast) return; // automated tests run in hidden tabs
+      if (document.hidden) {
+        if (this.mode === 'play' && !this.finale && !this.ui.dialogOpen) this.pause();
+        else if (this.mode === 'play' && !this.finale && !this.devFast) this.safe(() => this.autosave());
+        this.audio.ctx?.suspend?.();
+      } else this.audio.ctx?.resume?.();
+    });
     document.addEventListener('pointerlockchange', () => {
       // Esc while pointer-locked releases the lock without a keydown event → pause
       if (!this.input.locked && this.mode === 'play' && !this.ui.dialogOpen && !this.ignoreUnlock) this.pause();
@@ -1137,7 +1155,10 @@ export class Game {
   async showDialog(lines, choices, npc) {
     if (npc) npc.talking = true;
     this.player.frozen = true;
+    const free = !!choices && this.input.locked; // answers can be clicked (dialogOpen keeps the unlock from pausing)
+    if (free) this.input.unlock();
     const r = await this.ui.dialog(lines.map((l) => ({ who: l.who, text: L(l.text) })), (w) => this.speakerInfo(w), choices?.map(L));
+    if (free && this.mode === 'play') this.input.lock();
     this.player.frozen = false;
     if (npc) npc.talking = false;
     return r;
@@ -1386,7 +1407,12 @@ export class Game {
     if (this.devFast) { onWin(); return; } // automated tests: skill games always win, right away
     const de = getLang() === 'de';
     this.player.frozen = true;
+    // tile / list games are clicked: free the mouse meanwhile (without that counting as Esc → pause)
+    const kinds = [].concat(step.minigame).map((m) => (typeof m === 'string' ? m : m?.kind));
+    const free = this.input.locked && kinds.some((k) => ['order', 'match', 'spot'].includes(k));
+    if (free) { this.ignoreUnlock = true; this.input.unlock(); }
     this.minigame.run(step.minigame, { title: L(step.minigameTitle) || L(step.label) || L(step.buildLabel), ...(step.minigameOpts || {}) }).then((ok) => {
+      if (free) { if (this.mode === 'play') this.input.lock(); setTimeout(() => (this.ignoreUnlock = false), 150); }
       this.player.frozen = false;
       if (ok) onWin();
       else this.ui.toast(L(step.minigameFail) || (de ? 'Daneben! Nochmal.' : 'Missed! Again.'));
@@ -1750,6 +1776,7 @@ export class Game {
     if (playing && veh && !veh.quiet) this.safe(() => this.checkRunOver(veh));
     if (playing) this.safe(() => { this.bikeSys.update(dt); this.scooterSys.update(dt); });
     this.safe(() => this.quests.update(time, dt, this.player.position));
+    this.world.nutFixed = this.quests.isDone('x1_nuss');
     this.safe(() => this.world.update(time, dt, this.player.position));
     this.safe(() => this.trigel.update(dt, time, this.player.vehicle ? this.player.vehicle.position : this.player.position, this.world.night));
     this.safe(() => this.updateBuilding(dt));
@@ -1759,7 +1786,7 @@ export class Game {
       this.safe(() => this.drama.update(dt));
       this.safe(() => this.updateNight(dt));
       this.safe(() => this.shoutWristband(dt));
-      if (inp.hit('F9')) this.world.toggleColliderDebug();
+      if (/[?&]dev/.test(location.search) && inp.hit('F9')) this.world.toggleColliderDebug();
       this.safe(() => this.effects.update(dt));
       this.safe(() => this.police.update(dt));
       this.safe(() => this.soundbox.update(dt));

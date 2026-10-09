@@ -74,6 +74,7 @@ export const FESTIVAL_FENCE = {
   pts: poly([...[[100, 540], [300, 497], [448, 462], [612, 598], [625, 785], [65, 785], [80, 640]], [100, 540]]),
   gaps: [P(560, 555), P(616, 606), P(623, 725), P(73, 700), P(450, 464)], // last one: corner towards the camping (loader!)
   gapRadius: 6,
+  wobbly: P(616, 666), // the wobbly stretch next to the entrance – needs the special nut (x1_nuss)
 };
 
 // ---------------------------------------------------------------- crew base

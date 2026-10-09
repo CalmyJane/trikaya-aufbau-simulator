@@ -40,6 +40,7 @@ import { L, t, getLang, setLang, onLangChange, applyDom } from '../i18n.js';
 import { TouchControls, portraitHint } from '../ui/TouchControls.js';
 
 const SAVE_KEY = 'trikaya-aufbau-save-v2';
+const AUTO_KEY = 'trikaya-aufbau-autosaves-v2'; // ring of the last 10 minute-autosaves
 const SETTINGS_KEY = 'trikaya-settings';
 
 export class Game {
@@ -360,6 +361,7 @@ export class Game {
       $('btn-reset-no').onclick = () => { this.audio.click(); this.ui.closeModal(); };
     };
     $('btn-continue').onclick = () => { unlockAudio(); this.exitPreview(); this.startPlay(); };
+    $('btn-load').onclick = () => { unlockAudio(); this.openLoadMenu(); };
     $('btn-preview').onclick = () => { unlockAudio(); this.togglePreview(); };
     $('btn-controls').onclick = () => { this.audio.click(); this.ui.modal(this.controlsHtml()); };
     $('btn-settings').onclick = () => { this.audio.click(); this.openSettings(); };
@@ -451,6 +453,50 @@ export class Game {
     b.textContent = t(b.dataset.i18n);
   }
 
+  /** All saves: the last one plus the minute-autosaves of the last 10 minutes. */
+  savesList() {
+    const out = [];
+    try { const s = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); if (s) out.push({ kind: 'last', data: s }); } catch { /* ignore */ }
+    try { for (const a of JSON.parse(localStorage.getItem(AUTO_KEY) || '[]')) out.push({ kind: 'auto', data: a }); } catch { /* ignore */ }
+    return out;
+  }
+
+  openLoadMenu() {
+    const saves = this.savesList();
+    const de = getLang() === 'de';
+    const ago = (ts) => {
+      if (!ts) return '';
+      const m = Math.round((Date.now() - ts) / 60000);
+      if (m < 1) return de ? 'gerade eben' : 'just now';
+      if (m < 60) return de ? `vor ${m} Min.` : `${m} min ago`;
+      const h = Math.round(m / 60);
+      return h < 48 ? (de ? `vor ${h} Std.` : `${h} h ago`) : new Date(ts).toLocaleDateString(de ? 'de-DE' : 'en-GB');
+    };
+    const info = (d) => {
+      const q = d.quests || {};
+      const jobs = (q.completed || []).filter((id) => !id.startsWith('err_')).length;
+      const day = q.day || 1, night = q.phase === 'night';
+      return `${de ? 'Tag' : 'Day'} ${day}${night ? ' 🌙' : ''} · ✺ ${Math.floor(q.karma || 0)} · ${jobs} Jobs`;
+    };
+    const rows = saves.map((s, i) => `<div class="qlog-item load-item" data-i="${i}" style="cursor:pointer"><div class="t">${s.kind === 'last' ? '💾 ' + t('load.last') : '🕐 ' + t('load.auto')} · ${ago(s.data.t)}</div><div class="s">${info(s.data)}</div></div>`).join('');
+    this.ui.modal(`<h2>${t('load.title')}</h2>${rows || `<p>${t('load.none')}</p>`}<p class="s" style="opacity:.7;font-size:13px">${t('load.hint')}</p>`);
+    document.querySelectorAll('#modal-body .load-item').forEach((el) => {
+      el.onclick = () => { this.audio.click(); this.ui.closeModal(); this.loadFrom(saves[+el.dataset.i].data); };
+    });
+  }
+
+  /** Load any save (last or autosave) and jump straight into the game. */
+  loadFrom(data) {
+    this.exitPreview();
+    this.world.clearStructures();
+    this.quests.reset();
+    this.resetWorldState();
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch { /* ignore */ }
+    if (!this.load()) { this.ui.toast(getLang() === 'de' ? '⚠️ Spielstand kaputt, neues Spiel.' : '⚠️ Save broken, new game.'); this.newGame(); return; }
+    this._autoT = 0;
+    this.startPlay();
+  }
+
   toMenu() {
     const from = this.mode;
     this.mode = 'menu';
@@ -462,12 +508,13 @@ export class Game {
     let has = false;
     try { has = !!localStorage.getItem(SAVE_KEY); } catch { /* ignore */ }
     this.ui.showMenu(has);
+    document.getElementById('btn-load')?.classList.toggle('hidden', !this.savesList().length);
   }
 
   newGame() {
     this.exitPreview();
     this.clearVolTarget?.();
-    try { localStorage.removeItem(SAVE_KEY); } catch { /* ignore */ }
+    try { localStorage.removeItem(SAVE_KEY); localStorage.removeItem(AUTO_KEY); } catch { /* ignore */ }
     this.world.clearStructures();
     this.quests.reset();
     this.resetWorldState();
@@ -1407,7 +1454,25 @@ export class Game {
 
   // ------------------------------------------------------------------ save / load
   save() {
-    if (!this.quests || this.previewState) return; // never save the menu preview
+    const data = this.saveData();
+    if (!data) return;
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch { /* storage full or blocked */ }
+  }
+
+  /** Every minute while playing: a snapshot into the autosave ring (last 10). */
+  autosave() {
+    const data = this.saveData();
+    if (!data) return;
+    let list = [];
+    try { list = JSON.parse(localStorage.getItem(AUTO_KEY) || '[]'); } catch { list = []; }
+    list.unshift(data);
+    list = list.slice(0, 10);
+    try { localStorage.setItem(AUTO_KEY, JSON.stringify(list)); } catch { try { localStorage.setItem(AUTO_KEY, JSON.stringify(list.slice(0, 5))); } catch { /* full */ } }
+    this.save();
+  }
+
+  saveData() {
+    if (!this.quests || this.previewState) return null; // never save the menu preview
     const { quad, radlader } = this.vehicles;
     const vs = (v) => ({ x: v.position.x, z: v.position.z, h: v.heading });
     const data = {
@@ -1416,8 +1481,9 @@ export class Game {
       player: { x: this.player.position.x, z: this.player.position.z, r: this.headingOf() },
       vehicles: { quad: { ...vs(quad), broken: quad.broken, odo: quad.odometer }, radlader: { ...vs(radlader), fuel: radlader.fuel } },
       introShown: this.introShown,
+      t: Date.now(),
     };
-    try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch { /* storage full or blocked */ }
+    return data;
   }
 
   load() {
@@ -1630,6 +1696,7 @@ export class Game {
         for (const v of Object.values(this.vehicles)) if (Math.abs(v.speed) < 0.5) v.unstick(null, 0.6);
       }
       this.safe(() => this.updateVolTarget(this.time));
+      if (!this.finale && !this.devFast && (this._autoT = (this._autoT || 0) + dt) >= 60) { this._autoT = 0; this.safe(() => this.autosave()); }
       this._markerT = (this._markerT || 0) - dt;
       if (this._markerT <= 0) { this._markerT = 0.5; this.updateMarkers(); }
     }

@@ -223,7 +223,7 @@ body.touch .track .tt { font-size: 14px; }
 body.touch .track .ts { font-size: 13px; }
 body.touch .track ul { font-size: 12px; }
 /* phones: compact task lines – one per task, colour = kind, details inline */
-#tracker.compact { width: min(250px, 46vw); gap: 3px; pointer-events: auto; }
+#tracker.compact { width: min(250px, 46vw); gap: 3px; pointer-events: auto; max-height: calc(100vh - 56px - 196px - env(safe-area-inset-bottom)); overflow-y: auto; touch-action: pan-y; } /* ends above the sprint button (taps there stay the button's), scrolls if longer */
 #tracker.compact .trow { display: flex; align-items: center; gap: 5px; background: rgba(14, 18, 24, 0.78); border-left: 3px solid var(--gold); border-radius: 8px; padding: 3px 7px; font-size: 12px; line-height: 1.25; }
 #tracker.compact .trow .ti { flex: 0 0 auto; font-size: 11px; }
 #tracker.compact .trow .tx { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -242,7 +242,7 @@ body.touch .track ul { font-size: 12px; }
 #tracker.compact .k-new { border-left-color: #ffd21f; }
 #tracker.compact .k-new .ti b { color: #ffd21f; font-size: 13px; }
 /* tapped open: full text, wrapped, a bit wider */
-#tracker.compact.open { width: min(320px, 46vw); gap: 4px; right: calc(112px + env(safe-area-inset-right)); max-height: calc(100vh - 56px - 116px - env(safe-area-inset-bottom)); overflow-y: auto; touch-action: pan-y; } /* left of the sprint / E buttons, above the prompt */
+#tracker.compact.open { gap: 3px; }
 #tracker.compact.open .trow { align-items: flex-start; padding: 5px 8px; }
 #tracker.compact.open .trow .tx { white-space: normal; overflow: visible; }
 #tracker.compact.open .trow .tx b { color: var(--gold-2); }

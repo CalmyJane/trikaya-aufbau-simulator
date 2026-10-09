@@ -895,10 +895,10 @@ export function makeCamper(i, rng = Math.random) {
   };
 }
 
-/** The player's look — a fresh goa hippie volunteer. */
+/** The player's look — a fresh goa hippie volunteer, kept fairly gender-neutral: patchwork hoodie, curls, headband. */
 export const PLAYER_LOOK = {
-  base: 'm_adventurer', backpack: false, skin: SKIN.light, hair: '#6a4424',
+  base: 'm_hoodie', skin: SKIN.light, hair: '#7a4a2a', height: 1.72, width: 0.93,
   shirt: '#d98c2b', shirt2: '#9b3d8a', pants: '#2e6b5e', patchwork: true,
   shirtPatch: ['#d98c2b', '#9b3d8a', '#c9b24a'], pantsPatch: ['#2e6b5e', '#7a4a8a', '#8a6a4a'],
-  hairStyle: 'dreads', hairStyleColor: '#6a4424', beads: true,
+  hairStyle: 'curly', hairStyleColor: '#7a4a2a', headband: '#9b3d8a',
 };

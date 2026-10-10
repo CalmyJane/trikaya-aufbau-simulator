@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { Assets } from '../core/Assets.js';
 import { CREW_BASE, AREAS, LANDMARKS } from './layout.js';
+import { heightAt } from './Height.js';
 import { mat, box, cyl, corrugated, textPlane, signPost, dixi, fenceRun, beerBench, bauwagen } from './Props.js';
 
 // Crew base (the real crew camp): white site cabins – office, Matze's, Corni's, the workshop,
@@ -296,12 +297,40 @@ export function buildCrewBase(world) {
   // ------------------------------------------------ registration desk (Jan)
   base.add(box(2.2, 0.06, 0.9, mat('#c9a27a'), 5, 0.78, 15.6));
   for (const [x, z] of [[4.05, 15.2], [5.95, 15.2], [4.05, 16], [5.95, 16]]) base.add(box(0.05, 0.76, 0.05, mat('#444'), x, 0.39, z));
-  base.add(box(0.45, 0.3, 0.03, mat('#222'), 4.6, 0.97, 15.4));
-  base.add(box(0.35, 0.18, 0.25, mat('#e74c3c'), 5.7, 0.9, 15.7)); // box of wristbands
   addBoxCollider(5, 15.6, 1.15, 0.5, 0, 'crewbase');
-  const reg = signPost('EINLASS', { width: 2.2, height: 1.0, bg: '#ffe066', fg: '#222' });
-  reg.position.set(7, 0, 16.3);
-  base.add(reg);
+
+  // ------------------------------------------------ beer bottles: on the tables and lying around everywhere
+  const T = 0.81, B = 0.805; // top of the desk / of a beer bench
+  base.add(beerBottles([
+    // Jan's table
+    [4.3, T, 15.45], [4.55, T, 15.7], [4.95, T, 15.4], [5.2, T, 15.85], [5.6, T, 15.55], [5.85, T, 15.75, 1], [4.7, 0, 16.5, 1], [5.9, 0, 16.4],
+    // Aufenthaltszelt (benches at -4.2/1.0/-1.6) and the campfire
+    [-4.6, B, 1.3], [-3.9, B, 1.4], [0.6, B, 1.2], [1.5, B, 1.35, 1], [-1.9, B, 3.7], [-1.2, B, 3.9], [-0.9, B, 3.75], [-3.2, 0, 0.2, 1], [0.3, 0, 5.2],
+    [4.6, 0, 2.2], [5.3, 0, 4.6, 1], [7.4, 0, 3.6], [6.9, 0, 1.6, 1], [7.9, 0, 2.3],
+    // the lane, the workshop porch, Zdenko's hut, the generator, the gates
+    [-12.9, 0, -0.4], [-10.6, 0, 3.2, 1], [-10.4, 0, 6.3], [-6.2, 0, 9.6], [-5.6, 0, 11.4, 1], [-4.9, 0, -9.6, 1], [-5.3, 0, -12.2], [-3.4, 0, -13.2],
+    [-11.4, 0, 17.6], [-10.2, 0, 19.2, 1], [-17.2, 0, -8.9], [-8.1, 0, -20.6, 1], [-11.2, 0, -20.9], [3.2, 0, 20.9, 1], [-3.1, 0, 21.2],
+    // the yard, the cars, the sauna
+    [9.2, 0, -5.4, 1], [12.1, 0, -15.6], [15.2, 0, -12.6, 1], [16.1, 0, -12.2], [11.6, 0, 6.2], [13.1, 0, 12.4, 1], [2.4, 0, -17.6], [8.6, 0, 12.6, 1],
+    // Thompsen's wagon
+    [11.4, 0, 22.9], [11.9, 0, 23.1], [12.3, 0, 22.7, 1], [9.9, 0, 23.0, 1],
+  ]));
+  // …and all over the festival ground and the camping
+  {
+    const rnd = (i) => { const v = Math.sin(i * 53.7 + 9.1) * 43758.5453; return v - Math.floor(v); };
+    const list = [];
+    for (const [poly, count] of [[AREAS.festival, 70], [AREAS.crewCamp, 30]]) {
+      const bb = poly.reduce((b, p) => ({ x0: Math.min(b.x0, p.x), x1: Math.max(b.x1, p.x), z0: Math.min(b.z0, p.z), z1: Math.max(b.z1, p.z) }), { x0: 1e9, x1: -1e9, z0: 1e9, z1: -1e9 });
+      for (let i = 0, n = 0; n < count && i < 2000; i++) {
+        const x = bb.x0 + rnd(i * 2 + count) * (bb.x1 - bb.x0), z = bb.z0 + rnd(i * 2 + 1 + count) * (bb.z1 - bb.z0);
+        if (!pointInPoly(x, z, poly)) continue;
+        n++;
+        list.push([x, heightAt(x, z), z, rnd(i + 0.5) < 0.45 ? 1 : 0]);
+        if (rnd(i + 0.25) < 0.3) list.push([x + 0.25, heightAt(x + 0.25, z + 0.15), z + 0.15, 0]); // sometimes two friends
+      }
+    }
+    scene.add(beerBottles(list));
+  }
   addSpot('registration', 5, 14.5);
 
   // ------------------------------------------------ diesel tank (IBC) for the Radlader
@@ -888,6 +917,28 @@ function buildCampfire(base, world, addBoxCollider, x, z) {
     flames.forEach((f, i) => { const k = 1 + Math.sin(t * 9 + i * 1.7) * 0.2; f.scale.set(1, k, 1); f.rotation.y = t * (1 + i * 0.3); });
     glow.intensity = 5 + Math.sin(t * 11) * 0.8 + Math.sin(t * 5.3) * 0.6;
   });
+}
+
+let bottleGeo;
+/** Brown beer bottles as one instanced mesh. Entries: [x, y, z, lying?] (y = height of the surface they stand on). */
+function beerBottles(list) {
+  if (!bottleGeo) {
+    const pr = [[0, 0], [0.034, 0], [0.036, 0.02], [0.036, 0.13], [0.03, 0.16], [0.015, 0.2], [0.014, 0.245], [0.017, 0.25], [0, 0.25]];
+    bottleGeo = new THREE.LatheGeometry(pr.map(([r, y]) => new THREE.Vector2(r, y)), 7);
+  }
+  const im = new THREE.InstancedMesh(bottleGeo, new THREE.MeshStandardMaterial({ roughness: 0.25, metalness: 0.1 }), list.length);
+  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), one = new THREE.Vector3(1, 1, 1), col = new THREE.Color();
+  const cols = ['#5a3312', '#6b3d14', '#4a2a10', '#2f5a2a', '#5a3312'];
+  list.forEach(([x, y, z, lying], i) => {
+    const a = Math.sin(i * 12.9898) * 43758.5453, r = (a - Math.floor(a)) * 6.28;
+    e.set(lying ? Math.PI / 2 : 0, 0, lying ? r : 0);
+    q.setFromEuler(e);
+    m4.compose(new THREE.Vector3(x, y + (lying ? 0.036 : 0), z), q, one);
+    im.setMatrixAt(i, m4);
+    im.setColorAt(i, col.set(cols[i % cols.length]));
+  });
+  im.castShadow = true;
+  return im;
 }
 
 function chicken() {

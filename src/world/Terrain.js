@@ -30,7 +30,8 @@ const BASE_PATHS = [
   [[-11.9, -1], [-11, -9], [-9.3, -15], [-9.3, -22.5]],                            // → north gate between the storage cabins
   [[-9.3, -15], [-3.7, -16]],                                                      // Hühnercontainer
   [[-11, -9], [-14, -12.5], [-17.1, -15.3]],                                       // Künstlergasse
-  [[10.5, -3], [-2, -9.5], [-11, -9]],                                             // yard → storage cabins
+  [[10.5, -3], [-1.3, -6.2], [-11, -9]],                                           // yard → storage cabins
+  [[-1.3, -6.2], [-1.4, -8]],                                                      // Zdenko's hut
   [[0, 12], [-5, 17], [-11, 18.6]],                                                // generator
   [[9, 7], [7, 4.3]],                                                              // Lagerfeuer
 ];

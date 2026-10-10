@@ -929,6 +929,18 @@ const BEHAVIORS = {
         else if (n.stateT <= 0) { n.state = 'wander'; n.stateT = 20; }
         break;
       }
+      case 'goHut': { // his own garden shed in the crew camp: chair under the porch
+        const hs = n.world.spots.zdenko_seat;
+        const r = n.walkTo(hs, dt, 1.4);
+        if (r) { n.sitAt(hs, n.world.spots.zdenko_table); n.state = 'hut'; n.stateT = 40 + Math.random() * 40; }
+        else if (n.stateT <= 0) { n.state = 'wander'; n.stateT = 20; }
+        break;
+      }
+      case 'hut':
+        n.char.play('neutral');
+        if (Math.random() < dt * 0.04 && !n.bubble) n.say(pick([{ de: 'Meine Hütte. Mein Stuhl. Mein Bier. Respekt.', en: 'My hut. My chair. My beer. Respect.' }, { de: 'Hier chillt der Chef.', en: 'This is where the boss chills.' }, { de: '*prostet der Hütte zu*', en: '*raises his bottle to the hut*' }]), 3);
+        if (n.stateT <= 0) { n.standUp(); n.state = 'wander'; n.stateT = 20 + Math.random() * 20; }
+        break;
       case 'werkstatt': // radio on, head nodding
         n.char.faceTowards(n.world.spots.werkstatt_inside, dt, 3);
         n.char.play('idle', 0.3, { timeScale: 1.6 });
@@ -946,7 +958,7 @@ const BEHAVIORS = {
         break;
       case 'wander':
       default: {
-        if (n.stateT <= 0 && n.state === 'wander') { n.state = Math.random() < 0.45 && n.world.spots.werkstatt_seat ? 'goWerkstatt' : 'goSit'; n.stateT = 60; break; }
+        if (n.stateT <= 0 && n.state === 'wander') { const roll = Math.random(); n.state = roll < 0.3 && n.world.spots.werkstatt_seat ? 'goWerkstatt' : roll < 0.6 && n.world.spots.zdenko_seat ? 'goHut' : 'goSit'; n.stateT = roll < 0.6 ? 90 : 60; break; }
         if (n.toPlayer < 3) {
           n.char.faceTowards(player.position, dt);
           n.char.play('idle');

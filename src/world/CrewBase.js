@@ -188,6 +188,9 @@ export function buildCrewBase(world) {
   addSpot('campfire', 6, 3);
   addSpot('campfire_box', 8.7, 1.1);
 
+  // Zdenko's garden shed between the Hühnercontainer and the Aufenthaltszelt – he likes to chill under its little porch
+  buildZdenkoHut(base, addBoxCollider, addSpot, -1.5, -11, 0.1);
+
   // aliases for jobs written against the old container numbers
   spots.C1_front = spots.werkstatt_inside;        // tools, shackles, ropes, pegs, screws
   spots.C2_front = spots.kuenstler_front;         // cables & steel wires, drill
@@ -606,6 +609,55 @@ function buildLoungeTent(base, addBoxCollider, addSpot, x, z) {
   g.position.set(x, 0, z);
   base.add(g);
   addSpot('aufenthalt', x, z);
+}
+
+/** Zdenko's Hütte: small wooden garden shed, porch roof in front (+z) with a table and a chair. */
+function buildZdenkoHut(base, addBoxCollider, addSpot, x, z, rot) {
+  const g = new THREE.Group();
+  const W = 3.0, D = 2.4, H = 2.0, PD = 1.7;
+  const wood = mat('#9a7248', { roughness: 0.9 }), dark = mat('#6b4a2b', { roughness: 0.9 }), roofM = mat('#3c3a36', { roughness: 0.8 });
+  g.add(box(W, H, D, wood, 0, H / 2, 0));
+  for (let i = 1; i < 8; i++) g.add(box(0.03, H, 0.02, dark, -W / 2 + (i * W) / 8, H / 2, D / 2 + 0.01)); // plank joints
+  g.add(box(0.8, 1.75, 0.05, dark, -0.7, 0.9, D / 2 + 0.03));                                   // door
+  g.add(box(0.7, 0.6, 0.05, mat('#9fd3f0', { roughness: 0.2 }), 0.75, 1.3, D / 2 + 0.03));      // window
+  // gabled roof (ridge along x), the front slope runs on as the porch roof
+  const rise = 0.6, hw = D / 2 + 0.2;
+  const back = box(W + 0.3, 0.06, Math.hypot(hw, rise), roofM, 0, H + rise / 2, -hw / 2);
+  back.rotation.x = -Math.atan2(rise, hw);
+  g.add(back);
+  const frontLen = Math.hypot(hw + PD, rise + 0.25);
+  const front = box(W + 0.3, 0.06, frontLen, roofM, 0, H + rise / 2 - 0.125, (hw + PD) / 2);
+  front.rotation.x = Math.atan2(rise + 0.25, hw + PD);
+  g.add(front);
+  for (const s of [-1, 1]) {
+    const tri = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(s * W / 2, H, -D / 2), new THREE.Vector3(s * W / 2, H, D / 2), new THREE.Vector3(s * W / 2, H + rise, 0)]);
+    tri.computeVertexNormals();
+    g.add(new THREE.Mesh(tri, mat('#9a7248', { roughness: 0.9, side: THREE.DoubleSide })));
+    g.add(box(0.1, H - 0.2, 0.1, dark, s * (W / 2 - 0.05), (H - 0.2) / 2, D / 2 + PD - 0.1)); // porch posts
+  }
+  g.add(box(W, 0.08, PD, mat('#8a6a42'), 0, 0.04, D / 2 + PD / 2));                               // porch deck
+  // table + chair under the porch
+  const tx = 0.55, tz = D / 2 + 0.85;
+  g.add(cyl(0.38, 0.38, 0.05, mat('#c9a27a'), 10, tx, 0.72, tz));
+  g.add(cyl(0.05, 0.05, 0.66, dark, 6, tx, 0.39, tz));
+  g.add(cyl(0.06, 0.05, 0.16, mat('#6b3a1a'), 6, tx + 0.1, 0.83, tz - 0.08));                    // beer bottle
+  const cx = -0.45;
+  g.add(box(0.45, 0.06, 0.45, dark, cx, 0.46, tz));
+  g.add(box(0.06, 0.5, 0.45, dark, cx - 0.22, 0.72, tz));
+  for (const [dx, dz] of [[-0.18, -0.18], [0.18, -0.18], [-0.18, 0.18], [0.18, 0.18]]) g.add(box(0.05, 0.42, 0.05, dark, cx + dx, 0.25, tz + dz));
+  const sign = textPlane('ZDENKO', 0.9, 0.24, { w: 384, h: 104, bg: '#e8d8b0', fg: '#3a2a1a', font: 'bold 64px sans-serif' });
+  sign.position.set(-0.7, 1.92, D / 2 + 0.05);
+  g.add(sign);
+  g.position.set(x, 0, z);
+  g.rotation.y = rot;
+  base.add(g);
+  const L = (lx, lz) => cabinLocal(x, z, rot, lx, lz);
+  addBoxCollider(x, z, W / 2, D / 2, rot, 'zdenko_hut');
+  for (const s of [-1, 1]) { const [px, pz] = L(s * (W / 2 - 0.05), D / 2 + PD - 0.1); addBoxCollider(px, pz, 0.08, 0.08, rot, 'zdenko_hut'); }
+  const [ax, az] = L(tx, tz); addBoxCollider(ax, az, 0.3, 0.3, rot, 'zdenko_hut');
+  const [sx, sz] = L(cx, tz); addSpot('zdenko_seat', sx, sz);
+  addSpot('zdenko_table', ax, az);
+  const [fx, fz] = L(0, D / 2 + PD + 1.2); addSpot('zdenko_hut', fx, fz);
 }
 
 /** Lagerfeuer: ring of stones, burning logs, a few tree-trunk seats around it. */

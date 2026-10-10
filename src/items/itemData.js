@@ -43,6 +43,8 @@ export const ITEMS = {
   market_goods: { name: { de: 'Ware für die Shops', en: 'Goods for the shops' }, icon: '💎', mesh: () => duffel('#6a3d9a', 0.8) },
   diag_device: { name: { de: 'Diagnosegerät', en: 'Diagnostic tool' }, icon: '🧰', mesh: () => { const g = new THREE.Group(); g.add(box(0.45, 0.25, 0.3, mat('#f1c40f'), 0, 0.13, 0)); g.add(box(0.2, 0.12, 0.02, mat('#4aa3ff'), 0, 0.2, 0.16)); return g; } },
   narnia_screws: { name: { de: 'Kiste Terrassenschrauben', en: 'Box of deck screws' }, icon: '🔩', mesh: () => box(0.45, 0.25, 0.3, mat('#2f6fb3'), 0, 0.13, 0) },
+  cable_auger: { name: { de: 'Erdbohrer', en: 'Earth auger' }, icon: '🌀', mesh: () => auger('#e87a10') },
+  cable_drum: { name: { de: 'Kabeltrommel (Starkstrom)', en: 'Cable drum (heavy current)' }, icon: '🔌', mesh: cableDrum },
   narnia_cable: { name: { de: 'Kabeltrommel', en: 'Cable drum' }, icon: '🔌', mesh: cableDrum },
   kg_stretch: { name: { de: 'Stretchzelt (Künstlergasse)', en: 'Stretch tent (Künstlergasse)' }, icon: '⛺', mesh: () => duffel('#e8d2a6', 1.1) },
   kg_royal: { name: { de: 'Königszelt (rot-gold)', en: 'Royal tent (red & gold)' }, icon: '👑', mesh: () => duffel('#a8233a', 1.0) },

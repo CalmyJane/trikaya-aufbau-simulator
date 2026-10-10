@@ -349,6 +349,7 @@ export function buildCrewBase(world) {
   base.add(box(2.2, 0.06, 0.9, mat('#c9a27a'), 5, 0.78, 15.6));
   for (const [x, z] of [[4.05, 15.2], [5.95, 15.2], [4.05, 16], [5.95, 16]]) base.add(box(0.05, 0.76, 0.05, mat('#444'), x, 0.39, z));
   addBoxCollider(5, 15.6, 1.15, 0.5, 0, 'crewbase');
+  addSpot('registration', 5, 14.5);
 
   // ------------------------------------------------ beer bottles: where there are tables and corners people chill in
   const T = 0.81, B = 0.805; // top of the desk / of a beer bench

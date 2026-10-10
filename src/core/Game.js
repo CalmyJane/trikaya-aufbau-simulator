@@ -223,7 +223,9 @@ export class Game {
     const lvl = this.quests ? this.quests.state.completed.filter((id) => !id.startsWith('err_')).length : 0;
     this.world.setCampProgress(lvl);
     // Mia's crew builds the Narnia Floor in stages – each delivery lets them get further
-    const narnia = ['n1_narnia', 'n2_narnia', 'n3_narnia'].filter((id) => this.quests?.isDone(id)).length;
+    // (two deliveries; before the first one the crew has already started once day 2 begins)
+    const nDone = ['n2_narnia', 'n3_narnia'].filter((id) => this.quests?.isDone(id)).length;
+    const narnia = nDone ? nDone + 1 : ((this.quests?.state.day || 1) >= 2 ? 1 : 0);
     this.npcs.nutFound = !!this.quests?.isDone('x1_nuss'); // the special nut running gag ends
     this.world.setStructureStage('narnia_floor', narnia);
     // the chai tent: overnight before the last build day it suddenly stands. Empty. (it's never finished)

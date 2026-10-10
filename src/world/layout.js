@@ -106,7 +106,7 @@ export const LANDMARKS = {
   kitchen: P(445, 548),       // crew kitchen, on the festival ground (right of the dragon, straw bales behind)
   dixi_delivery: P(434, 390), // pallets of Dixis are dropped at the front of the crew camp, next to the road
   wc_container: P(604, 760),   // the toilet trailer is delivered straight onto the festival ground
-  festival_generator: P(585, 615),
+  festival_generator: P(451, 528), // behind the crew kitchen (north side, towards the hedge)
   bar_tent: P(358, 740),       // the red & black round bar tent at the south fence
   east_gate: P(612, 728),
   gate_drop: P(594, 706),     // just inside the east gate: suppliers drop heavy material for the western stages here     // gate in the east fence: deliveries come in here (the entrance tent stands further inside)

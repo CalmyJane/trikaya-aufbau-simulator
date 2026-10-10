@@ -51,6 +51,7 @@ export class Minigame {
       case 'spot': return this.spot(o);
       case 'crown': return this.crown(o);
       case 'pump': return this.pump(o);
+      case 'trench': return this.trench(o);
       default: return this.timing(o);
     }
   }
@@ -254,6 +255,83 @@ export class Minigame {
       };
       raf = requestAnimationFrame(tick);
       const off = this.listen(el, () => { hold = true; }, () => finish(false), () => { hold = false; });
+    });
+  }
+
+  /**
+   * Cable trench: the auger scratches along the marked route all by itself, you only keep it on the line
+   * (hold = right, let go = left). Stay on it long enough and the cable is in; wander off too long and it's a mess.
+   */
+  trench({ title, length = 9, width = 0.3, slack = 3 } = {}) {
+    const de = getLang() === 'de';
+    const el = this.frame(title || (de ? 'In der Spur bleiben!' : 'Stay on track!'), de ? '<b>E</b> / Leertaste / Finger <b>halten</b> lenkt nach rechts, loslassen nach links' : '<b>Hold</b> E / Space / finger to steer right, let go to drift left',
+      '<canvas class="mg-canvas" width="420" height="210" style="width:100%;display:block;border-radius:10px;background:#6f8a45"></canvas><div class="mg-sub"><div class="mg-subfill"></div></div>');
+    const cv = el.querySelector('canvas'), ctx = cv.getContext('2d'), sub = el.querySelector('.mg-subfill');
+    const W = cv.width, H = cv.height, AY = H * 0.36, PX = 46; // auger line, pixels per metre of route
+    const ph = Math.random() * 6;
+    const route = (d) => 0.5 + 0.22 * Math.sin(d * 0.6 + ph) + 0.07 * Math.sin(d * 1.5 + ph * 1.7);
+    return new Promise((resolve) => {
+      let x = route(0), v = 0, hold = false, dist = 0, off = 0, last = performance.now(), raf = 0, t = 0;
+      const trail = []; // [distance, x, on track?]
+      const finish = this.finisher(el, resolve, () => { cancelAnimationFrame(raf); stop(); });
+      const draw = () => {
+        ctx.clearRect(0, 0, W, H);
+        // grass tufts scrolling by
+        ctx.fillStyle = 'rgba(40,70,25,0.35)';
+        for (let i = 0; i < 26; i++) {
+          const gy = ((i * 53 + dist * PX) % (H + 20)) - 10, gx = (i * 97) % W;
+          ctx.fillRect(gx, H - gy, 3, 7);
+        }
+        // the marked route ahead (spray paint dashes)
+        ctx.setLineDash([10, 9]); ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(255,90,170,0.9)';
+        ctx.beginPath();
+        for (let y = AY; y <= H + 8; y += 8) { const d = dist + (y - AY) / PX; const px = route(d) * W; if (y === AY) ctx.moveTo(px, y); else ctx.lineTo(px, y); }
+        ctx.stroke(); ctx.setLineDash([]);
+        // the trench already scratched + the cable in it
+        for (const [col, lw] of [['#4a3520', 22], ['#2e2114', 12]]) {
+          ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+          ctx.beginPath();
+          trail.forEach(([d, tx], i) => { const y = AY - (dist - d) * PX; if (i) ctx.lineTo(tx * W, y); else ctx.moveTo(tx * W, y); });
+          ctx.lineTo(x * W, AY); ctx.stroke();
+        }
+        ctx.strokeStyle = '#e8b020'; ctx.lineWidth = 3;
+        ctx.beginPath();
+        trail.forEach(([d, tx], i) => { const y = AY - (dist - d) * PX; if (y > AY - 14) return; if (i) ctx.lineTo(tx * W, y); else ctx.moveTo(tx * W, y); });
+        ctx.stroke();
+        // the auger: spinning spiral, shaking a bit
+        const sx = x * W + Math.sin(t * 40) * 1.5, on = Math.abs(x - route(dist)) < width / 2;
+        ctx.fillStyle = on ? '#ffb020' : '#ff5040';
+        ctx.beginPath(); ctx.arc(sx, AY, 13, 0, 7); ctx.fill();
+        ctx.strokeStyle = '#3a2a10'; ctx.lineWidth = 3;
+        ctx.beginPath();
+        for (let a = 0; a < 9; a += 0.4) { const r = a * 1.3, px = sx + Math.cos(a + t * 14) * r, py = AY + Math.sin(a + t * 14) * r; if (a) ctx.lineTo(px, py); else ctx.moveTo(px, py); }
+        ctx.stroke();
+        // dirt flying
+        ctx.fillStyle = '#5a4026';
+        for (let i = 0; i < 6; i++) { const a = t * 9 + i * 1.05; ctx.fillRect(sx + Math.cos(a) * (16 + (i % 3) * 5), AY - 6 - Math.abs(Math.sin(a * 1.7)) * 12, 3, 3); }
+      };
+      const tick = (now) => {
+        const dt = Math.min(0.05, (now - last) / 1000); last = now; t += dt;
+        const speed = 1.1 + 0.2 * Math.min(1, dist / length); // pulls a little harder towards the end
+        dist += speed * dt;
+        v += (hold ? 3.2 : -3.2) * dt;
+        v *= 1 - 3.5 * dt;
+        x = Math.min(0.97, Math.max(0.03, x + v * dt));
+        if (x <= 0.03 || x >= 0.97) v = 0;
+        const on = Math.abs(x - route(dist)) < width / 2;
+        if (!on) off += dt;
+        if (!trail.length || dist - trail[trail.length - 1][0] > 0.08) trail.push([dist, x, on]);
+        while (trail.length && (dist - trail[0][0]) * PX > AY + 30) trail.shift();
+        sub.style.width = `${Math.min(1, dist / length) * 100}%`;
+        sub.style.background = off > slack * 0.6 ? '#ff7a50' : '';
+        draw();
+        if (off > slack) return finish(false);
+        if (dist >= length) return finish(true);
+        raf = requestAnimationFrame(tick);
+      };
+      draw();
+      raf = requestAnimationFrame(tick);
+      const stop = this.listen(el, () => { hold = true; }, () => finish(false), () => { hold = false; });
     });
   }
 

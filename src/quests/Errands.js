@@ -83,7 +83,7 @@ const MESSAGES = [
   { from: 'felix', to: 'julez', ask: C('Sag Julez, das Lichtkonzept ist final. FINAL.', 'Tell Julez the lighting concept is final. FINAL.'),
     msg: C('Felix sagt, das Lichtkonzept ist final.', 'Felix says the lighting concept is final.'), reply: C('Final ist es, wenn es richtig ist. Und das ist es nicht.', 'It\'s final when it\'s right. And it isn\'t.'),
     relay: C('Julez sagt, final ist es erst, wenn es richtig ist. Und das ist es nicht.', 'Julez says it\'s only final once it\'s right. And it isn\'t.'), back: C('*seufz* Julez. Immer Julez. Ich mach\'s trotzdem so. Kann man so machen.', '*sigh* Julez. Always Julez. I\'m doing it anyway. You could do it like that.') },
-  { from: 'mia', to: 'lenny', needs: 'n1_narnia', ask: C('Sag Lenny, sie soll schrauben, nicht tanzen. Lieb, aber bestimmt. 💛', 'Tell Lenny to screw, not dance. Kindly but firmly. 💛'),
+  { from: 'mia', to: 'lenny', needs: 'n2_narnia', ask: C('Sag Lenny, sie soll schrauben, nicht tanzen. Lieb, aber bestimmt. 💛', 'Tell Lenny to screw, not dance. Kindly but firmly. 💛'),
     msg: C('Mia sagt: schrauben, nicht tanzen.', 'Mia says: screw, don\'t dance.'), reply: C('Ich schraub doch! Im Takt!', 'I am screwing! In rhythm!'),
     relay: C('Lenny schraubt. Im Takt. Mit Hüftschwung.', 'Lenny is screwing. In rhythm. With a hip swing.'), back: C('Im Takt… okay. Das zählt. 💛', 'In rhythm… okay. That counts. 💛') },
   { from: 'silke', to: 'juli', ask: C('Frag Juli, ob wir einen Hammer leihen dürfen. Für die Vision.', 'Ask Juli if we can borrow a hammer. For the vision.'),

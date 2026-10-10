@@ -314,6 +314,22 @@ export class World {
     this.scene.add(gen);
     this.colliders.addBox(fg.x, fg.z, 1.35, 0.65, 0.4, 'gen');
 
+    // cable trench from the generator towards the mainstage (Felix' job): three sections, each appears once it is dug
+    this.trenches = [0, 1, 2].map((i) => {
+      const x = fg.x - 4 - i * 5.2, z = fg.z + 0.9 + i * 0.35;
+      const g = new THREE.Group();
+      g.add(box(5.2, 0.05, 0.5, mat('#3a2a18'), 0, 0.03, 0));                      // the scratched channel
+      for (const s of [-1, 1]) g.add(box(5.2, 0.1, 0.22, mat('#6b5236'), 0, 0.05, s * 0.36)); // earth thrown up beside it
+      g.add(box(5.2, 0.05, 0.08, mat('#e8b020'), 0, 0.07, 0));                      // the cable
+      g.position.set(x, heightAt(x, z), z);
+      g.rotation.y = -0.07;
+      g.visible = false;
+      this.scene.add(g);
+      this.spots[`trench_${i + 1}`] = new THREE.Vector3(x, 0, z + 1.1);
+      return g;
+    });
+    this.progressHandlers.trench = (done) => this.trenches.forEach((g, i) => { g.visible = done.includes(i); });
+
     // Entrance sign
     const ent = PLOTS.entrance.pos;
     const s = signPost('TRIKAYA', { width: 3, height: 1.4, bg: '#101010', fg: '#e8a33a' });

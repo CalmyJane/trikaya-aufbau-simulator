@@ -40,19 +40,19 @@ export const FIELDS = [
 // Roads & tracks: width in metres
 export const ROADS = [
   { name: 'Enterstraße', pts: line([[150, 300], [235, 328], [470, 440], [622, 578]]), width: 5, kind: 'gravel' },
-  { name: 'Enterstraße', pts: line([[622, 578], [800, 530], [1100, 452], [1255, 413], [1500, 400]]), width: 6, kind: 'asphalt' },
+  { name: 'Enterstraße', pts: line([[622, 578], [800, 530], [960, 494], [1105, 465], [1190, 436], [1255, 413], [1500, 400]]), width: 6, kind: 'asphalt' }, // runs parallel to the south edge of the crew base
   { name: 'Gündinger Weg', pts: line([[1060, -200], [1120, 20], [1150, 120], [1172, 245], [1200, 340], [1255, 413], [1280, 700], [1290, 961]]), width: 6, kind: 'asphalt' }, // ends at Lippweg
   { name: 'Feldweg', pts: line([[-200, 330], [265, 303], [930, 238], [1172, 238]]), width: 4, kind: 'dirt' },
-  { name: 'Crew-Zufahrt', pts: line([[470, 440], [520, 421], [700, 379], [916, 323], [1000, 306], [1049, 304]]), width: 4, kind: 'dirt' },
-  { name: 'Crew-Einfahrt', pts: line([[972, 312], [975, 332]]), width: 4, kind: 'dirt' }, // into the crew base, between the two storage cabins
-  { name: 'Base-Einfahrt', pts: line([[1034, 468], [1030, 452]]), width: 6, kind: 'gravel' },
+  { name: 'Crew-Zufahrt', pts: line([[470, 440], [520, 421], [700, 379], [916, 323], [1000, 303], [1071, 289], [1178, 267.5]]), width: 4, kind: 'dirt' }, // parallel to the north edge of the crew base, on to the Gündinger Weg
+  { name: 'Crew-Einfahrt', pts: line([[971, 309], [975, 332]]), width: 4, kind: 'dirt' }, // into the crew base, between the two storage cabins
+  { name: 'Base-Einfahrt', pts: line([[1035, 480], [1033, 460]]), width: 6, kind: 'gravel' },
   { name: 'Parkplatz-Zufahrt', pts: line([[1172, 250], [1122, 255]]), width: 5, kind: 'gravel' },
 ];
 
 // Tree rows / clusters (plan coords)
 export const TREE_LINES = [
   { pts: line([[640, 600], [648, 880]]), spacing: 5, jitter: 1 },                    // hedge east of festival (TSV side)
-  { pts: line([[800, 538], [1100, 460]]), spacing: 16, jitter: 2 },                 // a few trees along Enterstraße east
+  { pts: line([[800, 542], [960, 506], [1100, 478]]), spacing: 16, jitter: 2 },                 // a few trees along Enterstraße east
   { pts: line([[650, 900], [790, 900]]), spacing: 6, jitter: 1.2 },
   { pts: line([[387, -30], [300, 140], [223, 297], [120, 470], [15, 640], [-130, 867]]), spacing: 7, jitter: 2 }, // the long hedge along the field track west of the site
   { pts: line([[1260, 440], [1290, 700]]), spacing: 6, jitter: 2 },
@@ -116,11 +116,11 @@ export const LANDMARKS = {
 // Festival build plots (from the site plan). Quests reference these by id.
 export const PLOTS = {
   // West → east, as on the drone photos. The dragon stands at the hedge in the middle of the north side.
-  mainstage:    { pos: P(370, 577), size: 30, flatRadius: 24, label: 'Mainstage', prebuilt: true },
+  mainstage:    { pos: P(370, 577), size: 30, flatRadius: 27, label: 'Mainstage', prebuilt: true },
   // the firespace with the wooden Shiva statue is already standing too
   firespace:    { pos: P(295, 734), size: 18, flatRadius: 13, label: 'Firespace', prebuilt: true }, // south-west of the dancefloor, where the dragon looks
   hammocks:     { pos: P(215, 728), size: 18, label: 'Hängemattenwald' },                         // between the Forest Dome and the statue
-  chai_lounge:  { pos: P(405, 655), size: 16, label: 'Chai Lounge', prebuilt: true },               // below the mainstage, in the middle of the ground – eternal construction site
+  chai_lounge:  { pos: P(432, 660), size: 16, label: 'Chai Lounge', prebuilt: true },               // below the mainstage, in the middle of the ground – eternal construction site
   planetarium:  { pos: P(514, 556), size: 18, label: 'Planetarium' },                               // the rectangle at the far east, right along the north-east fence
   biergarten:   { pos: P(420, 724), size: 15, label: 'Techno Floor', rotation: -0.45, scale: 0.82 }, // the two tents near the bar, a bit smaller, turned like the Forest Dome
   awareness:    { pos: P(565, 590), size: 12, label: 'Awareness' },                                 // green & light green, at the north-east fence next to the planetarium (generator south of it)

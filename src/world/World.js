@@ -8,7 +8,7 @@ import { buildCrewBase, pointInPoly } from './CrewBase.js';
 import { strawWall } from './Structures2.js';
 import { buildStructure } from './Structures.js';
 import { heightAt } from './Height.js';
-import { postPositions } from './Mainstage.js';
+import { postPositions, RING_Z } from './Mainstage.js';
 import {
   AREAS, TREE_LINES, TREE_CLUSTERS, FESTIVAL_FENCE, PLOTS, LANDMARKS, P, ROADS, HEDGES, DIXI_ROWS, SITE_BOUNDS,
 } from './layout.js';
@@ -610,7 +610,7 @@ export class World {
     // rigging posts of the mainstage (stand just outside each post)
     const ms = PLOTS.mainstage.pos;
     postPositions().forEach((pp, i) => {
-      const out = pp.clone().normalize().multiplyScalar(1.3);
+      const out = new THREE.Vector3(pp.x, 0, pp.z - RING_Z).normalize().multiplyScalar(1.3);
       add(`post_${i + 1}`, { x: ms.x + pp.x + out.x, z: ms.z + pp.z + out.z });
     });
   }

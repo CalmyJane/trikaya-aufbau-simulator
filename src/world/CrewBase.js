@@ -73,15 +73,15 @@ export function buildCrewBase(world) {
       const n = Math.ceil(((t1 - t0) * len) / 3.5);
       for (let k = 0; k < n; k++) {
         const ta = t0 + ((t1 - t0) * k) / n, tb = t0 + ((t1 - t0) * (k + 1)) / n;
-        const a = toWorld(ax + (bx - ax) * ta, az + (bz - az) * ta), b = toWorld(ax + (bx - ax) * tb, az + (bz - az) * tb);
-        segs.push({ ax: a.x, az: a.z, bx: b.x, bz: b.z });
-        const fw = colliders.addWall(a.x, a.z, b.x, b.z, 0.3, 'basefence');
-        fw.h = 2.0;
-        fw.navPad = 0.42; // paths keep a body width away, so nobody grinds along the fence next to a gate
+        const la = [ax + (bx - ax) * ta, az + (bz - az) * ta], lb = [ax + (bx - ax) * tb, az + (bz - az) * tb];
+        const a = toWorld(...la), b = toWorld(...lb);
+        segs.push([la, lb]);
+        colliders.addWall(a.x, a.z, b.x, b.z, 1.1, 'basefence').h = 2.0;
       }
     }
   }
-  scene.add(fenceRun(segs));
+  // no Bauzaun around the real crew camp: bushes and reeds grow all around it
+  base.add(scrubHedge(segs));
   const wall = earthWall(HD * 2);
   wall.position.set(-HW, 0, 0);
   base.add(wall);
@@ -211,7 +211,7 @@ export function buildCrewBase(world) {
   spots.C2_front = spots.kuenstler_front;         // cables & steel wires, drill
   spots.C3_front = spots.huehner_front;           // tents, tarps, yurt
   addSpot('C4_front', 2.6, -16.5);              // deco stuff next to the Hühnercontainer
-  addSpot('sauna_site', 16.5, -16.5);                  // Krygo's sauna (eternal construction site)
+  addSpot('sauna_site', 17.3, -14.3);                  // Krygo's sauna (eternal construction site)
 
   // ------------------------------------------------ vehicles, pallets, clutter
   const pickup = Assets.model('pickup', { length: 5.3 });
@@ -221,6 +221,19 @@ export function buildCrewBase(world) {
   world.crewPickup = pickup;
   addBoxCollider(13.5, 8.5, 1.05, 2.6, -0.4, 'pickup'); // the model is long along its z axis
   addSpot('pickup_bed', 13.5 + Math.sin(0.4) * 3.6, 8.5 - Math.cos(0.4) * 3.6); // behind the truck (the bed points to -z)
+
+  // a few crew cars parked nose-first at the north hedge
+  for (const [x, z, rot, tint] of [[10.6, -19, 0.06, '#7a2a22'], [13.6, -19.2, -0.05, '#d8d4c8']]) {
+    const car = Assets.model('pickup', { length: 5.2 });
+    car.traverse((o) => { if (o.isMesh && o.material.color) { o.material = o.material.clone(); o.material.color.lerp(new THREE.Color(tint), 0.55); } });
+    car.position.set(x, 0, z);
+    car.rotation.y = rot;
+    base.add(car);
+    addBoxCollider(x, z, 1.05, 2.6, rot, 'car');
+  }
+
+  // Tinyhaus Thompsen's home: the big red wagon at the Enterstraße, an old orange tipper trailer next to it
+  buildTinyhaus(base, addBoxCollider, addSpot, 10.2, 19.4);
 
   // Bauwagen along the east side (the blue one is where Fabi leaves the diesel canister)
   for (const [col, x, z, rot] of [['#2d6a9f', 15.2, 14.2, -Math.PI / 2], ['#a8483a', 17, 1.5, -Math.PI / 2 + 0.12]]) {
@@ -233,7 +246,7 @@ export function buildCrewBase(world) {
 
   const clutter = [
     ['pallet', { length: 1.2 }, 11, -12, 0.2], ['pallet', { length: 1.2 }, 12.4, -11.6, -0.1],
-    ['crate', { height: 0.9 }, 11, -12, 0, 0.14], ['crate', { height: 0.9 }, 3.6, -19.4, 0.5],
+    ['crate', { height: 0.9 }, 11, -12, 0, 0.14], ['crate', { height: 0.9 }, 2.2, -19.8, 0.5],
     ['cone', { height: 0.7 }, -2, 20], ['cone', { height: 0.7 }, 2, 20],
     ['ladder', { height: 3 }, -12.5, 14.75, 0],
   ];
@@ -244,15 +257,15 @@ export function buildCrewBase(world) {
     base.add(m);
   }
   addBoxCollider(11.7, -11.8, 1.5, 0.8, 0, 'crewbase');
-  addBoxCollider(3.6, -19.4, 0.5, 0.5, 0, 'crewbase');
+  addBoxCollider(2.2, -19.8, 0.5, 0.5, 0, 'crewbase');
 
   // cable drums
   for (let i = 0; i < 3; i++) {
-    const drum = cyl(0.7, 0.7, 0.6, mat('#8a5a2b'), 12, 6.5 + i * 1.6, 0.7, -19.5);
+    const drum = cyl(0.7, 0.7, 0.6, mat('#8a5a2b'), 12, 4.3 + i * 1.6, 0.7, -19.8);
     drum.rotation.x = Math.PI / 2;
     base.add(drum);
   }
-  addBoxCollider(8.1, -19.5, 2.4, 0.5, 0, 'crewbase');
+  addBoxCollider(5.9, -19.8, 2.4, 0.5, 0, 'crewbase');
 
   // flag pole with festival flag
   base.add(cyl(0.06, 0.06, 8, mat('#cccccc', { metalness: 0.6 }), 6, 18.5, 4, 6));
@@ -624,6 +637,108 @@ function buildLoungeTent(base, addBoxCollider, addSpot, x, z) {
   g.position.set(x, 0, z);
   base.add(g);
   addSpot('aufenthalt', x, z);
+}
+
+/** Bushes and reed clumps along the given base-local segments [[x0, z0], [x1, z1]] (replaces the fence). */
+function scrubHedge(segs) {
+  const g = new THREE.Group();
+  const rnd = (i) => { const v = Math.sin(i * 91.7 + 1.3) * 43758.5453; return v - Math.floor(v); };
+  const bushes = [], reeds = [];
+  let k = 0;
+  for (const [[x0, z0], [x1, z1]] of segs) {
+    const len = Math.hypot(x1 - x0, z1 - z0);
+    const nx = -(z1 - z0) / len, nz = (x1 - x0) / len;
+    const n = Math.max(2, Math.round(len / 0.95));
+    for (let i = 0; i < n; i++, k++) {
+      const t = (i + 0.5) / n, off = (rnd(k) - 0.5) * 0.7;
+      const x = x0 + (x1 - x0) * t + nx * off, z = z0 + (z1 - z0) * t + nz * off;
+      bushes.push([x, z, 0.75 + rnd(k + 0.3) * 0.65]);
+      if (k % 2 === 0) for (let r = 0; r < 4; r++) reeds.push([x + (rnd(k * 5 + r) - 0.5) * 1.3, z + (rnd(k * 7 + r) - 0.5) * 1.3, 1.5 + rnd(k * 3 + r) * 1.0]);
+    }
+  }
+  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), col = new THREE.Color();
+  const bm = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 1), new THREE.MeshStandardMaterial({ roughness: 0.9, flatShading: true }), bushes.length);
+  const greens = ['#3f6b2a', '#4c7d31', '#35592a', '#5a8a3a', '#6b7a34'];
+  bushes.forEach(([x, z, s], i) => {
+    q.setFromAxisAngle(up, rnd(i + 0.7) * 6.28);
+    m4.compose(new THREE.Vector3(x, s * 0.6, z), q, new THREE.Vector3(s * 1.15, s * (0.85 + rnd(i + 0.9) * 0.5), s * 1.05));
+    bm.setMatrixAt(i, m4);
+    bm.setColorAt(i, col.set(greens[i % greens.length]));
+  });
+  bm.castShadow = true;
+  g.add(bm);
+  // dry reeds / tall grass poking out of the bushes
+  const rgeo = new THREE.ConeGeometry(0.05, 1, 4);
+  rgeo.translate(0, 0.5, 0);
+  const rm = new THREE.InstancedMesh(rgeo, new THREE.MeshStandardMaterial({ roughness: 1 }), reeds.length);
+  const tans = ['#c9b06a', '#b89a55', '#d6c283', '#a88f4e'];
+  const e = new THREE.Euler();
+  reeds.forEach(([x, z, h], i) => {
+    e.set((rnd(i + 2.1) - 0.5) * 0.3, 0, (rnd(i + 4.2) - 0.5) * 0.3);
+    q.setFromEuler(e);
+    m4.compose(new THREE.Vector3(x, 0, z), q, new THREE.Vector3(1, h, 1));
+    rm.setMatrixAt(i, m4);
+    rm.setColorAt(i, col.set(tans[i % tans.length]));
+  });
+  g.add(rm);
+  return g;
+}
+
+/** Tinyhaus Thompsen's wagon (long side along x): red corrugated tiny house on a trailer + an orange tipper trailer east of it. */
+function buildTinyhaus(base, addBoxCollider, addSpot, x, z) {
+  const g = new THREE.Group();
+  const L = 7.6, D = 2.6, H = 2.9, Y0 = 0.55;
+  const red = corrugated('#8f2f2c');
+  red.map.repeat.set(6, 1);
+  const trim = mat('#5a1c1a'), ply = mat('#c9a877', { roughness: 0.9 }), tyre = mat('#1c1c1c'), steel = mat('#4a4a48', { metalness: 0.5 });
+  g.add(box(L, H, D, red, 0, Y0 + H / 2, 0));
+  const roof = box(L + 0.2, 0.1, D + 0.25, mat('#3a3836'), 0, Y0 + H + 0.08, 0);
+  roof.rotation.x = 0.04;
+  g.add(roof);
+  g.add(box(L + 0.1, 0.18, D - 0.3, steel, 0, Y0 - 0.08, 0));                                   // chassis
+  for (const wx of [-1.3, 1.3]) for (const wz of [-D / 2 + 0.1, D / 2 - 0.1]) {
+    const w = cyl(0.42, 0.42, 0.26, tyre, 12, wx, 0.42, wz);
+    w.rotation.x = Math.PI / 2;
+    g.add(w);
+  }
+  g.add(box(1.6, 0.1, 0.1, steel, -L / 2 - 0.8, 0.5, 0));                                        // drawbar (west end)
+  g.add(cyl(0.05, 0.05, 0.5, steel, 6, -L / 2 - 1.4, 0.25, 0));
+  // east end: the window with the plywood shutter
+  g.add(box(0.06, 1.25, 1.35, trim, L / 2 + 0.03, Y0 + 1.75, 0));
+  g.add(box(0.06, 1.1, 1.2, ply, L / 2 + 0.07, Y0 + 1.75, 0));
+  // both long sides: a window; the door with steps faces into the camp (north)
+  const glass = mat('#9fd3f0', { roughness: 0.2 });
+  for (const s of [-1, 1]) {
+    g.add(box(0.75, 1.0, 0.06, trim, 1.9, Y0 + 1.75, s * (D / 2 + 0.02)));
+    g.add(box(0.6, 0.85, 0.06, glass, 1.9, Y0 + 1.75, s * (D / 2 + 0.04)));
+  }
+  g.add(box(0.9, 2.0, 0.06, trim, -1.2, Y0 + 1.05, -D / 2 - 0.03));
+  for (let i = 0; i < 2; i++) g.add(box(1.0, 0.14, 0.34, mat('#8a6a42'), -1.2, 0.14 + i * 0.22, -D / 2 - 0.55 + i * 0.3));
+  const sign = textPlane('TINYHAUS', 1.3, 0.3, { w: 448, h: 104, bg: '#e8d8b0', fg: '#3a1a14', font: 'bold 64px sans-serif' });
+  sign.position.set(-1.2, Y0 + 2.4, -D / 2 - 0.05);
+  sign.rotation.y = Math.PI;
+  g.add(sign);
+  // camping chair + beer crate in front of the door
+  g.add(box(0.5, 0.05, 0.5, mat('#2f5f8a'), 0.6, 0.42, -D / 2 - 1.1));
+  g.add(box(0.5, 0.55, 0.05, mat('#2f5f8a'), 0.6, 0.7, -D / 2 - 0.86));
+  for (const [dx, dz] of [[-0.2, -0.2], [0.2, -0.2], [-0.2, 0.2], [0.2, 0.2]]) g.add(box(0.04, 0.42, 0.04, steel, 0.6 + dx, 0.21, -D / 2 - 1.1 + dz));
+  g.add(box(0.42, 0.3, 0.32, mat('#b8860b'), 1.4, 0.15, -D / 2 - 1.0));
+  // the orange tipper trailer
+  const tx = L / 2 + 2.9, orange = mat('#d98a1e', { roughness: 0.8 });
+  g.add(box(4.4, 0.12, 2.2, steel, tx, 0.95, 0));
+  for (const s of [-1, 1]) g.add(box(4.4, 1.2, 0.08, orange, tx, 1.6, s * 1.1));
+  for (const s of [-1, 1]) g.add(box(0.08, 1.2, 2.2, orange, tx + s * 2.2, 1.6, 0));
+  for (let i = 0; i < 5; i++) for (const s of [-1, 1]) g.add(box(0.06, 1.2, 0.04, mat('#b06c10'), tx - 1.8 + i * 0.9, 1.6, s * 1.15));
+  for (const wx of [-1.3, 1.3]) for (const wz of [-0.95, 0.95]) {
+    const w = cyl(0.45, 0.45, 0.25, tyre, 12, tx + wx, 0.45, wz);
+    w.rotation.x = Math.PI / 2;
+    g.add(w);
+  }
+  g.position.set(x, 0, z);
+  base.add(g);
+  addBoxCollider(x, z, L / 2, D / 2, 0, 'tinyhaus');
+  addBoxCollider(x + tx, z, 2.25, 1.15, 0, 'tinyhaus');
+  addSpot('tinyhaus', x - 1.2, z - D / 2 - 1.8);
 }
 
 /** Erdwall along local z (centred), overgrown with scrub: lumpy half-round profile, bushes and tufts on top. */

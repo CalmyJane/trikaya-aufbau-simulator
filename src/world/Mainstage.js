@@ -7,13 +7,14 @@ import { mat, box, cyl, strut, signPost } from './Props.js';
 
 export const POST_RADIUS = 15;
 export const POST_HEIGHT = 10.5;
+export const RING_Z = 9; // centre of the post ring: in front of the stage, so the dragon stands before the rondell and not with its head in the deco
 const WIRE_Y = POST_HEIGHT - 0.4;
 
 export function postPositions() {
   const out = [];
   for (let i = 0; i < 6; i++) {
     const a = -Math.PI / 2 + Math.PI / 6 + (i * Math.PI) / 3; // flat side towards the stage
-    out.push(new THREE.Vector3(Math.cos(a) * POST_RADIUS, 0, Math.sin(a) * POST_RADIUS));
+    out.push(new THREE.Vector3(Math.cos(a) * POST_RADIUS, 0, RING_Z + Math.sin(a) * POST_RADIUS));
   }
   return out;
 }
@@ -249,7 +250,7 @@ export function buildMainstage() {
 
   // ---------------------------------------------------------------- rigging (hidden until quests)
   const wireMat = mat('#4a4f55', { metalness: 0.8, roughness: 0.3 });
-  const centre = new THREE.Vector3(0, WIRE_Y + 0.4, 0);
+  const centre = new THREE.Vector3(0, WIRE_Y + 0.4, RING_Z);
   const rigGroups = posts.map((p, i) => {
     const grp = new THREE.Group();
     const a = new THREE.Vector3(p.x, WIRE_Y, p.z);
@@ -274,17 +275,17 @@ export function buildMainstage() {
   // ---------------------------------------------------------------- two half-round stretch tents beside the dance floor
   for (const s of [-1, 1]) {
     const t = halfRoundTent();
-    t.object.position.set(s * 17.5, 0, 2);
+    t.object.position.set(s * 17.5, 0, 2 + RING_Z);
     if (s < 0) t.object.rotation.y = Math.PI; // the straight, high edge always faces the dance floor
     g.add(t.object);
     for (const c of t.colliders) {
       const x = s < 0 ? -c.x : c.x, z = s < 0 ? -c.z : c.z;
-      colliders.push({ ...c, x: s * 17.5 + x, z: 2 + z });
+      colliders.push({ ...c, x: s * 17.5 + x, z: 2 + RING_Z + z });
     }
   }
 
   const sign = signPost('MAINSTAGE', { width: 2.6, height: 1.3, bg: '#2a160a', fg: '#ffb020' });
-  sign.position.set(7.5, 0, -7);
+  sign.position.set(9.5, 0, -8);
   sign.rotation.y = -0.4;
   g.add(sign);
 
@@ -307,7 +308,7 @@ export function buildMainstage() {
  */
 export function buildShadeSails() {
   const g = new THREE.Group();
-  const posts = postPositions();
+  const posts = postPositions().map((p) => new THREE.Vector3(p.x, 0, p.z - RING_Z)); // built around the ring centre, shifted as a whole below
   const NEON = [ // [print 1, fabric colour, dark line colour, print 2]
     ['#ffe600', '#ff2bd6', '#2a0a4a', '#39ff14'],
     ['#ff2bd6', '#00d8f0', '#10103a', '#ffe600'],
@@ -371,7 +372,10 @@ export function buildShadeSails() {
     // lycra breathes a little in the wind
     g.children.forEach((c, i) => { if (c.userData.ribbon) c.rotation.y = Math.sin(t * 0.8 + i) * 0.25; });
   };
-  return { object: g, colliders: [] };
+  const outer = new THREE.Group();
+  g.position.z = RING_Z;
+  outer.add(g);
+  return { object: outer, colliders: [] };
 }
 
 function uvMaterial(tex) {

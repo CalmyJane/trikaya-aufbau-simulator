@@ -310,7 +310,7 @@ function paintPlotMarks(ctx) {
       // trampled dance floor in front of the mainstage
       ctx.globalAlpha = 0.5;
       ctx.fillStyle = '#6e5a3c';
-      ctx.beginPath(); ctx.arc(0, 2 * M, plot.size * 0.44 * M, 0, 7); ctx.fill();
+      ctx.beginPath(); ctx.arc(0, (plot === PLOTS.mainstage ? 10 : 2) * M, plot.size * 0.44 * M, 0, 7); ctx.fill();
       ctx.restore();
       continue;
     }

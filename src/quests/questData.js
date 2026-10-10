@@ -457,7 +457,7 @@ export const QUESTS = [
     offer: [
       { who: 'corni', text: { de: 'Der Techno Floor. Dunkellila Stretchzelt, Laser, Stroboskop, Bass bis zum Morgengrauen. Und eine kleine Bar für Verena.', en: 'The Techno Floor. Dark purple stretch tent, lasers, strobes, bass until dawn. And a little bar for Verena.' } },
       { who: 'corni', text: { de: 'Nur: Das Zelt ist weg. *funkt* Fabi? Das lila Zelt?', en: 'Only: the tent is gone. *radios* Fabi? The purple tent?' } },
-      { who: 'fabi', text: { de: '*über Funk* Das Techno-Zelt? Hmm… Zdenko und Tinyhaus Thompsen wollten „nur kurz Schatten testen“. Beim Hängemattenwald.', en: '*over the radio* The techno tent? Hmm… Zdenko and Tinyhaus Thompsen wanted to "just test some shade". At the hammock forest.' } },
+      { who: 'fabi', text: { de: '*über Funk* Das Techno-Zelt? Hmm… Zdenko und Thomas wollten „nur kurz Schatten testen“. Beim Hängemattenwald.', en: '*over the radio* The techno tent? Hmm… Zdenko and Thomas wanted to "just test some shade". At the hammock forest.' } },
       { who: 'fabi', text: { de: '*über Funk* Und nimm Heringe aus der Werkstatt mit. Die kommen nie zurück. Nie.', en: '*over the radio* And grab pegs from the workshop. They never come back. Never.' } },
     ],
     accept: { de: 'Jawoll!', en: 'Jawoll!' },

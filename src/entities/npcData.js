@@ -120,10 +120,13 @@ export const NPCS = [
     ],
   },
   {
-    id: 'thompsen', name: 'Tinyhaus Thompsen', role: { de: 'Stimmung', en: 'Morale' }, portrait: '😂',
+    id: 'thompsen', name: 'Thomas', role: { de: 'Stimmung', en: 'Morale' }, portrait: '😂',
     look: { base: 'm_casual', skin: SKIN.fair, hair: '#f2dc8a', brows: '#c8a85a', shirt: '#2a8a7a', pants: '#b08a3a', patchwork: true, extras: ['bottle'] },
-    behavior: 'sitter', home: 'chill_seat2',
+    behavior: 'thompsen', home: 'chill_seat2', // evenings: in the camping chair at his red wagon, radio on
     lines: [
+      { de: 'Abends gehört die Welt mir, meinem Wagen und dem Radio. Hehehe.', en: 'In the evening the world belongs to me, my wagon and the radio. Hehehe.', night: true },
+      { de: 'Hörst du das? Bestes Lied. Hahaha, ich kenn es gar nicht!', en: 'Hear that? Best song. Hahaha, I don\'t even know it!', night: true },
+      { de: 'Setz dich. Ist nur ein Stuhl da. Hahaha!', en: 'Sit down. There\'s only one chair. Hahaha!', night: true },
       { de: 'HAHAHAHA!', en: 'HAHAHAHA!' },
       { de: 'Hahaha, der Zdenko! Hahaha!', en: 'Hahaha, that Zdenko! Hahaha!' },
       { de: '*lacht Tränen*', en: '*cries laughing*' },
@@ -419,8 +422,8 @@ export const NPCS = [
       { de: 'Alles dilettantisch. Jedes Jahr. Und jedes Jahr kimmt ihr wieder. Und i sag jedes Jahr ja.', en: 'All amateurish. Every year. And every year you come back. And every year I say yes.' },
     ],
     benchLines: [
-      { de: 'Zdenko, Tinyhaus, habts ihr heut scho was g\'arbeitet? …Na. Hab i ma denkt.', en: 'Zdenko, Tinyhaus, done any work today? …No. Thought so.' },
-      { de: 'Gib ma a Bier, Tinyhaus. Des is mei Wiese, i derf des.', en: 'Give me a beer, Tinyhaus. It\'s my meadow, I\'m allowed.' },
+      { de: 'Zdenko, Thomas, habts ihr heut scho was g\'arbeitet? …Na. Hab i ma denkt.', en: 'Zdenko, Thomas, done any work today? …No. Thought so.' },
+      { de: 'Gib ma a Bier, Thomas. Des is mei Wiese, i derf des.', en: 'Give me a beer, Thomas. It\'s my meadow, I\'m allowed.' },
       { de: 'So dilettantisch, wie ihr des macht… aber lustig seids.', en: 'As amateurish as you do it all… but you\'re fun.' },
       { de: 'Prost, ihr Hippies. Auf mei Wiese.', en: 'Cheers, you hippies. To my meadow.' },
     ],
@@ -612,7 +615,7 @@ export const NPCS = [
       { de: 'Schön, dass du da bist! Wirklich. …Barfuß auf der Baustelle? Hm. Jeder, wie er meint.', en: 'Lovely that you\'re here! Really. …Barefoot on a building site? Hm. Each to their own.' },
       { de: 'Ich will ja niemanden verurteilen. Aber Zdenko. Ich mein ja nur. Zdenko.', en: 'I don\'t want to judge anyone. But Zdenko. I\'m just saying. Zdenko.' },
       { de: 'Namaste, Bruder! Hast du heute schon Plastik benutzt? Ich frag nur. Ganz ohne Wertung.', en: 'Namaste, brother! Used any plastic today? Just asking. No judgement at all.' },
-      { de: 'Tinyhaus trinkt schon wieder. Um elf. Ich sag nix. Ich denk es nur sehr laut.', en: 'Tinyhaus is drinking again. At eleven. I won\'t say anything. I\'m just thinking it very loudly.' },
+      { de: 'Thomas trinkt schon wieder. Um elf. Ich sag nix. Ich denk es nur sehr laut.', en: 'Thomas is drinking again. At eleven. I won\'t say anything. I\'m just thinking it very loudly.' },
       { de: 'Du machst das toll! Also… für deine Verhältnisse. Das ist ein Kompliment!', en: 'You\'re doing great! Well… by your standards. That\'s a compliment!' },
       { de: 'Das Feuer ist heilig. Wer mit Petroleum rumplempert wie Dennis, hat das nicht verstanden. Liebe Grüße an Dennis.', en: 'Fire is sacred. Anyone sloshing paraffin around like Dennis hasn\'t understood that. Much love to Dennis.' },
       { de: 'Ich find\'s super, dass du so… entspannt mit Zeit umgehst. Wirklich. Jeder Mensch ist anders.', en: 'I think it\'s great that you\'re so… relaxed about time. Really. Everyone is different.' },

@@ -863,6 +863,28 @@ const BEHAVIORS = {
     if (Math.random() < dt * 0.05 && !n.bubble) n.say(n.line(), 2.5);
   },
 
+  // Thomas (id thompsen): beer bench by day; once it gets dark he sits in front of his red wagon and listens to music.
+  thompsen(n, t, dt) {
+    const sp = n.world.spots;
+    n.dayHome ||= n.home.clone();
+    const evening = n.world.night > 0.45 && !!sp.tinyhaus_seat;
+    const seat = evening ? sp.tinyhaus_seat : n.dayHome;
+    if (n.home.distanceTo(seat) > 0.1) { // time to move
+      n.home = seat.clone();
+      if (n.char.sitting) n.standUp();
+      if (!(n.toPlayer < 40)) n.root.position.copy(seat); // nobody watches: he is simply there
+    }
+    n.atWagon = false;
+    if (!n.char.sitting) {
+      if (n.position.distanceTo(n.home) > 0.7) { n.walkTo(n.home, dt, 1.5); return; }
+      n.sitAt(n.home, (evening ? sp.tinyhaus_face : sp.chill) || n.home);
+    }
+    n.atWagon = evening;
+    n.char.play('neutral');
+    if (evening) n.root.rotation.y += Math.sin(t * 2.2) * dt * 0.25; // sways to the radio
+    if (Math.random() < dt * 0.05 && !n.bubble) n.say(n.line(), 2.5);
+  },
+
   // Zdenko: drunk, clueless, kung fu, sits with Thompsen, pesters AFK players.
   estenko(n, t, dt, { player, game }) {
     n.stateT -= dt;

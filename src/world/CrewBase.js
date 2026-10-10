@@ -808,7 +808,21 @@ function buildTinyhaus(base, addBoxCollider, addSpot, x, z) {
   base.add(g);
   addBoxCollider(x, z, L / 2, D / 2, 0, 'tinyhaus');
   addBoxCollider(x + tx, z, 2.25, 1.15, 0, 'tinyhaus');
+  // a lantern over the door, so he doesn't sit in the dark in the evening
+  g.add(box(0.05, 0.05, 0.5, steel, 0.1, Y0 + 2.5, D / 2 + 0.25));
+  const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), new THREE.MeshBasicMaterial({ color: '#ffd9a0' }));
+  bulb.position.set(0.1, Y0 + 2.36, D / 2 + 0.48);
+  g.add(bulb);
+  const lantern = new THREE.PointLight('#ffb866', 9, 11, 1.5);
+  lantern.position.set(0.1, Y0 + 2.2, D / 2 + 0.9);
+  g.add(lantern);
+  // his radio next to the chair
+  g.add(box(0.36, 0.22, 0.14, mat('#2a2a2a'), 0.05, 0.11, D / 2 + 0.75));
+  g.add(box(0.3, 0.02, 0.02, steel, 0.05, 0.25, D / 2 + 0.75));
+  g.add(cyl(0.008, 0.008, 0.4, steel, 4, 0.2, 0.4, D / 2 + 0.75));
   addSpot('tinyhaus', x - 1.2, z + D / 2 + 1.6);
+  addSpot('tinyhaus_seat', x + 0.6, z + D / 2 + 0.8);
+  addSpot('tinyhaus_face', x + 0.6, z + D / 2 + 4);
 }
 
 /** Erdwall along local z (centred), overgrown with scrub: lumpy half-round profile, bushes and tufts on top. */

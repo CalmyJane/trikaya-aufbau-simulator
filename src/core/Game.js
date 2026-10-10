@@ -126,6 +126,7 @@ export class Game {
       return this.mode !== 'menu' && m && !m.hidden && m.char.sitting && m.position.distanceTo(spots.corni_seat) < 1.2 ? spots.corni_desk : null;
     } });
     this.music.add({ id: 'werkstatt_radio', range: 16, vol: 0.2, tinny: true, start: 1, pos: () => (this.mode !== 'menu' && this.npcs.get('estenko')?.state === 'werkstatt' ? spots.werkstatt_inside : null) });
+    this.music.add({ id: 'tinyhaus_radio', range: 20, vol: 0.22, tinny: true, start: 3, pos: () => (this.mode !== 'menu' && this.npcs.get('thompsen')?.atWagon ? spots.tinyhaus_seat : null) });
     // the Techno Floor plays techno once it stands; the fire island has its own little fire track
     this.music.add({ id: 'techno', playlist: 'techno', range: 120, vol: 0.45, pos: () => (this.mode === 'menu' ? null : this.world.structures.biergarten?.object.position || null) });
     this.music.add({ id: 'firespace', playlist: 'fire', range: 28, vol: 0.25, pos: () => (this.mode === 'menu' ? null : this.world.spots.fire_stage) });

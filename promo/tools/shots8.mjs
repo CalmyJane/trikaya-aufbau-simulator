@@ -25,8 +25,7 @@ export const SHOTS = [
      place(116.6, -7.5, Math.PI); g.cam.pitch = 0.22; g.cam.targetDist = 6;`,
     `walkTo(116.9, -40, false);
      for (const c of _crew) { const [nn, line] = c; nn.wait = 99; nn.char.faceTowards(g.player.position, 1 / 30, 5);
-       if (!c[2] && g.player.position.z < nn.position.z + 4.2) { c[2] = true; sayF(nn, line, 1.7); nn.char.play('wave', 0.2, { once: true }); } }
-     cap('Die ganze Crew ist da.', f, n);`],
+       if (!c[2] && g.player.position.z < nn.position.z + 4.2) { c[2] = true; sayF(nn, line, 1.7); nn.char.play('wave', 0.2, { once: true }); } }`],
   // ------------------------------------------------ new rides
   ['BIKE', 68, 3,
     `g.bikeSys.rented = true; ride(g.vehicles.bike, -26, 47, -Math.PI / 2); g.vehicles.bike.speed = 8; g.cam.pitch = 0.09; lock(); zoom(1.7); g.cam.yaw += 0.3;
@@ -69,13 +68,12 @@ export const SHOTS = [
     `const pp = g.player.position; const j = hold('jan', _c0.x - 1.2, _c0.z + 0.2); j.char.faceTowards(pp, 1 / 30, 4); const fa = hold('fabi', _c0.x - 3.4, _c0.z + 0.4); fa.char.faceTowards(pp, 1 / 30, 4);
      if (f === 3) sayF(j, 'Teammeeting fällt aus.', 0.9);
      if (f === 30) sayF(fa, 'Dann ist jetzt Feierabend. Prost!', 1.6);
-     if (f === 34 || f === 48 || f === 60) { g.effects.buy('beer', true); g.player.char.play('wave', 0.2, { once: true }); g.player.waveTimer = 0.8; }
-     cap('Feierabendbier…', f, n);`],
+     if (f === 34 || f === 48 || f === 60) { g.effects.buy('beer', true); g.player.char.play('wave', 0.2, { once: true }); g.player.waveTimer = 0.8; }`],
   ['DRUNK', 54, 3,
     `untoast(); g.effects.beerLevel = 4; g.bikeSys.rented = true; ride(g.vehicles.bike, -28, 47, -Math.PI / 2); g.vehicles.bike.speed = 7; g.cam.pitch = 0.1; zoom(1.5);`,
     `g.effects.beerLevel = 4; driveTo(-75, 47 + Math.sin(f * 0.16) * 14, true); if (f === 20) hop();
      g.cam.yaw += Math.sin(f * 0.13) * 0.012; const cv = g.renderer.domElement; cv.style.transform = 'rotate(' + (Math.sin(f * 0.11) * 2.6) + 'deg) scale(1.08)'; cv.style.filter = 'blur(' + (0.6 + 0.8 * Math.sin(f * 0.2) ** 2) + 'px) saturate(1.3)';
-     promo('<div class="black"></div><div class="cap">…eins zu viel…</div>', 1); document.querySelector('#promo .black').style.opacity = Math.max(0, (f - (n - 9)) / 8); document.querySelector('#promo .cap').style.opacity = Math.min(1, (f + 1) / 4, Math.max(0, (n - 9 - f) / 4));`],
+     promo('<div class="black"></div>', Math.max(0, (f - (n - 9)) / 8));`],
   // the music stops for a second
   ['AWARE', 36, 3,
     `const tp = g.world.structures.awareness.object.position; place(tp.x + 1.2, tp.z + 0.8, -Math.PI / 2); hold('franzi', tp.x + 2.6, tp.z + 1.8, [tp.x + 1.2, tp.z + 0.8]); hold('delsin', tp.x - 0.6, tp.z + 2.4, [tp.x + 1.2, tp.z + 0.8]);

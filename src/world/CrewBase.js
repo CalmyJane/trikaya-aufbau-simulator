@@ -82,7 +82,7 @@ export function buildCrewBase(world) {
   s1.position.set(7, 0, HD + 1.2);
   base.add(s1);
   const s2 = signPost('CREW BASE', { width: 3, height: 1.4, bg: '#1a2a1a', fg: '#e8b04a' });
-  s2.position.set(9.5, 0, -HD - 1.2);
+  s2.position.set(-4.5, 0, -HD - 1.2);
   s2.rotation.y = Math.PI;
   base.add(s2);
 
@@ -92,12 +92,12 @@ export function buildCrewBase(world) {
   // across a narrow lane with the Aufenthaltszelt right behind it, the big workshop closing the lane in the south.
   // storage cabins (closed): Künstlergasse & Hühnercontainer – things lie in front of them
   buildStorage(base, addBoxCollider, addSpot, { id: 'kuenstler', x: -15.5, z: -18, rot: 0, label: 'KÜNSTLERGASSE', frame: '#c9b02a' });
-  buildStorage(base, addBoxCollider, addSpot, { id: 'huehner', x: -8, z: -19, rot: 0.15, label: 'HÜHNERCONTAINER', frame: '#3040b0' });
+  buildStorage(base, addBoxCollider, addSpot, { id: 'huehner', x: -2.5, z: -19, rot: 0.15, label: 'HÜHNERCONTAINER', frame: '#3040b0' });
   // a few chickens in front of the Hühnercontainer (of course)
   const chickens = [];
   for (let i = 0; i < 4; i++) {
     const ch = chicken();
-    ch.position.set(-10.5 + i * 1.3, 0, -15.4 + (i % 2) * 0.8);
+    ch.position.set(-5 + i * 1.3, 0, -15.4 + (i % 2) * 0.8);
     ch.rotation.y = i * 1.7;
     base.add(ch);
     chickens.push(ch);
@@ -192,7 +192,7 @@ export function buildCrewBase(world) {
   spots.C1_front = spots.werkstatt_inside;        // tools, shackles, ropes, pegs, screws
   spots.C2_front = spots.kuenstler_front;         // cables & steel wires, drill
   spots.C3_front = spots.huehner_front;           // tents, tarps, yurt
-  addSpot('C4_front', -3.2, -16.5);              // deco stuff next to the Hühnercontainer
+  addSpot('C4_front', 2.6, -16.5);              // deco stuff next to the Hühnercontainer
   addSpot('sauna_site', 16, -8);                  // Krygo's sauna (eternal construction site)
 
   // ------------------------------------------------ vehicles, pallets, clutter
@@ -215,7 +215,7 @@ export function buildCrewBase(world) {
 
   const clutter = [
     ['pallet', { length: 1.2 }, 11, -12, 0.2], ['pallet', { length: 1.2 }, 12.4, -11.6, -0.1],
-    ['crate', { height: 0.9 }, 11, -12, 0, 0.14], ['crate', { height: 0.9 }, -2, -19, 0.5],
+    ['crate', { height: 0.9 }, 11, -12, 0, 0.14], ['crate', { height: 0.9 }, 3.6, -19.4, 0.5],
     ['cone', { height: 0.7 }, -2, 20], ['cone', { height: 0.7 }, 2, 20],
     ['ladder', { height: 3 }, -12.5, 14.75, 0],
   ];
@@ -226,15 +226,15 @@ export function buildCrewBase(world) {
     base.add(m);
   }
   addBoxCollider(11.7, -11.8, 1.5, 0.8, 0, 'crewbase');
-  addBoxCollider(-2, -19, 0.5, 0.5, 0, 'crewbase');
+  addBoxCollider(3.6, -19.4, 0.5, 0.5, 0, 'crewbase');
 
   // cable drums
   for (let i = 0; i < 3; i++) {
-    const drum = cyl(0.7, 0.7, 0.6, mat('#8a5a2b'), 12, 1.5 + i * 1.6, 0.7, -19.5);
+    const drum = cyl(0.7, 0.7, 0.6, mat('#8a5a2b'), 12, 6.5 + i * 1.6, 0.7, -19.5);
     drum.rotation.x = Math.PI / 2;
     base.add(drum);
   }
-  addBoxCollider(3.1, -19.5, 2.4, 0.5, 0, 'crewbase');
+  addBoxCollider(8.1, -19.5, 2.4, 0.5, 0, 'crewbase');
 
   // flag pole with festival flag
   base.add(cyl(0.06, 0.06, 8, mat('#cccccc', { metalness: 0.6 }), 6, 18.5, 4, 6));
@@ -379,7 +379,7 @@ function buildOffice(base, world, addBoxCollider, addSpot, ox, oz, rot = 0) {
   const roof = box(W + 0.1, 0.12, D + 0.1, corrugated('#c9cdd1'), 0, H + 0.06, 0);
   g.add(roof);
   // label
-  const lbl = textPlane('BÜRO / AUFBAULEITUNG', 3.6, 0.5, { w: 768, h: 108, bg: '#1b1b1b', fg: '#ffd24a', font: 'bold 60px sans-serif' });
+  const lbl = textPlane('BÜRO', 1.6, 0.5, { w: 344, h: 108, bg: '#1b1b1b', fg: '#ffd24a', font: 'bold 60px sans-serif' });
   lbl.position.set(-0.8, 2.35, D / 2 + 0.07);
   g.add(lbl);
   // interior walls lining

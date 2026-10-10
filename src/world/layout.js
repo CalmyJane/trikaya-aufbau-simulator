@@ -43,7 +43,8 @@ export const ROADS = [
   { name: 'Enterstraße', pts: line([[622, 578], [800, 530], [1100, 452], [1255, 413], [1500, 400]]), width: 6, kind: 'asphalt' },
   { name: 'Gündinger Weg', pts: line([[1060, -200], [1120, 20], [1150, 120], [1172, 245], [1200, 340], [1255, 413], [1280, 700], [1290, 961]]), width: 6, kind: 'asphalt' }, // ends at Lippweg
   { name: 'Feldweg', pts: line([[-200, 330], [265, 303], [930, 238], [1172, 238]]), width: 4, kind: 'dirt' },
-  { name: 'Crew-Zufahrt', pts: line([[470, 440], [520, 421], [700, 379], [916, 323], [1000, 306], [1049, 304], [1051, 322]]), width: 4, kind: 'dirt' },
+  { name: 'Crew-Zufahrt', pts: line([[470, 440], [520, 421], [700, 379], [916, 323], [1000, 306], [1049, 304]]), width: 4, kind: 'dirt' },
+  { name: 'Crew-Einfahrt', pts: line([[972, 312], [975, 332]]), width: 4, kind: 'dirt' }, // into the crew base, between the two storage cabins
   { name: 'Base-Einfahrt', pts: line([[1034, 468], [1030, 452]]), width: 6, kind: 'gravel' },
   { name: 'Parkplatz-Zufahrt', pts: line([[1172, 250], [1122, 255]]), width: 5, kind: 'gravel' },
 ];
@@ -85,7 +86,7 @@ export const CREW_BASE = {
   rotation: 0.2,
   halfW: 20.5,   // local x
   halfD: 22.5,   // local z
-  gates: [{ x: 0, z: 22.5, w: 8 }, { x: 14.5, z: -22.5, w: 7 }], // south (Enterstraße) + north (camp / parking)
+  gates: [{ x: 0, z: 22.5, w: 8 }, { x: -9.3, z: -22.5, w: 6 }], // south (Enterstraße) + north (camp / parking), between Künstlergasse and Hühnercontainer
 };
 /** crew-base local (x, z) -> world {x, z} */
 export function baseToWorld(x, z) {

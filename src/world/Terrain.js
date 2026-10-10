@@ -25,9 +25,10 @@ function pathPoly(ctx, pts) {
 
 // dirt paths inside the crew base (base-local coordinates)
 const BASE_PATHS = [
-  [[0, 22.5], [0, 12], [4.5, 9.5], [9, 7], [10.5, -3], [10.5, -11], [14.5, -22.5]], // south gate → around the tent → yard → north gate
+  [[0, 22.5], [0, 12], [4.5, 9.5], [9, 7], [10.5, -3], [12, -8]],                    // south gate → around the tent → yard
   [[0, 12], [-3, 7.6], [-7.2, 6.2], [-11.9, 5.6], [-11.9, -1], [-12.4, -1.6]],     // the lane: workshop, office, Corni, Matze
-  [[-11.9, -1], [-11, -9], [-9.2, -16]],                                           // Hühnercontainer
+  [[-11.9, -1], [-11, -9], [-9.3, -15], [-9.3, -22.5]],                            // → north gate between the storage cabins
+  [[-9.3, -15], [-3.7, -16]],                                                      // Hühnercontainer
   [[-11, -9], [-14, -12.5], [-17.1, -15.3]],                                       // Künstlergasse
   [[10.5, -3], [-2, -9.5], [-11, -9]],                                             // yard → storage cabins
   [[0, 12], [-5, 17], [-11, 18.6]],                                                // generator

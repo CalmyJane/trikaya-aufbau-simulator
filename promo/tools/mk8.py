@@ -1,6 +1,6 @@
 # Assemble promo v8: %TEMP%/trikaya_promo8/<SHOT>/f*.jpg (or PROMO_OUT) in shots8.mjs order + music.
 # Music is 160 BPM (one bar = 1.5 s = 45 frames). The first drop (210.05 s in the track) lands on the TITLE cut,
-# the one-second silence on AWARE, the second drop on NARNIA, and the music stops under the end card.
+# the one-second silence on AWARE, the second drop on STAGE, and the music stops under the end card.
 import io, re, glob, subprocess, os, tempfile
 root = (os.environ.get('PROMO_OUT') or os.path.join(tempfile.gettempdir(), 'trikaya_promo8')).replace(os.sep, '/')
 order = re.findall(r"\n  \['([A-Z]+)', (\d+),", io.open('shots8.mjs', encoding='utf8').read())

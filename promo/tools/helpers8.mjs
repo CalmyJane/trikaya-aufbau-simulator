@@ -16,7 +16,7 @@ export const HELPERS = `
     #promo .black{position:absolute;inset:0;background:#000}
     .cjbig{display:flex;flex-direction:column;align-items:center;gap:\${B * 0.03}px;margin-top:\${B * 0.05}px}
     .cjbig img.h{height:\${B * 0.2}px;filter:drop-shadow(0 4px 16px rgba(0,0,0,.7))}
-    .cjbig img.t{height:\${B * 0.11}px;filter:invert(1) drop-shadow(0 3px 10px rgba(0,0,0,.7))}
+    .cjbig img.t{height:\${B * 0.15}px;filter:invert(1) drop-shadow(0 3px 10px rgba(0,0,0,.7))}
     #cjmark{position:fixed;right:\${B * 0.03}px;bottom:\${B * 0.03}px;z-index:998;pointer-events:none;display:flex;align-items:center;opacity:.85}
     #cjmark img.t{height:\${B * 0.065}px;filter:invert(1) drop-shadow(0 2px 6px rgba(0,0,0,.6))}\`;
   document.head.appendChild(st);
@@ -26,7 +26,7 @@ export const HELPERS = `
   window.cap = (txt, f, n, a = 4, b = 4, cls = 'low') => promo(txt ? '<div class="cap ' + cls + '">' + txt + '</div>' : '', Math.max(0, Math.min(1, a ? (f + 1) / a : 1, b ? (n - 1 - f) / b : 1)));
   const m = document.createElement('div'); m.id = 'cjmark'; m.innerHTML = '<img class="t" src="assets/ui/calmyjane_text.svg">'; document.body.appendChild(m);
   window.cjmark = (op) => { m.style.opacity = op; };
-  window.CJBIG = '<div class="cjbig"><img class="h" src="/CalmyJaneHeadWhite.png"><img class="t" src="assets/ui/calmyjane_text.svg"></div>';
+  window.CJBIG = '<div class="cjbig"><img class="t" src="assets/ui/calmyjane_text.svg"></div>';
   window.TITLE = '<div class="vig"></div><img class="logo" src="assets/ui/logo_notext.png"><h1>TRIKAYA<span>AUFBAU SIMULATOR</span></h1>';
   window.hud = (on) => { document.getElementById('hud').style.visibility = on ? '' : 'hidden'; };
   window.bubbles = (on) => { document.getElementById('bubbles').style.visibility = on ? '' : 'hidden'; };

@@ -66,6 +66,7 @@ export const NPCS = [
       { de: 'Künstlergasse-Container, hinten links, unter der Plane. Oder im Hühnercontainer.', en: 'Künstlergasse container, back left, under the tarp. Or in the chicken container.' },
       { de: 'Wer hat mein Maßband?!', en: 'Who has my tape measure?!' },
       { de: 'Ich hab eine Liste. Die Liste ist leider im Hühnercontainer.', en: 'I have a list. Sadly the list is in the chicken container.' },
+      { de: 'Danny ist ein guter Freund von mir. Glaub ihm ein Zehntel. Auflegen kann er aber wirklich.', en: 'Danny\'s a good friend of mine. Believe a tenth of it. He really can DJ, though.' },
     ],
   },
   {
@@ -796,6 +797,21 @@ export const NPCS = [
       { de: 'Boom bap am Morgen, Four-to-the-Floor am Abend. Das ist mein Aufbau-Rhythmus.', en: 'Boom bap in the morning, four-to-the-floor at night. That\'s my build-up rhythm.' },
       { de: 'Hab gerade nen Beat im Kopf. Warte… nee, war nur der Generator. Trotzdem Bass!', en: 'Got a beat in my head. Wait… nah, that was the generator. Still bass!' },
       { de: 'Alle zusammen, jetzt: Aufbau! Aufbau! Aufbau! …Wo geht\'s zur Soundanlage?', en: 'Everybody now: build-up! Build-up! Build-up! …Where\'s the sound system?' },
+    ],
+  },
+  {
+    id: 'danny', name: 'Danny', role: { de: 'DJ (Danny & Pash, Mellow Monks): Psytrance & große Sprüche', en: 'DJ (Danny & Pash, Mellow Monks): psytrance & big talk' }, portrait: '🎛️',
+    look: { base: 'm_casual', skin: SKIN.light, hair: '#8f7240', brows: '#6e5630', hairCut: [0.95, 0.35, 0.95], shirt: '#1e2a4a', pants: '#3a3a3a', patchwork: true, shirtPatch: ['#1e2a4a', '#2ad1a0', '#e0a030'], height: 1.95, width: 1.05 },
+    behavior: 'wander', home: 'festival_random', roam: 'festival_random', radius: 14,
+    lines: [
+      { de: 'Danny. Von Danny & Pash. Ja, DER Danny. Autogramme später.', en: 'Danny. Of Danny & Pash. Yes, THAT Danny. Autographs later.' },
+      { de: 'Wenn ich auflege, wackelt die A99. Frag die Lärmschutzwand.', en: 'When I play, the A99 shakes. Ask the noise barrier.' },
+      { de: 'Die Mainstage? Hätt ich in zwei Stunden allein aufgebaut. Hab nur gerade keine Zeit.', en: 'The mainstage? I\'d have built that alone in two hours. Just don\'t have time right now.' },
+      { de: 'Fabi und ich, wir kennen uns ewig. Ohne mich wüsste der gar nicht, wo irgendwas ist.', en: 'Fabi and I go way back. Without me he wouldn\'t know where anything is.' },
+      { de: 'Mellow Monks ist für den Sonnenaufgang. Da weinen erwachsene Männer. Ich hab\'s gesehen. Ich war einer davon.', en: 'Mellow Monks is for sunrise. Grown men cry. I\'ve seen it. I was one of them.' },
+      { de: 'Pash sagt, ich übertreibe. Pash hat auch noch nie vor zehntausend Leuten gespielt. Ich auch nicht, aber fast.', en: 'Pash says I exaggerate. Pash has never played to ten thousand people either. Neither have I, but nearly.' },
+      { de: 'Ich trag keine Kisten. Ich bin 1,95, ich bin für die oberen Regale zuständig. Und für die Stimmung.', en: 'I don\'t carry crates. I\'m six foot five, I\'m in charge of the top shelves. And the vibe.' },
+      { de: 'Mein Set dieses Jahr wird das beste, das hier je gelaufen ist. Hab ich letztes Jahr auch gesagt. Stimmte auch.', en: 'My set this year will be the best ever played here. Said that last year too. Was true too.' },
     ],
   },
   {

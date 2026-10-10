@@ -24,3 +24,9 @@ promo/*.mp4
 
 # rendered promo frames (hundreds of MB, backed up via ProtonDrive)
 promo/tools/shots*_land/
+
+# promo v8 working files (stills, logs)
+promo/tools/preview*_land/
+promo/tools/scout8/
+promo/tools/check8/
+promo/tools/*.log

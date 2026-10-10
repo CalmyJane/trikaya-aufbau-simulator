@@ -8,8 +8,8 @@ export async function launch() {
     args: ['--use-angle=d3d11', '--enable-gpu', '--ignore-gpu-blocklist', '--mute-audio'],
   });
 }
-export async function openGame(browser, save, { width = 1920, height = 1080 } = {}) {
-  const ctx = await browser.newContext({ viewport: { width, height } });
+export async function openGame(browser, save, { width = 1920, height = 1080, scale = 1 } = {}) {
+  const ctx = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: scale });
   const page = await ctx.newPage();
   page.on('pageerror', (e) => console.log('PAGEERR', e.message));
   const data = save ? fs.readFileSync(save, 'utf8') : null;

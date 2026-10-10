@@ -232,7 +232,7 @@ export function buildSauna() {
   for (let i = 0; i < 6; i++) g.add(box(0.2, 0.14, 0.2, mat('#7a7a72'), W / 2 + 0.6 + (i % 3) * 0.24, 0.07 + Math.floor(i / 3) * 0.12, 1.5)); // sauna stones
   // board pile, sign
   for (let i = 0; i < 8; i++) g.add(box(2.2, 0.05, 0.18, i % 2 ? wood : fresh, -W / 2 - 0.9, 0.04 + Math.floor(i / 4) * 0.06, 0.6 + (i % 4) * 0.2));
-  const sign = signPost('SAUNA – fast fertig', { width: 2.2, height: 0.8, bg: '#f4e2b8', fg: '#7a2a10' });
+  const sign = signPost('SAUNA', { width: 2.2, height: 0.8, bg: '#f4e2b8', fg: '#7a2a10' });
   sign.position.set(-0.6, 0, D / 2 + 1.0);
   sign.scale.setScalar(0.8);
   g.add(sign);

@@ -54,11 +54,13 @@ export function buildCrewBase(world) {
   const HW = CREW_BASE.halfW, HD = CREW_BASE.halfD;
 
   // ------------------------------------------------ fence with gates
-  const corners = [[-HW, -HD], [HW, -HD], [HW, HD], [-HW, HD]];
+  // the hedge steps back in the south-east: a strip at the Enterstraße stays free for Thompsen's wagon
+  const STRIP_Z = 18.2, STRIP_X = 5.6;
+  const corners = [[-HW, -HD], [HW, -HD], [HW, STRIP_Z], [STRIP_X, STRIP_Z], [STRIP_X, HD], [-HW, HD]];
   const segs = [];
-  for (let i = 0; i < 4; i++) {
-    if (i === 3) continue; // west side: no fence, an earth wall with scrub separates the camp from the football pitch
-    const [ax, az] = corners[i], [bx, bz] = corners[(i + 1) % 4];
+  for (let i = 0; i < corners.length; i++) {
+    if (i === corners.length - 1) continue; // west side: no fence, an earth wall with scrub separates the camp from the football pitch
+    const [ax, az] = corners[i], [bx, bz] = corners[(i + 1) % corners.length];
     const len = Math.hypot(bx - ax, bz - az);
     // the fence runs exactly from gate post to gate post
     const cuts = [0, 1];
@@ -94,7 +96,7 @@ export function buildCrewBase(world) {
     }
   }
   const s1 = signPost('CREW BASE', { width: 3, height: 1.4, bg: '#1a2a1a', fg: '#e8b04a' });
-  s1.position.set(7, 0, HD + 1.2);
+  s1.position.set(-6.5, 0, HD + 1.2);
   base.add(s1);
   const s2 = signPost('CREW BASE', { width: 3, height: 1.4, bg: '#1a2a1a', fg: '#e8b04a' });
   s2.position.set(-4.5, 0, -HD - 1.2);
@@ -232,8 +234,8 @@ export function buildCrewBase(world) {
     addBoxCollider(x, z, 1.05, 2.6, rot, 'car');
   }
 
-  // Tinyhaus Thompsen's home: the big red wagon at the Enterstraße, an old orange tipper trailer next to it
-  buildTinyhaus(base, addBoxCollider, addSpot, 10.2, 19.4);
+  // Tinyhaus Thompsen's home: the big red wagon right at the Enterstraße (outside the hedge), an old orange tipper trailer next to it
+  buildTinyhaus(base, addBoxCollider, addSpot, 10.4, 20.7);
 
   // Bauwagen along the east side (the blue one is where Fabi leaves the diesel canister)
   for (const [col, x, z, rot] of [['#2d6a9f', 15.2, 14.2, -Math.PI / 2], ['#a8483a', 17, 1.5, -Math.PI / 2 + 0.12]]) {
@@ -706,23 +708,19 @@ function buildTinyhaus(base, addBoxCollider, addSpot, x, z) {
   // east end: the window with the plywood shutter
   g.add(box(0.06, 1.25, 1.35, trim, L / 2 + 0.03, Y0 + 1.75, 0));
   g.add(box(0.06, 1.1, 1.2, ply, L / 2 + 0.07, Y0 + 1.75, 0));
-  // both long sides: a window; the door with steps faces into the camp (north)
+  // both long sides: a window; the door with steps faces the road (south)
   const glass = mat('#9fd3f0', { roughness: 0.2 });
   for (const s of [-1, 1]) {
     g.add(box(0.75, 1.0, 0.06, trim, 1.9, Y0 + 1.75, s * (D / 2 + 0.02)));
     g.add(box(0.6, 0.85, 0.06, glass, 1.9, Y0 + 1.75, s * (D / 2 + 0.04)));
   }
-  g.add(box(0.9, 2.0, 0.06, trim, -1.2, Y0 + 1.05, -D / 2 - 0.03));
-  for (let i = 0; i < 2; i++) g.add(box(1.0, 0.14, 0.34, mat('#8a6a42'), -1.2, 0.14 + i * 0.22, -D / 2 - 0.55 + i * 0.3));
-  const sign = textPlane('TINYHAUS', 1.3, 0.3, { w: 448, h: 104, bg: '#e8d8b0', fg: '#3a1a14', font: 'bold 64px sans-serif' });
-  sign.position.set(-1.2, Y0 + 2.4, -D / 2 - 0.05);
-  sign.rotation.y = Math.PI;
-  g.add(sign);
+  g.add(box(0.9, 2.0, 0.06, trim, -1.2, Y0 + 1.05, D / 2 + 0.03));
+  for (let i = 0; i < 2; i++) g.add(box(1.0, 0.14, 0.34, mat('#8a6a42'), -1.2, 0.14 + i * 0.22, D / 2 + 0.55 - i * 0.3));
   // camping chair + beer crate in front of the door
-  g.add(box(0.5, 0.05, 0.5, mat('#2f5f8a'), 0.6, 0.42, -D / 2 - 1.1));
-  g.add(box(0.5, 0.55, 0.05, mat('#2f5f8a'), 0.6, 0.7, -D / 2 - 0.86));
-  for (const [dx, dz] of [[-0.2, -0.2], [0.2, -0.2], [-0.2, 0.2], [0.2, 0.2]]) g.add(box(0.04, 0.42, 0.04, steel, 0.6 + dx, 0.21, -D / 2 - 1.1 + dz));
-  g.add(box(0.42, 0.3, 0.32, mat('#b8860b'), 1.4, 0.15, -D / 2 - 1.0));
+  g.add(box(0.5, 0.05, 0.5, mat('#2f5f8a'), 0.6, 0.42, D / 2 + 0.8));
+  g.add(box(0.5, 0.55, 0.05, mat('#2f5f8a'), 0.6, 0.7, D / 2 + 0.56));
+  for (const [dx, dz] of [[-0.2, -0.2], [0.2, -0.2], [-0.2, 0.2], [0.2, 0.2]]) g.add(box(0.04, 0.42, 0.04, steel, 0.6 + dx, 0.21, D / 2 + 0.8 + dz));
+  g.add(box(0.42, 0.3, 0.32, mat('#b8860b'), 1.4, 0.15, D / 2 + 0.7));
   // the orange tipper trailer
   const tx = L / 2 + 2.9, orange = mat('#d98a1e', { roughness: 0.8 });
   g.add(box(4.4, 0.12, 2.2, steel, tx, 0.95, 0));
@@ -738,7 +736,7 @@ function buildTinyhaus(base, addBoxCollider, addSpot, x, z) {
   base.add(g);
   addBoxCollider(x, z, L / 2, D / 2, 0, 'tinyhaus');
   addBoxCollider(x + tx, z, 2.25, 1.15, 0, 'tinyhaus');
-  addSpot('tinyhaus', x - 1.2, z - D / 2 - 1.8);
+  addSpot('tinyhaus', x - 1.2, z + D / 2 + 1.6);
 }
 
 /** Erdwall along local z (centred), overgrown with scrub: lumpy half-round profile, bushes and tufts on top. */

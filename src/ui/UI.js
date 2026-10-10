@@ -294,13 +294,9 @@ export class UI {
 
   vehicleHud(v) {
     const el = $('vehicle-hud');
-    if (!v) { if (!el.classList.contains('hidden')) el.classList.add('hidden'); $('hint').textContent = t('hud.hint'); return; }
-    el.classList.remove('hidden');
-    $('hint').textContent = t(v.o?.hop ? 'hud.hintRide' : 'hud.hintDrive');
-    let html = `<div class="vh-name">${L(v.name)}</div>`;
-    if (v.fuel !== undefined) html += `<div class="vh-fuel"><span>${t('hud.fuel')}</span><div class="bar"><div style="width:${Math.round(v.fuel * 100)}%"></div></div></div>`;
-    if (v.broken) html += `<div class="vh-broken">💥 ${t('p.quadBroken')}</div>`;
-    if (el._last !== html) { el.innerHTML = html; el._last = html; }
+    // no panel while driving any more (no name, speed or fuel) – only the key hint line changes
+    if (!el.classList.contains('hidden')) el.classList.add('hidden');
+    $('hint').textContent = t(!v ? 'hud.hint' : v.o?.hop ? 'hud.hintRide' : 'hud.hintDrive');
   }
 
   forceRefresh() {

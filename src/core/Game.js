@@ -156,6 +156,7 @@ export class Game {
       obj.scale.y = s; obj.updateMatrixWorld(true);
       for (const v of Object.values(this.vehicles)) if (v.unstick(obj.position, 0.35, area)) this.ui.toast(getLang() === 'de' ? `🚜 ${L(v.name)} umgeparkt, stand im Weg.` : `🚜 ${L(v.name)} moved, it was in the way.`); };
     this.vehicles.quad.onBreak = () => {
+      this.quadDownT = 0; this.quadNagT = 0;
       this.mechanicNearby();
       this.audio.sputter();
       this.ui.toast(t('t.quadDead'));
@@ -1000,6 +1001,46 @@ export class Game {
     this.refreshHUD();
   }
 
+  /** A mechanic walks to the broken quad and fixes it. slow = he came on his own, takes his time. */
+  sendMechanic(npc, slow = false) {
+    const quad = this.vehicles.quad, de = getLang() === 'de';
+    quad.repairing = true;
+    npc.incident = null;
+    if (npc.char.sitting) npc.standUp();
+    npc.task = {
+      phase: 'go', pos: () => quad.position, arriveDist: 2.5, workTime: slow ? 14 : 5, speed: slow ? 2.2 : 4.5,
+      arriveLine: slow ? (de ? 'Na, wer hat\'s wieder kaputtgefahren? Lass mich mal. Dauert kurz.' : 'So, who drove it to death again? Let me. Takes a moment.') : (de ? 'Ah. Klassiker. Zündkerze. Und Gaffa.' : 'Ah. Classic. Spark plug. And gaffa.'),
+      then: () => {
+        quad.repair();
+        for (const m of ['flo', 'andi'].map((i) => this.npcs.get(i))) if (m?.homeBackup) { m.home = m.homeBackup; m.homeBackup = null; m.target = null; }
+        this.economy.spend(150, { de: 'Quad-Reparatur (Zündkerze, Gaffa)', en: 'Quad repair (spark plug, gaffa)' });
+        quad.repairing = false;
+        npc.say(de ? 'Läuft. Fahr nicht so viel. Oder doch, dann seh ich dich wieder.' : 'Runs. Don\'t drive so much. Or do, then I\'ll see you again.', 4);
+        this.ui.toast(t('t.quadFixed'));
+        this.audio.accept();
+      },
+    };
+  }
+
+  /** Broken quad: remind the player now and then; after a good while Andi shows up on his own. */
+  quadBreakdown(dt) {
+    const quad = this.vehicles.quad;
+    if (!quad.broken) { this.quadDownT = 0; return; }
+    if (quad.repairing || this.finale || this.ui.dialogOpen) return;
+    this.quadDownT = (this.quadDownT || 0) + dt;
+    this.quadNagT = (this.quadNagT || 0) + dt;
+    const onIt = this.player.vehicle === quad;
+    const trying = onIt && (this.input.down('KeyW', 'ArrowUp', 'KeyS', 'ArrowDown') || Math.abs(this.input.axis.y) > 0.3);
+    if (this.quadNagT > (trying ? 6 : onIt ? 20 : 50)) { this.quadNagT = 0; this.ui.toast(`💥 ${t('p.quadBroken')}`); }
+    if (this.quadDownT > 150) {
+      const andi = this.npcs.get('andi');
+      if (!andi || andi.hidden || andi.gone || andi.riding) { this.quadDownT = 120; return; } // not around right now: try again later
+      this.quadDownT = 0;
+      this.ui.toast(getLang() === 'de' ? '🔧 Andi hat gehört, dass das Quad steht. Er kommt von selbst. Gemütlich.' : '🔧 Andi heard the quad is down. He\'s coming on his own. Leisurely.');
+      this.sendMechanic(andi, true);
+    }
+  }
+
   prepareQuadExpress() {
     const q = this.vehicles.quad;
     if (q.broken) q.repair();
@@ -1243,20 +1284,7 @@ export class Game {
         { who: 'you', text: de ? 'Das Quad ist verreckt…' : 'The quad died…' },
         { who: id, text: de ? 'Schon wieder? *trinkt aus* Ich komm. Wo steht\'s?' : 'Again? *finishes beer* I\'m coming. Where is it?' },
       ], null, npc);
-      quad.repairing = true;
-      npc.task = {
-        phase: 'go', pos: () => quad.position, arriveDist: 2.5, workTime: 5, speed: 4.5,
-        arriveLine: de ? 'Ah. Klassiker. Zündkerze. Und Gaffa.' : 'Ah. Classic. Spark plug. And gaffa.',
-        then: () => {
-          quad.repair();
-          for (const m of ['flo', 'andi'].map((i) => this.npcs.get(i))) if (m?.homeBackup) { m.home = m.homeBackup; m.homeBackup = null; m.target = null; }
-          this.economy.spend(150, { de: 'Quad-Reparatur (Zündkerze, Gaffa)', en: 'Quad repair (spark plug, gaffa)' });
-          quad.repairing = false;
-          npc.say(de ? 'Läuft. Fahr nicht so viel. Oder doch, dann seh ich dich wieder.' : 'Runs. Don\'t drive so much. Or do, then I\'ll see you again.', 4);
-          this.ui.toast(t('t.quadFixed'));
-          this.audio.accept();
-        },
-      };
+      this.sendMechanic(npc);
       return;
     }
     // 4a) Thompsen & Zdenko push stuck vehicles back to the base
@@ -1843,6 +1871,7 @@ export class Game {
     this.safe(() => this.ui.tracker(this.quests, this.player.position, this.drama));
     this.ui.stamina(veh ? 1 : this.player.stamina, veh ? 1 : this.player.staminaMax || 1);
     this.safe(() => this.ui.vehicleHud(veh));
+    if (playing) this.safe(() => this.quadBreakdown(dt));
     let objectives = [];
     this.safe(() => { objectives = [...this.quests.trackedObjectives(), ...this.drama.objectives(), ...this.soundbox.objectives()]; });
     const visibleNpcs = this.npcs.all.filter((n) => !n.hidden);

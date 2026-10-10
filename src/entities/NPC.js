@@ -221,7 +221,10 @@ export class NPC {
     // advance along the path; skip corners we already see past
     while (nv.i < nv.path.length - 1) {
       const c = nv.path[nv.i];
-      if (Math.hypot(c.x - p.x, c.z - p.z) < 0.9) { nv.i++; continue; }
+      const cd = Math.hypot(c.x - p.x, c.z - p.z);
+      // a corner only counts as passed once the way to the next one is really free – otherwise people
+      // cut the corner at a gate post and keep running into the fence next to it
+      if (cd < 0.45 || (cd < 0.9 && grid.lineClear(p, nv.path[nv.i + 1]))) { nv.i++; continue; }
       break;
     }
     const last = nv.path[nv.path.length - 1];

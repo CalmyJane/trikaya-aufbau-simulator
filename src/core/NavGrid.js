@@ -40,7 +40,7 @@ export class NavGrid {
     b.fill(0);
     for (const c of this.colliders.list) {
       // thin walls (fences, container walls) get less padding so doors stay passable
-      const pad = c.type === 'box' && Math.min(c.hw, c.hd) < 0.2 ? 0.3 : inflate;
+      const pad = c.navPad ?? (c.type === 'box' && Math.min(c.hw, c.hd) < 0.2 ? 0.3 : inflate); // navPad: walls that want a full body width of clearance
       const ext = (c.type === 'circle' ? c.r : Math.hypot(c.hw, c.hd)) + pad;
       const i0 = Math.max(0, Math.floor((c.x - ext - minX) / cell)), i1 = Math.min(w - 1, Math.ceil((c.x + ext - minX) / cell));
       const j0 = Math.max(0, Math.floor((c.z - ext - minZ) / cell)), j1 = Math.min(h - 1, Math.ceil((c.z + ext - minZ) / cell));

@@ -44,7 +44,7 @@ export function buildCrewBase(world) {
   const toWorld = (x, z) => new THREE.Vector3(x, 0, z).applyMatrix4(base.matrixWorld);
   const addBoxCollider = (x, z, hw, hd, rot = 0, tag) => {
     const w = toWorld(x, z);
-    colliders.addBox(w.x, w.z, hw, hd, rot + CREW_BASE.rotation, tag);
+    return colliders.addBox(w.x, w.z, hw, hd, rot + CREW_BASE.rotation, tag);
   };
   const addSpot = (name, x, z, y = 0) => {
     const w = toWorld(x, z);
@@ -60,15 +60,25 @@ export function buildCrewBase(world) {
     if (i === 3) continue; // west side: no fence, an earth wall with scrub separates the camp from the football pitch
     const [ax, az] = corners[i], [bx, bz] = corners[(i + 1) % 4];
     const len = Math.hypot(bx - ax, bz - az);
-    const n = Math.ceil(len / 3.5);
-    for (let k = 0; k < n; k++) {
-      const x0 = ax + ((bx - ax) * k) / n, z0 = az + ((bz - az) * k) / n;
-      const x1 = ax + ((bx - ax) * (k + 1)) / n, z1 = az + ((bz - az) * (k + 1)) / n;
-      const mx = (x0 + x1) / 2, mz = (z0 + z1) / 2;
-      if (CREW_BASE.gates.some((g) => Math.hypot(g.x - mx, g.z - mz) < g.w / 2)) continue;
-      const a = toWorld(x0, z0), b = toWorld(x1, z1);
-      segs.push({ ax: a.x, az: a.z, bx: b.x, bz: b.z });
-      colliders.addWall(a.x, a.z, b.x, b.z, 0.3, 'basefence').h = 2.0;
+    // the fence runs exactly from gate post to gate post
+    const cuts = [0, 1];
+    for (const g of CREW_BASE.gates) {
+      const t = ((g.x - ax) * (bx - ax) + (g.z - az) * (bz - az)) / (len * len);
+      const off = Math.hypot(ax + (bx - ax) * t - g.x, az + (bz - az) * t - g.z);
+      if (off < 0.5 && t > 0 && t < 1) cuts.push(t - g.w / 2 / len, t + g.w / 2 / len);
+    }
+    cuts.sort((p, q) => p - q);
+    for (let c = 0; c < cuts.length; c += 2) {
+      const t0 = cuts[c], t1 = cuts[c + 1];
+      const n = Math.ceil(((t1 - t0) * len) / 3.5);
+      for (let k = 0; k < n; k++) {
+        const ta = t0 + ((t1 - t0) * k) / n, tb = t0 + ((t1 - t0) * (k + 1)) / n;
+        const a = toWorld(ax + (bx - ax) * ta, az + (bz - az) * ta), b = toWorld(ax + (bx - ax) * tb, az + (bz - az) * tb);
+        segs.push({ ax: a.x, az: a.z, bx: b.x, bz: b.z });
+        const fw = colliders.addWall(a.x, a.z, b.x, b.z, 0.3, 'basefence');
+        fw.h = 2.0;
+        fw.navPad = 0.42; // paths keep a body width away, so nobody grinds along the fence next to a gate
+      }
     }
   }
   scene.add(fenceRun(segs));
@@ -201,7 +211,7 @@ export function buildCrewBase(world) {
   spots.C2_front = spots.kuenstler_front;         // cables & steel wires, drill
   spots.C3_front = spots.huehner_front;           // tents, tarps, yurt
   addSpot('C4_front', 2.6, -16.5);              // deco stuff next to the Hühnercontainer
-  addSpot('sauna_site', 16, -8);                  // Krygo's sauna (eternal construction site)
+  addSpot('sauna_site', 16.5, -16.5);                  // Krygo's sauna (eternal construction site)
 
   // ------------------------------------------------ vehicles, pallets, clutter
   const pickup = Assets.model('pickup', { length: 5.3 });
@@ -262,7 +272,7 @@ export function buildCrewBase(world) {
   gen.position.set(-14, 0, 17.3);
   base.add(gen);
   addBoxCollider(-14, 17.3, 1.65, 0.75, 0, 'crewbase');
-  addSpot('generator', -11, 18.6);
+  addSpot('generator', -9.5, 16.5); // people who hang out "at the generator" stand around this point – keep it clear of the fence
 
   addSpot('spawn', 0, 9);
   addSpot('base_yard', 10, -7);
@@ -369,7 +379,7 @@ function buildOffice(base, world, addBoxCollider, addSpot, ox, oz, rot = 0) {
   g.add(box(t, H, D, steelOut, -W / 2, H / 2, 0));
   g.add(box(t, H, D, steelOut, W / 2, H / 2, 0));
   // front wall with door gap (door at x=+1.6) and a window
-  const doorX = 1.6, doorW = 1.2;
+  const doorX = 1.6, doorW = 1.5;
   const leftW = W / 2 + doorX - doorW / 2;
   g.add(box(leftW, H, t, steelOut, -W / 2 + leftW / 2, H / 2, D / 2));
   const rightW = W / 2 - doorX - doorW / 2;
@@ -426,7 +436,7 @@ function buildOffice(base, world, addBoxCollider, addSpot, ox, oz, rot = 0) {
 
   // colliders (office coordinates → base)
   const wallT = 0.12;
-  const col = (cx, cz, hw, hd) => { const [bx, bz] = cabinLocal(ox, oz, rot, cx, cz); addBoxCollider(bx, bz, hw, hd, rot, 'office'); };
+  const col = (cx, cz, hw, hd) => { const [bx, bz] = cabinLocal(ox, oz, rot, cx, cz); const c = addBoxCollider(bx, bz, hw, hd, rot, 'office'); if (Math.min(hw, hd) < 0.2) c.navPad = 0.42; };
   const spot = (name, cx, cz) => { const [sx, sz] = cabinLocal(ox, oz, rot, cx, cz); addSpot(name, sx, sz); };
   col(0, -D / 2, W / 2, wallT);
   col(-W / 2, 0, wallT, D / 2);
@@ -514,7 +524,7 @@ function buildCabin(base, world, addBoxCollider, addSpot, { id, x, z, rot, label
   const g = cabinShell(frame, false, CAB_W, CAB_D);
   const wall = mat('#ecebe4', { roughness: 0.7 });
   const t = 0.08;
-  const doorW = 1.2; // wide enough that the nav grid always finds a free cell in the gap
+  const doorW = 1.5; // wide enough that the nav grid always finds a free cell in the gap, a full body width from both jambs
   const leftW = CAB_W / 2 + doorX - doorW / 2, rightW = CAB_W / 2 - doorX - doorW / 2;
   g.add(box(leftW, CAB_H, t, wall, -CAB_W / 2 + leftW / 2, CAB_H / 2, CAB_D / 2));
   g.add(box(rightW, CAB_H, t, wall, CAB_W / 2 - rightW / 2, CAB_H / 2, CAB_D / 2));
@@ -543,7 +553,7 @@ function buildCabin(base, world, addBoxCollider, addSpot, { id, x, z, rot, label
   world.cameraBlockers.push(g);
 
   // walls → colliders (door gap stays open)
-  const wallCol = (cx, cz, hw, hd) => { const [bx, bz] = cabinLocal(x, z, rot, cx, cz); addBoxCollider(bx, bz, hw, hd, rot, id); };
+  const wallCol = (cx, cz, hw, hd) => { const [bx, bz] = cabinLocal(x, z, rot, cx, cz); const c = addBoxCollider(bx, bz, hw, hd, rot, id); if (Math.min(hw, hd) < 0.2) c.navPad = 0.42; };
   wallCol(0, -CAB_D / 2, CAB_W / 2, 0.06);
   wallCol(-CAB_W / 2, 0, 0.06, CAB_D / 2);
   wallCol(CAB_W / 2, 0, 0.06, CAB_D / 2);

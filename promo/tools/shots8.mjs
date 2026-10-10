@@ -19,18 +19,18 @@ export const SHOTS = [
      promo(TITLE, Math.min(1, (f + 1) / 3, (n - 1 - f) / 8));`],
   // ------------------------------------------------ the crew
   ['CREW', 135, 3,
-    `const C = [['jan', 119.6, -12.5, 'Moin! Kaffee steht im Büro.'], ['fabi', 113.6, -14.5, 'Gaffa? Hab ich.'], ['sabse', 119.8, -17, 'Heute gibt’s Linsen.'], ['corni', 113.9, -18.2, 'Hast du die Spezial-Nuss?'], ['franzi', 119.8, -21.5, 'Trink Wasser!'], ['estenko', 119.4, -25.5, 'Radio bleibt an.']];
+    `const C = [['jan', 127, -25.5, 'Moin! Kaffee steht im Büro.'], ['fabi', 122.2, -23.4, 'Gaffa? Hab ich.'], ['sabse', 127, -21, 'Heute gibt’s Linsen.'], ['corni', 122.2, -19, 'Hast du die Spezial-Nuss?'], ['franzi', 127, -16.5, 'Trink Wasser!'], ['estenko', 122.2, -14, 'Radio bleibt an.']];
      window._crew = C.map(([id, x, z, line]) => [hold(id, x, z), line, false]);
-     g.vehicles.quad.place({ x: 124, z: -9 }, 2.2);
-     place(116.6, -7.5, Math.PI); g.cam.pitch = 0.22; g.cam.targetDist = 6;`,
-    `walkTo(116.9, -40, false);
+     g.vehicles.radlader.place({ x: 115, z: -7.5 }, 1.2);
+     place(124.6, -30.5, 0); g.cam.pitch = 0.22; g.cam.targetDist = 6;`,
+    `walkTo(124.8, 5, false);
      for (const c of _crew) { const [nn, line] = c; nn.wait = 99; nn.char.faceTowards(g.player.position, 1 / 30, 5);
-       if (!c[2] && g.player.position.z < nn.position.z + 4.2) { c[2] = true; sayF(nn, line, 1.7); nn.char.play('wave', 0.2, { once: true }); } }`],
+       if (!c[2] && g.player.position.z > nn.position.z - 4.2) { c[2] = true; sayF(nn, line, 1.7); nn.char.play('wave', 0.2, { once: true }); } }`],
   // ------------------------------------------------ new rides
   ['BIKE', 68, 3,
-    `g.bikeSys.rented = true; ride(g.vehicles.bike, -26, 47, -Math.PI / 2); g.vehicles.bike.speed = 8; g.cam.pitch = 0.09; lock(); zoom(1.7); g.cam.yaw += 0.3;
-     hold('franzi', -30, 50.5, [-40, 47]);`,
-    `driveTo(-75, 47.5, true); if (f === 16 || f === 44) hop();
+    `g.bikeSys.rented = true; ride(g.vehicles.bike, -26, 46.2, -Math.PI / 2); g.vehicles.bike.speed = 8; g.cam.pitch = 0.09; lock(); zoom(1.7); g.cam.yaw += 0.3;
+     hold('franzi', -30, 49.7, [-40, 46]);`,
+    `driveTo(-75, 46.2, true); if (f === 16 || f === 44) hop();
      if (f === 3) sayF(g.npcs.get('franzi'), 'Bring’s heil zurück!', 1.6);`],
   ['SCOOTER', 67, 3,
     `g.scooterSys.rented = true; const h = Math.atan2(-64.8, 16.8); ride(g.vehicles.scooter, 74, -41.6, h); g.vehicles.scooter.speed = 8; g.cam.pitch = 0.09; lock(); zoom(1.7); g.cam.yaw -= 0.3;
@@ -49,29 +49,29 @@ export const SHOTS = [
   ['HAENGER', 113, 3,
     `g.trailer.start('t1_trailer', g.quests.quests.t1_trailer.steps[0]); const a = g.trailer.active; const o = a.obstacles[4];
      // drive across the cable bridge (its long side lies along the local x axis), coming from the east
-     const head = -Math.PI / 2, dir = [-1, 0]; o.pos.set(-50, 0, 47); o.cos = Math.cos(head); o.sin = Math.sin(head); a.group.children[4].position.set(-50, 0, 47); a.group.children[4].rotation.y = head;
-     g.checkRunOver = () => {}; ride(g.vehicles.quad, -38, 47, head); g.vehicles.quad.speed = 7; g.trailer.cart.hitchTo(g.vehicles.quad);
+     const head = -Math.PI / 2, dir = [-1, 0]; o.pos.set(-40, 0, 46.3); o.cos = Math.cos(head); o.sin = Math.sin(head); a.group.children[4].position.set(-40, 0, 46.3); a.group.children[4].rotation.y = head;
+     g.checkRunOver = () => {}; ride(g.vehicles.quad, -28, 46.3, head); g.vehicles.quad.speed = 7; g.trailer.cart.hitchTo(g.vehicles.quad);
      for (const id of ['juli', 'julez', 'corni']) hold(id); g.trailer.board(); untoast();
      const b0 = g.trailer.bump.bind(g.trailer); g.trailer.bump = (c, s) => b0(0, s);
      window._tr = { o, dir, out: -1 }; g.cam.pitch = 0.13; lock(); zoom(1.4); g.cam.yaw += 0.5;`,
-    `const { o, dir } = _tr; if (g.vehicles.quad.speed < 8) driveTo(-66, 47, false); else keys();
+    `const { o, dir } = _tr; if (g.vehicles.quad.speed < 8) driveTo(-56, 46.3, false); else keys();
      if (f === 3) sayF(g.npcs.get('corni'), 'Fahr los, aber mit Gefühl!', 1.6);
      if (_tr.out < 0 && o.onT) { _tr.out = f; console.log('FALL at ' + f); g.trailer.fallOut(g.npcs.get('julez')); }
      if (_tr.out >= 0 && f === _tr.out + 30) sayF(g.npcs.get('julez'), 'Hab ich doch gesagt, das hält nicht!', 2.2);`],
   ['RADLADER', 67, 3,
-    `g.checkRunOver = () => {}; const r = g.vehicles.radlader; const h = Math.atan2(-30, -2); ride(r, -65, 42.5, h); r.speed = 6; r.armTarget = -0.95; r.arm.rotation.x = -0.95; g.cam.pitch = 0.2; lock(); zoom(1.3); g.cam.yaw = h + Math.PI - 0.55; untoast();`,
+    `g.checkRunOver = () => {}; const r = g.vehicles.radlader; const h = Math.atan2(-30, -2); ride(r, -69.5, 42, h); r.speed = 6; r.armTarget = -0.95; r.arm.rotation.x = -0.95; g.cam.pitch = 0.2; lock(); zoom(1.3); g.cam.yaw = h + Math.PI - 0.55; untoast();`,
     `driveTo(-95, 40.5, true); if (f === 18) g.vehicles.radlader.armTarget = 0.1; if (f === 48) g.vehicles.radlader.armTarget = -0.95;`],
   // ------------------------------------------------ after work
   ['BEER', 68, 3,
-    `const t0 = g.world.spots.tent_table1; window._c0 = t0; g.vehicles.radlader.place({ x: 100, z: -6 }, 0);
-     place(t0.x - 2.6, t0.z + 2.4, Math.atan2(2.6, -2.4)); g.cam.yaw = Math.atan2(2.6, -2.4) + Math.PI + 0.5; g.cam.pitch = 0.26; g.cam.targetDist = 5;`,
-    `const pp = g.player.position; const j = hold('jan', _c0.x - 1.2, _c0.z + 0.2); j.char.faceTowards(pp, 1 / 30, 4); const fa = hold('fabi', _c0.x - 3.4, _c0.z + 0.4); fa.char.faceTowards(pp, 1 / 30, 4);
+    `const c0 = g.world.spots.campfire; window._c0 = c0; const h = Math.atan2(-2.2, -1.6);
+     place(c0.x + 2.2, c0.z + 1.6, h); g.cam.yaw = h + Math.PI + 0.45; g.cam.pitch = 0.24; g.cam.targetDist = 5.5;`,
+    `const pp = g.player.position; const j = hold('jan', _c0.x - 1.4, _c0.z + 1.9); j.char.faceTowards(pp, 1 / 30, 4); const fa = hold('fabi', _c0.x + 0.6, _c0.z - 2.3); fa.char.faceTowards(pp, 1 / 30, 4);
      if (f === 3) sayF(j, 'Teammeeting fällt aus.', 0.9);
      if (f === 30) sayF(fa, 'Dann ist jetzt Feierabend. Prost!', 1.6);
      if (f === 34 || f === 48 || f === 60) { g.effects.buy('beer', true); g.player.char.play('wave', 0.2, { once: true }); g.player.waveTimer = 0.8; }`],
   ['DRUNK', 54, 3,
-    `untoast(); g.effects.beerLevel = 4; g.bikeSys.rented = true; ride(g.vehicles.bike, -28, 47, -Math.PI / 2); g.vehicles.bike.speed = 7; g.cam.pitch = 0.1; zoom(1.5);`,
-    `g.effects.beerLevel = 4; driveTo(-75, 47 + Math.sin(f * 0.16) * 14, true); if (f === 20) hop();
+    `untoast(); g.effects.beerLevel = 4; g.bikeSys.rented = true; ride(g.vehicles.bike, -24, 46.2, -Math.PI / 2); g.vehicles.bike.speed = 7; g.cam.pitch = 0.1; zoom(1.5);`,
+    `g.effects.beerLevel = 4; driveTo(-75, 46.2 + Math.sin(f * 0.16) * 12, true); if (f === 20) hop();
      g.cam.yaw += Math.sin(f * 0.13) * 0.012; const cv = g.renderer.domElement; cv.style.transform = 'rotate(' + (Math.sin(f * 0.11) * 2.6) + 'deg) scale(1.08)'; cv.style.filter = 'blur(' + (0.6 + 0.8 * Math.sin(f * 0.2) ** 2) + 'px) saturate(1.3)';
      promo('<div class="black"></div>', Math.max(0, (f - (n - 9)) / 8));`],
   // the music stops for a second

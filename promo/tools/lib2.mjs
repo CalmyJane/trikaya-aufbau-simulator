@@ -20,7 +20,7 @@ export async function openGame(browser, save, { width = 1920, height = 1080, sca
   // vite occasionally reloads the page right after load: retry
   for (let attempt = 0; ; attempt++) {
     try {
-      await page.goto('http://localhost:5173/');
+      await page.goto(`http://localhost:${process.env.PROMO_PORT || 5173}/`);
       await page.waitForFunction(() => window.game && window.game.mode === 'menu', null, { timeout: 180000 });
       await page.waitForTimeout(500);
       await page.evaluate(() => window.game.mode);

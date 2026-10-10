@@ -31,7 +31,7 @@ const BASE_PATHS = [
   [[-9.3, -15], [-3.7, -16]],                                                      // Hühnercontainer
   [[-11, -9], [-14, -12.5], [-17.1, -15.3]],                                       // Künstlergasse
   [[10.5, -3], [-1.3, -6.2], [-11, -9]],                                           // yard → storage cabins
-  [[-1.3, -6.2], [-1.4, -8]],                                                      // Zdenko's hut
+  [[-6.2, -7.6], [-5.5, -10.8]],                                                   // Zdenko's hut (porch faces west)
   [[0, 12], [-5, 17], [-11, 18.6]],                                                // generator
   [[9, 7], [7, 4.3]],                                                              // Lagerfeuer
 ];

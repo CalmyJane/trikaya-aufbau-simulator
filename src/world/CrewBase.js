@@ -189,7 +189,7 @@ export function buildCrewBase(world) {
   addSpot('campfire_box', 8.7, 1.1);
 
   // Zdenko's garden shed between the Hühnercontainer and the Aufenthaltszelt – he likes to chill under its little porch
-  buildZdenkoHut(base, addBoxCollider, addSpot, -1.5, -11, 0.1);
+  buildZdenkoHut(base, addBoxCollider, addSpot, -1.5, -11, -Math.PI / 2 + 0.08); // porch faces west
 
   // aliases for jobs written against the old container numbers
   spots.C1_front = spots.werkstatt_inside;        // tools, shackles, ropes, pegs, screws
@@ -611,7 +611,7 @@ function buildLoungeTent(base, addBoxCollider, addSpot, x, z) {
   addSpot('aufenthalt', x, z);
 }
 
-/** Zdenko's Hütte: small wooden garden shed, porch roof in front (+z) with a table and a chair. */
+/** Zdenko's Hütte: small wooden garden shed, porch roof in front (+z) with a table and two chairs. */
 function buildZdenkoHut(base, addBoxCollider, addSpot, x, z, rot) {
   const g = new THREE.Group();
   const W = 3.0, D = 2.4, H = 2.0, PD = 1.7;
@@ -636,15 +636,17 @@ function buildZdenkoHut(base, addBoxCollider, addSpot, x, z, rot) {
     g.add(box(0.1, H - 0.2, 0.1, dark, s * (W / 2 - 0.05), (H - 0.2) / 2, D / 2 + PD - 0.1)); // porch posts
   }
   g.add(box(W, 0.08, PD, mat('#8a6a42'), 0, 0.04, D / 2 + PD / 2));                               // porch deck
-  // table + chair under the porch
-  const tx = 0.55, tz = D / 2 + 0.85;
+  // table + two chairs under the porch
+  const tx = 0, tz = D / 2 + 0.85;
   g.add(cyl(0.38, 0.38, 0.05, mat('#c9a27a'), 10, tx, 0.72, tz));
   g.add(cyl(0.05, 0.05, 0.66, dark, 6, tx, 0.39, tz));
   g.add(cyl(0.06, 0.05, 0.16, mat('#6b3a1a'), 6, tx + 0.1, 0.83, tz - 0.08));                    // beer bottle
-  const cx = -0.45;
-  g.add(box(0.45, 0.06, 0.45, dark, cx, 0.46, tz));
-  g.add(box(0.06, 0.5, 0.45, dark, cx - 0.22, 0.72, tz));
-  for (const [dx, dz] of [[-0.18, -0.18], [0.18, -0.18], [-0.18, 0.18], [0.18, 0.18]]) g.add(box(0.05, 0.42, 0.05, dark, cx + dx, 0.25, tz + dz));
+  const chairs = [-0.9, 0.9];
+  for (const cx of chairs) {
+    g.add(box(0.45, 0.06, 0.45, dark, cx, 0.46, tz));
+    g.add(box(0.06, 0.5, 0.45, dark, cx + Math.sign(cx) * 0.22, 0.72, tz));
+    for (const [dx, dz] of [[-0.18, -0.18], [0.18, -0.18], [-0.18, 0.18], [0.18, 0.18]]) g.add(box(0.05, 0.42, 0.05, dark, cx + dx, 0.25, tz + dz));
+  }
   const sign = textPlane('ZDENKO', 0.9, 0.24, { w: 384, h: 104, bg: '#e8d8b0', fg: '#3a2a1a', font: 'bold 64px sans-serif' });
   sign.position.set(-0.7, 1.92, D / 2 + 0.05);
   g.add(sign);
@@ -655,7 +657,7 @@ function buildZdenkoHut(base, addBoxCollider, addSpot, x, z, rot) {
   addBoxCollider(x, z, W / 2, D / 2, rot, 'zdenko_hut');
   for (const s of [-1, 1]) { const [px, pz] = L(s * (W / 2 - 0.05), D / 2 + PD - 0.1); addBoxCollider(px, pz, 0.08, 0.08, rot, 'zdenko_hut'); }
   const [ax, az] = L(tx, tz); addBoxCollider(ax, az, 0.3, 0.3, rot, 'zdenko_hut');
-  const [sx, sz] = L(cx, tz); addSpot('zdenko_seat', sx, sz);
+  chairs.forEach((cx, i) => { const [sx, sz] = L(cx, tz); addSpot(i ? 'zdenko_seat2' : 'zdenko_seat', sx, sz); });
   addSpot('zdenko_table', ax, az);
   const [fx, fz] = L(0, D / 2 + PD + 1.2); addSpot('zdenko_hut', fx, fz);
 }

@@ -57,6 +57,7 @@ export function buildCrewBase(world) {
   const corners = [[-HW, -HD], [HW, -HD], [HW, HD], [-HW, HD]];
   const segs = [];
   for (let i = 0; i < 4; i++) {
+    if (i === 3) continue; // west side: no fence, an earth wall with scrub separates the camp from the football pitch
     const [ax, az] = corners[i], [bx, bz] = corners[(i + 1) % 4];
     const len = Math.hypot(bx - ax, bz - az);
     const n = Math.ceil(len / 3.5);
@@ -71,6 +72,10 @@ export function buildCrewBase(world) {
     }
   }
   scene.add(fenceRun(segs));
+  const wall = earthWall(HD * 2);
+  wall.position.set(-HW, 0, 0);
+  base.add(wall);
+  { const a = toWorld(-HW, -HD), b = toWorld(-HW, HD); colliders.addWall(a.x, a.z, b.x, b.z, 1.7, 'basefence').h = 2.0; }
   // gate posts + signs
   for (const g of CREW_BASE.gates) {
     const along = Math.abs(g.z) > Math.abs(g.x) ? [1, 0] : [0, 1];
@@ -282,10 +287,10 @@ export function buildCrewBase(world) {
   const ibcSign = textPlane('DIESEL', 0.8, 0.3, { w: 256, h: 96, bg: '#ffd400', fg: '#111', font: 'bold 60px sans-serif' });
   ibcSign.position.set(0, 0.8, 0.49);
   ibc.add(ibcSign);
-  ibc.position.set(-18.5, 0, -8);
+  ibc.position.set(-18.1, 0, -8);
   base.add(ibc);
-  addBoxCollider(-18.5, -8, 0.65, 0.55, 0, 'crewbase');
-  addSpot('diesel_tank', -16.3, -8);
+  addBoxCollider(-18.1, -8, 0.65, 0.55, 0, 'crewbase');
+  addSpot('diesel_tank', -15.9, -8);
 
   // vehicle parking (world heading = base rotation + local heading)
   world.vehicleSpots = {
@@ -609,6 +614,61 @@ function buildLoungeTent(base, addBoxCollider, addSpot, x, z) {
   g.position.set(x, 0, z);
   base.add(g);
   addSpot('aufenthalt', x, z);
+}
+
+/** Erdwall along local z (centred), overgrown with scrub: lumpy half-round profile, bushes and tufts on top. */
+function earthWall(len) {
+  const g = new THREE.Group();
+  const rnd = (i) => { const v = Math.sin(i * 127.1 + 3.3) * 43758.5453; return v - Math.floor(v); };
+  const NS = Math.ceil(len / 1.1), NP = 8;
+  const pos = [], col = [], idx = [];
+  const earth = new THREE.Color('#7b6243'), grass = new THREE.Color('#6f8a45'), c = new THREE.Color();
+  for (let i = 0; i <= NS; i++) {
+    const z = -len / 2 + (len * i) / NS;
+    const end = Math.min(1, Math.min(i, NS - i) / 2);               // tapers off at both ends
+    const h = (0.95 + rnd(i) * 0.45) * (0.35 + 0.65 * end), w = 1.0 + rnd(i + 50) * 0.3;
+    for (let k = 0; k <= NP; k++) {
+      const a = (k / NP) * Math.PI;
+      const j = 1 + (rnd(i * 13 + k) - 0.5) * 0.16;
+      pos.push(-Math.cos(a) * w * j + (rnd(i + 90) - 0.5) * 0.3, Math.sin(a) * h * j, z);
+      c.copy(earth).lerp(grass, Math.min(1, rnd(i * 7 + k * 3) * 0.9 + (k === 0 || k === NP ? 0.4 : 0)));
+      col.push(c.r, c.g, c.b);
+    }
+  }
+  for (let i = 0; i < NS; i++) for (let k = 0; k < NP; k++) {
+    const a = i * (NP + 1) + k, b = a + NP + 1;
+    idx.push(a, a + 1, b, a + 1, b + 1, b);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  geo.setIndex(idx);
+  geo.computeVertexNormals();
+  const mound = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true, side: THREE.DoubleSide }));
+  mound.castShadow = true; mound.receiveShadow = true;
+  g.add(mound);
+  // Gestrüpp: scruffy bushes and a few bare twigs
+  const n = Math.floor(len / 1.3);
+  const bushGeo = new THREE.IcosahedronGeometry(1, 0);
+  const bushes = new THREE.InstancedMesh(bushGeo, new THREE.MeshStandardMaterial({ roughness: 0.95, flatShading: true }), n);
+  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0);
+  const cols = ['#4c6b2c', '#5d7a34', '#3d5a28', '#75803c', '#586a2a'];
+  for (let i = 0; i < n; i++) {
+    const z = -len / 2 + 1 + ((len - 2) * (i + rnd(i + 200) * 0.8)) / n;
+    const sc = 0.35 + rnd(i + 300) * 0.5;
+    q.setFromAxisAngle(up, rnd(i + 400) * 6.28);
+    m4.compose(new THREE.Vector3((rnd(i + 500) - 0.5) * 1.3, 0.85 + rnd(i + 600) * 0.35, z), q, new THREE.Vector3(sc * 1.25, sc * (0.7 + rnd(i + 700) * 0.6), sc * 1.1));
+    bushes.setMatrixAt(i, m4);
+    bushes.setColorAt(i, c.set(cols[i % cols.length]));
+    if (i % 3 === 0) { // twigs sticking out
+      const tw = cyl(0.015, 0.03, 0.9 + rnd(i) * 0.6, mat('#5a4630'), 4, (rnd(i + 800) - 0.5) * 1.2, 1.3, z + 0.4);
+      tw.rotation.set((rnd(i + 900) - 0.5) * 0.7, 0, (rnd(i + 950) - 0.5) * 0.7);
+      g.add(tw);
+    }
+  }
+  bushes.castShadow = true;
+  g.add(bushes);
+  return g;
 }
 
 /** Zdenko's Hütte: small wooden garden shed, porch roof in front (+z) with a table and two chairs. */

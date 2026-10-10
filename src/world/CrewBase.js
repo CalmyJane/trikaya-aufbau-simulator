@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { Assets } from '../core/Assets.js';
 import { CREW_BASE, AREAS, LANDMARKS } from './layout.js';
-import { mat, box, cyl, corrugated, textPlane, signPost, dixi, fenceRun, beerBench } from './Props.js';
+import { mat, box, cyl, corrugated, textPlane, signPost, dixi, fenceRun, beerBench, bauwagen } from './Props.js';
 
 // Crew base (the real crew camp): white site cabins – office, Matze's, Corni's, the workshop,
 // two storage cabins – the Aufenthaltszelt, pickup, generator. Registers named "spots" used by quests.
@@ -87,14 +87,17 @@ export function buildCrewBase(world) {
   base.add(s2);
 
   // ------------------------------------------------ Baucontainer (site cabins) like on the real crew camp
+  // Everything is squeezed into the west side, as on the aerial photo: the two storage cabins in the
+  // north-west corner; below them Matze's and the office end to end along the west fence, Corni's
+  // across a narrow lane with the Aufenthaltszelt right behind it, the workshop closing the lane in the south.
   // storage cabins (closed): Künstlergasse & Hühnercontainer – things lie in front of them
-  buildStorage(base, addBoxCollider, addSpot, { id: 'kuenstler', x: -6, z: -15, rot: 0, label: 'KÜNSTLERGASSE', frame: '#c9b02a' });
-  buildStorage(base, addBoxCollider, addSpot, { id: 'huehner', x: 6, z: -16, rot: 0.05, label: 'HÜHNERCONTAINER', frame: '#3040b0' });
+  buildStorage(base, addBoxCollider, addSpot, { id: 'kuenstler', x: -15.5, z: -18, rot: 0, label: 'KÜNSTLERGASSE', frame: '#c9b02a' });
+  buildStorage(base, addBoxCollider, addSpot, { id: 'huehner', x: -8, z: -19, rot: 0.15, label: 'HÜHNERCONTAINER', frame: '#3040b0' });
   // a few chickens in front of the Hühnercontainer (of course)
   const chickens = [];
   for (let i = 0; i < 4; i++) {
     const ch = chicken();
-    ch.position.set(4 + i * 1.3, 0, -12.6 + (i % 2) * 0.8);
+    ch.position.set(-10.5 + i * 1.3, 0, -15.4 + (i % 2) * 0.8);
     ch.rotation.y = i * 1.7;
     base.add(ch);
     chickens.push(ch);
@@ -106,7 +109,7 @@ export function buildCrewBase(world) {
 
   // walk-in cabins: Matze's (volunteers hang out), Corni's (Mahdi listens to music), the workshop
   buildCabin(base, world, addBoxCollider, addSpot, {
-    id: 'matze', x: -9, z: -4, rot: Math.PI / 2, label: 'MATZE', frame: '#7a3aa8',
+    id: 'matze', x: -14.98, z: -3.2, rot: Math.PI / 2, label: 'MATZE', frame: '#7a3aa8',
     furnish: (g, add, col, spot) => {
       add(box(2.0, 0.42, 0.7, mat('#6a3d2a'), 0, 0.3, -0.8));            // sofa
       add(box(2.0, 0.5, 0.18, mat('#5a321f'), 0, 0.72, -1.08));
@@ -118,7 +121,7 @@ export function buildCrewBase(world) {
     },
   });
   buildCabin(base, world, addBoxCollider, addSpot, {
-    id: 'corni', x: -1, z: -6, rot: 0, label: 'CORNI', frame: '#20a8b0',
+    id: 'corni', x: -6.5, z: 1, rot: -Math.PI / 2, label: 'CORNI', frame: '#20a8b0',
     furnish: (g, add, col, spot) => {
       add(box(1.6, 0.06, 0.7, mat('#c9a27a'), 1.6, 0.78, -0.75));        // desk
       for (const [x, z] of [[0.9, -1.0], [2.3, -1.0], [0.9, -0.5], [2.3, -0.5]]) add(box(0.05, 0.76, 0.05, mat('#444'), x, 0.39, z));
@@ -130,7 +133,7 @@ export function buildCrewBase(world) {
     },
   });
   buildCabin(base, world, addBoxCollider, addSpot, {
-    id: 'werkstatt', x: -7, z: 15, rot: Math.PI, label: 'WERKSTATT', frame: '#b8302a',
+    id: 'werkstatt', x: -11.5, z: 8.25, rot: Math.PI, label: 'WERKSTATT', frame: '#b8302a',
     furnish: (g, add, col, spot) => {
       add(box(2.4, 0.08, 0.7, mat('#8a6a42'), 1.3, 0.9, -0.8));          // workbench
       add(box(2.4, 0.86, 0.66, mat('#5a4a3a'), 1.3, 0.43, -0.8));
@@ -145,32 +148,41 @@ export function buildCrewBase(world) {
       spot('werkstatt_inside', 0.4, 0.25); spot('werkstatt_seat', -1.2, 0.3);
     },
   });
-  buildOffice(base, world, toWorld, addBoxCollider, addSpot, -8, 7);
+  buildOffice(base, world, addBoxCollider, addSpot, -13.76, 3.2, Math.PI / 2);
 
   // Aufenthaltszelt: green marquee with beer benches – people hang out here
-  buildLoungeTent(base, addBoxCollider, addSpot, 7, -3);
+  buildLoungeTent(base, addBoxCollider, addSpot, 0.3, 3.5);
 
   // aliases for jobs written against the old container numbers
   spots.C1_front = spots.werkstatt_inside;        // tools, shackles, ropes, pegs, screws
   spots.C2_front = spots.kuenstler_front;         // cables & steel wires, drill
   spots.C3_front = spots.huehner_front;           // tents, tarps, yurt
-  addSpot('C4_front', 8.5, -12.6);                // deco stuff next to the Hühnercontainer
-  addSpot('sauna_site', -12, -12);                // Krygo's sauna (eternal construction site)
+  addSpot('C4_front', -3.2, -16.5);              // deco stuff next to the Hühnercontainer
+  addSpot('sauna_site', 16, -8);                  // Krygo's sauna (eternal construction site)
 
   // ------------------------------------------------ vehicles, pallets, clutter
   const pickup = Assets.model('pickup', { length: 5.3 });
-  pickup.position.set(8, 0, 9);
+  pickup.position.set(10.5, 0, 9.5);
   pickup.rotation.y = -0.4;
   base.add(pickup);
   world.crewPickup = pickup;
-  addBoxCollider(8, 9, 1.05, 2.6, -0.4, 'pickup'); // the model is long along its z axis
-  addSpot('pickup_bed', 8 + Math.sin(0.4) * 3.6, 9 - Math.cos(0.4) * 3.6); // behind the truck (the bed points to -z)
+  addBoxCollider(10.5, 9.5, 1.05, 2.6, -0.4, 'pickup'); // the model is long along its z axis
+  addSpot('pickup_bed', 10.5 + Math.sin(0.4) * 3.6, 9.5 - Math.cos(0.4) * 3.6); // behind the truck (the bed points to -z)
+
+  // Bauwagen along the east side (the blue one is where Fabi leaves the diesel canister)
+  for (const [col, x, z, rot] of [['#2d6a9f', 15.2, 14.2, -Math.PI / 2], ['#a8483a', 17, 1.5, -Math.PI / 2 + 0.12]]) {
+    const bw = bauwagen(col);
+    bw.position.set(x, 0, z);
+    bw.rotation.y = rot;
+    base.add(bw);
+    addBoxCollider(x, z, 3.05, 1.25, rot, 'crewbase');
+  }
 
   const clutter = [
     ['pallet', { length: 1.2 }, 11, -12, 0.2], ['pallet', { length: 1.2 }, 12.4, -11.6, -0.1],
-    ['crate', { height: 0.9 }, 11, -12, 0, 0.14], ['crate', { height: 0.9 }, -3, -12.5, 0.5],
+    ['crate', { height: 0.9 }, 11, -12, 0, 0.14], ['crate', { height: 0.9 }, -2, -19, 0.5],
     ['cone', { height: 0.7 }, -2, 20], ['cone', { height: 0.7 }, 2, 20],
-    ['ladder', { height: 3 }, -11.5, 12.5, 0],
+    ['ladder', { height: 3 }, -12.5, 10.1, 0],
   ];
   for (const [name, opt, x, z, rot = 0, y = 0] of clutter) {
     const m = Assets.model(name, opt);
@@ -179,15 +191,15 @@ export function buildCrewBase(world) {
     base.add(m);
   }
   addBoxCollider(11.7, -11.8, 1.5, 0.8, 0, 'crewbase');
-  addBoxCollider(-3, -12.5, 0.5, 0.5, 0, 'crewbase');
+  addBoxCollider(-2, -19, 0.5, 0.5, 0, 'crewbase');
 
   // cable drums
   for (let i = 0; i < 3; i++) {
-    const drum = cyl(0.7, 0.7, 0.6, mat('#8a5a2b'), 12, -16 + i * 1.6, 0.7, -3);
+    const drum = cyl(0.7, 0.7, 0.6, mat('#8a5a2b'), 12, 1.5 + i * 1.6, 0.7, -19.5);
     drum.rotation.x = Math.PI / 2;
     base.add(drum);
   }
-  addBoxCollider(-14.4, -3, 2.4, 0.5, 0, 'crewbase');
+  addBoxCollider(3.1, -19.5, 2.4, 0.5, 0, 'crewbase');
 
   // flag pole with festival flag
   base.add(cyl(0.06, 0.06, 8, mat('#cccccc', { metalness: 0.6 }), 6, 18.5, 4, 6));
@@ -204,14 +216,14 @@ export function buildCrewBase(world) {
   const genSign = textPlane('STROM 100 kVA', 1.6, 0.3, { w: 512, h: 96, bg: '#ffd400', fg: '#111', font: 'bold 56px sans-serif' });
   genSign.position.set(0, 1.3, 0.71);
   gen.add(genSign);
-  gen.position.set(-17.5, 0, 3.5);
+  gen.position.set(-17.5, 0, 15);
   gen.rotation.y = Math.PI / 2;
   base.add(gen);
-  addBoxCollider(-17.5, 3.5, 0.75, 1.65, 0, 'crewbase');
-  addSpot('generator', -15, 3.5);
+  addBoxCollider(-17.5, 15, 0.75, 1.65, 0, 'crewbase');
+  addSpot('generator', -15, 15);
 
   addSpot('spawn', 0, 9);
-  addSpot('base_yard', 0, 0);
+  addSpot('base_yard', 8, -5);
   addSpot('diesel_spot', 12, 14.2);          // diesel canister next to the blue Bauwagen
 
   // ------------------------------------------------ registration desk (Jan)
@@ -241,7 +253,7 @@ export function buildCrewBase(world) {
   // vehicle parking (world heading = base rotation + local heading)
   world.vehicleSpots = {
     quad: { pos: toWorld(0, 12.5), heading: CREW_BASE.rotation + Math.PI / 2 },
-    radlader: { pos: toWorld(-1, 1.5), heading: CREW_BASE.rotation },
+    radlader: { pos: toWorld(9, -2), heading: CREW_BASE.rotation },
   };
 
   // ------------------------------------------------ crew camp tents along the camp strip
@@ -294,11 +306,12 @@ export function buildCrewBase(world) {
   return base;
 }
 
-function buildOffice(base, world, toWorld, addBoxCollider, addSpot, ox, oz) {
+function buildOffice(base, world, addBoxCollider, addSpot, ox, oz, rot = 0) {
   const { colliders } = world;
   const W = 6.06, D = 4.88, H = CONTAINER_H;
   const g = new THREE.Group();
   g.position.set(ox, 0, oz);
+  g.rotation.y = rot;
   base.add(g);
   world.cameraBlockers.push(g);
 
@@ -372,20 +385,22 @@ function buildOffice(base, world, toWorld, addBoxCollider, addSpot, ox, oz) {
   lamp.position.set(0, H - 0.3, 0);
   g.add(lamp);
 
-  // colliders (world space)
+  // colliders (office coordinates → base)
   const wallT = 0.12;
-  addBoxCollider(ox, oz - D / 2, W / 2, wallT, 0, 'office');
-  addBoxCollider(ox - W / 2, oz, wallT, D / 2, 0, 'office');
-  addBoxCollider(ox + W / 2, oz, wallT, D / 2, 0, 'office');
-  addBoxCollider(ox - W / 2 + leftW / 2, oz + D / 2, leftW / 2, wallT, 0, 'office');
-  addBoxCollider(ox + W / 2 - rightW / 2, oz + D / 2, rightW / 2, wallT, 0, 'office');
-  addBoxCollider(ox - 1.4, oz - 1.6, 1.15, 0.5, 0, 'office'); // desk
-  addBoxCollider(ox + W / 2 - 0.3, oz - 0.8, 0.25, 0.9, 0, 'office'); // shelf
-  addBoxCollider(ox - 1.8, oz + 1.65, 0.9, 0.45, 0, 'office'); // sofa
+  const col = (cx, cz, hw, hd) => { const [bx, bz] = cabinLocal(ox, oz, rot, cx, cz); addBoxCollider(bx, bz, hw, hd, rot, 'office'); };
+  const spot = (name, cx, cz) => { const [sx, sz] = cabinLocal(ox, oz, rot, cx, cz); addSpot(name, sx, sz); };
+  col(0, -D / 2, W / 2, wallT);
+  col(-W / 2, 0, wallT, D / 2);
+  col(W / 2, 0, wallT, D / 2);
+  col(-W / 2 + leftW / 2, D / 2, leftW / 2, wallT);
+  col(W / 2 - rightW / 2, D / 2, rightW / 2, wallT);
+  col(-1.4, -1.6, 1.15, 0.5); // desk
+  col(W / 2 - 0.3, -0.8, 0.25, 0.9); // shelf
+  col(-1.8, 1.65, 0.9, 0.45); // sofa
 
-  addSpot('office_boss', ox - 1.4, oz - 0.5);
-  addSpot('office_door', ox + doorX, oz + D / 2 + 2.5);
-  addSpot('office_inside', ox + 0.8, oz + 0.6);
+  spot('office_boss', -1.4, -0.5);
+  spot('office_door', doorX, D / 2 + 1.8); // the lane in front of the door is narrow
+  spot('office_inside', 0.8, 0.6);
 
   // interior volume: roof hides while the player is inside
   g.updateMatrixWorld(true);
@@ -461,7 +476,7 @@ function buildCabin(base, world, addBoxCollider, addSpot, { id, x, z, rot, label
   const g = cabinShell(frame, false);
   const wall = mat('#ecebe4', { roughness: 0.7 });
   const t = 0.08;
-  const doorX = -1.6, doorW = 1.05;
+  const doorX = -1.6, doorW = 1.2; // wide enough that the nav grid always finds a free cell in the gap
   const leftW = CAB_W / 2 + doorX - doorW / 2, rightW = CAB_W / 2 - doorX - doorW / 2;
   g.add(box(leftW, CAB_H, t, wall, -CAB_W / 2 + leftW / 2, CAB_H / 2, CAB_D / 2));
   g.add(box(rightW, CAB_H, t, wall, CAB_W / 2 - rightW / 2, CAB_H / 2, CAB_D / 2));

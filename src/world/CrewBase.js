@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Assets } from '../core/Assets.js';
-import { CREW_BASE, AREAS, LANDMARKS } from './layout.js';
+import { CREW_BASE, AREAS, LANDMARKS, PLOTS } from './layout.js';
 import { heightAt } from './Height.js';
 import { mat, box, cyl, corrugated, textPlane, signPost, dixi, fenceRun, beerBench, bauwagen } from './Props.js';
 
@@ -60,7 +60,7 @@ export function buildCrewBase(world) {
   const corners = [[-HW, -HD], [HW, -HD], [HW, STRIP_Z], [STRIP_X, STRIP_Z], [STRIP_X, HD], [-HW, HD]];
   const segs = [];
   for (let i = 0; i < corners.length; i++) {
-    if (i === corners.length - 1) continue; // west side: no fence, an earth wall with scrub separates the camp from the football pitch
+    if (i === corners.length - 1 || i === 1) continue; // west: earth wall · east: open, no hedge // west side: no fence, an earth wall with scrub separates the camp from the football pitch
     const [ax, az] = corners[i], [bx, bz] = corners[(i + 1) % corners.length];
     const len = Math.hypot(bx - ax, bz - az);
     // the fence runs exactly from gate post to gate post
@@ -225,16 +225,6 @@ export function buildCrewBase(world) {
   addBoxCollider(13.5, 8.5, 1.05, 2.6, -0.4, 'pickup'); // the model is long along its z axis
   addSpot('pickup_bed', 13.5 + Math.sin(0.4) * 3.6, 8.5 - Math.cos(0.4) * 3.6); // behind the truck (the bed points to -z)
 
-  // a few crew cars parked nose-first at the north hedge
-  for (const [x, z, rot, tint] of [[10.6, -19, 0.06, '#7a2a22'], [13.6, -19.2, -0.05, '#d8d4c8']]) {
-    const car = Assets.model('pickup', { length: 5.2 });
-    car.traverse((o) => { if (o.isMesh && o.material.color) { o.material = o.material.clone(); o.material.color.lerp(new THREE.Color(tint), 0.55); } });
-    car.position.set(x, 0, z);
-    car.rotation.y = rot;
-    base.add(car);
-    addBoxCollider(x, z, 1.05, 2.6, rot, 'car');
-  }
-
   // Tinyhaus Thompsen's home: the big red wagon right at the Enterstraße (outside the hedge), an old orange tipper trailer next to it
   buildTinyhaus(base, addBoxCollider, addSpot, 10.4, 20.7);
 
@@ -270,12 +260,73 @@ export function buildCrewBase(world) {
   }
   addBoxCollider(5.9, -19.8, 2.4, 0.5, 0, 'crewbase');
 
-  // flag pole with festival flag
-  base.add(cyl(0.06, 0.06, 8, mat('#cccccc', { metalness: 0.6 }), 6, 18.5, 4, 6));
-  const flag = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 1.6), new THREE.MeshStandardMaterial({ map: Assets.textures.logo, side: THREE.DoubleSide, color: '#ffffff' }));
-  flag.position.set(19.75, 7.1, 6);
-  base.add(flag);
-  world.animated.push((t) => { flag.rotation.y = Math.sin(t * 1.3) * 0.25; });
+  // flag pole: big waving festival flag, a long pennant under it, gold ball on top and two lines of bunting down to the ground
+  {
+    const fx = 18.5, fz = 6, PH = 11;
+    const fg = new THREE.Group();
+    fg.position.set(fx, 0, fz);
+    base.add(fg);
+    fg.add(cyl(0.07, 0.1, PH, mat('#d8d8d8', { metalness: 0.7, roughness: 0.3 }), 8, 0, PH / 2, 0));
+    fg.add(cyl(0.3, 0.36, 0.3, mat('#8a8a80'), 8, 0, 0.15, 0));
+    const ball = new THREE.Mesh(new THREE.SphereGeometry(0.17, 12, 8), mat('#e8b04a', { metalness: 0.9, roughness: 0.2 }));
+    ball.position.y = PH + 0.12;
+    fg.add(ball);
+    // cloth that really waves: the vertices are moved every frame, the edge at the pole stays put
+    const cloth = (w, h, sx, sy, material, taper = 0) => {
+      const geo = new THREE.PlaneGeometry(w, h, sx, sy);
+      geo.translate(w / 2, 0, 0);
+      const p0 = geo.attributes.position.array.slice();
+      if (taper) for (let i = 0; i < p0.length; i += 3) p0[i + 1] *= 1 - taper * (p0[i] / w); // pennant runs to a point
+      const m = new THREE.Mesh(geo, material);
+      m.castShadow = true;
+      const wave = (t, speed, amp) => {
+        const a = geo.attributes.position.array;
+        for (let i = 0; i < a.length; i += 3) {
+          const u = p0[i] / w;
+          a[i] = p0[i] - u * u * 0.12 * w * (0.5 + 0.5 * Math.sin(t * 0.7));
+          a[i + 1] = p0[i + 1] - u * u * 0.18 + Math.sin(p0[i] * 2.1 - t * speed * 0.8) * 0.05 * u;
+          a[i + 2] = (Math.sin(p0[i] * 2.6 - t * speed + p0[i + 1] * 0.9) * amp + Math.sin(p0[i] * 5.3 - t * speed * 1.7) * amp * 0.35) * u;
+        }
+        geo.attributes.position.needsUpdate = true;
+        geo.computeVertexNormals();
+      };
+      return { m, wave };
+    };
+    const flag = cloth(4.2, 2.8, 18, 8, new THREE.MeshStandardMaterial({ map: Assets.textures.logo, side: THREE.DoubleSide, roughness: 0.8, emissive: '#ffffff', emissiveMap: Assets.textures.logo, emissiveIntensity: 0.12 }));
+    flag.m.position.set(0.08, PH - 1.6, 0);
+    fg.add(flag.m);
+    const pennant = cloth(5.5, 0.7, 20, 2, new THREE.MeshStandardMaterial({ color: '#e8b04a', side: THREE.DoubleSide, roughness: 0.8 }), 0.95);
+    pennant.m.position.set(0.08, PH - 3.5, 0);
+    fg.add(pennant.m);
+    // bunting: small coloured triangles on two lines from the pole down to pegs in the ground
+    const bCols = ['#e63946', '#f4a261', '#ffe066', '#2a9d8f', '#4a7bd0', '#b56bd6'];
+    const tri = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-0.17, 0, 0), new THREE.Vector3(0.17, 0, 0), new THREE.Vector3(0, -0.42, 0)]);
+    tri.computeVertexNormals();
+    const pennons = [];
+    for (const [ex, ez] of [[-7.5, 5.5], [-6.5, -6.5]]) {
+      const top = new THREE.Vector3(0, PH - 3.9, 0), end = new THREE.Vector3(ex, 0.1, ez);
+      const N = 16, pts = [];
+      for (let i = 0; i <= N; i++) { const t = i / N; pts.push(top.clone().lerp(end, t).setY(top.y + (end.y - top.y) * t - Math.sin(t * Math.PI) * 1.1)); }
+      fg.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: '#3a3a3a' })));
+      const yaw = Math.atan2(ex, ez) + Math.PI / 2;
+      for (let i = 1; i < N; i++) {
+        const f = new THREE.Mesh(tri, new THREE.MeshStandardMaterial({ color: bCols[(i + (ex > -7 ? 3 : 0)) % bCols.length], side: THREE.DoubleSide, roughness: 0.8 }));
+        f.position.copy(pts[i]);
+        f.rotation.y = yaw;
+        fg.add(f);
+        pennons.push(f);
+      }
+      fg.add(cyl(0.03, 0.03, 0.3, mat('#6b4a2b'), 5, ex, 0.15, ez));
+    }
+    addBoxCollider(fx, fz, 0.2, 0.2, 0, 'crewbase');
+    world.animated.push((t) => {
+      const yawW = 0.25 * Math.sin(t * 0.35) + 0.1 * Math.sin(t * 1.1); // the wind turns a little
+      flag.m.rotation.y = yawW; pennant.m.rotation.y = yawW * 1.3 + 0.1;
+      flag.wave(t, 5.5, 0.32);
+      pennant.wave(t + 1.3, 7, 0.4);
+      for (let i = 0; i < pennons.length; i++) pennons[i].rotation.x = Math.sin(t * 4 + i * 0.9) * 0.35;
+    });
+  }
 
   // ------------------------------------------------ power generator (Felix' baby)
   const gen = new THREE.Group();
@@ -299,39 +350,31 @@ export function buildCrewBase(world) {
   for (const [x, z] of [[4.05, 15.2], [5.95, 15.2], [4.05, 16], [5.95, 16]]) base.add(box(0.05, 0.76, 0.05, mat('#444'), x, 0.39, z));
   addBoxCollider(5, 15.6, 1.15, 0.5, 0, 'crewbase');
 
-  // ------------------------------------------------ beer bottles: on the tables and lying around everywhere
+  // ------------------------------------------------ beer bottles: where there are tables and corners people chill in
   const T = 0.81, B = 0.805; // top of the desk / of a beer bench
   base.add(beerBottles([
     // Jan's table
-    [4.3, T, 15.45], [4.55, T, 15.7], [4.95, T, 15.4], [5.2, T, 15.85], [5.6, T, 15.55], [5.85, T, 15.75, 1], [4.7, 0, 16.5, 1], [5.9, 0, 16.4],
+    [4.3, T, 15.45], [4.55, T, 15.7], [4.95, T, 15.4], [5.2, T, 15.85], [5.6, T, 15.55], [5.85, T, 15.75, 1], [4.7, 0, 16.5, 1],
     // Aufenthaltszelt (benches at -4.2/1.0/-1.6) and the campfire
-    [-4.6, B, 1.3], [-3.9, B, 1.4], [0.6, B, 1.2], [1.5, B, 1.35, 1], [-1.9, B, 3.7], [-1.2, B, 3.9], [-0.9, B, 3.75], [-3.2, 0, 0.2, 1], [0.3, 0, 5.2],
-    [4.6, 0, 2.2], [5.3, 0, 4.6, 1], [7.4, 0, 3.6], [6.9, 0, 1.6, 1], [7.9, 0, 2.3],
-    // the lane, the workshop porch, Zdenko's hut, the generator, the gates
-    [-12.9, 0, -0.4], [-10.6, 0, 3.2, 1], [-10.4, 0, 6.3], [-6.2, 0, 9.6], [-5.6, 0, 11.4, 1], [-4.9, 0, -9.6, 1], [-5.3, 0, -12.2], [-3.4, 0, -13.2],
-    [-11.4, 0, 17.6], [-10.2, 0, 19.2, 1], [-17.2, 0, -8.9], [-8.1, 0, -20.6, 1], [-11.2, 0, -20.9], [3.2, 0, 20.9, 1], [-3.1, 0, 21.2],
-    // the yard, the cars, the sauna
-    [9.2, 0, -5.4, 1], [12.1, 0, -15.6], [15.2, 0, -12.6, 1], [16.1, 0, -12.2], [11.6, 0, 6.2], [13.1, 0, 12.4, 1], [2.4, 0, -17.6], [8.6, 0, 12.6, 1],
-    // Thompsen's wagon
-    [11.4, 0, 22.9], [11.9, 0, 23.1], [12.3, 0, 22.7, 1], [9.9, 0, 23.0, 1],
+    [-4.6, B, 1.3], [-3.9, B, 1.4], [0.6, B, 1.2], [1.5, B, 1.35, 1], [-1.9, B, 3.7], [-1.2, B, 3.9], [-0.9, B, 3.75], [0.3, 0, 4.6, 1],
+    [4.6, 0, 2.2], [5.3, 0, 4.6, 1], [7.4, 0, 3.6], [7.9, 0, 2.3],
+    // the workshop porch, Zdenko's hut, Thompsen's wagon
+    [-6.2, 0, 9.6], [-5.6, 0, 11.4, 1], [-4.9, 0, -9.6, 1], [-5.3, 0, -12.2],
+    [11.4, 0, 22.9], [11.9, 0, 23.1], [12.3, 0, 22.7, 1],
   ]));
-  // …and all over the festival ground and the camping
+  // a few more at the hangouts outside the base: the beer bench on the camping, the firespace, the bar tent
   {
     const rnd = (i) => { const v = Math.sin(i * 53.7 + 9.1) * 43758.5453; return v - Math.floor(v); };
     const list = [];
-    for (const [poly, count] of [[AREAS.festival, 70], [AREAS.crewCamp, 30]]) {
-      const bb = poly.reduce((b, p) => ({ x0: Math.min(b.x0, p.x), x1: Math.max(b.x1, p.x), z0: Math.min(b.z0, p.z), z1: Math.max(b.z1, p.z) }), { x0: 1e9, x1: -1e9, z0: 1e9, z1: -1e9 });
-      for (let i = 0, n = 0; n < count && i < 2000; i++) {
-        const x = bb.x0 + rnd(i * 2 + count) * (bb.x1 - bb.x0), z = bb.z0 + rnd(i * 2 + 1 + count) * (bb.z1 - bb.z0);
-        if (!pointInPoly(x, z, poly)) continue;
-        n++;
-        list.push([x, heightAt(x, z), z, rnd(i + 0.5) < 0.45 ? 1 : 0]);
-        if (rnd(i + 0.25) < 0.3) list.push([x + 0.25, heightAt(x + 0.25, z + 0.15), z + 0.15, 0]); // sometimes two friends
+    [[LANDMARKS.chill, 1.6, 6], [PLOTS.firespace.pos, 5.5, 6], [LANDMARKS.bar_tent, 5, 5]].forEach(([c, r, n], k) => {
+      for (let i = 0; i < n; i++) {
+        const a = rnd(k * 20 + i) * 6.28, d = r * (0.75 + rnd(k * 20 + i + 0.5) * 0.4);
+        const x = c.x + Math.cos(a) * d, z = c.z + Math.sin(a) * d;
+        list.push([x, heightAt(x, z), z, rnd(k * 20 + i + 0.25) < 0.4 ? 1 : 0]);
       }
-    }
+    });
     scene.add(beerBottles(list));
   }
-  addSpot('registration', 5, 14.5);
 
   // ------------------------------------------------ diesel tank (IBC) for the Radlader
   const ibc = new THREE.Group();

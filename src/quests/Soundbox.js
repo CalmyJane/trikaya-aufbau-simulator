@@ -13,6 +13,12 @@ const SCOLD = [
   { de: 'Mach das Ding aus. Die Mainstage ist 200 Meter weiter, da läuft Musik. Echte.', en: 'Turn that thing off. The mainstage is 200 metres away, there\'s music there. Real music.' },
   { de: 'Soundboks? Auf dem Camping? Ernsthaft? AUS. Jetzt.', en: 'A soundbox? On the camping? Seriously? OFF. Now.' },
 ];
+// the Lagerfeuer in the crew camp is no exception
+const SCOLD_FIRE = [
+  { de: 'Ey, auch am Lagerfeuer gilt: keine Soundboksen im Crew Camp. Die Leute hier müssen morgen wieder aufbauen.', en: 'Hey, same rule at the campfire: no soundboxes in the crew camp. People here have to build again tomorrow.' },
+  { de: 'Lagerfeuer ja, Soundboks nein. Mach aus – nimm eine Gitarre, wenn es sein muss.', en: 'Campfire yes, soundbox no. Turn it off – grab a guitar if you must.' },
+  { de: 'Soundboks am Feuer? Im Crew Camp sind die Dinger genauso verboten wie auf dem Campingplatz. AUS.', en: 'A soundbox at the fire? They\'re just as forbidden in the crew camp as on the camping. OFF.' },
+];
 const EXCUSES = [
   { de: 'Oh… echt? Ich dachte, das gilt nur für große Boksen. Die ist doch klein. …Okay, okay, ist aus.', en: 'Oh… really? I thought that only applies to big ones. This one\'s small. …Okay, okay, it\'s off.' },
   { de: 'Aber der Drop kommt gleich! …Ja gut. Aus. Menno.', en: 'But the drop is coming! …Fine. Off. Meh.' },
@@ -93,7 +99,10 @@ export class Soundboxes {
     const pp = g.player.position;
     const cands = g.npcs.campers.filter((n) => !n.hidden && !n.incident && !n.task && !n.talking && !n.party && !n.knocked);
     const far = spots.filter((s) => s.distanceTo(pp) > 25);
-    const spot = far[Math.floor(Math.random() * far.length)] || spots[Math.floor(Math.random() * spots.length)];
+    // now and then the box stands at the Lagerfeuer in the crew camp instead
+    const fireSpot = g.world.spots.campfire_box;
+    const fire = !forMission && fireSpot && fireSpot.distanceTo(pp) > 25 && Math.random() < 0.35;
+    const spot = fire ? fireSpot : far[Math.floor(Math.random() * far.length)] || spots[Math.floor(Math.random() * spots.length)];
     if (!spot || cands.length < (forMission ? 1 : 2)) return;
     // the nearest campers throw the party – they're standing right at the box from the start
     const npcs = cands.sort((a, b) => a.position.distanceTo(spot) - b.position.distanceTo(spot)).slice(0, 1 + Math.floor(Math.random() * 2));
@@ -107,9 +116,15 @@ export class Soundboxes {
       if (n.char.sitting) n.standUp?.();
       if (!(n.toPlayer < 15)) { n.root.position.copy(n.party.pos); n.target = null; } // no walking over from the other end of the camp
     });
-    this.box = { pos, npcs, t: 0, mission: forMission };
+    this.box = { pos, npcs, t: 0, mission: forMission, fire };
     g.music.shuffle(this.source);
-    if (!this.hinted && !forMission) {
+    if (fire) {
+      for (const n of npcs) { n.root.position.copy(n.party.pos); n.target = null; } // they are already sitting at the fire
+      if (!this.hintedFire) {
+        this.hintedFire = true;
+        g.ui.toast(L({ de: '🔊 Am Lagerfeuer im Crew Camp läuft eine Soundboks! Auch dort sind die verboten, geh hin und sag Bescheid.', en: '🔊 There\'s a soundbox playing at the campfire in the crew camp! They\'re forbidden there too, go over and tell them.' }));
+      }
+    } else if (!this.hinted && !forMission) {
       this.hinted = true;
       g.ui.toast(L({ de: '🔊 Da hat jemand auf dem Campingplatz eine Soundboks aufgedreht! Die sind dort verboten, geh hin und sag Bescheid.', en: '🔊 Someone turned on a soundbox on the camping! They\'re forbidden there, go over and tell them.' }));
     }
@@ -127,9 +142,10 @@ export class Soundboxes {
   async scold(npc) {
     const g = this.game;
     await g.runDialog([
-      { who: 'you', text: pick(SCOLD) },
+      { who: 'you', text: pick(this.box?.fire ? SCOLD_FIRE : SCOLD) },
       { who: npc.def.id, text: pick(EXCUSES) },
     ], null, npc);
+    const fire = this.box?.fire;
     this.stop();
     // the soundbox mission waits for exactly this
     const qid = Object.keys(g.quests.state.active).find((id) => g.quests.currentStep(id)?.type === 'soundbox');
@@ -137,7 +153,7 @@ export class Soundboxes {
     const k = 20;
     g.quests.state.karma += k;
     g.audio.accept();
-    g.ui.toast(getLang() === 'de' ? `🔇 Soundboks aus. Die Nachbarzelte danken dir. (+${k} ✺)` : `🔇 Soundbox off. The neighbouring tents thank you. (+${k} ✺)`);
+    g.ui.toast(getLang() === 'de' ? `🔇 Soundboks aus. ${fire ? 'Das Crew Camp dankt' : 'Die Nachbarzelte danken'} dir. (+${k} ✺)` : `🔇 Soundbox off. ${fire ? 'The crew camp thanks' : 'The neighbouring tents thank'} you. (+${k} ✺)`);
     g.refreshHUD();
   }
 

@@ -89,7 +89,7 @@ export function buildCrewBase(world) {
   // ------------------------------------------------ Baucontainer (site cabins) like on the real crew camp
   // Everything is squeezed into the west side, as on the aerial photo: the two storage cabins in the
   // north-west corner; below them Matze's and the office end to end along the west fence, Corni's
-  // across a narrow lane with the Aufenthaltszelt right behind it, the workshop closing the lane in the south.
+  // across a narrow lane with the Aufenthaltszelt right behind it, the big workshop closing the lane in the south.
   // storage cabins (closed): Künstlergasse & Hühnercontainer – things lie in front of them
   buildStorage(base, addBoxCollider, addSpot, { id: 'kuenstler', x: -15.5, z: -18, rot: 0, label: 'KÜNSTLERGASSE', frame: '#c9b02a' });
   buildStorage(base, addBoxCollider, addSpot, { id: 'huehner', x: -8, z: -19, rot: 0.15, label: 'HÜHNERCONTAINER', frame: '#3040b0' });
@@ -121,7 +121,7 @@ export function buildCrewBase(world) {
     },
   });
   buildCabin(base, world, addBoxCollider, addSpot, {
-    id: 'corni', x: -6.5, z: 1, rot: -Math.PI / 2, label: 'CORNI', frame: '#20a8b0',
+    id: 'corni', x: -8.94, z: 1, rot: -Math.PI / 2, label: 'CORNI', frame: '#20a8b0',
     furnish: (g, add, col, spot) => {
       add(box(1.6, 0.06, 0.7, mat('#c9a27a'), 1.6, 0.78, -0.75));        // desk
       for (const [x, z] of [[0.9, -1.0], [2.3, -1.0], [0.9, -0.5], [2.3, -0.5]]) add(box(0.05, 0.76, 0.05, mat('#444'), x, 0.39, z));
@@ -132,26 +132,61 @@ export function buildCrewBase(world) {
       spot('corni_seat', 1.4, -0.1); spot('corni_desk', 1.4, -1.0);
     },
   });
+  // the workshop is a proper shed, three cabins deep, with a small lean-to roof on its east side
+  const WS_W = 8.4, WS_D = 7.3, wsBack = -WS_D / 2;
   buildCabin(base, world, addBoxCollider, addSpot, {
-    id: 'werkstatt', x: -11.5, z: 8.25, rot: Math.PI, label: 'WERKSTATT', frame: '#b8302a',
+    id: 'werkstatt', x: -11.9, z: 10.68, rot: Math.PI, label: 'WERKSTATT', frame: '#b8302a', w: WS_W, d: WS_D, doorX: 0, winX: 2.6, lblX: -2.4,
     furnish: (g, add, col, spot) => {
-      add(box(2.4, 0.08, 0.7, mat('#8a6a42'), 1.3, 0.9, -0.8));          // workbench
-      add(box(2.4, 0.86, 0.66, mat('#5a4a3a'), 1.3, 0.43, -0.8));
-      add(box(0.2, 0.18, 0.3, mat('#3a5a8a', { metalness: 0.5 }), 0.4, 1.03, -0.8)); // vise
-      add(box(2.4, 1.0, 0.04, mat('#c8a878'), 1.3, 1.7, -1.12));         // tool wall
+      add(box(2.4, 0.08, 0.7, mat('#8a6a42'), 1.3, 0.9, wsBack + 0.42));          // workbench
+      add(box(2.4, 0.86, 0.66, mat('#5a4a3a'), 1.3, 0.43, wsBack + 0.42));
+      add(box(0.2, 0.18, 0.3, mat('#3a5a8a', { metalness: 0.5 }), 0.4, 1.03, wsBack + 0.42)); // vise
+      add(box(2.4, 1.0, 0.04, mat('#c8a878'), 1.3, 1.7, wsBack + 0.1));           // tool wall
       const tools = ['#c0392b', '#7f8c8d', '#e67e22', '#2c3e50', '#16a085', '#8e44ad'];
-      tools.forEach((c, i) => add(box(0.08, 0.35 + (i % 3) * 0.1, 0.04, mat(c), 0.4 + i * 0.35, 1.7, -1.08)));
-      add(box(0.45, 0.28, 0.22, mat('#1a1a1a'), 2.3, 1.08, -0.7));        // radio
-      add(box(0.5, 1.8, 0.5, mat('#6a6a6a', { metalness: 0.4 }), -2.5, 0.9, -0.8)); // shelf
-      add(cyl(0.25, 0.3, 0.5, mat('#2d6a9f'), 10, -1.4, 0.25, -0.8));    // compressor
-      col(1.3, -0.8, 1.25, 0.4); col(-2.5, -0.8, 0.3, 0.3); col(-1.4, -0.8, 0.3, 0.3);
-      spot('werkstatt_inside', 0.4, 0.25); spot('werkstatt_seat', -1.2, 0.3);
+      tools.forEach((c, i) => add(box(0.08, 0.35 + (i % 3) * 0.1, 0.04, mat(c), 0.4 + i * 0.35, 1.7, wsBack + 0.14)));
+      add(box(0.45, 0.28, 0.22, mat('#1a1a1a'), 2.3, 1.08, wsBack + 0.52));        // radio
+      add(box(0.5, 1.8, 0.5, mat('#6a6a6a', { metalness: 0.4 }), -2.5, 0.9, wsBack + 0.42)); // shelf
+      add(cyl(0.25, 0.3, 0.5, mat('#2d6a9f'), 10, -1.4, 0.25, wsBack + 0.42));    // compressor
+      col(1.3, wsBack + 0.42, 1.25, 0.4); col(-2.5, wsBack + 0.42, 0.3, 0.3); col(-1.4, wsBack + 0.42, 0.3, 0.3);
+      // long shelves along the side walls, a second bench and a pile of timber – it is big in here
+      for (const sx of [-1, 1]) {
+        const x = sx * (WS_W / 2 - 0.4);
+        add(box(0.5, 2.0, 3.6, mat('#7a5a3a'), x, 1.0, -0.6));
+        for (let i = 0; i < 6; i++) add(box(0.4, 0.3, 0.45, mat(tools[(i + (sx > 0 ? 3 : 0)) % 6]), x, 0.75 + (i % 2) * 0.62, -2.0 + Math.floor(i / 2) * 1.3));
+        col(x, -0.6, 0.3, 1.85);
+      }
+      add(box(1.8, 0.08, 0.8, mat('#8a6a42'), -1.9, 0.85, 0.2));                   // second bench in the middle
+      for (const [x, z] of [[-2.7, -0.1], [-1.1, -0.1], [-2.7, 0.5], [-1.1, 0.5]]) add(box(0.07, 0.82, 0.07, mat('#5a4a3a'), x, 0.41, z));
+      col(-1.9, 0.2, 0.9, 0.4);
+      for (let i = 0; i < 5; i++) add(box(2.2, 0.09, 0.14, mat(i % 2 ? '#c49a62' : '#b08850'), 2.5, 0.06 + Math.floor(i / 3) * 0.1, 3.0 + (i % 3) * 0.17)); // timber along the front wall
+      col(2.5, 3.17, 1.1, 0.3);
+      spot('werkstatt_inside', 0.4, -1.2); spot('werkstatt_seat', -1.9, 1.3);
+
+      // Vordach: lean-to roof on the east wall (east = cabin -x, the cabin is turned by 180°)
+      const vx = -WS_W / 2 - 1.3, vz = 0.3, vl = 4.4;
+      const roof = box(2.7, 0.06, vl, corrugated('#b9bdc1'), vx, 2.2, vz);
+      roof.rotation.z = -0.16;
+      add(roof);
+      for (const z of [vz - vl / 2 + 0.15, vz + vl / 2 - 0.15]) {
+        add(box(0.1, 2.0, 0.1, mat('#8a6a42'), vx - 1.2, 1.0, z));
+        const beam = box(2.5, 0.08, 0.08, mat('#8a6a42'), vx, 2.14, z);
+        beam.rotation.z = -0.16;
+        add(beam);
+        col(vx - 1.2, z, 0.1, 0.1);
+      }
+      add(box(1.6, 0.06, 0.7, mat('#8a6a42'), vx + 0.75, 0.8, vz));                // sawhorse table under the roof
+      for (const z of [vz - 0.6, vz + 0.6]) add(box(0.06, 0.8, 0.5, mat('#6b4a2b'), vx + 0.75, 0.4, z));
+      col(vx + 0.75, vz, 0.4, 0.85);
     },
   });
-  buildOffice(base, world, addBoxCollider, addSpot, -13.76, 3.2, Math.PI / 2);
+  buildOffice(base, world, addBoxCollider, addSpot, -14.98, 3.2, Math.PI / 2);
 
   // Aufenthaltszelt: green marquee with beer benches – people hang out here
-  buildLoungeTent(base, addBoxCollider, addSpot, 0.3, 3.5);
+  buildLoungeTent(base, addBoxCollider, addSpot, -1.6, 2.4);
+
+  // Lagerfeuer next to the tent – sometimes somebody sets up a soundbox here (not allowed either)
+  buildCampfire(base, world, addBoxCollider, 6, 3);
+  addSpot('campfire', 6, 3);
+  addSpot('campfire_box', 8.7, 1.1);
 
   // aliases for jobs written against the old container numbers
   spots.C1_front = spots.werkstatt_inside;        // tools, shackles, ropes, pegs, screws
@@ -162,12 +197,12 @@ export function buildCrewBase(world) {
 
   // ------------------------------------------------ vehicles, pallets, clutter
   const pickup = Assets.model('pickup', { length: 5.3 });
-  pickup.position.set(10.5, 0, 9.5);
+  pickup.position.set(13.5, 0, 8.5);
   pickup.rotation.y = -0.4;
   base.add(pickup);
   world.crewPickup = pickup;
-  addBoxCollider(10.5, 9.5, 1.05, 2.6, -0.4, 'pickup'); // the model is long along its z axis
-  addSpot('pickup_bed', 10.5 + Math.sin(0.4) * 3.6, 9.5 - Math.cos(0.4) * 3.6); // behind the truck (the bed points to -z)
+  addBoxCollider(13.5, 8.5, 1.05, 2.6, -0.4, 'pickup'); // the model is long along its z axis
+  addSpot('pickup_bed', 13.5 + Math.sin(0.4) * 3.6, 8.5 - Math.cos(0.4) * 3.6); // behind the truck (the bed points to -z)
 
   // Bauwagen along the east side (the blue one is where Fabi leaves the diesel canister)
   for (const [col, x, z, rot] of [['#2d6a9f', 15.2, 14.2, -Math.PI / 2], ['#a8483a', 17, 1.5, -Math.PI / 2 + 0.12]]) {
@@ -182,7 +217,7 @@ export function buildCrewBase(world) {
     ['pallet', { length: 1.2 }, 11, -12, 0.2], ['pallet', { length: 1.2 }, 12.4, -11.6, -0.1],
     ['crate', { height: 0.9 }, 11, -12, 0, 0.14], ['crate', { height: 0.9 }, -2, -19, 0.5],
     ['cone', { height: 0.7 }, -2, 20], ['cone', { height: 0.7 }, 2, 20],
-    ['ladder', { height: 3 }, -12.5, 10.1, 0],
+    ['ladder', { height: 3 }, -12.5, 14.75, 0],
   ];
   for (const [name, opt, x, z, rot = 0, y = 0] of clutter) {
     const m = Assets.model(name, opt);
@@ -216,14 +251,13 @@ export function buildCrewBase(world) {
   const genSign = textPlane('STROM 100 kVA', 1.6, 0.3, { w: 512, h: 96, bg: '#ffd400', fg: '#111', font: 'bold 56px sans-serif' });
   genSign.position.set(0, 1.3, 0.71);
   gen.add(genSign);
-  gen.position.set(-17.5, 0, 15);
-  gen.rotation.y = Math.PI / 2;
+  gen.position.set(-14, 0, 17.3);
   base.add(gen);
-  addBoxCollider(-17.5, 15, 0.75, 1.65, 0, 'crewbase');
-  addSpot('generator', -15, 15);
+  addBoxCollider(-14, 17.3, 1.65, 0.75, 0, 'crewbase');
+  addSpot('generator', -11, 18.6);
 
   addSpot('spawn', 0, 9);
-  addSpot('base_yard', 8, -5);
+  addSpot('base_yard', 10, -7);
   addSpot('diesel_spot', 12, 14.2);          // diesel canister next to the blue Bauwagen
 
   // ------------------------------------------------ registration desk (Jan)
@@ -253,7 +287,7 @@ export function buildCrewBase(world) {
   // vehicle parking (world heading = base rotation + local heading)
   world.vehicleSpots = {
     quad: { pos: toWorld(0, 12.5), heading: CREW_BASE.rotation + Math.PI / 2 },
-    radlader: { pos: toWorld(9, -2), heading: CREW_BASE.rotation },
+    radlader: { pos: toWorld(13.2, -4.5), heading: CREW_BASE.rotation },
   };
 
   // ------------------------------------------------ crew camp tents along the camp strip
@@ -308,7 +342,7 @@ export function buildCrewBase(world) {
 
 function buildOffice(base, world, addBoxCollider, addSpot, ox, oz, rot = 0) {
   const { colliders } = world;
-  const W = 6.06, D = 4.88, H = CONTAINER_H;
+  const W = 6.06, D = 2.44, H = CONTAINER_H;
   const g = new THREE.Group();
   g.position.set(ox, 0, oz);
   g.rotation.y = rot;
@@ -353,33 +387,30 @@ function buildOffice(base, world, addBoxCollider, addSpot, ox, oz, rot = 0) {
   lining.castShadow = false;
   g.add(lining);
 
-  // --- interior furniture
-  const desk = box(2.2, 0.06, 0.9, mat('#c9a27a'), -1.4, 0.78, -1.6);
+  // --- interior furniture (everything along the back wall, the cabin is only 2.4 m deep)
+  const desk = box(2.2, 0.06, 0.7, mat('#c9a27a'), -1.4, 0.78, -0.8);
   g.add(desk);
-  for (const [x, z] of [[-2.4, -1.2], [-0.4, -1.2], [-2.4, -2.0], [-0.4, -2.0]]) g.add(box(0.05, 0.76, 0.05, mat('#444'), x, 0.39, z));
-  g.add(box(0.5, 0.33, 0.03, mat('#222'), -1.2, 0.98, -1.8)); // laptop screen
+  for (const [x, z] of [[-2.4, -0.5], [-0.4, -0.5], [-2.4, -1.1], [-0.4, -1.1]]) g.add(box(0.05, 0.76, 0.05, mat('#444'), x, 0.39, z));
+  g.add(box(0.5, 0.33, 0.03, mat('#222'), -1.2, 0.98, -0.98)); // laptop screen
   const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.46, 0.29), new THREE.MeshBasicMaterial({ color: '#4aa3ff' }));
-  screen.position.set(-1.2, 0.98, -1.78); g.add(screen);
-  g.add(box(0.5, 0.02, 0.35, mat('#333'), -1.2, 0.82, -1.55));
+  screen.position.set(-1.2, 0.98, -0.96); g.add(screen);
+  g.add(box(0.5, 0.02, 0.35, mat('#333'), -1.2, 0.82, -0.75));
   // coffee machine (the most important piece of festival infrastructure)
-  g.add(box(0.35, 0.45, 0.35, mat('#b33a2e'), -2.2, 1.04, -1.7));
-  for (let i = 0; i < 4; i++) g.add(cyl(0.05, 0.045, 0.1, mat('#ffffff'), 6, -1.9 + i * 0.12, 0.86, -1.3));
+  g.add(box(0.35, 0.45, 0.35, mat('#b33a2e'), -2.2, 1.04, -0.9));
+  for (let i = 0; i < 4; i++) g.add(cyl(0.05, 0.045, 0.1, mat('#ffffff'), 6, -1.9 + i * 0.12, 0.86, -0.55));
   // chair
-  g.add(box(0.5, 0.06, 0.5, mat('#222'), -1.4, 0.48, -0.9));
-  g.add(box(0.5, 0.5, 0.06, mat('#222'), -1.4, 0.75, -0.65));
-  g.add(cyl(0.03, 0.03, 0.45, mat('#555'), 5, -1.4, 0.23, -0.9));
+  g.add(box(0.5, 0.06, 0.5, mat('#222'), -2.2, 0.48, -0.05));
+  g.add(box(0.06, 0.5, 0.5, mat('#222'), -2.45, 0.75, -0.05));
+  g.add(cyl(0.03, 0.03, 0.45, mat('#555'), 5, -2.2, 0.23, -0.05));
   // whiteboard with the real site plan
-  const plan = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 1.7), new THREE.MeshBasicMaterial({ map: Assets.textures.siteplan }));
-  plan.position.set(1.3, 1.5, -D / 2 + 0.1);
+  const plan = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 1.4), new THREE.MeshBasicMaterial({ map: Assets.textures.siteplan }));
+  plan.position.set(1.2, 1.5, -D / 2 + 0.1);
   g.add(plan);
-  g.add(box(2.5, 1.8, 0.03, mat('#dddddd'), 1.3, 1.5, -D / 2 + 0.08));
+  g.add(box(2.1, 1.5, 0.03, mat('#dddddd'), 1.2, 1.5, -D / 2 + 0.08));
   // shelf with binders
-  g.add(box(0.4, 1.8, 1.8, mat('#8a6b4a'), W / 2 - 0.3, 0.9, -0.8));
+  g.add(box(0.4, 1.8, 1.0, mat('#8a6b4a'), W / 2 - 0.3, 0.9, -0.6));
   const binderCols = ['#c0392b', '#2980b9', '#27ae60', '#f39c12', '#8e44ad'];
-  for (let i = 0; i < 10; i++) g.add(box(0.3, 0.32, 0.07, mat(binderCols[i % 5]), W / 2 - 0.35, 1.25 + (i > 4 ? 0.45 : 0), -1.5 + (i % 5) * 0.12));
-  // sofa
-  g.add(box(1.8, 0.45, 0.8, mat('#556b2f'), -1.8, 0.3, 1.6));
-  g.add(box(1.8, 0.5, 0.2, mat('#4b5e2a'), -1.8, 0.7, 1.95));
+  for (let i = 0; i < 10; i++) g.add(box(0.3, 0.32, 0.07, mat(binderCols[i % 5]), W / 2 - 0.35, 1.25 + (i > 4 ? 0.45 : 0), -0.95 + (i % 5) * 0.12));
   // ceiling light
   const lamp = new THREE.PointLight('#fff1d6', 6, 8, 1.5);
   lamp.position.set(0, H - 0.3, 0);
@@ -394,13 +425,12 @@ function buildOffice(base, world, addBoxCollider, addSpot, ox, oz, rot = 0) {
   col(W / 2, 0, wallT, D / 2);
   col(-W / 2 + leftW / 2, D / 2, leftW / 2, wallT);
   col(W / 2 - rightW / 2, D / 2, rightW / 2, wallT);
-  col(-1.4, -1.6, 1.15, 0.5); // desk
-  col(W / 2 - 0.3, -0.8, 0.25, 0.9); // shelf
-  col(-1.8, 1.65, 0.9, 0.45); // sofa
+  col(-1.4, -0.8, 1.15, 0.38); // desk
+  col(W / 2 - 0.3, -0.6, 0.25, 0.5); // shelf
 
-  spot('office_boss', -1.4, -0.5);
+  spot('office_boss', -1.2, 0.3);
   spot('office_door', doorX, D / 2 + 1.8); // the lane in front of the door is narrow
-  spot('office_inside', 0.8, 0.6);
+  spot('office_inside', 0.6, 0.3);
 
   // interior volume: roof hides while the player is inside
   g.updateMatrixWorld(true);
@@ -433,7 +463,7 @@ function cabinLocal(gx, gz, rot, x, z) {
 }
 
 /** White site-container shell with a coloured steel frame. */
-function cabinShell(frame, closed) {
+function cabinShell(frame, closed, CAB_W = 6.06, CAB_D = 2.44) {
   const g = new THREE.Group();
   const wall = mat('#ecebe4', { roughness: 0.7 });
   const fr = mat(frame, { roughness: 0.6, metalness: 0.2 });
@@ -472,16 +502,16 @@ function buildStorage(base, addBoxCollider, addSpot, { id, x, z, rot, label, fra
  * Walk-in cabin: door in the front (+z) long side, roof hides while you're inside.
  * furnish(g, add, col, spot) places furniture in cabin coordinates.
  */
-function buildCabin(base, world, addBoxCollider, addSpot, { id, x, z, rot, label, frame, furnish }) {
-  const g = cabinShell(frame, false);
+function buildCabin(base, world, addBoxCollider, addSpot, { id, x, z, rot, label, frame, furnish, w: CAB_W = 6.06, d: CAB_D = 2.44, doorX = -1.6, winX = doorX + 2.8, lblX = winX }) {
+  const g = cabinShell(frame, false, CAB_W, CAB_D);
   const wall = mat('#ecebe4', { roughness: 0.7 });
   const t = 0.08;
-  const doorX = -1.6, doorW = 1.2; // wide enough that the nav grid always finds a free cell in the gap
+  const doorW = 1.2; // wide enough that the nav grid always finds a free cell in the gap
   const leftW = CAB_W / 2 + doorX - doorW / 2, rightW = CAB_W / 2 - doorX - doorW / 2;
   g.add(box(leftW, CAB_H, t, wall, -CAB_W / 2 + leftW / 2, CAB_H / 2, CAB_D / 2));
   g.add(box(rightW, CAB_H, t, wall, CAB_W / 2 - rightW / 2, CAB_H / 2, CAB_D / 2));
   g.add(box(doorW, CAB_H - 2.1, t, wall, doorX, 2.1 + (CAB_H - 2.1) / 2, CAB_D / 2));
-  const win = box(1.2, 0.8, 0.1, new THREE.MeshStandardMaterial({ color: '#9fd3f0', roughness: 0.1, transparent: true, opacity: 0.55 }), 1.2, 1.55, CAB_D / 2);
+  const win = box(1.2, 0.8, 0.1, new THREE.MeshStandardMaterial({ color: '#9fd3f0', roughness: 0.1, transparent: true, opacity: 0.55 }), winX, 1.55, CAB_D / 2);
   win.castShadow = false;
   g.add(win);
   const door = box(doorW, 2.05, 0.05, mat(frame), 0, 1.05, 0);
@@ -494,7 +524,7 @@ function buildCabin(base, world, addBoxCollider, addSpot, { id, x, z, rot, label
   const roof = box(CAB_W + 0.1, 0.12, CAB_D + 0.1, mat('#d8d8d0'), 0, CAB_H + 0.06, 0);
   g.add(roof);
   const lbl = textPlane(label, 2.2, 0.45, { w: 512, h: 104, bg: '#ffffff', fg: '#1b1b1b', font: 'bold 64px sans-serif' });
-  lbl.position.set(1.2, 2.25, CAB_D / 2 + 0.07);
+  lbl.position.set(lblX, 2.25, CAB_D / 2 + 0.07);
   g.add(lbl);
   const light = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.05, 0.2), new THREE.MeshBasicMaterial({ color: '#fff4d8' }));
   light.position.set(0, CAB_H - 0.08, 0);
@@ -576,6 +606,51 @@ function buildLoungeTent(base, addBoxCollider, addSpot, x, z) {
   g.position.set(x, 0, z);
   base.add(g);
   addSpot('aufenthalt', x, z);
+}
+
+/** Lagerfeuer: ring of stones, burning logs, a few tree-trunk seats around it. */
+function buildCampfire(base, world, addBoxCollider, x, z) {
+  const g = new THREE.Group();
+  const stone = mat('#8d8a82', { roughness: 1 });
+  for (let i = 0; i < 9; i++) {
+    const a = (i / 9) * Math.PI * 2;
+    const st = new THREE.Mesh(new THREE.SphereGeometry(0.17 + (i % 3) * 0.03, 6, 5), stone);
+    st.scale.y = 0.7;
+    st.position.set(Math.cos(a) * 0.62, 0.08, Math.sin(a) * 0.62);
+    g.add(st);
+  }
+  g.add(cyl(0.55, 0.55, 0.04, mat('#2a2622'), 12, 0, 0.02, 0)); // ash
+  for (let i = 0; i < 4; i++) {
+    const log = cyl(0.07, 0.07, 0.8, mat('#4a3320'), 6, 0, 0.2, 0);
+    log.rotation.z = 1.05; log.rotation.y = i * 1.57 + 0.3;
+    g.add(log);
+  }
+  const flameMat = new THREE.MeshBasicMaterial({ color: '#ff8a1e', transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false });
+  const flames = [];
+  for (const [fx, fz, h] of [[0, 0, 0.9], [0.18, 0.1, 0.6], [-0.15, 0.14, 0.55], [0.02, -0.2, 0.65]]) {
+    const geo = new THREE.ConeGeometry(0.2, h, 6);
+    geo.translate(0, h / 2, 0);
+    const f = new THREE.Mesh(geo, flameMat);
+    f.position.set(fx, 0.15, fz);
+    g.add(f);
+    flames.push(f);
+  }
+  const glow = new THREE.PointLight('#ff9a3a', 5, 9, 1.6);
+  glow.position.set(0, 0.9, 0);
+  g.add(glow);
+  // tree-trunk seats
+  for (const a of [0.4, 1.9, 3.5, 5.0]) {
+    const sx = Math.cos(a) * 1.9, sz = Math.sin(a) * 1.9;
+    g.add(cyl(0.26, 0.28, 0.42, mat('#7a5a3a'), 8, sx, 0.21, sz));
+    addBoxCollider(x + sx, z + sz, 0.24, 0.24, 0, 'campfire');
+  }
+  g.position.set(x, 0, z);
+  base.add(g);
+  addBoxCollider(x, z, 0.6, 0.6, 0, 'campfire');
+  world.animated.push((t) => {
+    flames.forEach((f, i) => { const k = 1 + Math.sin(t * 9 + i * 1.7) * 0.2; f.scale.set(1, k, 1); f.rotation.y = t * (1 + i * 0.3); });
+    glow.intensity = 5 + Math.sin(t * 11) * 0.8 + Math.sin(t * 5.3) * 0.6;
+  });
 }
 
 function chicken() {

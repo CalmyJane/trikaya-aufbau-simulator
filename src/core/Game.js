@@ -8,8 +8,8 @@ import { Player, CameraRig } from '../entities/Player.js';
 import { FlyCam } from './FlyCam.js';
 import { Trigel } from '../world/Trigel.js';
 import { NPCManager } from '../entities/NPC.js';
-import { Quad, Radlader, Bike, Scooter } from '../entities/Vehicles.js';
-import { FranziBike, FabiScooter } from '../quests/Bike.js';
+import { Quad, Radlader, Bike, Scooter, Skateboard } from '../entities/Vehicles.js';
+import { FranziBike, FabiScooter, LeoSkate } from '../quests/Bike.js';
 import { Services, HIRE_COST } from '../quests/Services.js';
 import { TOKEN_TRADERS } from '../quests/Shop.js';
 import { PLAYER_LOOK } from '../entities/npcData.js';
@@ -104,9 +104,11 @@ export class Game {
     await this.npcs.populate(breathe);
     this.trigel = new Trigel(this.world);
     this.npcs.game = this;
-    this.vehicles = { quad: new Quad(this.world), radlader: new Radlader(this.world), bike: new Bike(this.world), scooter: new Scooter(this.world) };
+    this.vehicles = { quad: new Quad(this.world), radlader: new Radlader(this.world), bike: new Bike(this.world), scooter: new Scooter(this.world), skate: new Skateboard(this.world) };
     this.bikeSys = new FranziBike(this, this.vehicles.bike);
     this.scooterSys = new FabiScooter(this, this.vehicles.scooter);
+    this.skateSys = new LeoSkate(this, this.vehicles.skate);
+    this.rentals = [this.bikeSys, this.scooterSys, this.skateSys];
     this.services = new Services(this);
     this.quests = new QuestSystem(this);
     this.economy = new Economy(this);
@@ -195,6 +197,7 @@ export class Game {
     this.vehicles.radlader.fuel = 0;
     this.bikeSys?.reset();
     this.scooterSys?.reset();
+    this.skateSys?.reset();
     if (this.player.char.look !== PLAYER_LOOK) { this.player.setLook(PLAYER_LOOK); this.updateCarried(); }
     this.drama?.clearAll();
     this.trigel?.reset();
@@ -255,6 +258,7 @@ export class Game {
     this.updateCarried();
     this.bikeSys?.onExit(v);
     this.scooterSys?.onExit(v);
+    this.skateSys?.onExit(v);
   }
 
   // ------------------------------------------------------------------ menus
@@ -1167,6 +1171,7 @@ export class Game {
     this.vehicles.radlader.setCargo(veh === this.vehicles.radlader ? light() : []);
     this.vehicles.bike.setCargo(veh === this.vehicles.bike ? light() : []);
     this.vehicles.scooter.setCargo(veh === this.vehicles.scooter ? light() : []);
+    this.vehicles.skate.setCargo(veh === this.vehicles.skate ? light() : []);
     this.vehicles.radlader.setLoad(inv.filter(isHeavy).map((id) => createItemMesh(id)));
   }
 
@@ -1293,7 +1298,7 @@ export class Game {
     // 4a) Thompsen & Zdenko push stuck vehicles back to the base
     if (id === 'thompsen') { await this.thompsenTalk(npc); return; }
     // 4) Mark & Fabi sell things for karma
-    const rental = [this.bikeSys, this.scooterSys].find((r) => r.ownerId === id);
+    const rental = this.rentals.find((r) => r.ownerId === id);
     const rentOpt = rental?.canAsk() ? [[rental.text().ask, async () => await this.reply(npc, rental.ask() ? rental.text().yes : rental.text().noKarma)]] : [];
     if (await this.effects.vendorTalk(npc, rentOpt)) return;
     // 5) a little conversation with answer options (karma +/-)
@@ -1343,7 +1348,7 @@ export class Game {
     if (fx.tokens > 0 && npc.def.tokenAsker && !npc.gotToken) extra.push([de ? `🎟️ Getränkemarke schenken (du hast ${fx.tokens})` : `🎟️ Give a drink token (you have ${fx.tokens})`, () => fx.giftToken(npc)]);
     if (fx.tokens > 0 && TOKEN_TRADERS.includes(id) && (id !== 'verena' || qs.isDone('q9_festzelt'))) extra.push([de ? `🎟️ Getränk gegen Marke (du hast ${fx.tokens})` : `🎟️ A drink for a token (you have ${fx.tokens})`, () => fx.tokenShop(npc)]);
     if (this.services.canHire(npc)) extra.push([de ? `🤝 Kannst du mir was holen? (✺ ${HIRE_COST})` : `🤝 Could you fetch something for me? (✺ ${HIRE_COST})`, () => this.services.hire(npc)]);
-    const rs = [this.bikeSys, this.scooterSys].find((r) => r.ownerId === id);
+    const rs = this.rentals.find((r) => r.ownerId === id);
     if (rs?.canAsk()) { const tx = rs.text(); extra.push([tx.ask, async () => await this.reply(npc, rs.ask() ? tx.yes : tx.noKarma)]); }
     if (this.services.canStyle(npc)) extra.push([de ? '💇 Stylen lassen' : '💇 Get styled', () => this.services.styling(npc)]);
     const ask = fx.canAsk(npc);
@@ -1516,7 +1521,7 @@ export class Game {
         } });
       }
       // Franzi's bike & Fabi's e-scooter: ask once, then take it whenever (costs a little karma per ride)
-      for (const rs of [this.bikeSys, this.scooterSys]) {
+      for (const rs of this.rentals) {
         const v = rs.vehicle, d = v.position.distanceTo(p);
         if (d > 2.2 || rs.rider) continue;
         const tx = rs.text();
@@ -1644,6 +1649,7 @@ export class Game {
       if (this.quests.state.flags.look) { this.player.setLook(this.quests.state.flags.look); this.updateCarried(); }
       this.bikeSys.reset();
       this.scooterSys.reset();
+      this.skateSys.reset();
       return true;
     } catch (e) {
       console.warn('Save broken, starting fresh', e);
@@ -1805,7 +1811,7 @@ export class Game {
 
     this.safe(() => this.npcs.update(time, dt, ctx));
     if (playing && veh && !veh.quiet) this.safe(() => this.checkRunOver(veh));
-    if (playing) this.safe(() => { this.bikeSys.update(dt); this.scooterSys.update(dt); });
+    if (playing) this.safe(() => { this.bikeSys.update(dt); this.scooterSys.update(dt); this.skateSys.update(dt); });
     this.safe(() => this.quests.update(time, dt, this.player.position));
     this.world.nutFixed = this.quests.isDone('x1_nuss');
     this.safe(() => this.world.update(time, dt, this.player.position));

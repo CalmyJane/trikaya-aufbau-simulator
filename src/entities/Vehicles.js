@@ -525,3 +525,33 @@ export class Scooter extends Vehicle {
     this.cargo.position.set(0, 0.95, 0.5);
   }
 }
+
+/** Leocitas' skateboard: you stand on it, a bit faster than running, no stamina needed. */
+export class Skateboard extends Vehicle {
+  constructor(world) {
+    super(world, { maxSpeed: 10.5, accel: 4.2, brake: 9, drag: 0.6, maxSteer: 1, turnRate: 2.9, lean: 0.32, hop: 4.4, radius: 0.55, bodyRadius: 0.3, bodyOffset: 0.2, length: 0.9, width: 0.3, boost: 1.12 });
+    this.id = 'skate';
+    this.name = { de: 'Leocitas\' Skateboard', en: 'Leocitas\' skateboard' };
+    this.quiet = true;
+    this.standing = true;
+    const b = this.body;
+    const wood = mat('#c98a4a', { roughness: 0.7 }), grip = mat('#1c1c1c', { roughness: 1 }), steel = mat('#b8bcc2', { metalness: 0.7, roughness: 0.3 });
+    b.add(box(0.22, 0.025, 0.62, wood, 0, 0.115, 0));                    // deck
+    b.add(box(0.215, 0.006, 0.6, grip, 0, 0.131, 0));                    // grip tape
+    for (const s of [-1, 1]) {                                           // kicked-up nose & tail
+      const tip = box(0.22, 0.025, 0.16, wood, 0, 0.135, s * 0.375);
+      tip.rotation.x = -s * 0.35;
+      b.add(tip);
+      const tipGrip = box(0.215, 0.006, 0.15, grip, 0, 0.15, s * 0.372);
+      tipGrip.rotation.x = -s * 0.35;
+      b.add(tipGrip);
+      b.add(box(0.2, 0.03, 0.05, steel, 0, 0.085, s * 0.22));            // trucks
+    }
+    // Leocitas painted the underside
+    b.add(box(0.2, 0.004, 0.3, mat('#9b3d8a', { emissive: '#9b3d8a', emissiveIntensity: 0.25 }), 0, 0.1, 0));
+    b.add(box(0.12, 0.004, 0.12, mat('#f0c040', { emissive: '#f0c040', emissiveIntensity: 0.3 }), 0, 0.098, 0));
+    for (const z of [0.22, -0.22]) for (const x of [-0.11, 0.11]) this.wheel(0.035, 0.035, x, 0.035, z);
+    this.seat.position.set(0, 0.135, -0.02);
+    this.cargo.position.set(0, 0.9, 0.35);
+  }
+}

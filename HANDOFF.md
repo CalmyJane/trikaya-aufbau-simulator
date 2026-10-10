@@ -38,6 +38,8 @@ New step types: `park` (wheel loader precision parking through a cone lane, `src
 
 - Only one timed job at a time (`QuestSystem.timedBusy/isTimed`): other timed offers are hidden meanwhile, urgent favours not generated. Heavy material for the western stages lies at `gate_drop` (inside the east gate), not the parking. Krygo keeps asking for sauna bits (errand templates). Karma step (g1): need sinks if you lose karma, `pay` = what is actually taken.
 
+- Oct 2026: crew camp rebuilt after the aerial photos (`CrewBase.js`: cabins tight in the west, earth wall, hedge, Zdenko's hut, Thomas' (id `thompsen`) red wagon at the road, campfire). Minigames are skill-only (no text games); `trench` = cable trench (auger pulls by itself, you only steer) used by `c1_kabel` (Felix, day 2). Narnia has two missions (n2, n3). Leocitas lends his skateboard (`Skateboard` vehicle, `LeoSkate` rental – the board lies wherever he currently is).
+
 ## Open / ideas
 - Geist's profile link unknown (search link used) – ask the user.
 - Suggested but not built: cable laying with Felix & Thomas.

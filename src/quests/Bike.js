@@ -226,3 +226,52 @@ export class FabiScooter extends Rental {
     };
   }
 }
+
+/** Leocitas is always on the move somewhere – his board lies next to wherever he currently is. */
+export class LeoSkate extends Rental {
+  constructor(game, board) {
+    super(game, board, { owner: 'leocitas', cost: 2, park: [1.1, 0.6, 0.9], refund: true });
+  }
+
+  parkAtOwner() {
+    const f = this.owner;
+    if (!f) return;
+    const [dx, dz, hd] = this.park;
+    this.vehicle.place({ x: f.position.x + dx, z: f.position.z + dz }, hd);
+    this.vehicle.speed = 0;
+    this.vehicle.unstick(null, 0.1);
+  }
+
+  nearOwner(dist = 14) { return super.nearOwner(Math.min(dist, 7)); } // he wanders: the board keeps up with him
+
+  text() {
+    const c = this.cost;
+    return getLang() === 'de' ? {
+      ask: `🛹 Darf ich mir dein Skateboard ausleihen? (✺ ${c})`,
+      yes: 'Das Brett gehört der Wiese, man selbst passt nur darauf auf. Der Wanderer darf rollen, wann immer er mag.',
+      noKarma: 'Man selbst würde es dem Wanderer schenken. Aber das Brett möchte ein kleines bisschen Karma.',
+      firstToast: `🛹 Leocitas' Skateboard gehört dir (−${c} ✺). Ab jetzt darfst du es immer nehmen. Bringst du es ihm zurück, kriegst du das Karma wieder.`,
+      takeToast: `🛹 Skateboard geliehen (−${c} ✺). Bring es zu Leocitas zurück, dann kriegst du das Karma wieder!`,
+      returned: '🛹 Skateboard zurückgebracht. Leocitas gibt dir dein Karma wieder: +{n} ✺',
+      thanks: 'Das Brett ist heimgekehrt. Man selbst dankt dem Wanderer.',
+      noKarmaToast: `🛹 Zu wenig Karma fürs Skateboard (✺ ${c}).`,
+      ride: '🛹 Skateboard fahren',
+      take: `🛹 Skateboard nehmen (✺ ${c})`,
+      needAsk: '🛹 Frag Leocitas, ob du dir sein Skateboard ausleihen darfst',
+      fetched: '🛹 Leocitas hat sein Skateboard wieder eingesammelt. Das Karma behält das Brett.',
+    } : {
+      ask: `🛹 Can I borrow your skateboard? (✺ ${c})`,
+      yes: 'The board belongs to the meadow, one only looks after it. The wanderer may roll whenever he likes.',
+      noKarma: 'One would give it to the wanderer for free. But the board wants a tiny bit of karma.',
+      firstToast: `🛹 Leocitas' skateboard is yours (−${c} ✺). From now on you may always take it. Bring it back to him and you get the karma back.`,
+      takeToast: `🛹 Skateboard borrowed (−${c} ✺). Bring it back to Leocitas and you get the karma back!`,
+      returned: '🛹 Skateboard returned. Leocitas gives you your karma back: +{n} ✺',
+      thanks: 'The board has come home. One thanks the wanderer.',
+      noKarmaToast: `🛹 Not enough karma for the skateboard (✺ ${c}).`,
+      ride: '🛹 Ride the skateboard',
+      take: `🛹 Take the skateboard (✺ ${c})`,
+      needAsk: '🛹 Ask Leocitas if you may borrow his skateboard',
+      fetched: '🛹 Leocitas collected his skateboard again. The board keeps the karma.',
+    };
+  }
+}

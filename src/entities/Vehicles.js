@@ -249,10 +249,20 @@ export class Quad extends Vehicle {
     b.add(box(1.25, 0.08, 0.6, mat('#1d1d1d'), 0, 0.72, -0.62));  // rear fender
     b.add(box(0.5, 0.14, 0.7, mat('#222'), 0, 0.86, -0.2));       // seat
     b.add(box(0.7, 0.3, 0.4, red, 0, 0.9, 0.45));                // tank
-    const bar = cyl(0.025, 0.025, 0.8, mat('#333'), 6, 0, 1.12, 0.62); // handlebar
+    // handlebar on a stem: turns with the front wheels, rider's hands on the grips
+    const dark = mat('#333');
+    const bar = cyl(0.025, 0.025, 0.8, dark, 6, 0, 1.12, 0.55);
     bar.rotation.z = Math.PI / 2;
-    b.add(bar);
-    b.add(cyl(0.03, 0.03, 0.35, mat('#333'), 6, 0, 0.98, 0.58));
+    const stem = cyl(0.03, 0.03, 0.35, dark, 6, 0, 0.98, 0.56);
+    const rubber = mat('#151515', { roughness: 0.9 });
+    const gripL = cyl(0.035, 0.035, 0.14, rubber, 6, 0.36, 1.12, 0.55), gripR = cyl(0.035, 0.035, 0.14, rubber, 6, -0.36, 1.12, 0.55);
+    gripL.rotation.z = gripR.rotation.z = Math.PI / 2;
+    const st = this.makeSteerer([bar, stem, gripL, gripR], new THREE.Vector3(0, 0.98, 0.56));
+    this.grips = [this.anchor(st, 0.34, 0.15, -0.04), this.anchor(st, -0.34, 0.15, -0.04)];
+    // footrests on both sides, the rider's feet stand on them
+    for (const s of [1, -1]) b.add(box(0.16, 0.03, 0.34, mat('#444', { metalness: 0.4 }), s * 0.5, 0.5, 0.05));
+    this.pedals = [this.anchor(b, 0.48, 0.55, 0.12), this.anchor(b, -0.48, 0.55, 0.12)];
+    this.riderLean = 0.28; // upright-ish, not a racing bike
     // racks
     const rack = mat('#555', { metalness: 0.5 });
     b.add(box(0.9, 0.04, 0.35, rack, 0, 0.95, 0.85));

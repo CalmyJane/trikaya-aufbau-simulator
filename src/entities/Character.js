@@ -969,7 +969,17 @@ export class Character {
       if (this._torsoSet && torso.quaternion.equals(this._torsoSet)) torso.quaternion.copy(this._torsoBase);
       else (this._torsoBase ||= new THREE.Quaternion()).copy(torso.quaternion);
       torso.updateWorldMatrix(true, false);
-      const q = _q1.setFromAxisAngle(_v4.set(1, 0, 0).applyQuaternion(rq), this.sitting ? 0.55 : 0.14);
+      const q = _q1.setFromAxisAngle(_v4.set(1, 0, 0).applyQuaternion(rq), v.riderLean ?? (this.sitting ? 0.55 : 0.14));
+      // quad: lean into the curve (left turn = top to the left) and a little forward when giving it gas
+      if (v.riderLean != null) {
+        const sp = Math.min(1, Math.abs(v.speed) / v.o.maxSpeed);
+        this._rideRoll = (this._rideRoll || 0) + (-v.steer * sp * 0.45 - (this._rideRoll || 0)) * 0.15;
+        this._ridePitch = (this._ridePitch || 0) + ((v.throttle > 0 ? 0.12 * sp + (v.boosting ? 0.1 : 0) : v.throttle < 0 ? -0.08 : 0) - (this._ridePitch || 0)) * 0.1;
+        q.premultiply(_q5.setFromAxisAngle(_v5.set(0, 0, 1).applyQuaternion(rq), this._rideRoll));
+        q.multiply(_q5.setFromAxisAngle(_v5.set(1, 0, 0).applyQuaternion(rq), this._ridePitch));
+        // bumpy meadow: a small judder that grows with speed
+        this.model.position.y += Math.sin(performance.now() * 0.031) * 0.012 * sp + Math.sin(performance.now() * 0.017) * 0.008 * sp;
+      }
       const bw = torso.getWorldQuaternion(_q2), pw = torso.parent.getWorldQuaternion(_q3);
       torso.quaternion.copy(pw.invert().multiply(q).multiply(bw));
       (this._torsoSet ||= new THREE.Quaternion()).copy(torso.quaternion);
@@ -1112,4 +1122,5 @@ function buildFlowToy(type) {
 
 const _a1 = new THREE.Vector3(), _a2 = new THREE.Vector3(), _a3 = new THREE.Vector3(), _a4 = new THREE.Vector3(), _a5 = new THREE.Vector3(), _a6 = new THREE.Vector3(), _a7 = new THREE.Vector3(), _b1 = new THREE.Vector3(), _b2 = new THREE.Vector3();
 const _v1 = new THREE.Vector3(), _v2 = new THREE.Vector3(), _v3 = new THREE.Vector3(), _v4 = new THREE.Vector3();
-const _q1 = new THREE.Quaternion(), _q2 = new THREE.Quaternion(), _q3 = new THREE.Quaternion(), _q4 = new THREE.Quaternion();
+const _q1 = new THREE.Quaternion(), _q2 = new THREE.Quaternion(), _q3 = new THREE.Quaternion(), _q4 = new THREE.Quaternion(), _q5 = new THREE.Quaternion();
+const _v5 = new THREE.Vector3();

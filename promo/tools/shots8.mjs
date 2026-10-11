@@ -39,13 +39,12 @@ export const SHOTS = [
      if (f === 3) sayF(g.npcs.get('fabi'), 'Der ist nur geliehen!', 1.6);`],
   // the break in the music: full throttle… and exactly one person in the way (hit on the bar, frame 45)
   ['QUAD', 112, 3,
-    `const h = Math.atan2(-45.6, -41.4); ride(g.vehicles.quad, -10, 28.2, h); g.vehicles.quad.speed = 11; g.cam.pitch = 0.13; lock(); zoom(1.35);
+    `const h = -Math.PI / 2; ride(g.vehicles.quad, -112.5, 67, h); g.vehicles.quad.speed = 9; g.cam.pitch = 0.11; lock(); zoom(1.35);
      g.knockReaction = () => ({ karma: 10, shout: { de: 'AAH!', en: 'AAH!' }, line: { de: 'Das ist ein Festival, keine Autobahn!', en: '' } });
-     const d = hold('danny', -10 + Math.sin(h) * 26.7, 28.2 + Math.cos(h) * 26.7); d.root.rotation.y = h; window._hit = -1;
-     g.ui.toast('🛵 Quad-Express: noch 0:41!');`,
+     const d = hold('danny', -112.5 - QD, 67); d.root.rotation.y = h; window._hit = -1;`,
     `const d = g.npcs.get('danny');
-     if (_hit < 0) { driveTo(-51, -9, true); if (d.knocked) { window._hit = f; console.log('HIT at ' + f); } else { d.wait = 99; } }
-     else { keys(); if (f === _hit + 34) sayF(d, 'Das ist ein Festival, keine Autobahn!', 2.2); }`],
+     if (_hit < 0) { driveTo(-160, 67, false); if (d.knocked) { window._hit = f; console.log('HIT at ' + f + ' x=' + g.vehicles.quad.position.x.toFixed(1)); } else { d.wait = 99; } }
+     else if (Math.abs(g.vehicles.quad.speed) > 0.6) keys('Space'); else keys();`],
   ['HAENGER', 113, 3,
     `g.trailer.start('t1_trailer', g.quests.quests.t1_trailer.steps[0]); const a = g.trailer.active; const oi = Math.min(4, a.obstacles.length - 1); const o = a.obstacles[oi];
      // drive across the cable bridge (its long side lies along the local x axis), coming from the east
@@ -53,7 +52,7 @@ export const SHOTS = [
      g.checkRunOver = () => {}; ride(g.vehicles.quad, -28, 46.3, head); g.vehicles.quad.speed = 7; g.trailer.cart.hitchTo(g.vehicles.quad);
      for (const id of ['juli', 'julez', 'corni']) hold(id); g.trailer.board(); untoast();
      const b0 = g.trailer.bump.bind(g.trailer); g.trailer.bump = (c, s) => b0(0, s);
-     window._tr = { o, dir, out: -1 }; g.cam.pitch = 0.13; lock(); zoom(1.4); g.cam.yaw += 0.5;`,
+     g.vehicles.quad.speed = 0; step(40); g.vehicles.quad.speed = 7; window._tr = { o, dir, out: -1 }; g.cam.pitch = 0.13; lock(); zoom(1.4); g.cam.yaw += 0.5;`,
     `const { o, dir } = _tr; if (g.vehicles.quad.speed < 8) driveTo(-56, 46.3, false); else keys();
      if (f === 3) sayF(g.npcs.get('corni'), 'Fahr los, aber mit Gefühl!', 1.6);
      if (_tr.out < 0 && o.onT) { _tr.out = f; console.log('FALL at ' + f); g.trailer.fallOut(g.npcs.get('julez')); }

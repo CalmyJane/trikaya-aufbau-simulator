@@ -47,9 +47,9 @@ export const SHOTS = [
      if (_hit < 0) { driveTo(-51, -9, true); if (d.knocked) { window._hit = f; console.log('HIT at ' + f); } else { d.wait = 99; } }
      else { keys(); if (f === _hit + 34) sayF(d, 'Das ist ein Festival, keine Autobahn!', 2.2); }`],
   ['HAENGER', 113, 3,
-    `g.trailer.start('t1_trailer', g.quests.quests.t1_trailer.steps[0]); const a = g.trailer.active; const o = a.obstacles[4];
+    `g.trailer.start('t1_trailer', g.quests.quests.t1_trailer.steps[0]); const a = g.trailer.active; const oi = Math.min(4, a.obstacles.length - 1); const o = a.obstacles[oi];
      // drive across the cable bridge (its long side lies along the local x axis), coming from the east
-     const head = -Math.PI / 2, dir = [-1, 0]; o.pos.set(-40, 0, 46.3); o.cos = Math.cos(head); o.sin = Math.sin(head); a.group.children[4].position.set(-40, 0, 46.3); a.group.children[4].rotation.y = head;
+     const head = -Math.PI / 2, dir = [-1, 0]; o.pos.set(-40, 0, 46.3); o.cos = Math.cos(head); o.sin = Math.sin(head); a.group.children[oi].position.set(-40, 0, 46.3); a.group.children[oi].rotation.y = head;
      g.checkRunOver = () => {}; ride(g.vehicles.quad, -28, 46.3, head); g.vehicles.quad.speed = 7; g.trailer.cart.hitchTo(g.vehicles.quad);
      for (const id of ['juli', 'julez', 'corni']) hold(id); g.trailer.board(); untoast();
      const b0 = g.trailer.bump.bind(g.trailer); g.trailer.bump = (c, s) => b0(0, s);

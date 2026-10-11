@@ -615,9 +615,10 @@ export class World {
     add('stage_front', { x: PLOTS.mainstage.pos.x + 3, z: PLOTS.mainstage.pos.z - 9 });
     add('festival_generator_side', { x: LANDMARKS.festival_generator.x + 2.4, z: LANDMARKS.festival_generator.z + 1.6 });
     add('wc_pump', { x: LANDMARKS.wc_container.x + 4.0, z: LANDMARKS.wc_container.z + 3.3 });
-    // precision parking: the loader stops here (nose to the kitchen), the tank goes right in front of the bucket
-    add('water_tank_spot', { x: LANDMARKS.kitchen.x + 12.5, z: LANDMARKS.kitchen.z + 2 });
-    add('water_tank_drop', { x: LANDMARKS.kitchen.x + 8.6, z: LANDMARKS.kitchen.z + 2 });
+    // precision parking behind the kitchen (north side, east of the generator): the loader comes down from the
+    // camping corner and stops here, nose to the kitchen; the tank goes right in front of the bucket
+    add('water_tank_spot', { x: LANDMARKS.kitchen.x + 6.5, z: LANDMARKS.kitchen.z - 8.5 });
+    add('water_tank_drop', { x: LANDMARKS.kitchen.x + 6.5, z: LANDMARKS.kitchen.z - 4.6 });
     // the wobbly Bauzaun field next to the entrance (special nut)
     {
       const wc = FESTIVAL_FENCE.wobbly, e = PLOTS.entrance.pos, d = Math.hypot(e.x - wc.x, e.z - wc.z) || 1;

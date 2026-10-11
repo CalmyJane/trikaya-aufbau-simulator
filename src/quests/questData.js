@@ -794,18 +794,18 @@ export const QUESTS = [
     giver: 'andi',
     day: 3,
     requires: ['q3_toilets'],
-    summary: { de: 'Sabses Küche braucht einen 1000-Liter-Wassertank. Der muss mit dem Radlader in eine enge Lücke neben die Küche. Hütchen inklusive.', en: 'Sabse\'s kitchen needs a 1000-litre water tank. It has to go into a tight gap next to the kitchen with the loader. Cones included.' },
+    summary: { de: 'Sabses Küche braucht einen 1000-Liter-Wassertank. Der muss mit dem Radlader in eine enge Lücke hinter die Küche. Hütchen inklusive.', en: 'Sabse\'s kitchen needs a 1000-litre water tank. It has to go into a tight gap behind the kitchen with the loader. Cones included.' },
     offer: [
       { who: 'andi', text: { de: 'Andi hier, vom Wasser. Sabse hat kein Wasser mehr in der Küche. Und Sabse ohne Wasser… willst du nicht erleben.', en: 'Andi here, water team. Sabse has no water left in the kitchen. And Sabse without water… you don\'t want to see it.' } },
-      { who: 'andi', text: { de: 'Der Tank steht am Parkplatz. Radlader. Und neben der Küche ist es eng, ich hab dir Hütchen hingestellt. Bleib in der Gasse und halt auf der Markierung an.', en: 'The tank is at the parking. Loader. And it\'s tight next to the kitchen, I put out cones for you. Stay in the lane and stop on the mark.' } },
+      { who: 'andi', text: { de: 'Der Tank steht am Parkplatz. Radlader. Und hinter der Küche ist es eng, ich hab dir Hütchen hingestellt. Bleib in der Gasse und halt auf der Markierung an.', en: 'The tank is at the parking. Loader. And it\'s tight behind the kitchen, I put out cones for you. Stay in the lane and stop on the mark.' } },
     ],
     accept: { de: 'Millimetergenau!', en: 'Spot on!' },
     decline: { de: 'Später.', en: 'Later.' },
     steps: [
       { type: 'pickup', text: { de: 'Lade den Wassertank am Parkplatz auf (Radlader)', en: 'Load the water tank at the parking (loader)' }, items: [{ item: 'water_tank', at: 'parking' }] },
       {
-        type: 'park', at: 'water_tank_spot', heading: -Math.PI / 2, item: 'water_tank',
-        text: { de: 'Rangier den Tank durch die Hütchengasse neben die Küche und halt auf der gelben Markierung', en: 'Manoeuvre the tank through the cone lane next to the kitchen and stop on the yellow mark' },
+        type: 'park', at: 'water_tank_spot', heading: 0, item: 'water_tank',
+        text: { de: 'Rangier den Tank durch die Hütchengasse hinter die Küche und halt auf der gelben Markierung', en: 'Manoeuvre the tank through the cone lane behind the kitchen and stop on the yellow mark' },
         build: { id: 'water_tank', type: 'water_tank', at: 'water_tank_drop', rotation: 0, cost: 350 },
       },
       {

@@ -832,6 +832,20 @@ export const NPCS = [
       { de: 'Bitte nicht auf das Moos treten. Das wächst da schon länger, als es uns alle hier gibt.', en: 'Please don\'t step on the moss. It\'s been growing there longer than any of us have been here.' },
     ],
   },
+  {
+    id: 'adele', name: 'Adele', role: { de: 'Hilft wo sie kann · Besorgungsfahrten', en: 'Helps wherever she can · supply runs' }, portrait: '🐴',
+    look: { base: 'f_casual', skin: SKIN.fair, hair: '#b88a52', brows: '#8a6238', hairStyle: 'ponytail', hairStyleColor: '#b88a52', hairLength: 0.4, shirt: '#e8d9a8', pants: '#6a4a8a', patchwork: true, shirtPatch: ['#e8d9a8', '#8ad0a0', '#e84a8a'], height: 1.68 },
+    behavior: 'wander', home: 'festival_random', roam: 'festival_random', radius: 12,
+    lines: [
+      { de: 'Oh! Hallo! Kann ich dir was helfen? Ich helf gern. Wirklich. Sag einfach was.', en: 'Oh! Hi! Can I help you with something? I love helping. Really. Just say.' },
+      { de: 'Ich fahr gleich in die Stadt, Besorgungen. Brauchst du was? Schrauben? Kaffee? Irgendwas?', en: 'I\'m driving into town in a bit, errands. Need anything? Screws? Coffee? Anything?' },
+      { de: 'Gestern hab ich Kabelbinder geholt. Und Pferdefutter. Das war nicht auf der Liste, aber es lag so da.', en: 'Yesterday I picked up cable ties. And horse feed. It wasn\'t on the list, but it was just there.' },
+      { de: 'Hast du die Wolke da gesehen? Die sieht aus wie ein Pferd. Ein Pferd mit Flügeln.', en: 'Did you see that cloud? It looks like a horse. A horse with wings.' },
+      { de: 'Pferde sind die klügsten Wesen. Die wissen immer, wo\'s langgeht. Im Gegensatz zu Leo.', en: 'Horses are the wisest beings. They always know the way. Unlike Leo.' },
+      { de: 'Ich wollte eigentlich nur kurz Wasser holen… und dann hab ich drei Leuten beim Tragen geholfen. Ich bin noch nicht beim Wasser.', en: 'I only wanted to fetch water… then I helped three people carry stuff. I haven\'t reached the water yet.' },
+      { de: 'Ich hoffe, ich mach alles richtig. Sag Bescheid, wenn nicht, ja? Ich geb mir wirklich Mühe!', en: 'I hope I\'m doing everything right. Tell me if not, okay? I\'m really trying!' },
+    ],
+  },
 ];
 
 // ------------------------------------------------------------------ random campers

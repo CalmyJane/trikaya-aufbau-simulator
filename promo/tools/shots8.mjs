@@ -65,7 +65,7 @@ export const SHOTS = [
   ['BEER', 68, 3,
     `const c0 = g.world.spots.campfire; window._c0 = c0; const h = Math.atan2(-2.2, -1.6);
      place(c0.x + 2.2, c0.z + 1.6, h); g.cam.yaw = h + Math.PI + 0.45; g.cam.pitch = 0.24; g.cam.targetDist = 5.5;`,
-    `const pp = g.player.position; const j = hold('jan', _c0.x - 1.4, _c0.z + 1.9); j.char.faceTowards(pp, 1 / 30, 4); const fa = hold('fabi', _c0.x + 0.6, _c0.z - 2.3); fa.char.faceTowards(pp, 1 / 30, 4);
+    `const pp = g.player.position; const j = hold('jan', _c0.x - 1.4, _c0.z + 1.9); j.char.faceTowards(pp, 1 / 30, 4); const fa = hold('matze', _c0.x + 0.6, _c0.z - 2.3); fa.char.faceTowards(pp, 1 / 30, 4);
      if (f === 3) sayF(j, 'Teammeeting fällt aus.', 0.9);
      if (f === 30) sayF(fa, 'Dann ist jetzt Feierabend. Prost!', 1.6);
      if (f === 34 || f === 48 || f === 60) { g.effects.buy('beer', true); g.player.char.play('wave', 0.2, { once: true }); g.player.waveTimer = 0.8; }`],
@@ -82,8 +82,8 @@ export const SHOTS = [
     `promo('<div class="black"></div>', Math.max(0, 1 - (f + 1) / 6));`],
   // ------------------------------------------------ second drop: night
   ['STAGE', 68, 60,
-    `night(0.85); aerial(-81, 38); dance(extras().slice(0, 30), -81, 35, 3, 1.9); shot([-81, 2.6, 52], [-81, 5, 20]);`,
-    `shot([-81 + k * 2, 2.6 + k * 2.2, 50 + k * 4], [-81, 5, 20]);`],
+    `night(0.85); aerial(-81, 38); dance(extras().slice(0, 30), -81, 35, 3, 1.9); shot([-83, 2.1, 45.5], [-81, 4.2, 20]);`,
+    `shot([-83 + k * 4, 2.1 + k * 0.9, 45.5 + k * 2.5], [-81, 4.2, 20]);`],
   ['DOME', 67, 60,
     `night(0.85); aerial(-146, 68); dance(extras().slice(0, 16), -135, 68, 2.4, 1.8); shot([-126, 5, 62], [-150, 3.5, 67]);`,
     `shot([-126 - k * 4, 5 - k * 1.2, 62 + k * 6], [-150, 3.5, 67]);`],

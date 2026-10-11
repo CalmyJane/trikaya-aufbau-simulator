@@ -54,9 +54,11 @@ export const SHOTS = [
      const b0 = g.trailer.bump.bind(g.trailer); g.trailer.bump = (c, s) => b0(0, s);
      for (const nn of g.npcs.all) if (!nn.riding && !nn.hidden) { const q = nn.root.position; if (q.x > -80 && q.x < -15 && q.z > 41 && q.z < 52) q.z = q.z < 46.3 ? 36 + Math.random() * 3 : 55 + Math.random() * 3; if (Math.hypot(q.x + 45, q.z - 46) < 55) { nn.task = null; nn.target = null; nn.wait = 99; } } // nobody walks into the lane
      g.vehicles.quad.speed = 0; step(40); g.vehicles.quad.speed = 7; window._tr = { o, dir, out: -1 }; g.cam.pitch = 0.13; lock(); zoom(1.4); g.cam.yaw += 0.5;`,
-    `const { o, dir } = _tr; if (g.vehicles.quad.speed < 8) driveTo(-56, 46.3, false); else keys();
+    `const { o, dir } = _tr; if (_tr.out >= 0 && f > _tr.out + 14) { if (g.vehicles.quad.speed > 1.2) keys('KeyS'); else { keys(); g.vehicles.quad.speed = 0; } } else if (g.vehicles.quad.speed < 8) driveTo(-56, 46.3, false); else keys(); // someone fell out: stop
      if (f === 3) sayF(g.npcs.get('corni'), 'Fahr los, aber mit Gefühl!', 1.6);
-     if (_tr.out < 0 && o.onT) { _tr.out = f; console.log('FALL at ' + f); g.trailer.fallOut(g.npcs.get('julez')); }
+     if (_tr.out < 0 && o.onT) { _tr.out = f; console.log('FALL at ' + f); const r0 = Math.random; Math.random = () => FS; g.trailer.fallOut(g.npcs.get('julez')); Math.random = r0; /* fixed side: away from the camera */ }
+     if (_tr.out >= 0 && f > _tr.out + 16) { const q = g.vehicles.quad.position, F = g.npcs.get('julez').root.position; const want = Math.atan2(q.x - F.x, q.z - F.z) + CO; g.cam.yaw += Math.atan2(Math.sin(want - g.cam.yaw), Math.cos(want - g.cam.yaw)) * 0.07; } // the camera turns to the one who fell out
+     if (window.DBG && _tr.out >= 0 && (f - _tr.out) % 8 === 0) console.log('faller ' + f + ' camdist ' + g.npcs.get('julez').root.position.distanceTo(g.camera.position).toFixed(1));
      if (_tr.out >= 0 && f === _tr.out + 30) sayF(g.npcs.get('julez'), 'Hab ich doch gesagt, das hält nicht!', 2.2);`],
   ['RADLADER', 67, 3,
     `g.checkRunOver = () => {}; const r = g.vehicles.radlader; const h = Math.atan2(-30, -2); ride(r, -69.5, 42, h); r.speed = 6; r.armTarget = -0.95; r.arm.rotation.x = -0.95; g.cam.pitch = 0.2; lock(); zoom(1.3); g.cam.yaw = h + Math.PI - 0.55; untoast();`,

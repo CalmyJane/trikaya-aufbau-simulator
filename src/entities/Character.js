@@ -598,6 +598,7 @@ export class Character {
       this.attachToBone('Chest', g);
     }
     if (look.shirtPrint) this.addShirtPrint(look.shirtPrint, look.printColor || '#ffd21f');
+    if (look.shirtLogo === 'calmyjane') this.addCalmyJaneLogo();
     if (extras.includes('glitter') && this.bones.Head) {
       // glitter on the cheeks (Annika's styling): a few tiny sparkly bits
       const g = new THREE.Group();
@@ -656,6 +657,30 @@ export class Character {
     b.position.set(0, (this.look.printY ?? 0) + 0.03, -(this.look.printZ ?? 0.15) + 0.005);
     b.rotation.y = Math.PI;
     g.add(b);
+    this.attachToBone('Chest', g);
+  }
+
+  /** Calmy Jane smiley on the shirt front (white box, square eyes, crooked mouth). */
+  addCalmyJaneLogo() {
+    const c = document.createElement('canvas');
+    c.width = 427; c.height = 360;
+    const ctx = c.getContext('2d');
+    ctx.scale(0.5, 0.5);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, 854, 720);
+    ctx.fillStyle = '#0e0e0e';
+    ctx.fillRect(204, 186, 106, 106);
+    ctx.fillRect(560, 186, 106, 106);
+    ctx.fillRect(104, 366, 102, 178);
+    ctx.fillRect(104, 442, 645, 102);
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(0.15, 0.126), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.9 }));
+    m.position.set(0, this.look.printY ?? 0, this.look.printZ ?? 0.15);
+    m.rotation.z = -0.06;
+    const g = new THREE.Group();
+    g.scale.set(this.look.width || 1, 1, this.look.width || 1);
+    g.add(m);
     this.attachToBone('Chest', g);
   }
 

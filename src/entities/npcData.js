@@ -71,7 +71,7 @@ export const NPCS = [
   },
   {
     id: 'jan', name: 'Jan', role: { de: 'Anmeldung', en: 'Registration' }, portrait: '📋',
-    look: { base: 'm_casual', skin: SKIN.light, hair: '#8a6a38', brows: '#6a5030', hairCut: 'sidecut', shirt: '#c9b24a', pants: '#5a4a7a', patchwork: true, height: 1.97 },
+    look: { base: 'm_casual', skin: SKIN.light, hair: '#8a6a38', brows: '#6a5030', hairCut: 'sidecut', shirt: '#161616', pants: '#5a4a7a', patchwork: true, shirtPatch: ['#161616', '#1c1c1c', '#121212'], shirtLogo: 'calmyjane', height: 1.97 },
     behavior: 'stationary', home: 'office_boss',
     lines: [
       { de: 'Name? Tätigkeit? Lieblings-Dixi?', en: 'Name? Job? Favourite portaloo?' },

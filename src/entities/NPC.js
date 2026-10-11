@@ -37,6 +37,13 @@ function markerTexture(ch, color) {
 }
 const MARKERS = {};
 const pick = (a) => a[Math.floor(Math.random() * a.length)];
+const DANCE_MOVES = ['bounce', 'pump', 'handsup', 'twist', 'flow', 'headbang', 'jump', 'sidestep', 'robot'];
+const DANCE_ROBOT = [ // [left hand, right hand] per beat
+  [[0.55, 1.45, 0.3], [-0.3, 1.0, 0.35]],
+  [[0.3, 1.0, 0.35], [-0.55, 1.45, 0.3]],
+  [[0.3, 1.9, 0.15], [-0.3, 1.0, 0.35]],
+  [[0.5, 1.2, 0.4], [-0.5, 1.2, 0.4]],
+];
 
 // quick greetings when you walk past someone (NPC.greetReact)
 const G = (de, en) => ({ de, en });
@@ -357,7 +364,9 @@ export class NPC {
   finish(dt) {
     if (!this._worked && this.char.work) this.char.setWork(null);
     this._worked = false;
-    if (!this.emote && this.char.armPose) this.char.armPose = null;
+    if (!this.emote && !this._danced && this.char.armPose) this.char.armPose = null;
+    if (this._lean && !this._danced) { this.char.model.rotation.x = this.char.model.rotation.z = 0; this._lean = false; }
+    this._danced = false;
     const p = this.root.position;
     p.y = heightAt(p.x, p.z) + (this.party ? this.bob || 0 : 0) + (this.emoteY || 0);
     this.char.update(dt);
@@ -422,11 +431,9 @@ export class NPC {
     const pt = this.party;
     if (this.char.sitting) this.standUp();
     if (this.position.distanceTo(pt.pos) > 0.8) { this.walkTo(pt.pos, dt, 2.2); return; }
-    // "dancing": bouncing, turning, the odd arm wave
-    this.char.faceTowards(pt.box, dt, 2);
-    this.root.rotation.y += Math.sin(t * 2.2 + pt.pos.x) * dt * 1.5;
-    this.char.play(Math.sin(t * 0.7 + pt.pos.z) > 0.6 ? 'wave' : 'idle', 0.3, { timeScale: 1.8 });
-    this.bob = Math.abs(Math.sin(t * 7.2)) * 0.08;
+    // dancing around the box, everyone with their own moves
+    this.char.faceTowards(pt.box, dt, 1.2);
+    this.bob = this.dance((pt.dance ||= { ph: pt.pos.x }), t, dt);
     pt.lineT -= dt;
     if (pt.lineT <= 0 && this.manager?.partyLine) { pt.lineT = 5 + Math.random() * 6; this.say(this.manager.partyLine(), 2.5); }
   }
@@ -614,6 +621,91 @@ export class NPC {
     this.char.play('idle', 0.25);
   }
 
+  /**
+   * One frame of dancing; `d` keeps the dancer's state ({ ph }), `t` runs on. Every few seconds a new move from
+   * DANCE_MOVES: arms via IK, hips/turns via the root, a little body lean, stepping on the spot. Returns the bounce height.
+   */
+  dance(d, t, dt) {
+    const c = this.char;
+    if (!d.move || t > d.until || t < d.until - 8) {
+      d.move = pick(DANCE_MOVES.filter((m) => m !== d.move));
+      d.until = t + 3 + Math.random() * 3.5;
+    }
+    const bt = t * 7.2 + d.ph;                    // one bounce per beat
+    const b = Math.abs(Math.sin(bt)), s = Math.sin(bt), sw = Math.sin(bt * 0.5);
+    let y = b * 0.07, L = null, R = null, lx = 0, lz = 0, off = 0, clip = 'idle', ts = 1.8;
+    switch (d.move) {
+      case 'bounce': // bounce, sway, throw an arm up now and then
+        y = b * 0.09;
+        this.root.rotation.y += Math.sin(t * 1.9 + d.ph) * dt * 1.6;
+        if (Math.sin(t * 0.9 + d.ph) > 0.3) clip = 'wave';
+        break;
+      case 'pump': { // one fist in the air, changing sides every few beats
+        const r = Math.sin(bt * 0.125) > 0, up = [0.3, 1.72 + b * 0.38, 0.2], low = [0.3, 1.02, 0.18];
+        y = b * 0.1;
+        L = r ? low : up; R = r ? [-up[0], up[1], up[2]] : [-low[0], low[1], low[2]];
+        this.root.rotation.y += Math.sin(t * 1.3 + d.ph) * dt * 0.9;
+        break;
+      }
+      case 'handsup': // both arms up, swaying from side to side
+        L = [0.3 + sw * 0.32, 2.02, 0.1]; R = [-0.3 + sw * 0.32, 2.02, 0.1];
+        lz = -sw * 0.09;
+        break;
+      case 'twist': // hips left-right, arms pumping against each other
+        y = b * 0.05; clip = 'walk'; ts = 1.5;
+        this.root.rotation.y += Math.cos(bt) * dt * 4.5;
+        L = [0.36, 1.15, 0.12 + 0.3 * s]; R = [-0.36, 1.15, 0.12 - 0.3 * s];
+        break;
+      case 'flow': { // dreamy: hands drawing circles, slowly turning
+        const a = t * 2.3 + d.ph;
+        y = b * 0.03; ts = 1;
+        L = [0.45 + 0.28 * Math.cos(a), 1.5 + 0.38 * Math.sin(a), 0.25];
+        R = [-0.45 + 0.28 * Math.cos(a), 1.5 - 0.38 * Math.sin(a), 0.25];
+        lz = Math.sin(a * 0.5) * 0.08;
+        this.root.rotation.y += dt * 0.9;
+        break;
+      }
+      case 'headbang': // fists low, head nodding along
+        y = b * 0.04; lx = b * 0.1;
+        L = [0.24, 1.02 + b * 0.14, 0.3]; R = [-0.24, 1.02 + b * 0.14, 0.3];
+        if (!(c.nodT > 0)) c.nod();
+        break;
+      case 'jump': // jumping high, arms punching up in turns
+        y = b * 0.3;
+        L = [0.3, 1.65 + 0.42 * Math.max(0, s), 0.15]; R = [-0.3, 1.65 + 0.42 * Math.max(0, -s), 0.15];
+        break;
+      case 'sidestep': // step left, step right, clapping
+        y = b * 0.05; clip = 'walk'; ts = 1.2;
+        off = sw * 0.3; lz = Math.cos(bt * 0.5) * 0.06;
+        L = [0.04 + 0.26 * b, 1.3, 0.36]; R = [-0.04 - 0.26 * b, 1.3, 0.36];
+        break;
+      case 'robot': { // stiff poses, snapping on the beat
+        const q = Math.floor(bt / Math.PI) & 3, P = DANCE_ROBOT[q];
+        y = 0; ts = 0.2;
+        L = P[0]; R = P[1];
+        this.root.rotation.y += (q & 1 ? 1 : -1) * dt * 0.7;
+        break;
+      }
+    }
+    // step sideways without drifting away
+    if (off || d.off) {
+      const h = this.root.rotation.y, dx = off - (d.off || 0);
+      this.root.position.x += Math.cos(h) * dx; this.root.position.z -= Math.sin(h) * dx;
+      d.off = off;
+    }
+    // arms glide from one move into the next
+    if (L) {
+      const k = d.move === 'robot' ? 1 : Math.min(1, dt * 12);
+      d.L ||= [...L]; d.R ||= [...R];
+      for (let i = 0; i < 3; i++) { d.L[i] += (L[i] - d.L[i]) * k; d.R[i] += (R[i] - d.R[i]) * k; }
+      c.armPose = { L: d.L, R: d.R };
+    } else { c.armPose = null; d.L = d.R = null; }
+    c.model.rotation.x = lx; c.model.rotation.z = lz;
+    this._lean = true; this._danced = true;
+    c.play(clip, 0.25, { timeScale: ts });
+    return y;
+  }
+
   /** Little moments: dancing near music, a big wave, hops, a somersault, a spin, cheering, stretching… */
   startEmote(kind, dur) {
     this.emote = { kind, t: 0, dur, ph: Math.random() * 6 };
@@ -627,10 +719,7 @@ export class NPC {
     const t = e.t;
     if (t >= e.dur) { this.emote = null; this.emoteY = 0; this.char.play('idle', 0.3); return false; }
     if (e.kind === 'dance') {
-      // bounce to the beat, sway, throw an arm up now and then
-      this.emoteY = Math.abs(Math.sin(t * 6.2 + e.ph)) * 0.09;
-      this.root.rotation.y += Math.sin(t * 1.9 + e.ph) * dt * 1.6;
-      this.char.play(Math.sin(t * 0.9 + e.ph) > 0.55 ? 'wave' : 'idle', 0.25, { timeScale: 1.9 });
+      this.emoteY = this.dance(e, t + e.ph, dt);
     } else if (e.kind === 'bigwave') {
       this.emoteY = Math.max(0, Math.sin(t * 7)) * 0.12; // waving with little jumps
       this.char.play('wave', 0.2, { timeScale: 1.6 });

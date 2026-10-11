@@ -76,7 +76,7 @@ export const HELPERS = `
     for (const q of Object.values(g.quests.quests)) { all.completed.push(q.id); for (const s of q.steps) { if (s.build) all.built.push({ ...s.build }); if (s.type === 'work' && s.progress) all.progress[s.progress] = s.targets.map((_, i) => i); } }
     all.karma = 120; all.day = 4; all.phase = 'day'; g.days.evening = async () => {}; g.days.sleep = async () => {}; g.finaleSys.start = async () => {}; g.world.clearStructures(); g.quests.restore(all); g.applyProgressLevel(); g.npcs.setCrowd(30); g.refreshHUD(); };
   // tele lens (in a vehicle the camera never comes closer than 9 m)
-  window._zoom = 1; window.zoom = (z) => { window._zoom = z; }; const eu0 = g.effects.update.bind(g.effects); g.effects.update = (dt) => { eu0(dt); if (_zoom !== 1) { g.camera.fov /= _zoom; g.camera.updateProjectionMatrix(); } };
+  const ZB = innerHeight > innerWidth ? 0.7 : 1; window._zoom = ZB; window.zoom = (z) => { window._zoom = z * ZB; }; const eu0 = g.effects.update.bind(g.effects); g.effects.update = (dt) => { eu0(dt); if (_zoom !== 1) { g.camera.fov /= _zoom; g.camera.updateProjectionMatrix(); } };
   // keep the camera where the shot put it (no swinging behind the vehicle, no pitch reset)
   window.lock = () => { g.cam.lastMouse = performance.now() + 1e7; };
   window.night = (v) => { g.world.night = v; g.world.setNight(v, .1); };

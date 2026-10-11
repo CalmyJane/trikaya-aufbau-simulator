@@ -13,11 +13,13 @@ process.env.PROMO_LANG = 'de';
 const preview = process.argv[2] === 'preview';
 const only = process.argv[3] ? process.argv[3].split(',') : null;
 // 1280x720 CSS pixels: HUD, bubbles and dialogs come out 1.5x bigger (readable in a video); full = 1.5x device pixels = 1920x1080
-const [W, H] = [1280, 720];
+// PROMO_ORIENT=port: upright 9:16 (1080x1920), wider lens so the framing still works
+const port = process.env.PROMO_ORIENT === 'port';
+const [W, H] = port ? [720, 1280] : [1280, 720];
 const SCALE = preview ? 0.75 : 1.5;
 
 // frames go to the local temp folder: inside ProtonDrive the sync renames freshly re-created folders ("Name clash")
-const outRoot = preview ? 'preview8_land' : (process.env.PROMO_OUT || os.tmpdir() + '/trikaya_promo8').split(path.sep).join('/');
+const outRoot = preview ? 'preview8_land' : (process.env.PROMO_OUT || os.tmpdir() + (port ? '/trikaya_promo8_port' : '/trikaya_promo8')).split(path.sep).join('/');
 fs.mkdirSync(outRoot, { recursive: true });
 const browser = await launch();
 const { page } = await openGame(browser, 'saves4/24.json', { width: W, height: H, scale: SCALE });

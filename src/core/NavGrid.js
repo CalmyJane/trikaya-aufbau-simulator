@@ -87,7 +87,8 @@ export class NavGrid {
 
   /**
    * Is the straight walk from a to b free? The first/last metre is forgiven (people stand right
-   * next to walls, and targets often sit at a wall – e.g. a container door).
+   * next to walls, and targets often sit at a wall – e.g. a container door) – but only the padding around
+   * a wall, never the wall itself: otherwise somebody standing at a fence "sees" a free way straight through it.
    */
   lineClear(a, b) {
     this.ensure();
@@ -100,8 +101,8 @@ export class NavGrid {
       const along = t * len;
       const bl = this.blockedAt(a.x + dx * t, a.z + dz * t);
       if (!bl) { leftStart = true; continue; }
-      if (!leftStart && along < 1.2) continue;
-      if (len - along < 1.2) continue;
+      if (len - along < 0.6) continue; // the target itself may sit in something (a seat, a counter)
+      if (((!leftStart && along < 1.2) || len - along < 1.2) && !this.colliders.hits?.(a.x + dx * t, a.z + dz * t, 0.2)) continue;
       return false;
     }
     return true;

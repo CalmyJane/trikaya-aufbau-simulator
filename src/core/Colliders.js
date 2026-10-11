@@ -39,6 +39,18 @@ export class Colliders {
     this.version++;
   }
 
+  /** Is the point (plus a margin) inside any collider? Doesn't move anything. */
+  hits(x, z, margin = 0) {
+    for (const c of this.list) {
+      const dx = x - c.x, dz = z - c.z;
+      if (c.type === 'circle') {
+        const r = c.r + margin;
+        if (dx * dx + dz * dz < r * r) return true;
+      } else if (Math.abs(dx * c.cos - dz * c.sin) < c.hw + margin && Math.abs(dx * c.sin + dz * c.cos) < c.hd + margin) return true;
+    }
+    return false;
+  }
+
   /**
    * Push a circle (pos with x,z) out of all colliders. Returns true if it collided.
    * @param above  how high the feet are above the ground – low obstacles (c.h) are cleared when jumping over them

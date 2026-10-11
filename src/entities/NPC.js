@@ -214,7 +214,7 @@ export class NPC {
     nv.check -= dt;
     if (nv.check <= 0) {
       nv.check = nv.path ? 3 : 0.7;
-      if (!nv.forced && (d < 2.5 || grid.lineClear(p, target))) nv.path = null;
+      if (!nv.forced && grid.lineClear(p, target)) nv.path = null;
       else if (grid.budget > 0) {
         const t0 = performance.now();
         nv.path = grid.findPath(p, target);

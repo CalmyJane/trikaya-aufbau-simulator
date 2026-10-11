@@ -3,7 +3,7 @@ export const HELPERS = `
   const g = game;
   const st = document.createElement('style');
   const B = Math.min(innerWidth, innerHeight);
-  st.textContent = \`#hint,#btn-fs-hud,#touch,#dialog-hint,#tracker,#hud-vol,#prompt,#vehicle-hud{display:none!important}
+  st.textContent = \`#hint,#btn-fs-hud,#touch,#dialog-hint,#tracker,#hud-vol,#prompt,#vehicle-hud,#bubbles,#toasts,#dialog{display:none!important}
     #promo{position:fixed;inset:0;pointer-events:none;z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center}
     #promo img.logo{width:\${B * 0.27}px;border-radius:50%;box-shadow:0 8px 40px rgba(0,0,0,.7)}
     #promo h1{font-family:'Poiret One',sans-serif;font-size:\${B * 0.115}px;line-height:.95;margin:.25em 0 0;color:#f2c14e;letter-spacing:.06em;text-shadow:0 4px 18px rgba(0,0,0,.7)}

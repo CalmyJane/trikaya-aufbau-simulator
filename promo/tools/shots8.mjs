@@ -48,16 +48,17 @@ export const SHOTS = [
   ['HAENGER', 113, 3,
     `g.trailer.start('t1_trailer', g.quests.quests.t1_trailer.steps[0]); const a = g.trailer.active; const oi = Math.min(4, a.obstacles.length - 1); const o = a.obstacles[oi];
      // drive across the cable bridge (its long side lies along the local x axis), coming from the east
-     const head = -Math.PI / 2, dir = [-1, 0]; o.pos.set(-40, 0, 46.3); o.cos = Math.cos(head); o.sin = Math.sin(head); a.group.children[oi].position.set(-40, 0, 46.3); a.group.children[oi].rotation.y = head;
-     g.checkRunOver = () => {}; ride(g.vehicles.quad, -28, 46.3, head); g.vehicles.quad.speed = 7; g.trailer.cart.hitchTo(g.vehicles.quad);
+     const head = -Math.PI / 2, dir = [-1, 0]; o.pos.set(-40, 0, 42.8); o.cos = Math.cos(head); o.sin = Math.sin(head); a.group.children[oi].position.set(-40, 0, 42.8); a.group.children[oi].rotation.y = head;
+     g.checkRunOver = () => {}; ride(g.vehicles.quad, -32.2, 42.8, head); g.vehicles.quad.speed = 7; g.trailer.cart.hitchTo(g.vehicles.quad);
      for (const id of ['juli', 'julez', 'corni']) hold(id); g.trailer.board(); untoast();
      const b0 = g.trailer.bump.bind(g.trailer); g.trailer.bump = (c, s) => b0(0, s);
-     for (const nn of g.npcs.all) if (!nn.riding && !nn.hidden) { const q = nn.root.position; if (q.x > -80 && q.x < -15 && q.z > 41 && q.z < 52) q.z = q.z < 46.3 ? 36 + Math.random() * 3 : 55 + Math.random() * 3; if (Math.hypot(q.x + 45, q.z - 46) < 55) { nn.task = null; nn.target = null; nn.wait = 99; } } // nobody walks into the lane
-     g.vehicles.quad.speed = 0; step(40); g.vehicles.quad.speed = 7; window._tr = { o, dir, out: -1 }; g.cam.pitch = 0.13; lock(); zoom(1.4); g.cam.yaw += 0.5;`,
-    `const { o, dir } = _tr; if (_tr.out >= 0 && f > _tr.out + 14) { if (g.vehicles.quad.speed > 1.2) keys('KeyS'); else { keys(); g.vehicles.quad.speed = 0; } } else if (g.vehicles.quad.speed < 8) driveTo(-56, 46.3, false); else keys(); // someone fell out: stop
+     for (const nn of g.npcs.all) if (!nn.riding && !nn.hidden) { const q = nn.root.position; if (q.x > -80 && q.x < -15 && q.z > 37 && q.z < 49) q.z = q.z < 42.8 ? 33 + Math.random() * 3 : 54 + Math.random() * 3; if (Math.hypot(q.x + 45, q.z - 46) < 55) { nn.task = null; nn.target = null; nn.wait = 99; } } // nobody walks into the lane
+     g.vehicles.quad.speed = 0; step(40); g.vehicles.quad.speed = 7; window._tr = { o, dir, out: -1 }; g.cam.pitch = 0.16; lock(); zoom(1.4); g.cam.yaw += 0.5;`,
+    `const { o, dir } = _tr; if (_tr.out >= 0 && f > _tr.out + 14) { if (g.vehicles.quad.speed > 1.2) keys('KeyS'); else { keys(); g.vehicles.quad.speed = 0; } } else if (g.vehicles.quad.speed < 8) driveTo(-56, 42.8, false); else keys(); // someone fell out: stop
      if (f === 3) sayF(g.npcs.get('corni'), 'Fahr los, aber mit Gefühl!', 1.6);
      if (_tr.out < 0 && o.onT) { _tr.out = f; console.log('FALL at ' + f); const r0 = Math.random; Math.random = () => FS; g.trailer.fallOut(g.npcs.get('julez')); Math.random = r0; /* fixed side: away from the camera */ }
-     if (_tr.out >= 0 && f > _tr.out + 16) { const q = g.vehicles.quad.position, F = g.npcs.get('julez').root.position; const want = Math.atan2(q.x - F.x, q.z - F.z) + CO; g.cam.yaw += Math.atan2(Math.sin(want - g.cam.yaw), Math.cos(want - g.cam.yaw)) * 0.07; } // the camera turns to the one who fell out
+     if (f >= 22) { const q = g.vehicles.quad.position, F = g.npcs.get('julez').root.position; const want = Math.atan2(q.x - F.x, q.z - F.z) + CO; g.cam.yaw += Math.atan2(Math.sin(want - g.cam.yaw), Math.cos(want - g.cam.yaw)) * 0.08; }
+     { const slow = _tr.out >= 0 && f >= _tr.out + 17 && f < _tr.out + 17 + 44; g.clock.getDelta = () => (slow ? 1 / 60 : 1 / 30); } // the flight in slow motion // the camera turns to the one who fell out
      if (window.DBG && _tr.out >= 0 && (f - _tr.out) % 8 === 0) console.log('faller ' + f + ' camdist ' + g.npcs.get('julez').root.position.distanceTo(g.camera.position).toFixed(1));
      if (_tr.out >= 0 && f === _tr.out + 30) sayF(g.npcs.get('julez'), 'Hab ich doch gesagt, das hält nicht!', 2.2);`],
   ['RADLADER', 67, 3,

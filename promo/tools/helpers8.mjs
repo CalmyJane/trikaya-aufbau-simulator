@@ -92,7 +92,7 @@ export const HELPERS = `
     g.drama.clearAll(); g.drama.nextT = 1e9; g.soundbox.stop?.(); g.player.root.visible = true; hud(true); bubbles(true); promo('', 0); cjmark(0.85);
     for (const nn of g.npcs.all) { nn.bubble = null; if (nn.party) nn.party = null; if (nn.wait > 50) nn.wait = 0; }
     untoast(); document.getElementById('banner')?.classList.add('hidden');
-    night(0); zoom(1); g.cam.lastMouse = 0;
+    night(0); zoom(1); g.cam.lastMouse = 0; g.clock.getDelta = () => 1 / 30;
     const vs = g.world.vehicleSpots; g.vehicles.quad.place(vs.quad.pos, vs.quad.heading); g.vehicles.radlader.place(vs.radlader.pos, vs.radlader.heading);
     g.bikeSys.reset(); g.scooterSys.reset();
   };

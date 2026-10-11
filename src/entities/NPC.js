@@ -280,6 +280,7 @@ export class NPC {
       if (this.rideSeat) { // a seat on the trailer bench
         q.body.updateMatrixWorld(true);
         this.rideSeat.getWorldPosition(this.root.position);
+        if (this.tipping) { this.runTipping(dt); return; }
       } else {
         const back = new THREE.Vector3(0, 0, -0.62).applyAxisAngle(new THREE.Vector3(0, 1, 0), q.heading);
         this.root.position.set(q.position.x + back.x, q.position.y + 0.55, q.position.z + back.z);
@@ -457,7 +458,48 @@ export class NPC {
     return c.tumble;
   }
 
-  /** Hit by the quad / wheel loader: flies backwards head over heels, bounces, slides, lies there. */
+  /**
+   * Thrown off the trailer bench: wobble with flailing arms and tip over the side wall (`side` = ±1, towards
+   * the own left/right), then `launch()` – which lets go of the seat and calls knock().
+   */
+  tipOut(side, launch, shout) {
+    this.tipping = { t: 0, side, launch };
+    if (shout) this.say(shout, 1.5);
+  }
+
+  runTipping(dt) {
+    const tp = this.tipping, c = this.char;
+    tp.t += dt;
+    const f = Math.min(1, tp.t / 0.6);
+    this.root.rotation.y = this.riding.heading;
+    this.root.position.y += f * f * 0.3; // rising off the bench
+    const tb = this.tumbleRig();
+    tb.rotation.set(0, 0, -tp.side * f * f * 0.85 + Math.sin(tp.t * 28) * 0.07 * (1 - f));
+    c.update(dt);
+    // windmilling arms
+    const w = Math.sin(tp.t * 24) * 0.45;
+    c.armPose = { L: [0.55, 1.75 + w, 0.1], R: [-0.55, 1.75 - w, 0.1] };
+    c.applyArmPose();
+    if (f >= 1) {
+      this.tipping = null;
+      c.armPose = null;
+      tb.rotation.set(0, 0, 0);
+      tp.launch();
+    }
+  }
+
+  stopTipping() {
+    if (!this.tipping) return;
+    this.tipping = null;
+    this.char.armPose = null;
+    this.char.tumble?.rotation.set(0, 0, 0);
+  }
+
+  /**
+   * Hit by the quad / wheel loader: flies backwards head over heels, bounces, slides, lies there.
+   * reaction: { shout, line, karma, oblivious, angry } – plus for falls from a height (trailer):
+   * y0 (start height), minVy (launch at least this hard), flips (somersaults), rx0 (already leaning back this far).
+   */
   knock(dir, speed, reaction) {
     if (this.knocked || this.hidden) return false;
     this.char.setWork(null);
@@ -468,15 +510,17 @@ export class NPC {
     const h = tb.userData.h;
     // turn towards the vehicle, so they fly backwards and flip over backwards
     this.root.rotation.y = Math.atan2(-dir.x, -dir.z);
-    const vy = 3.2 + speed * 0.5, y0 = 0.15;
+    const vy = Math.max(reaction.minVy || 0, 3.2 + speed * 0.5), y0 = reaction.y0 ?? 0.15;
     const lieY = -h + 0.14; // lying on the back: hips just above the ground
     const air = (vy + Math.sqrt(vy * vy + 40 * (y0 - lieY))) / 20; // time until the back hits the ground (g = 20)
-    const flips = speed > 7 ? 1 : 0;
+    const flips = reaction.flips ?? (speed > 7 ? 1 : 0);
     this.knocked = {
       vx: dir.x * speed * 0.9, vz: dir.z * speed * 0.9, vy, y: y0, t: 0, phase: 'fly', air, lieY,
       rx: -(Math.PI / 2 + flips * Math.PI * 2), rz: (Math.random() - 0.5) * 1.4, spin: (Math.random() - 0.5) * 3, bounced: false, reaction,
+      rx0: reaction.rx0 || 0,
     };
-    this.say(reaction.shout, 1.5);
+    tb.rotation.set(this.knocked.rx0, 0, 0);
+    if (reaction.shout) this.say(reaction.shout, 1.5);
     this.char.play('hit', 0.05, { once: true, timeScale: 1.4 });
     const p = this.root.position;
     this.world.spawnDust?.(p, 0.25, { n: 14, size: 0.22, y: p.y + 0.4, life: 0.9 });
@@ -495,7 +539,7 @@ export class NPC {
       k.y += k.vy * dt;
       if (k.phase === 'fly') {
         const f = Math.min(1, k.t / k.air);
-        tb.rotation.x = k.rx * f;
+        tb.rotation.x = k.rx0 + (k.rx - k.rx0) * f;
         tb.rotation.z = k.rz * Math.sin(f * Math.PI);
         this.root.rotation.y += k.spin * dt;
       }

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { getLang, L } from '../i18n.js';
 import { mat, box, cyl } from '../world/Props.js';
 import { heightAt, tiltAt } from '../world/Height.js';
+import { NavGrid } from '../core/NavGrid.js';
 
 // Trailer ride (step type 'trailer'): the quad gets a little trailer, a few people climb in and you drive
 // them somewhere. Yellow cable bridges lie across the way – rattle over them too fast, crash into something
@@ -128,36 +129,88 @@ export class TrailerRide {
     const vs = w.vehicleSpots?.quad;
     const meet = step.meet === 'quad' && vs ? new THREE.Vector3(vs.pos.x, 0, vs.pos.z) : w.spots[step.meet], goal = w.spots[step.at];
     if (!meet || !goal) return;
-    // obstacles: cable bridges spread along the way, across the direction of travel
+    // obstacles: cable bridges spread along the ways you really drive (around fences, stages, whatever
+    // has been built by now), each lying across the direction of travel
     const group = new THREE.Group();
     const obstacles = [];
-    const dir = new THREE.Vector3().subVectors(goal, meet).setY(0);
-    const len = dir.length();
-    dir.normalize();
-    const side = new THREE.Vector3(dir.z, 0, -dir.x);
-    const n = step.obstacles || 7;
-    for (let i = 0; i < n; i++) {
-      const t = 0.14 + (i / (n - 1)) * 0.72;
-      // find a free spot near the line (not inside a tent, a container…)
-      for (let k = 0; k < 8; k++) {
-        const off = (k % 2 ? 1 : -1) * Math.ceil(k / 2) * 3 + Math.sin(i * 2.3) * 3;
-        const pos = meet.clone().addScaledVector(dir, t * len).addScaledVector(side, off);
-        const q = { x: pos.x, z: pos.z };
-        if (w.colliders.resolve(q, 2.0)) continue;
-        const ob = cableBridge();
-        const ang = Math.atan2(dir.x, dir.z) + Math.sin(i * 1.7) * 0.35;
-        ob.position.set(pos.x, heightAt(pos.x, pos.z), pos.z);
-        ob.rotation.y = ang;
-        group.add(ob);
-        obstacles.push({ pos: new THREE.Vector3(pos.x, 0, pos.z), cos: Math.cos(ang), sin: Math.sin(ang), onQ: false, onT: false });
-        break;
+    // aim for the edge of the arrival circle: the goal itself may sit inside a finished structure
+    const edge = goal.clone().add(new THREE.Vector3().subVectors(meet, goal).setY(0).setLength(step.radius || 10));
+    const ways = this.routes(meet, edge);
+    const n = ways.length > 1 ? Math.ceil((step.obstacles || 7) * 0.7) : step.obstacles || 7; // two ways: you only meet the ones on yours
+    ways.forEach((way, wi) => {
+      for (let i = 0; i < n; i++) {
+        const { pos: on, dir } = way.at(0.14 + (i / (n - 1)) * 0.72);
+        const side = new THREE.Vector3(dir.z, 0, -dir.x);
+        // find a free spot on the way (not inside a tent, a container…)
+        for (let k = 0; k < 8; k++) {
+          const off = (k % 2 ? 1 : -1) * Math.ceil(k / 2) * 2.5 + Math.sin((i + wi * 3) * 2.3) * 1.2;
+          const pos = on.clone().addScaledVector(side, off);
+          const q = { x: pos.x, z: pos.z };
+          if (w.colliders.resolve(q, 2.0)) continue;
+          const ob = cableBridge();
+          const ang = Math.atan2(dir.x, dir.z) + Math.sin((i + wi * 3) * 1.7) * 0.35;
+          ob.position.set(pos.x, heightAt(pos.x, pos.z), pos.z);
+          ob.rotation.y = ang;
+          group.add(ob);
+          obstacles.push({ pos: new THREE.Vector3(pos.x, 0, pos.z), cos: Math.cos(ang), sin: Math.sin(ang), onQ: false, onT: false });
+          break;
+        }
       }
-    }
+    });
     w.scene.add(group);
     this.active = { qid, step, meet, goal, group, obstacles, boarded: false, falls: 0, fallen: [], hist: [], busy: false, hinted: false };
     this.cart.root.visible = true;
     this.cart.hitchTo(this.quad);
     this.gather();
+  }
+
+  /**
+   * The ways a quad with a trailer can take from a to b through everything that stands there right now: the
+   * (near enough) shortest one, plus a second one through another gap if that is hardly longer – e.g. through the
+   * festival entrance or through the gap in the fence at the awareness tent.
+   * Each is { length, at(t) → { pos, dir } } for t = 0…1 along the way (a straight line if no way is found).
+   */
+  routes(a, b) {
+    const m = 50, R = 12;
+    // every wall padded to the vehicle's width, so nothing slips through the coarse grid
+    const list = this.game.world.colliders.list.filter((c) => c.tag !== 'vehicle').map((c) => ({ ...c, navPad: 1.3 }));
+    const nav = new NavGrid({ list, version: 0 }, {
+      minX: Math.min(a.x, b.x) - m, maxX: Math.max(a.x, b.x) + m, minZ: Math.min(a.z, b.z) - m, maxZ: Math.max(a.z, b.z) + m,
+    }, 1, 1.3);
+    const way = (path) => {
+      const pts = [new THREE.Vector3(a.x, 0, a.z)];
+      for (const p of path || [b]) pts.push(new THREE.Vector3(p.x, 0, p.z));
+      const cum = [0];
+      for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + pts[i].distanceTo(pts[i - 1]));
+      const total = cum[cum.length - 1] || 1;
+      return {
+        length: total,
+        at(t) {
+          const s = t * total;
+          let i = 1;
+          while (i < pts.length - 1 && cum[i] < s) i++;
+          const seg = cum[i] - cum[i - 1] || 1;
+          const dir = new THREE.Vector3().subVectors(pts[i], pts[i - 1]).normalize();
+          return { pos: pts[i - 1].clone().lerp(pts[i], (s - cum[i - 1]) / seg), dir };
+        },
+      };
+    };
+    const first = nav.findPath(a, b, 1e6, 1.1);
+    const out = [way(first)];
+    if (!first) return out;
+    // close the middle of that way and look for another one
+    for (let t = 0.25; t <= 0.75; t += 3 / out[0].length) {
+      const p = out[0].at(t).pos, ci = nav.ix(p.x), cj = nav.iz(p.z);
+      for (let dj = -R; dj <= R; dj++) {
+        for (let di = -R; di <= R; di++) if (di * di + dj * dj <= R * R && nav.inside(ci + di, cj + dj)) nav.blocked[(cj + dj) * nav.w + ci + di] = 1;
+      }
+    }
+    const second = nav.findPath(a, b, 1e6, 1.1);
+    if (second) {
+      const w2 = way(second);
+      if (w2.length < out[0].length * 1.25) out.push(w2);
+    }
+    return out;
   }
 
   stop() {
@@ -191,6 +244,7 @@ export class TrailerRide {
   }
 
   unseat(n, offset = 1.4) {
+    n.stopTipping();
     n.riding = null;
     n.rideSeat = null;
     n.char.setSitting(false);
@@ -294,7 +348,7 @@ export class TrailerRide {
     this.cart.jolt(strength);
     g.cam.shake = Math.max(g.cam.shake || 0, Math.min(0.3, 0.05 + strength * 0.02));
     g.audio.tone?.(110, 0.08, { type: 'square', vol: 0.06 });
-    const riders = this.people().filter((n) => n.riding === this.cart);
+    const riders = this.people().filter((n) => n.riding === this.cart && !n.tipping);
     if (!riders.length) return;
     if (Math.random() < chance) this.fallOut(riders[Math.floor(Math.random() * riders.length)]);
     else if (strength > 3 && Math.random() < 0.5) {
@@ -303,17 +357,25 @@ export class TrailerRide {
     }
   }
 
+  /** One of them goes overboard: wobbles on the bench, tips over the side wall, somersaults into the grass. */
   fallOut(n) {
     const a = this.active, g = this.game;
     const de = getLang() === 'de';
-    n.riding = null;
-    n.rideSeat = null;
-    n.char.setSitting(false);
-    const h = this.cart.heading, s = Math.random() < 0.5 ? 1 : -1;
-    const dir = new THREE.Vector3(Math.cos(h) * s, 0, -Math.sin(h) * s).addScaledVector(new THREE.Vector3(Math.sin(h), 0, Math.cos(h)), -0.6).normalize();
-    n.root.position.set(this.cart.position.x + dir.x * 0.6, 0, this.cart.position.z + dir.z * 0.6);
-    const line = a.step.fallLines?.[n.def.id] || pickL(FALL_LINES);
-    n.knock(dir, Math.max(3, Math.abs(this.quad.speed) * 0.6), { karma: 0, shout: { de: 'WAAAH!', en: 'WAAAH!' }, line });
+    const s = Math.random() < 0.5 ? 1 : -1;
+    n.tipOut(s, () => {
+      const seatY = n.root.position.y;
+      n.riding = null;
+      n.rideSeat = null;
+      n.char.setSitting(false);
+      const h = this.cart.heading;
+      const dir = new THREE.Vector3(Math.cos(h) * s, 0, -Math.sin(h) * s).addScaledVector(new THREE.Vector3(Math.sin(h), 0, Math.cos(h)), -0.6).normalize();
+      const p = n.root.position;
+      p.set(this.cart.position.x + dir.x * 0.6, 0, this.cart.position.z + dir.z * 0.6);
+      const line = a.step.fallLines?.[n.def.id] || pickL(FALL_LINES);
+      n.knock(dir, Math.max(3, Math.abs(this.quad.speed) * 0.6), { karma: 0, angry: true, line, y0: Math.max(0.3, seatY - heightAt(p.x, p.z)), minVy: 6.5, flips: 1, rx0: -0.85 });
+      g.audio.noise?.(0.1, { vol: 0.35, freq: 260 });
+    }, { de: 'WAAAH!', en: 'WAAAH!' });
+    g.audio.tone?.(520, 0.5, { type: 'sawtooth', vol: 0.07, slide: -0.6 });
     a.falls++;
     a.fallen.push(n.def.id);
     const max = a.step.maxFalls || 2;

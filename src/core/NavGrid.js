@@ -120,8 +120,11 @@ export class NavGrid {
     return true;
   }
 
-  /** A* from a to b. Returns [{x,z}, …] (smoothed, ending exactly at b) or null. */
-  findPath(a, b, maxExpand = 90000) {
+  /**
+   * A* from a to b. Returns [{x,z}, …] (smoothed, ending exactly at b) or null.
+   * greedy: heuristic weight – 1.4 is much faster with paths that are still fine, 1 gives the really shortest way.
+   */
+  findPath(a, b, maxExpand = 90000, greedy = 1.4) {
     this.ensure();
     const { w } = this;
     const s = this.nearestFree(this.ix(a.x), this.iz(a.z));
@@ -155,7 +158,7 @@ export class NavGrid {
       heap[k] = ln; heapF[k] = lf;
       return top;
     };
-    const hEst = (i, j) => { const dx = Math.abs(i - gi), dz = Math.abs(j - gj); return (dx + dz + (SQ2 - 2) * Math.min(dx, dz)) * 1.4; }; // slightly greedy: much faster, paths still fine
+    const hEst = (i, j) => { const dx = Math.abs(i - gi), dz = Math.abs(j - gj); return (dx + dz + (SQ2 - 2) * Math.min(dx, dz)) * greedy; };
     g[s] = 0; stamp[s] = id; parent[s] = -1;
     push(s, hEst(s % w, (s / w) | 0));
     let found = false, expanded = 0;

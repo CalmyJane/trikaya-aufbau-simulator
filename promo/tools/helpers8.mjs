@@ -79,7 +79,7 @@ export const HELPERS = `
   const ZB = innerHeight > innerWidth ? 0.7 : 1; window._zoom = ZB; window.zoom = (z) => { window._zoom = z * ZB; }; const eu0 = g.effects.update.bind(g.effects); g.effects.update = (dt) => { eu0(dt); if (_zoom !== 1) { g.camera.fov /= _zoom; g.camera.updateProjectionMatrix(); } };
   // keep the camera where the shot put it (no swinging behind the vehicle, no pitch reset)
   window.lock = () => { g.cam.lastMouse = performance.now() + 1e7; };
-  window.QD = 20.7; // QUAD: metres between quad and Danny at the cut (tuned so the hit lands on frame 44)
+  window.QD = 15.9; window.QY = 0.55; // QUAD: metres between quad and Danny at the cut (tuned so the hit lands on frame 44)
   window.night = (v) => { g.world.night = v; g.world.setNight(v, .1); };
   window.aerial = (x, z) => { hud(false); bubbles(false); g.player.root.position.set(x, 0, z); g.player.root.visible = false; };
   window.reset = async () => {

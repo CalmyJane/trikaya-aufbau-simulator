@@ -112,6 +112,16 @@ export class Audio {
     [523, 659, 784, 1046, 784, 1046, 1318].forEach((f, i) => this.tone(f, 0.25, { type: 'square', delay: i * 0.1, vol: 0.08 }));
     [261, 329, 392].forEach((f) => this.tone(f, 1.0, { type: 'sine', delay: 0.6, vol: 0.12 }));
   }
+  /** Chicken: a few short "bok"s, sometimes with a long "bo-gaak" at the end. vol 0..1 (distance). */
+  cluck(vol = 1) {
+    const n = 2 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < n; i++) this.tone(430 + Math.random() * 110, 0.07, { type: 'sawtooth', vol: 0.045 * vol, delay: i * 0.15, slide: 1.45 });
+    if (Math.random() < 0.3) this.tone(520, 0.28, { type: 'sawtooth', vol: 0.05 * vol, delay: n * 0.15 + 0.03, slide: 1.7 });
+  }
+  meow(vol = 1, pitch = 1) {
+    this.tone(520 * pitch, 0.12, { type: 'triangle', vol: 0.07 * vol, slide: 1.45 });
+    this.tone(760 * pitch, 0.42, { type: 'triangle', vol: 0.08 * vol, delay: 0.11, slide: 0.62 });
+  }
   step() { this.noise(0.05, { vol: 0.05, freq: 400 + Math.random() * 200 }); }
 
   startAmbience() {

@@ -22,7 +22,7 @@ export class World {
     this.colliders = new Colliders();
     this.nav = new NavGrid(this.colliders, { minX: -232, maxX: 232, minZ: -232, maxZ: 232 });
     this.spots = {};          // named positions used by quests / NPCs
-    this.animated = [];       // (time, dt) => void
+    this.animated = [];       // (time, dt, playerPos) => void
     this.interiors = [];      // { contains(p), hide: [objects] }
     this.structures = {};     // id -> { object, colliders, type }
     this.plotMarkers = {};    // plotId -> marker object
@@ -867,7 +867,7 @@ export class World {
       this.applyNight(this.night, playerPos);
       this._wasNight = this.night > 0.001 || this.rain > 0.001;
     }
-    for (const f of this.animated) f(time, dt);
+    for (const f of this.animated) f(time, dt, playerPos);
     // Harry's 3D mapping runs whenever it's dark
     const deco = this.structures.mapping_deco?.object.userData.mapping;
     if (deco) {

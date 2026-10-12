@@ -111,19 +111,81 @@ export function buildCrewBase(world) {
   // storage cabins (closed): Künstlergasse & Hühnercontainer – things lie in front of them
   buildStorage(base, addBoxCollider, addSpot, { id: 'kuenstler', x: -15.5, z: -18, rot: 0, label: 'KÜNSTLERGASSE', frame: '#c9b02a' });
   buildStorage(base, addBoxCollider, addSpot, { id: 'huehner', x: -2.5, z: -19, rot: 0.15, label: 'HÜHNERCONTAINER', frame: '#3040b0' });
-  // a few chickens in front of the Hühnercontainer (of course)
+  // animals of the base: they walk in base-local coordinates and turn around at anything solid
+  const rc = Math.cos(CREW_BASE.rotation), rs = Math.sin(CREW_BASE.rotation);
+  const free = (x, z, m = 0.2) => Math.abs(x) < HW - 2 && Math.abs(z) < HD - 2 && !colliders.hits(c.x + x * rc + z * rs, c.z - x * rs + z * rc, m);
+  const distTo = (o, p) => (p ? Math.hypot(c.x + o.position.x * rc + o.position.z * rs - p.x, c.z - o.position.x * rs + o.position.z * rc - p.z) : 1e9);
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const nearby = (p, r0, r1) => {
+    for (let k = 0; k < 8; k++) {
+      const a = rand(0, 6.28), r = rand(r0, r1), x = p.x + Math.cos(a) * r, z = p.z + Math.sin(a) * r;
+      if (free(x, z, 0.3)) return [[x, z]];
+    }
+    return [];
+  };
+
+  // chickens: they start in front of the Hühnercontainer (of course) and wander all over the base
   const chickens = [];
   for (let i = 0; i < 4; i++) {
     const ch = chicken();
     ch.position.set(-5 + i * 1.3, 0, -15.4 + (i % 2) * 0.8);
     ch.rotation.y = i * 1.7;
     base.add(ch);
-    chickens.push(ch);
+    const s = roamer(ch, { speed: 0.9, free, next: () => nearby(ch.position, 2, 8), pause: () => rand(1, 6) });
+    s.voice = rand(1, 6);
+    chickens.push(s);
   }
-  world.animated.push((t) => chickens.forEach((ch, i) => {
-    ch.userData.head.rotation.x = Math.max(0, Math.sin(t * 3 + i * 2)) * 0.9; // pecking
-    ch.rotation.y += Math.sin(t * 0.4 + i) * 0.004;
-  }));
+
+  // Blacky & Flocky: the two workshop cats – they nap in the Werkstatt and stroll around the crew camp
+  const WS_IN = [[-12.3, 11.9], [-13.6, 10.0], [-11.9, 9.0], [-14.0, 12.5]], WS_DOOR_IN = [-11.9, 8.6, 1], WS_DOOR_OUT = [-11.9, 5.4];
+  const inWorkshop = (p) => p.z > 7.1 && p.z < 14.3 && p.x > -16.1 && p.x < -7.7;
+  const cats = [['blacky', '#17161a', '#e8c93a', 0.85], ['flocky', '#e6c46e', '#5aa84a', 1.15]].map(([name, fur, eyes, pitch], i) => {
+    const ct = cat(fur, eyes);
+    ct.name = name;
+    ct.position.set(WS_IN[i][0], 0, WS_IN[i][1]);
+    base.add(ct);
+    const s = roamer(ct, {
+      speed: 1.3, free,
+      next: () => {
+        const p = ct.position, spot = WS_IN[Math.floor(Math.random() * WS_IN.length)];
+        if (inWorkshop(p)) return Math.random() < 0.45 ? [[...spot, 1]] : [WS_DOOR_IN, [...WS_DOOR_OUT, 1]];
+        if (Math.random() < 0.45) return [WS_DOOR_OUT, WS_DOOR_IN, [...spot, 1]]; // back home (if the way is clear)
+        return nearby(p, 3, 11);
+      },
+      pause: () => (inWorkshop(ct.position) ? rand(6, 20) : rand(1, 6)),
+    });
+    s.voice = rand(4, 12); s.pitch = pitch;
+    return s;
+  });
+
+  world.animated.push((t, dt, playerPos) => {
+    chickens.forEach((s, i) => {
+      const ch = s.obj;
+      s.update(dt);
+      ch.userData.head.rotation.x = s.moving ? Math.sin(t * 9 + i) * 0.15 : Math.max(0, Math.sin(t * 3 + i * 2)) * 0.9; // pecking
+      ch.position.y = s.moving ? Math.abs(Math.sin(t * 9 + i)) * 0.025 : 0;
+      if ((s.voice -= dt) <= 0) {
+        s.voice = rand(2.5, 9);
+        const d = distTo(ch, playerPos);
+        if (d < 11) world.audio?.cluck(1 - d / 11);
+      }
+    });
+    cats.forEach((s, i) => {
+      const ct = s.obj, u = ct.userData;
+      s.update(dt);
+      const nap = !s.moving && s.wait > 3; // curled up
+      u.legs.forEach((l, k) => { l.visible = !nap; l.rotation.x = s.moving ? Math.sin(t * 11 + (k % 3 ? Math.PI : 0)) * 0.6 : 0; });
+      ct.position.y = nap ? -0.09 : 0;
+      u.head.position.y = nap ? 0.2 : 0.27;
+      u.tail.rotation.x = nap ? -1.4 : -0.5;
+      u.tail.rotation.z = Math.sin(t * (nap ? 0.8 : 2.2) + i * 2) * (nap ? 0.15 : 0.35);
+      if ((s.voice -= dt) <= 0) {
+        s.voice = rand(7, 20);
+        const d = distTo(ct, playerPos);
+        if (d < 6) world.audio?.meow(1 - d / 8, s.pitch);
+      }
+    });
+  });
 
   // walk-in cabins: Matze's (volunteers hang out), Corni's (Mahdi listens to music), the workshop
   buildCabin(base, world, addBoxCollider, addSpot, {
@@ -1017,6 +1079,66 @@ function chicken() {
   for (const x of [-0.05, 0.05]) g.add(box(0.02, 0.16, 0.02, mat('#e8a020'), x, 0.08, 0));
   g.userData.head = head;
   return g;
+}
+
+/** Small cat, head towards +z. userData: head, tail (pivot), legs. */
+function cat(fur, eyes) {
+  const g = new THREE.Group();
+  const m = mat(fur, { roughness: 0.95 });
+  const body = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), m);
+  body.scale.set(1, 0.9, 2.3);
+  body.position.y = 0.2;
+  body.castShadow = true;
+  g.add(body);
+  const head = new THREE.Group();
+  head.position.set(0, 0.27, 0.25);
+  head.add(new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 6), m));
+  for (const x of [-0.045, 0.045]) {
+    const ear = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.065, 4), m);
+    ear.position.set(x, 0.085, 0);
+    head.add(ear);
+    head.add(box(0.022, 0.022, 0.01, new THREE.MeshBasicMaterial({ color: eyes }), x * 0.75, 0.015, 0.074));
+  }
+  head.add(box(0.018, 0.014, 0.01, mat('#d98a8a'), 0, -0.015, 0.08)); // nose
+  g.add(head);
+  const legs = [];
+  for (const x of [-0.055, 0.055]) for (const z of [-0.15, 0.15]) {
+    const l = box(0.035, 0.14, 0.035, m, x, 0.07, z);
+    g.add(l);
+    legs.push(l);
+  }
+  const tail = new THREE.Group();
+  tail.position.set(0, 0.23, -0.21);
+  tail.add(cyl(0.014, 0.02, 0.3, m, 5, 0, 0.15, 0));
+  tail.rotation.x = -0.5;
+  g.add(tail);
+  Object.assign(g.userData, { head, tail, legs });
+  return g;
+}
+
+/**
+ * Little wanderer for animals: walks waypoint lists [x, z, open?] in base-local coordinates, pauses in between.
+ * Legs that are not marked open are abandoned as soon as free(x, z) says no (the animal then picks something new).
+ */
+function roamer(obj, { speed, free, next, pause }) {
+  const s = { obj, path: [], wait: Math.random() * 3, moving: false };
+  s.update = (dt) => {
+    s.moving = false;
+    if (!s.path.length) {
+      if ((s.wait -= dt) > 0) return;
+      s.path = next();
+      if (!s.path.length) { s.wait = 0.5; return; }
+    }
+    const [tx, tz, open] = s.path[0];
+    const p = obj.position, dx = tx - p.x, dz = tz - p.z, d = Math.hypot(dx, dz);
+    if (d < 0.12) { s.path.shift(); if (!s.path.length) s.wait = pause(); return; }
+    const step = Math.min(d, speed * dt), nx = p.x + (dx / d) * step, nz = p.z + (dz / d) * step;
+    if (!open && !free(nx, nz)) { s.path = []; s.wait = 0.4; return; }
+    p.x = nx; p.z = nz; s.moving = true;
+    const da = Math.atan2(dx, dz) - obj.rotation.y;
+    obj.rotation.y += Math.atan2(Math.sin(da), Math.cos(da)) * Math.min(1, dt * 8);
+  };
+  return s;
 }
 
 let noSpeakerTex;

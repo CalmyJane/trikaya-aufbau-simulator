@@ -94,6 +94,7 @@ export class Game {
   /** Build everything after assets are loaded. */
   async init(breathe = async () => {}) {
     this.world = new World(this.scene);
+    this.world.audio = this.audio; // animals make noises when the player is close
     await this.world.build(breathe);
     if (this.input.touch) this.world.sun.shadow.mapSize.set(1024, 1024);
     this.player = new Player(this.world, this.input);

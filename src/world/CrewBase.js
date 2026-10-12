@@ -136,11 +136,13 @@ export function buildCrewBase(world) {
     chickens.push(s);
   }
 
-  // Blacky & Flocky: the two workshop cats – they nap in the Werkstatt and stroll around the crew camp
+  // Blacky & Flocke: the two workshop cats – they nap in the Werkstatt and stroll around the crew camp.
+  // Flocke (grey back, white belly) is trusting and comes over to the player, Blacky is shy and bolts.
+  let pl = null; // player in base-local coordinates
   const WS_IN = [[-12.3, 11.9], [-13.6, 10.0], [-11.9, 9.0], [-14.0, 12.5]], WS_DOOR_IN = [-11.9, 8.6, 1], WS_DOOR_OUT = [-11.9, 5.4];
   const inWorkshop = (p) => p.z > 7.1 && p.z < 14.3 && p.x > -16.1 && p.x < -7.7;
-  const cats = [['blacky', '#17161a', '#e8c93a', 0.85], ['flocky', '#e6c46e', '#5aa84a', 1.15]].map(([name, fur, eyes, pitch], i) => {
-    const ct = cat(fur, eyes);
+  const cats = [['blacky', '#17161a', '#e8c93a', 0.85], ['flocke', '#8a8d92', '#5aa84a', 1.15, '#f4f2ec']].map(([name, fur, eyes, pitch, belly], i) => {
+    const ct = cat(fur, eyes, belly);
     ct.name = name;
     ct.position.set(WS_IN[i][0], 0, WS_IN[i][1]);
     base.add(ct);
@@ -148,17 +150,27 @@ export function buildCrewBase(world) {
       speed: 1.3, free,
       next: () => {
         const p = ct.position, spot = WS_IN[Math.floor(Math.random() * WS_IN.length)];
+        if (name === 'flocke' && pl && Math.random() < 0.85) { // says hello and stays around
+          const dx = p.x - pl.x, dz = p.z - pl.z, d = Math.hypot(dx, dz);
+          if (d < 22 && inWorkshop(p) && !inWorkshop(pl)) return [WS_DOOR_IN, [...WS_DOOR_OUT, 1]];
+          if (d <= 1.3) return [];
+          if (d < 22 && inWorkshop(p) === inWorkshop(pl)) return [[pl.x + (dx / d) * 0.9, pl.z + (dz / d) * 0.9]];
+        }
         if (inWorkshop(p)) return Math.random() < 0.45 ? [[...spot, 1]] : [WS_DOOR_IN, [...WS_DOOR_OUT, 1]];
         if (Math.random() < 0.45) return [WS_DOOR_OUT, WS_DOOR_IN, [...spot, 1]]; // back home (if the way is clear)
         return nearby(p, 3, 11);
       },
       pause: () => (inWorkshop(ct.position) ? rand(6, 20) : rand(1, 6)),
     });
-    s.voice = rand(4, 12); s.pitch = pitch;
+    s.voice = rand(4, 12); s.pitch = pitch; s.shy = name === 'blacky';
     return s;
   });
 
   world.animated.push((t, dt, playerPos) => {
+    if (playerPos) {
+      const dx = playerPos.x - c.x, dz = playerPos.z - c.z;
+      pl = { x: dx * rc - dz * rs, z: dx * rs + dz * rc };
+    }
     chickens.forEach((s, i) => {
       const ch = s.obj;
       s.update(dt);
@@ -172,6 +184,19 @@ export function buildCrewBase(world) {
     });
     cats.forEach((s, i) => {
       const ct = s.obj, u = ct.userData;
+      if (s.flee && !s.path.length) { s.flee = false; s.speed = 1.3; }
+      if (s.shy && pl && !s.flee) { // too close: Blacky runs off
+        const p = ct.position, dx = p.x - pl.x, dz = p.z - pl.z, d = Math.hypot(dx, dz);
+        if (d < 4.5) {
+          let path = [];
+          if (inWorkshop(p)) path = inWorkshop(pl) ? [WS_DOOR_IN, [...WS_DOOR_OUT, 1]] : [];
+          else for (let k = 0; k < 8 && !path.length; k++) {
+            const a = Math.atan2(dz, dx) + rand(-0.9, 0.9), r = rand(6, 10), x = p.x + Math.cos(a) * r, z = p.z + Math.sin(a) * r;
+            if (free(x, z, 0.3)) path = [[x, z]];
+          }
+          if (path.length) { s.path = path; s.flee = true; s.speed = 3.4; s.wait = rand(2, 5); }
+        }
+      }
       s.update(dt);
       const nap = !s.moving && s.wait > 3; // curled up
       u.legs.forEach((l, k) => { l.visible = !nap; l.rotation.x = s.moving ? Math.sin(t * 11 + (k % 3 ? Math.PI : 0)) * 0.6 : 0; });
@@ -180,7 +205,7 @@ export function buildCrewBase(world) {
       u.tail.rotation.x = nap ? -1.4 : -0.5;
       u.tail.rotation.z = Math.sin(t * (nap ? 0.8 : 2.2) + i * 2) * (nap ? 0.15 : 0.35);
       if ((s.voice -= dt) <= 0) {
-        s.voice = rand(7, 20);
+        s.voice = s.shy ? rand(15, 40) : rand(4, 12);
         const d = distTo(ct, playerPos);
         if (d < 6) world.audio?.meow(1 - d / 8, s.pitch);
       }
@@ -1082,7 +1107,7 @@ function chicken() {
 }
 
 /** Small cat, head towards +z. userData: head, tail (pivot), legs. */
-function cat(fur, eyes) {
+function cat(fur, eyes, belly = fur) {
   const g = new THREE.Group();
   const m = mat(fur, { roughness: 0.95 });
   const body = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), m);
@@ -1090,8 +1115,16 @@ function cat(fur, eyes) {
   body.position.y = 0.2;
   body.castShadow = true;
   g.add(body);
+  const mb = belly === fur ? m : mat(belly, { roughness: 0.95 });
+  if (mb !== m) {
+    const under = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), mb);
+    under.scale.set(0.9, 0.8, 2.2);
+    under.position.y = 0.175;
+    g.add(under);
+  }
   const head = new THREE.Group();
   head.position.set(0, 0.27, 0.25);
+  if (mb !== m) head.add(box(0.07, 0.05, 0.03, mb, 0, -0.035, 0.062)); // white muzzle
   head.add(new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 6), m));
   for (const x of [-0.045, 0.045]) {
     const ear = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.065, 4), m);
@@ -1103,7 +1136,7 @@ function cat(fur, eyes) {
   g.add(head);
   const legs = [];
   for (const x of [-0.055, 0.055]) for (const z of [-0.15, 0.15]) {
-    const l = box(0.035, 0.14, 0.035, m, x, 0.07, z);
+    const l = box(0.035, 0.14, 0.035, mb, x, 0.07, z);
     g.add(l);
     legs.push(l);
   }
@@ -1121,7 +1154,7 @@ function cat(fur, eyes) {
  * Legs that are not marked open are abandoned as soon as free(x, z) says no (the animal then picks something new).
  */
 function roamer(obj, { speed, free, next, pause }) {
-  const s = { obj, path: [], wait: Math.random() * 3, moving: false };
+  const s = { obj, speed, path: [], wait: Math.random() * 3, moving: false };
   s.update = (dt) => {
     s.moving = false;
     if (!s.path.length) {
@@ -1132,7 +1165,7 @@ function roamer(obj, { speed, free, next, pause }) {
     const [tx, tz, open] = s.path[0];
     const p = obj.position, dx = tx - p.x, dz = tz - p.z, d = Math.hypot(dx, dz);
     if (d < 0.12) { s.path.shift(); if (!s.path.length) s.wait = pause(); return; }
-    const step = Math.min(d, speed * dt), nx = p.x + (dx / d) * step, nz = p.z + (dz / d) * step;
+    const step = Math.min(d, s.speed * dt), nx = p.x + (dx / d) * step, nz = p.z + (dz / d) * step;
     if (!open && !free(nx, nz)) { s.path = []; s.wait = 0.4; return; }
     p.x = nx; p.z = nz; s.moving = true;
     const da = Math.atan2(dx, dz) - obj.rotation.y;

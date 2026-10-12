@@ -566,7 +566,11 @@ body.touch .pmap canvas, .pmap.small canvas { width: 120px; height: 120px; }
 
 /* ---------- phone polish ---------- */
 /* the prompt sits over the joystick area: only a label, the big E button does the action */
-body.touch #prompt { pointer-events: none; }
+body.touch #prompt { pointer-events: none; bottom: calc(6px + env(safe-area-inset-bottom)); font-size: 12px; padding: 3px 10px; border-radius: 9px; max-width: 44vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.9; }
+body.touch #prompt .kbd { margin-right: 5px; padding: 0 5px; font-size: 11px; }
+/* stamina + progress bar follow it down, stacked just above the label */
+body.touch #stamina { bottom: calc(36px + env(safe-area-inset-bottom)); }
+body.touch #progress { bottom: calc(46px + env(safe-area-inset-bottom)); width: 44vw; }
 /* smaller speech bubbles so they don't bury the HUD */
 body.touch .bubble { font-size: 12px; max-width: 170px; padding: 4px 9px; border-radius: 12px; }
 body.touch .bubble .bn { font-size: 10px; }

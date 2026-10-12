@@ -165,6 +165,7 @@ export function buildCrewBase(world) {
     s.voice = rand(4, 12); s.pitch = pitch; s.shy = name === 'blacky';
     return s;
   });
+  world.animals = [...chickens, ...cats]; // Dotti comes over to play with them
 
   world.animated.push((t, dt, playerPos) => {
     if (playerPos) {

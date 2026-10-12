@@ -118,6 +118,14 @@ export class Audio {
     for (let i = 0; i < n; i++) this.tone(430 + Math.random() * 110, 0.07, { type: 'sawtooth', vol: 0.045 * vol, delay: i * 0.15, slide: 1.45 });
     if (Math.random() < 0.3) this.tone(520, 0.28, { type: 'sawtooth', vol: 0.05 * vol, delay: n * 0.15 + 0.03, slide: 1.7 });
   }
+  /** Small dog: two or three high yips. */
+  bark(vol = 1) {
+    const n = 1 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < n; i++) {
+      this.tone(780 + Math.random() * 80, 0.09, { type: 'square', vol: 0.05 * vol, delay: i * 0.2, slide: 0.55 });
+      this.noise(0.05, { vol: 0.08 * vol, freq: 1900, delay: i * 0.2 });
+    }
+  }
   meow(vol = 1, pitch = 1) {
     this.tone(520 * pitch, 0.12, { type: 'triangle', vol: 0.07 * vol, slide: 1.45 });
     this.tone(760 * pitch, 0.42, { type: 'triangle', vol: 0.08 * vol, delay: 0.11, slide: 0.62 });

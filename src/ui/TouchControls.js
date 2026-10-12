@@ -2,7 +2,7 @@ import { t } from '../i18n.js';
 
 // On-screen controls for phones/tablets:
 //  - left half: floating joystick (walk / drive; push to the edge = sprint)
-//  - right half: drag to look, pinch to zoom
+//  - right half: drag to look, pinch to zoom (sides swap with the swapSides setting → body.swap)
 //  - buttons: action (E), jump (Space), sprint toggle; top bar: map, jobs, menu
 // Everything is fed into the normal Input object, so game code doesn't care about touch.
 
@@ -92,8 +92,10 @@ export class TouchControls {
 
   down(e) {
     e.preventDefault();
-    const leftSide = e.clientX < window.innerWidth * 0.42;
-    if (leftSide && !this.stick) {
+    // joystick half: left by default, right when the sides are swapped in the settings
+    const swap = this.game.settings.swapSides;
+    const stickSide = swap ? e.clientX > window.innerWidth * 0.58 : e.clientX < window.innerWidth * 0.42;
+    if (stickSide && !this.stick) {
       this.stick = { id: e.pointerId, ox: e.clientX, oy: e.clientY };
       this.stickEl.style.display = 'block';
       this.stickEl.style.left = `${e.clientX}px`;

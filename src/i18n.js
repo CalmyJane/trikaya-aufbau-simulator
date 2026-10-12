@@ -159,6 +159,9 @@ const STRINGS = {
   's.lang': { de: 'Sprache', en: 'Language' },
   's.sens': { de: 'Mausempfindlichkeit', en: 'Mouse sensitivity' },
   's.invert': { de: 'Maus-Y invertieren', en: 'Invert mouse Y' },
+  's.side': { de: 'Steuerung (Joystick)', en: 'Controls (joystick)' },
+  's.sideL': { de: 'Links', en: 'Left' },
+  's.sideR': { de: 'Rechts', en: 'Right' },
   's.follow': { de: 'Kamera folgt automatisch', en: 'Camera auto-follow' },
   's.volume': { de: 'Lautstärke', en: 'Volume' },
 };

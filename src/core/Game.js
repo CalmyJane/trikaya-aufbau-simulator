@@ -71,6 +71,7 @@ export class Game {
     applyDom();
     if (this.input.touch) {
       this.touch = new TouchControls(this.input, this);
+      document.body.classList.toggle('swap', !!this.settings.swapSides);
     }
 
     window.addEventListener('resize', () => {
@@ -83,7 +84,7 @@ export class Game {
 
   // ------------------------------------------------------------------ settings
   loadSettings() {
-    const def = { sensitivity: 1, invertY: false, autoFollow: true, volume: 0.5, muted: false };
+    const def = { sensitivity: 1, invertY: false, autoFollow: true, volume: 0.5, muted: false, swapSides: false };
     try { return { ...def, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}') }; } catch { return def; }
   }
 
@@ -364,6 +365,8 @@ export class Game {
         <tr><td>${t('s.sens')}</td><td><input id="set-sens" type="range" min="0.3" max="2.5" step="0.1" value="${s.sensitivity}"></td></tr>
         <tr><td>${t('s.invert')}</td><td><input id="set-invert" type="checkbox" ${s.invertY ? 'checked' : ''}></td></tr>
         <tr><td>${t('s.follow')}</td><td><input id="set-follow" type="checkbox" ${s.autoFollow ? 'checked' : ''}></td></tr>
+        ${this.input.touch ? `<tr><td>${t('s.side')}</td><td>
+          <select id="set-side" class="sel"><option value="l" ${s.swapSides ? '' : 'selected'}>${t('s.sideL')}</option><option value="r" ${s.swapSides ? 'selected' : ''}>${t('s.sideR')}</option></select></td></tr>` : ''}
         <tr><td>${t('s.volume')}</td><td><input id="set-vol" type="range" min="0" max="1" step="0.05" value="${s.volume}"></td></tr>
       </table>`;
   }
@@ -375,6 +378,7 @@ export class Game {
     $('set-sens').oninput = (e) => { this.settings.sensitivity = +e.target.value; this.saveSettings(); };
     $('set-invert').onchange = (e) => { this.settings.invertY = e.target.checked; this.saveSettings(); };
     $('set-follow').onchange = (e) => { this.settings.autoFollow = e.target.checked; this.saveSettings(); };
+    if ($('set-side')) $('set-side').onchange = (e) => { this.settings.swapSides = e.target.value === 'r'; document.body.classList.toggle('swap', this.settings.swapSides); this.touch?.reset(); this.saveSettings(); };
     $('set-vol').oninput = (e) => { this.settings.volume = +e.target.value; this.saveSettings(); };
   }
 

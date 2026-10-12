@@ -609,3 +609,18 @@ body:not(.touch) #toasts { top: 62px; }
 #minigame .mg-pumpbtn { width: 84px; height: 60px; }
 #minigame .mg-panel.splash { animation: mgShake 0.4s; background: rgba(90, 60, 20, 0.95); }
 @media (max-height: 520px) { #minigame .mg-crown { width: 130px; height: 130px; } #minigame .mg-gauge, #minigame .mg-tank { height: 90px; } }
+
+/* ---------- phones: sides swapped (settings → joystick right) – buttons and HUD mirror ---------- */
+body.touch.swap #t-act { right: auto; left: calc(22px + env(safe-area-inset-left)); }
+body.touch.swap #t-jump { right: auto; left: calc(118px + env(safe-area-inset-left)); }
+body.touch.swap #t-sprint { right: auto; left: calc(38px + env(safe-area-inset-left)); }
+body.touch.swap #t-horn { right: auto; left: calc(108px + env(safe-area-inset-left)); }
+body.touch.swap #stats { left: auto; right: calc(8px + env(safe-area-inset-right)); }
+body.touch.swap #minimap { left: auto; right: calc(6px + env(safe-area-inset-right)); }
+body.touch.swap #tracker { right: auto; left: calc(8px + env(safe-area-inset-left)); }
+body.touch.swap #inventory { right: auto; left: calc(8px + env(safe-area-inset-left)); }
+body.touch.swap #money-floats { left: auto; right: 128px; align-items: flex-end; }
+body.touch.swap #toasts { left: calc(min(250px, 46vw) + 16px + (100vw - 168px - min(250px, 46vw) - 16px) / 2); }
+@media (orientation: portrait) {
+  body.touch.swap #toasts { left: auto; right: 8px; align-items: flex-end; }
+}

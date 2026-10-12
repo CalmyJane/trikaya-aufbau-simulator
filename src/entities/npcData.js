@@ -846,6 +846,23 @@ export const NPCS = [
       { de: 'Ich hoffe, ich mach alles richtig. Sag Bescheid, wenn nicht, ja? Ich geb mir wirklich Mühe!', en: 'I hope I\'m doing everything right. Tell me if not, okay? I\'m really trying!' },
     ],
   },
+  {
+    id: 'kobold', name: 'Kobold', role: { de: 'Schabernack & gute Laune', en: 'Mischief & good vibes' }, portrait: '🍀',
+    // Marco: small, long hair, green beard – always in a great mood, a cheeky little goblin
+    look: { base: 'm_casual', skin: SKIN.fair, hair: '#6a4a2a', brows: '#5a3e22', hairStyle: 'long', hairStyleColor: '#6a4a2a', hairLength: 0.55, beard: 'full', beardColor: '#3fa83a', shirt: '#8a3a3a', pants: '#2e6b3a', patchwork: true, shirtPatch: ['#8a3a3a', '#c9b24a', '#2e6b3a'], height: 1.52, width: 0.95 },
+    behavior: 'wander', home: 'festival_random', roam: 'festival_random', radius: 14, speed: 2.2,
+    lines: [
+      { de: 'Hihihi! Na, Großer? Wie ist die Luft da oben?', en: 'Heeheehee! Well, big guy? How\'s the air up there?' },
+      { de: 'Marco? Den kenn ich nicht. Hier gibt\'s nur den Kobold. Hihi!', en: 'Marco? Never heard of him. There\'s only the Kobold here. Heehee!' },
+      { de: 'Der Bart ist grün, weil ich im Moos geschlafen hab. Glaubst du nicht? Riech mal!', en: 'The beard is green because I slept in the moss. Don\'t believe me? Have a sniff!' },
+      { de: 'Ich hab Fabis Maßband versteckt. Psst! …Ich weiß nur selber nicht mehr, wo.', en: 'I hid Fabi\'s tape measure. Shh! …I just can\'t remember where myself.' },
+      { de: 'Wer hat Cornis Stahlseile? Ich nicht! Hihihi. …Diesmal wirklich nicht.', en: 'Who has Corni\'s steel wires? Not me! Heeheehee. …Really not, this time.', until: 'q1_rigging' },
+      { de: 'Ich pass unter jedem Bauzaun durch. Praktisch, oder? Und keiner sieht mich kommen!', en: 'I fit under every site fence. Handy, right? And nobody sees me coming!' },
+      { de: 'Am Ende vom Regenbogen steht kein Goldtopf. Da steht ein Dixi. Ich hab nachgeschaut.', en: 'There\'s no pot of gold at the end of the rainbow. There\'s a portaloo. I checked.' },
+      { de: 'Juli hat heute fast gelächelt. FAST! Ich bleib dran. Hihihi!', en: 'Juli almost smiled today. ALMOST! I\'m on it. Heeheehee!' },
+      { de: 'Arbeiten? Ich arbeite! Ich halte die Stimmung oben. Das wiegt mehr als jede Palette.', en: 'Working? I am working! I keep the mood up. That weighs more than any pallet.' },
+    ],
+  },
 ];
 
 // ------------------------------------------------------------------ random campers

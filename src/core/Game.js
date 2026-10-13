@@ -7,6 +7,7 @@ import { World } from '../world/World.js';
 import { Player, CameraRig } from '../entities/Player.js';
 import { FlyCam } from './FlyCam.js';
 import { Trigel } from '../world/Trigel.js';
+import { Scales } from '../quests/Scales.js';
 import { NPCManager } from '../entities/NPC.js';
 import { addDotti } from '../entities/Dotti.js';
 import { Quad, Radlader, Bike, Scooter, Skateboard } from '../entities/Vehicles.js';
@@ -115,6 +116,7 @@ export class Game {
     this.rentals = [this.bikeSys, this.scooterSys, this.skateSys];
     this.services = new Services(this);
     this.quests = new QuestSystem(this);
+    this.scales = new Scales(this); // dragon shingles: grow bit by bit, the player can saw along
     this.economy = new Economy(this);
     this.drama = new DramaSystem(this);
     this.effects = new Effects(this);
@@ -205,6 +207,7 @@ export class Game {
     if (this.player.char.look !== PLAYER_LOOK) { this.player.setLook(PLAYER_LOOK); this.updateCarried(); }
     this.drama?.clearAll();
     this.trigel?.reset();
+    this.scales?.reset();
     this.effects?.reset();
     this.soundbox?.reset();
     this.finaleSys?.reset();
@@ -1527,6 +1530,8 @@ export class Game {
           if (!this.trigel.petted) { this.trigel.petted = true; this.quests.state.karma += 1; this.refreshHUD(); }
         } });
       }
+      // sawbuck in the gazebo next to the dragon: saw scales (permanent side job)
+      if (this.registered && this.scales.near(p)) list.push({ d: 0.9, label: this.scales.label(), action: () => this.scales.cut() });
       // Franzi's bike & Fabi's e-scooter: ask once, then take it whenever (costs a little karma per ride)
       for (const rs of this.rentals) {
         const v = rs.vehicle, d = v.position.distanceTo(p);
@@ -1823,6 +1828,7 @@ export class Game {
     this.world.nutFixed = this.quests.isDone('x1_nuss');
     this.safe(() => this.world.update(time, dt, this.player.position));
     this.safe(() => this.trigel.update(dt, time, this.player.vehicle ? this.player.vehicle.position : this.player.position, this.world.night));
+    this.safe(() => this.scales.update(dt));
     this.safe(() => this.updateBuilding(dt));
     if (playing) {
       this.safe(() => this.checkKitchen(dt));

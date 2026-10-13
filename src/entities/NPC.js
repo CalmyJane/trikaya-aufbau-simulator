@@ -656,9 +656,10 @@ export class NPC {
   }
 
   /** Working on something: a tool in the hands (crew → hammer/saw/drill…, anyone → also shovel, tape measure). */
-  doWork() {
+  doWork(kind) {
     this._worked = true;
-    if (!this.char.work) {
+    if (kind) this.char.setWork(kind);
+    else if (!this.char.work) {
       const builder = ['builder', 'worker', 'mechanic'].includes(this.def.behavior);
       this.char.setWork(pick(builder ? ['hammer', 'hammer', 'saw', 'drill', 'measure', 'shovel'] : ['hammer', 'shovel', 'saw', 'drill', 'measure']));
     }
@@ -917,6 +918,14 @@ const BEHAVIORS = {
 
   wander(n, t, dt, { player, game }) {
     if (n.visit && n.runVisit(dt, player)) return;
+    if (n.scaleHelp > 0) { // sawing dragon scales with Jimmy's crew for a while (Scales.sendHelper)
+      n.scaleHelp -= dt;
+      const log = n.world.spots.scale_table;
+      if (log) n.char.faceTowards(log, dt, 4);
+      n.doWork('saw');
+      if (n.scaleHelp <= 0) n.target = null;
+      return;
+    }
     if (n.emote) { if (n.toPlayer < 2.2) { n.emote = null; n.emoteY = 0; } else if (n.runEmote(dt)) return; }
     if (n.greetCheck(dt, player, { busy: n.wait > 0 && n.workAnim, going: !!n.target && !(n.wait > 0) })) return;
     if (n.toPlayer < 3.5 && !n.snub && n.canAttend()) { n.char.faceTowards(player.position, dt); n.char.play('idle'); return; }
@@ -940,15 +949,48 @@ const BEHAVIORS = {
   route(n, dt, { player }, running, working) {
     if (!running && n.greetCheck(dt, player, { busy: working && n.wait > 0, going: !!n.target && !(n.wait > 0) })) return;
     if (!running && n.toPlayer < 3.5 && !n.snub && n.canAttend()) { n.char.faceTowards(player.position, dt); n.char.play('idle'); return; }
-    if (n.wait > 0) { n.wait -= dt; if (working) n.doWork(); else n.char.play('idle'); return; }
+    if (n.wait > 0) {
+      n.wait -= dt;
+      if (n.sawing) { n.char.faceTowards(n.sawing, dt, 4); n.doWork('saw'); } else if (working) n.doWork(); else n.char.play('idle');
+      return;
+    }
+    n.sawing = null;
     if (!n.target) {
       n.routeIdx = (n.routeIdx + 1) % n.def.route.length;
       n.target = n.resolveSpot(n.def.route[n.routeIdx]);
-      if (n.target) { n.target.x += (Math.random() - 0.5) * 6; n.target.z += (Math.random() - 0.5) * 6; }
+      // exact work spots (scale_w…: the dragon scale gazebo) are taken as they are, the rest is "somewhere around there"
+      const exact = n.def.route[n.routeIdx].startsWith('scale_w');
+      if (n.target && !exact) { n.target.x += (Math.random() - 0.5) * 6; n.target.z += (Math.random() - 0.5) * 6; }
     }
     if (!n.target) return;
     const r = n.walkTo(n.target, dt, running ? 7.5 : (working ? 2.4 : n.speed), running ? 'run' : 'walk');
-    if (r) { n.target = null; n.wait = running ? 0.4 : (working ? 5 + Math.random() * 5 : 2 + Math.random() * 3); }
+    if (r) {
+      n.target = null; n.wait = running ? 0.4 : (working ? 5 + Math.random() * 5 : 2 + Math.random() * 3);
+      // at the gazebo: saw scales for a good while
+      if (r === true && n.def.route[n.routeIdx].startsWith('scale_w')) { n.wait = 30 + Math.random() * 25; n.sawing = n.resolveSpot('scale_table'); }
+    }
+  },
+
+  // Jimmy & Lara: saw scales in the gazebo left of the dragon, carry them over and nail them onto its arms
+  scaler(n, t, dt, { player }) {
+    if (n.greetCheck(dt, player, { busy: n.wait > 0 })) return;
+    if (n.toPlayer < 2.4 && !n.snub && n.canAttend()) { n.char.faceTowards(player.position, dt); n.char.play('idle'); return; }
+    if (n.wait > 0) {
+      n.wait -= dt;
+      if (n.lookAt) n.char.faceTowards(n.lookAt, dt, 4);
+      n.doWork(n.nailing ? 'hammer' : 'saw');
+      return;
+    }
+    if (!n.target) {
+      const d = n.def;
+      n.nailing = !n.nailing && Math.random() < (d.nail ?? 0.4);
+      const arm = Math.random() < 0.5 ? '' : '2';
+      n.target = n.resolveSpot(n.nailing ? `scale_dragon${arm}` : d.saw) || n.home.clone();
+      if (n.nailing) { n.target.x += (Math.random() - 0.5) * 1.6; n.target.z += Math.random() * 1.2; }
+      n.lookAt = n.resolveSpot(n.nailing ? `scale_arm${arm}` : 'scale_log');
+    }
+    const r = n.walkTo(n.target, dt, 1.7);
+    if (r) { n.target = null; n.wait = n.nailing ? 8 + Math.random() * 8 : 14 + Math.random() * 14; }
   },
 
   // Leo: never where you are. Flees when you get close, then teleports somewhere else.

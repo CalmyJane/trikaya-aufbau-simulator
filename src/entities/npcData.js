@@ -199,11 +199,13 @@ export const NPCS = [
   {
     id: 'niklas', name: 'Niklas', role: { de: 'Hilft überall', en: 'Helps everywhere' }, portrait: '💪',
     look: { base: 'm_hoodie', skin: SKIN.light, hair: '#4a3420', shirt: '#b8483a', pants: '#3a4a2a', patchwork: true, height: 1.97 },
-    behavior: 'worker', route: ['plot_mainstage', 'base_yard', 'plot_chai_lounge', 'plot_forest_dome', 'plot_planetarium'],
+    behavior: 'worker', route: ['scale_w3', 'base_yard', 'scale_w3', 'plot_chai_lounge', 'scale_w3', 'plot_forest_dome', 'scale_w3', 'plot_planetarium'], // every other stop: sawing dragon scales with Jimmy
     lines: [
       { de: 'Ich hab heute schon die Bühne gefegt, Kabel sortiert und Fabbe einen Witz erzählt. Der Witz war das Anstrengendste.', en: 'I\'ve already swept the stage today, sorted cables and told Fabbe a joke. The joke was the hardest part.' },
       { de: 'Boah… die Wolken heute. Sorry. Was tragen wir?', en: 'Whoa… the clouds today. Sorry. What are we carrying?' },
       { de: 'Noch drei Paletten, dann Pause. Hab ich vor drei Paletten auch gesagt.', en: 'Three more pallets, then a break. Said that three pallets ago.' },
+      { de: 'Ich säg viel Schuppen mit Jimmy. Er sagt nix, ich sag nix. Beste Schicht des Tages.', en: 'I saw a lot of scales with Jimmy. He says nothing, I say nothing. Best shift of the day.' },
+      { de: 'Der Drache braucht noch ein paar tausend Schuppen. Ich hab heute schon… sieben. Aber schöne!', en: 'The dragon needs a few thousand more scales. I\'ve done… seven today. But pretty ones!' },
     ],
   },
   {
@@ -874,6 +876,43 @@ export const NPCS = [
       { de: 'Am Ende vom Regenbogen steht kein Goldtopf. Da steht ein Dixi. Ich hab nachgeschaut.', en: 'There\'s no pot of gold at the end of the rainbow. There\'s a portaloo. I checked.' },
       { de: 'Juli hat heute fast gelächelt. FAST! Ich bleib dran. Hihihi!', en: 'Juli almost smiled today. ALMOST! I\'m on it. Heeheehee!' },
       { de: 'Arbeiten? Ich arbeite! Ich halte die Stimmung oben. Das wiegt mehr als jede Palette.', en: 'Working? I am working! I keep the mood up. That weighs more than any pallet.' },
+    ],
+  },
+  {
+    id: 'jimmy', name: 'Jimmy', role: { de: 'Drachenschuppen', en: 'Dragon scales' }, portrait: '🐉',
+    // small, tattoos, long dreads – quiet, and busy with the dragon all day long
+    look: { base: 'm_casual', skin: SKIN.light, hair: '#3a2616', brows: '#2e1e12', hairStyle: 'dreads', hairStyleColor: '#4a321c', dreadLength: 1.0, beads: true, tattoos: true, shirt: '#3a3a34', pants: '#5a4a32', patchwork: true, shirtPatch: ['#3a3a34', '#6a4626', '#2e2e2a'], height: 1.6, width: 0.95 },
+    behavior: 'scaler', home: 'scale_w1', saw: 'scale_w1', nail: 0.35,
+    lines: [
+      { de: '…Hm? Ah. Hi. Ich säg grad.', en: '…Hm? Oh. Hi. I\'m sawing.' },
+      { de: 'Der Drache kriegt jede Schuppe einzeln. Von unten nach oben. Anders geht\'s nicht.', en: 'The dragon gets every scale one by one. From the bottom up. No other way.' },
+      { de: 'Wenn du willst: Säge liegt da. Scheibe für Scheibe. Nicht hetzen.', en: 'If you like: saw\'s over there. Slice by slice. No rush.' },
+      { de: 'Ich zähl die Schuppen nicht. …Doch. Aber ich sag\'s keinem.', en: 'I don\'t count the scales. …I do. But I\'m not telling anyone.' },
+      { de: 'Reden ist okay. Sägen ist besser.', en: 'Talking is fine. Sawing is better.' },
+      { de: 'Jede Scheibe ist anders. Deswegen sieht er am Ende lebendig aus.', en: 'Every slice is different. That\'s why he looks alive in the end.' },
+      { de: 'Lara ist zum ersten Mal dabei. Sägt schon gerader als ich. Sag\'s ihr nicht.', en: 'It\'s Lara\'s first time. Already saws straighter than me. Don\'t tell her.' },
+      { de: 'Niklas trägt die Stämme. Ich hab ihn nie drum gebeten. Er macht\'s einfach.', en: 'Niklas carries the logs. I never asked him to. He just does.' },
+      { de: 'Corni fragt, wann er fertig ist. …Wenn er fertig ist.', en: 'Corni asks when he\'ll be done. …When he\'s done.' },
+      { de: 'Nachts schaut er anders. Ich bleib dann noch ein bisschen.', en: 'He looks different at night. I stay a bit longer then.', night: true },
+      { de: 'Pause? …Später. Die Reihe noch.', en: 'Break? …Later. Just this row.' },
+    ],
+  },
+  {
+    id: 'lara_ms', name: 'Lara', role: { de: 'Hilft am Drachen · zum ersten Mal dabei', en: 'Helps at the dragon · first time here' }, portrait: '🌻',
+    // dreadlocks, doesn't smoke weed, travelled incredibly far, first time on the crew and thrilled to help
+    look: { base: 'f_casual', skin: SKIN.tan, hair: '#6a4424', brows: '#4a2e18', hairStyle: 'dreads', hairStyleColor: '#8a5a2e', dreadLength: 0.8, beads: true, headband: '#2a8a7a', shirt: '#d9822b', pants: '#3a5a4a', patchwork: true, shirtPatch: ['#d9822b', '#2a8a7a', '#c9b24a'], height: 1.7 },
+    behavior: 'scaler', home: 'scale_w2', saw: 'scale_w2', nail: 0.5,
+    lines: [
+      { de: 'Hi! Ich bin Lara! Ich bin zum allerersten Mal dabei – und ich darf am DRACHEN mithelfen!', en: 'Hi! I\'m Lara! It\'s my very first time – and I get to help with the DRAGON!' },
+      { de: 'Ich war drei Tage unterwegs. Zug, Bus, noch ein Bus, Fähre, Trampen. Und es hat sich SO gelohnt.', en: 'I travelled for three days. Train, bus, another bus, ferry, hitchhiking. And it was SO worth it.' },
+      { de: 'Jimmy redet nicht viel. Aber wenn er nickt, weiß ich: Die Schuppe sitzt.', en: 'Jimmy doesn\'t talk much. But when he nods, I know: that scale is on right.' },
+      { de: 'Kiffen? Nee, danke, ich kiff nicht. Ich bin von dem Drachen schon high genug!', en: 'Weed? No thanks, I don\'t smoke. The dragon gets me high enough!' },
+      { de: 'Ich hab heute meine erste Schuppe angenagelt. Ich weiß genau, welche. Die da. Nein, die daneben.', en: 'I nailed on my first scale today. I know exactly which one. That one. No, the one next to it.' },
+      { de: 'Daheim glaubt mir keiner, dass ich einen Drachen baue. Ich schick denen ein Foto. Wenn ich Netz hab.', en: 'Nobody back home believes I\'m building a dragon. I\'ll send them a photo. Once I have signal.' },
+      { de: 'Alle sind so lieb hier! Niklas hat mir gezeigt, wie man die Säge hält. Ohne zu lachen. Fast.', en: 'Everyone is so kind here! Niklas showed me how to hold the saw. Without laughing. Almost.' },
+      { de: 'Danke, dass ich mithelfen darf. Echt. Ich sag das jedem. Jimmy hat genickt.', en: 'Thanks for letting me help. Really. I tell everyone. Jimmy nodded.' },
+      { de: 'Nächstes Jahr komm ich wieder. Auch wenn\'s wieder drei Tage dauert.', en: 'I\'m coming back next year. Even if it takes three days again.' },
+      { de: 'Es gibt hier noch eine Lara! Die legt nachts auf. Ich bin die mit der Säge.', en: 'There\'s another Lara here! She DJs at night. I\'m the one with the saw.' },
     ],
   },
 ];

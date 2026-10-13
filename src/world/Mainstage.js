@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 import { mat, box, cyl, strut, signPost } from './Props.js';
 
-// The Trikaya mainstage: a wooden shingle dragon (already standing) crouching over a DJ stage,
+// The Trikaya mainstage: a wooden shingle dragon (the frame is already standing) crouching over a DJ stage,
 // surrounded by 6 tall posts. Quests rig steel wires between the posts (setRig) and then
-// hang the sun-shade decoration (buildShadeSails).
+// hang the sun-shade decoration (buildShadeSails). The shingles go on bit by bit, bottom to top
+// (setScales, src/quests/Scales.js) – they are sawn in the gazebo left of the dragon.
 
 export const POST_RADIUS = 15;
 export const POST_HEIGHT = 10.5;
@@ -109,6 +110,7 @@ export function buildMainstage() {
   // neck & head (looking out over the crowd, jaws wide open)
   const neck = new THREE.CatmullRomCurve3([V(0, 8.4, -13.8), V(0, 9.4, -12.7), V(0, 10.0, -11.6)]);
   sh.surface(tube(neck, 1.5, 1.1));
+  g.add(paramMesh(tube(neck, 1.35, 0.95), 10, 6, dark));
   sh.surface(ellipsoid(V(0, 10.2, -11.2), V(1.25, 1.15, 1.35)));
   const skullCore = new THREE.Mesh(new THREE.SphereGeometry(1, 10, 8), woodB);
   skullCore.scale.set(1.15, 1.05, 1.25);
@@ -170,7 +172,8 @@ export function buildMainstage() {
   crest.castShadow = true;
   g.add(crest);
   g.userData.eyeMat = eyeMat;
-  g.add(sh.build());
+  const scales = sh.build();
+  g.add(scales);
 
   // ---------------------------------------------------------------- wings: log frame + grey tarp,
   // draped down to the ground with two arched entrances on each side
@@ -284,6 +287,91 @@ export function buildMainstage() {
     }
   }
 
+  // ---------------------------------------------------------------- scale workshop: a gazebo left of the dragon,
+  // logs on a sawbuck, sliced into shingles (Jimmy's realm)
+  const PX = -19.5, PZ = -9.5;
+  {
+    const W = 4.6, D = 3.6, H = 2.3;
+    const canvas = new THREE.MeshStandardMaterial({ color: '#e9e4d4', side: THREE.DoubleSide, roughness: 0.9 });
+    const roof = new THREE.Mesh(new THREE.ConeGeometry(Math.hypot(W, D) / 2, 1.1, 4, 1, true), canvas);
+    roof.rotation.y = Math.PI / 4;
+    roof.scale.set(W / Math.hypot(W, D) * 1.41, 1, D / Math.hypot(W, D) * 1.41);
+    roof.position.set(PX, H + 0.55, PZ);
+    roof.castShadow = true;
+    roof.userData.noBlock = true;
+    g.add(roof);
+    const steel = mat('#c4c8cc', { metalness: 0.6, roughness: 0.4 });
+    for (const [x, z] of [[-W / 2, -D / 2], [W / 2, -D / 2], [W / 2, D / 2], [-W / 2, D / 2]]) {
+      g.add(cyl(0.035, 0.035, H, steel, 6, PX + x, H / 2, PZ + z));
+      colliders.push({ type: 'circle', x: PX + x, z: PZ + z, r: 0.12 });
+    }
+    const dust = new THREE.Mesh(new THREE.CircleGeometry(2.3, 14), new THREE.MeshStandardMaterial({ color: '#d9bd86', roughness: 1 }));
+    dust.rotation.x = -Math.PI / 2;
+    dust.scale.set(1, 0.75, 1);
+    dust.position.set(PX, 0.03, PZ - 0.2);
+    dust.receiveShadow = true;
+    g.add(dust);
+    // sawbuck with the log that is being sliced
+    const barkMat = mat('#6a4626'), cutMat = mat('#e2bd86');
+    const sz = PZ - 0.5;
+    for (const x of [-0.75, 0.75]) for (const k of [-1, 1]) {
+      g.add(strut(V(PX + x, 0, sz - 0.4 * k), V(PX + x, 1.0, sz + 0.3 * k), 0.04, woodB));
+    }
+    g.add(strut(V(PX - 0.75, 0.35, sz), V(PX + 0.75, 0.35, sz), 0.03, woodB));
+    const log = cyl(0.2, 0.2, 2.3, barkMat, 9, PX - 0.1, 0.86, sz);
+    log.rotation.z = Math.PI / 2;
+    g.add(log);
+    const cut = cyl(0.19, 0.19, 0.02, cutMat, 9, PX + 1.06, 0.86, sz);
+    cut.rotation.z = Math.PI / 2;
+    g.add(cut);
+    colliders.push({ type: 'box', x: PX, z: sz, hw: 1.2, hd: 0.3, rot: 0 });
+    // table with freshly cut shingles, more of them stacked on the ground
+    const tx = PX + 1.55, tz = PZ + 1.0;
+    g.add(box(1.1, 0.06, 0.7, woodC, tx, 0.8, tz));
+    for (const [x, z] of [[-0.48, -0.28], [0.48, -0.28], [0.48, 0.28], [-0.48, 0.28]]) g.add(box(0.06, 0.8, 0.06, woodB, tx + x, 0.4, tz + z));
+    colliders.push({ type: 'box', x: tx, z: tz, hw: 0.55, hd: 0.35, rot: 0 });
+    const discGeo = new THREE.CylinderGeometry(0.2, 0.2, 0.05, 9);
+    const discMats = ['#e2bd86', '#d4a86c', '#c8955a'].map((c) => [barkMat, mat(c), mat(c)]);
+    const disc = (x, y, z, k) => {
+      const m = new THREE.Mesh(discGeo, discMats[k % 3]);
+      m.position.set(x, y, z);
+      m.rotation.y = k * 1.7;
+      m.scale.set(1, 1, 0.8 + (k % 3) * 0.2);
+      m.castShadow = true;
+      g.add(m);
+    };
+    for (let i = 0; i < 9; i++) disc(tx - 0.3 + (i % 2) * 0.55, 0.86 + Math.floor(i / 2) * 0.055, tz + ((i % 3) - 1) * 0.08, i);
+    for (let i = 0; i < 18; i++) disc(PX - 1.6 + (i % 3) * 0.46, 0.03 + Math.floor(i / 3) * 0.055, PZ + 1.15 + ((i * 7) % 4) * 0.05, i + 3);
+    // log pile next to the gazebo
+    for (let i = 0; i < 6; i++) {
+      const row = i < 3 ? 0 : i < 5 ? 1 : 2;
+      const l = cyl(0.2, 0.2, 2.6, barkMat, 8, PX - 3.4 + (i - [0, 3, 5][row]) * 0.42 + row * 0.21, 0.2 + row * 0.36, PZ - 0.3);
+      l.rotation.x = Math.PI / 2;
+      l.castShadow = true;
+      g.add(l);
+    }
+    colliders.push({ type: 'box', x: PX - 2.95, z: PZ - 0.3, hw: 0.75, hd: 1.35, rot: 0 });
+    const ws = signPost('SCHUPPEN', { width: 2.2, height: 1.1, bg: '#2a160a', fg: '#e2bd86' });
+    ws.position.set(PX - 3.3, 0, PZ + 1.9);
+    ws.rotation.y = 0.35;
+    g.add(ws);
+  }
+  // spots (local x, z): where the player saws, where the crew saws, where the shingles get nailed on
+  g.userData.spots = {
+    scale_saw: [PX, PZ + 0.45],
+    scale_log: [PX, PZ - 0.5],
+    scale_pavilion: [PX, PZ],
+    scale_w1: [PX - 0.75, PZ - 1.4],
+    scale_w2: [PX + 0.75, PZ - 1.4],
+    scale_w3: [PX + 1.5, PZ + 0.2],
+    scale_w4: [PX - 1.5, PZ + 0.3],
+    scale_table: [PX + 1.55, PZ + 1.0],
+    scale_dragon: [-8.3, -8.4],
+    scale_dragon2: [8.3, -8.4],
+    scale_arm: [-6.4, -10.4],
+    scale_arm2: [6.4, -10.4],
+  };
+
   const sign = signPost('MAINSTAGE', { width: 2.6, height: 1.3, bg: '#2a160a', fg: '#ffb020' });
   sign.position.set(9.5, 0, -8);
   sign.rotation.y = -0.4;
@@ -291,6 +379,8 @@ export function buildMainstage() {
 
   const api = {
     posts,
+    /** How much of the dragon is covered in shingles (0…1, from the ground up). */
+    setScales(f) { scales.count = Math.round(scales.userData.total * THREE.MathUtils.clamp(f, 0, 1)); },
     setPosts(done) { postGroups.forEach((pg, i) => { pg.visible = done.includes(i); }); },
     setRig(done) {
       const set = Array.isArray(done) ? done : [...Array(done || 0).keys()];
@@ -607,7 +697,11 @@ function makeShingles() {
       const geo = new THREE.CylinderGeometry(0.5, 0.5, 0.08, 9);
       const face = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.95, flatShading: true });
       const bark = new THREE.MeshStandardMaterial({ color: '#6a4626', roughness: 1, flatShading: true });
+      // lowest first: the dragon gets shingled from the ground up (im.count = how many are on)
+      list.forEach((s) => { s.key = s.p.y + Math.random() * 0.9; });
+      list.sort((a, b) => a.key - b.key);
       const im = new THREE.InstancedMesh(geo, [bark, face, face], list.length);
+      im.userData.total = list.length;
       const cols = ['#e2bd86', '#d4a86c', '#c8955a', '#b98447', '#e8c99a', '#a87440'].map((c) => new THREE.Color(c));
       const m = new THREE.Matrix4(), tilt = new THREE.Matrix4().makeRotationX(-0.3), sc = new THREE.Matrix4();
       const down = new THREE.Vector3(0, -1, 0), x = new THREE.Vector3();
@@ -624,6 +718,7 @@ function makeShingles() {
         im.setColorAt(i, cols[(Math.random() * cols.length) | 0]);
       });
       im.castShadow = im.receiveShadow = true;
+      im.computeBoundingSphere(); // with all shingles, before any are hidden
       return im;
     },
   };

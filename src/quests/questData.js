@@ -80,7 +80,7 @@ export const QUESTS = [
     requires: ['q0_leo'],
     summary: { de: 'Die sechs Pfosten der Mainstage müssen in den Boden. Dafür braucht es einen Erdbohrer. Einen funktionierenden.', en: 'The six mainstage posts need to go into the ground. That takes an earth auger. A working one.' },
     offer: [
-      { who: 'corni', text: { de: 'Siehst du den Drachen? Der steht schon. Der ist der einfache Teil.', en: 'See the dragon? It\'s already standing. That\'s the easy part.' } },
+      { who: 'corni', text: { de: 'Siehst du den Drachen? Das Gerüst steht schon, die Schuppen sägt Jimmy drüben im Pavillon. Der ist der einfache Teil.', en: 'See the dragon? The frame is standing, Jimmy saws the scales over in the gazebo. That\'s the easy part.' } },
       { who: 'corni', text: { de: 'Um die Tanzfläche kommen sechs Pfosten. Die tragen später die Stahlseile und die Sonnensegel. Aber erst brauchen wir Löcher.', en: 'Six posts go around the dance floor. Later they carry the steel wires and the shade sails. But first we need holes.' } },
       { who: 'corni', text: { de: 'Der Erdbohrer liegt in der Werkstatt. Glaub ich. Hol ihn und fang beim ersten Pfosten-Punkt an.', en: 'The earth auger is in the workshop. I think. Get it and start at the first post spot.' } },
     ],

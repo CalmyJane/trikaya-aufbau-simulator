@@ -126,7 +126,7 @@ const TOKEN_THANKS = [
 ];
 
 // "Got anything?" – you can ask (almost) anyone. These never have anything and never sell.
-export const NO_STASH = ['stella', 'fabi', 'jan', 'leo', 'franzi', 'isi', 'verena', 'mia', 'daniel', 'delsin', 'aylien', 'sabse'];
+export const NO_STASH = ['stella', 'fabi', 'jan', 'leo', 'franzi', 'isi', 'verena', 'mia', 'daniel', 'delsin', 'aylien', 'sabse', 'lara_ms'];
 // crew members with a known stash; everyone else is random (most have nothing)
 const STASH_FIXED = { strom_andi: ['beer', 'schnaps'], juli: ['beer'], estenko: ['schnaps'], rocky: ['weed'], mehdi: ['weed'], schwarzhuber: ['schnaps'], lenny: ['energy', 'weed'], mux: ['weed'], leocitas: ['weed'] };
 const STASH_POOL = ['weed', 'weed', 'schnaps', 'energy', 'energy', 'beer'];
@@ -144,6 +144,7 @@ const NO_STASH_LINES = {
   leo: { de: 'Später! Später!', en: 'Later! Later!' },
   delsin: { de: 'Ich bin vom Awareness-Team. Ich hab Wasser, Zeit und ein offenes Ohr. Das andere such dir bitte woanders. Oder besser gar nicht.', en: 'I\'m on the awareness team. I have water, time and an open ear. Look for the other stuff elsewhere. Or better not at all.' },
   aylien: { de: 'Ich hab nur Umarmungen dabei. Die sind gratis und machen nicht abhängig. Na gut, ein bisschen.', en: 'All I have is hugs. They\'re free and not addictive. Okay, a little.' },
+  lara_ms: { de: 'Oh, nee, ich kiff nicht! Aber ich hab Nüsse von daheim dabei. Die sind drei Tage gereist. Willst du eine?', en: 'Oh no, I don\'t smoke! But I brought nuts from home. They travelled for three days. Want one?' },
   sabse: { de: 'In MEINER Küche? Ich hab Zwiebeln. Willst du Zwiebeln? Nein? Dann raus.', en: 'In MY kitchen? I have onions. Want onions? No? Then out.' },
 };
 const NOTHING_LINES = [

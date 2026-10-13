@@ -781,6 +781,9 @@ export class Character {
       const torso = this.bones.Torso;
       if (torso?.quaternion.equals(this._torsoSet)) torso.quaternion.copy(this._torsoBase);
       this._torsoSet = null;
+      const head = this.bones.Head;
+      if (this._headSet && head?.quaternion.equals(this._headSet)) head.quaternion.copy(this._headBase);
+      this._headSet = null;
     }
     if (this.ride) this.applyRidePose();
     else if (this.sitting) this.applySitPose();
@@ -1015,9 +1018,10 @@ export class Character {
    * feet on the pedals (they turn) or on the deck. Anchors come from the vehicle (`grips`, `pedals`).
    */
   applyRidePose() {
-    const v = this.ride;
+    const v = this.ride, sk = v.skate; // skateboard: sideways stance, crouch & lean come from the board
     if (this.sitting) this.model.position.y = this.sitBaseY;
-    else if (this.standY != null) this.model.position.y = this.standY - 0.06; // knees a little soft
+    else if (this.standY != null) this.model.position.y = this.standY - (sk ? sk.crouch : 0.06); // knees a little soft
+    if (sk) this.root.rotation.y = sk.yaw;
     this.root.updateMatrixWorld(true);
     v.body.updateMatrixWorld(true);
     const rq = this.root.getWorldQuaternion(_q4);
@@ -1028,7 +1032,7 @@ export class Character {
       if (this._torsoSet && torso.quaternion.equals(this._torsoSet)) torso.quaternion.copy(this._torsoBase);
       else (this._torsoBase ||= new THREE.Quaternion()).copy(torso.quaternion);
       torso.updateWorldMatrix(true, false);
-      const q = _q1.setFromAxisAngle(_v4.set(1, 0, 0).applyQuaternion(rq), v.riderLean ?? (this.sitting ? 0.55 : 0.14));
+      const q = _q1.setFromAxisAngle(_v4.set(1, 0, 0).applyQuaternion(rq), sk ? sk.lean : v.riderLean ?? (this.sitting ? 0.55 : 0.14));
       // quad: lean into the curve (left turn = top to the left) and a little forward when giving it gas
       if (v.riderLean != null) {
         const sp = Math.min(1, Math.abs(v.speed) / v.o.maxSpeed);
@@ -1042,6 +1046,17 @@ export class Character {
       const bw = torso.getWorldQuaternion(_q2), pw = torso.parent.getWorldQuaternion(_q3);
       torso.quaternion.copy(pw.invert().multiply(q).multiply(bw));
       (this._torsoSet ||= new THREE.Quaternion()).copy(torso.quaternion);
+    }
+    // skateboard: the body stands sideways, the head looks where the board is going
+    const head = sk && this.bones.Head;
+    if (head) {
+      if (this._headSet && head.quaternion.equals(this._headSet)) head.quaternion.copy(this._headBase);
+      else (this._headBase ||= new THREE.Quaternion()).copy(head.quaternion);
+      head.updateWorldMatrix(true, false);
+      const q = _q1.setFromAxisAngle(_v4.set(0, 1, 0), -sk.yaw * 0.8);
+      const bw = head.getWorldQuaternion(_q2), pw = head.parent.getWorldQuaternion(_q3);
+      head.quaternion.copy(pw.invert().multiply(q).multiply(bw));
+      (this._headSet ||= new THREE.Quaternion()).copy(head.quaternion);
     }
     if (v.grips) { this.reachArm('L', v.grips[0].getWorldPosition(_b1)); this.reachArm('R', v.grips[1].getWorldPosition(_b1)); }
     if (v.pedals) {

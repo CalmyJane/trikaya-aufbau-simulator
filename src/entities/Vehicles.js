@@ -555,6 +555,11 @@ export class Skateboard extends Vehicle {
     for (const z of [0.22, -0.22]) for (const x of [-0.11, 0.11]) b.add(this.wheel(0.035, 0.035, x, 0.035, z));
     this.seat.position.set(0, 0.135, -0.02);
     this.cargo.position.set(0, 0.9, 0.35);
+    // the rider stands sideways (left foot in front), arms out for balance – see Character.applyRidePose
+    this.pedals = [this.anchor(this.seat, 0.02, 0.015, 0.17), this.anchor(this.seat, -0.02, 0.015, -0.2)];
+    this.grips = [this.anchor(this.seat, -0.1, 1.08, 0.48), this.anchor(this.seat, -0.1, 1.04, -0.48)];
+    this.skate = { yaw: -1.15, crouch: 0.1, lean: 0.2 };
+    this.pushK = 0; this.pushT = 0; this.animT = 0;
   }
 
   /** Every hop is a trick: a kickflip going straight, a 360 shove-it when popped out of a curve. */
@@ -574,6 +579,23 @@ export class Skateboard extends Vehicle {
       d.position.y = -lift * 0.05; // the board drops away from the feet while it spins
     } else { d.rotation.set(0, 0, 0); d.position.y = 0; }
     this.seat.position.y = 0.135 + lift * 0.14; // knees tucked up
+
+    // rider: pushes off with the back foot while getting up to speed, then cruises crouched and carves
+    const o = this.o, s = this.skate, sp = Math.min(1, Math.abs(this.speed) / o.maxSpeed), k = Math.min(1, dt * 8);
+    const push = input && !air && this.throttle > 0 && this.speed > -0.2 && this.speed < o.maxSpeed * 0.72 ? 1 : 0;
+    this.pushK += (push - this.pushK) * Math.min(1, dt * 6);
+    this.pushT = this.pushK > 0.03 ? this.pushT + dt * 7.5 : 0;
+    this.animT += dt;
+    const pk = this.pushK, ph = this.pushT, t = this.animT, land = this.landT > 0 ? Math.sin((this.landT / 0.18) * Math.PI) : 0;
+    // back foot: on the tail, or down beside the board – back along the ground, lifted on the way forward
+    this.pedals[1].position.set(-0.02 - 0.2 * pk, 0.015 + pk * (-0.135 + Math.max(0, -Math.sin(ph)) * 0.13), -0.2 + pk * (0.25 + 0.3 * Math.cos(ph)));
+    s.yaw += (-1.15 + 0.7 * pk - s.yaw) * k; // turns towards the road while pushing
+    s.crouch += (0.09 + 0.06 * sp + 0.05 * pk * (1 + Math.cos(ph)) + 0.2 * lift + 0.14 * land + Math.sin(t * 2.1) * 0.012 - s.crouch) * k;
+    s.lean += (0.2 + 0.1 * sp + 0.12 * lift + 0.15 * land - this.steer * sp * 0.3 - s.lean) * k; // heels in a left turn, toes in a right turn
+    // arms: out to both sides, tipping like wings in the curve, up in the air, swinging along while pushing
+    const tip = this.steer * sp * 0.14, sw = Math.sin(ph) * 0.1 * pk;
+    this.grips[0].position.set(-0.1 - 0.08 * pk, 1.08 + tip + lift * 0.3 + Math.sin(t * 2.6) * 0.02 + sw, 0.48 - 0.12 * pk);
+    this.grips[1].position.set(-0.1 - 0.08 * pk, 1.04 - tip + lift * 0.34 + Math.sin(t * 2.6 + 2) * 0.02 - sw, -0.48 + 0.12 * pk);
     return moved;
   }
 }

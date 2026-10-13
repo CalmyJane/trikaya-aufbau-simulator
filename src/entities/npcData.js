@@ -395,6 +395,19 @@ export const NPCS = [
     ],
   },
   {
+    id: 'steffi', name: 'Steffi', role: { de: 'Fotos & Chillen', en: 'Photos & chilling' }, portrait: '📷',
+    look: { base: 'f_casual', skin: SKIN.light, hair: '#7a4a2a', brows: '#5a3820', hairStyle: 'long', hairStyleColor: '#7a4a2a', hairLength: 0.5, shirt: '#2a8a7a', pants: '#8a6a4a', patchwork: true, height: 1.68, extras: ['camera'] },
+    behavior: 'wander', home: 'matze_face', radius: 3,
+    lines: [
+      { de: 'Ich chill nur kurz vor Matzes Container. Seit ungefähr drei Stunden.', en: 'Just chilling in front of Matze\'s container for a bit. For about three hours now.' },
+      { de: 'Ohm und ich hängen hier ab. Das ist ein Vollzeitjob.', en: 'Ohm and I hang out here. It\'s a full-time job.' },
+      { de: 'Stillhalten… ja, genau so. *klick* Ich mach heimlich Fotos von Leuten. Nicht so heimlich.', en: 'Hold still… yes, just like that. *click* I secretly take photos of people. Not that secretly.' },
+      { de: 'Du hast gerade total fotogen Kisten getragen. Hab ich festgehalten.', en: 'You just carried crates so photogenically. Got it on camera.' },
+      { de: 'Matze sucht seinen Kaffee, Ohm sucht nix. Ich such das beste Licht.', en: 'Matze is looking for his coffee, Ohm is looking for nothing. I\'m looking for the best light.' },
+      { de: 'Die besten Fotos entstehen, wenn keiner merkt, dass ich da bin. Also ständig.', en: 'The best photos happen when nobody notices I\'m there. So, constantly.' },
+    ],
+  },
+  {
     id: 'sarah', name: 'Sarah', role: { de: 'Feuerinsel', en: 'Fire island' }, portrait: '🧝',
     look: { base: 'f_casual', skin: SKIN.fair, hair: '#f2dc8a', brows: '#c8a85a', hairStyle: 'long', hairStyleColor: '#f2dc8a', hairLength: 0.58, elfEars: true, shirt: '#2e6b5e', pants: '#3a2a4a', patchwork: true, shirtPatch: ['#2e6b5e', '#6a3d9a', '#1a1a1a'], height: 1.84, width: 0.88 },
     behavior: 'flow', toy: 'staff', home: 'fire_slot_4',

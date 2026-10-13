@@ -578,6 +578,17 @@ export class Character {
       bd.rotation.set(0.15, 0, 1.3);
       this.attachToBone('WristL', bd, new THREE.Vector3(0, -0.1, 0.03));
     }
+    if (extras.includes('camera')) {
+      // little camera held in the right hand
+      const c = new THREE.Group();
+      c.add(new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.09, 0.07), new THREE.MeshStandardMaterial({ color: '#222', flatShading: true })));
+      const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.035, 0.06, 8), new THREE.MeshStandardMaterial({ color: '#9ab', metalness: 0.6, roughness: 0.3 }));
+      lens.rotation.x = Math.PI / 2;
+      lens.position.z = 0.06;
+      c.add(lens);
+      c.rotation.x = -0.3;
+      this.attachToBone('WristR', c, new THREE.Vector3(0, -0.05, 0.06));
+    }
     if (extras.includes('bottle')) {
       const b = Assets.model('bottle', { height: 0.24 });
       b.position.set(0, -0.05, 0.02);

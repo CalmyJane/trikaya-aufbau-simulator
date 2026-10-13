@@ -817,6 +817,21 @@ export const NPCS = [
     ],
   },
   {
+    id: 'ronja', name: 'Ronja', role: { de: 'Helferin · mit Hündin Micka', en: 'Volunteer · with her dog Micka' }, portrait: '🐕',
+    // long brown hair, purple cap worn backwards, sunglasses, red striped poncho, red skirt – Micka never leaves her side
+    look: { base: 'f_casual', skin: SKIN.fair, hair: '#5a3a22', brows: '#3e2816', hairStyle: 'long', hairStyleColor: '#5a3a22', hairLength: 0.5, sunglasses: true, cap: '#8a6aa8', shirt: '#a8322a', pants: '#7a1f1c', patchwork: true, shirtPatch: ['#a8322a', '#d8842a', '#3a6a5a', '#5a2a4a'], height: 1.66 },
+    behavior: 'patrol', route: ['base_yard', 'kitchen', 'plot_chai_lounge', 'plot_mainstage', 'chill', 'plot_narnia_floor', 'plot_hammocks', 'plot_kuenstlergasse'], speed: 1.7,
+    lines: [
+      { de: 'Hey! Das ist Micka. Keine Sorge, die will nur wissen, ob du Wurst dabei hast.', en: 'Hey! This is Micka. Don\'t worry, she just wants to know if you\'ve got sausage on you.' },
+      { de: 'Micka geht keinen Meter ohne mich. Ich aufs Dixi, Micka vor dem Dixi. Sehr diskret.', en: 'Micka won\'t go a metre without me. Me in the portaloo, Micka outside the portaloo. Very discreet.' },
+      { de: 'Border Collie halt. Wenn hier keiner Schafe hat, hütet sie eben die Crew.', en: 'Border collie. If nobody here has sheep, she just herds the crew.' },
+      { de: 'Die Hühner im Crew Camp sind ihr Highlight. Einmal kurz rumflitzen, dann ist sie wieder da.', en: 'The chickens at the crew camp are her highlight. One quick zoom around, then she\'s back.' },
+      { de: 'Mit Dotti versteht sie sich super. Zwei Minuten Vollgas, dann tun beide so, als wär nix gewesen.', en: 'She gets on great with Dotti. Two minutes flat out, then both act like nothing happened.' },
+      { de: 'Der Poncho? Wärmt, ist Decke, ist Kopfkissen, ist Hundebett. Bestes Kleidungsstück der Welt.', en: 'The poncho? Keeps warm, is a blanket, a pillow, a dog bed. Best garment in the world.' },
+      { de: 'Ich hab eine Leine dabei. Rein symbolisch. Micka weiß das auch.', en: 'I do carry a leash. Purely symbolic. Micka knows it too.' },
+    ],
+  },
+  {
     id: 'leon', name: 'Leon', role: { de: 'DJ Stillbendana: Hype & Beats', en: 'DJ Stillbendana: hype & beats' }, portrait: '🎧',
     look: { base: 'm_hoodie', skin: SKIN.light, hair: '#8a6a3a', brows: '#6a4e2a', hairCut: [0.95, 0.4, 0.95], shirt: '#c8683a', pants: '#3a3a4a', patchwork: true, shirtPatch: ['#c8683a', '#2a8a7a', '#e0a030'], height: 1.78, width: 0.98 },
     behavior: 'wander', home: 'festival_random', roam: 'festival_random', radius: 14,

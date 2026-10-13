@@ -10,6 +10,7 @@ import { Trigel } from '../world/Trigel.js';
 import { Scales } from '../quests/Scales.js';
 import { NPCManager } from '../entities/NPC.js';
 import { addDotti } from '../entities/Dotti.js';
+import { addMicka } from '../entities/Micka.js';
 import { Quad, Radlader, Bike, Scooter, Skateboard } from '../entities/Vehicles.js';
 import { FranziBike, FabiScooter, LeoSkate } from '../quests/Bike.js';
 import { Services, HIRE_COST } from '../quests/Services.js';
@@ -108,7 +109,8 @@ export class Game {
     await this.npcs.populate(breathe);
     this.trigel = new Trigel(this.world);
     this.npcs.game = this;
-    addDotti(this); // Kobold's dog
+    this.dotti = addDotti(this); // Kobold's dog
+    addMicka(this); // Ronja's dog, always at heel
     this.vehicles = { quad: new Quad(this.world), radlader: new Radlader(this.world), bike: new Bike(this.world), scooter: new Scooter(this.world), skate: new Skateboard(this.world) };
     this.bikeSys = new FranziBike(this, this.vehicles.bike);
     this.scooterSys = new FabiScooter(this, this.vehicles.scooter);

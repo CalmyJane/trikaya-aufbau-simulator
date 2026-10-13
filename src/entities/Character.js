@@ -207,6 +207,7 @@ export class Character {
     if (look.elfEars && this.bones.Head) this.addElfEars(look);
     if ((look.sunglasses || look.glasses) && this.bones.Head) this.addSunglasses(look);
     if (look.vikingHat && this.bones.Head) this.addVikingHat(look);
+    if (look.cap && this.bones.Head) this.addCap(look);
     if (look.tattoos) this.addTattoos(look);
     if (look.grin && this.bones.Head) this.addGrin(look);
     if (!look.hairStyle && look.bangs && this.bones.Head) look = { ...look, hairStyle: 'model' }; // just the fringe
@@ -517,6 +518,28 @@ export class Character {
       h2.rotation.z = -s * 0.35;
       g.add(h2);
     }
+    this.attachToBone('Head', g);
+  }
+
+  /** A baseball cap worn backwards (look.cap = colour): crown, peak in the neck, strap across the forehead. */
+  addCap(look) {
+    this.root.updateMatrixWorld(true);
+    const { len } = this.headInfo();
+    const r = len * 0.42;
+    const g = new THREE.Group();
+    const cm = new THREE.MeshStandardMaterial({ color: look.cap === true ? '#8a6aa8' : look.cap, roughness: 0.9, flatShading: true });
+    const y0 = len * 0.58;
+    const crown = new THREE.Mesh(new THREE.SphereGeometry(r * 1.17, 12, 7, 0, Math.PI * 2, 0, Math.PI / 2), cm);
+    crown.position.set(0, y0, -r * 0.08);
+    crown.scale.y = 0.85;
+    g.add(crown);
+    const peak = new THREE.Mesh(new THREE.BoxGeometry(r * 1.5, r * 0.07, r * 0.95), cm);
+    peak.position.set(0, y0 + r * 0.02, -r * 1.5);
+    peak.rotation.x = 0.25;
+    g.add(peak);
+    const strap = new THREE.Mesh(new THREE.BoxGeometry(r * 0.9, r * 0.16, r * 0.05), new THREE.MeshStandardMaterial({ color: '#e8e4dc', roughness: 0.8 }));
+    strap.position.set(0, y0 + r * 0.12, r * 1.1);
+    g.add(strap);
     this.attachToBone('Head', g);
   }
 

@@ -296,6 +296,19 @@ export const NPCS = [
     ],
   },
   {
+    id: 'nina', name: 'Nina', role: { de: 'Narnia Floor · hilft Mia', en: 'Narnia Floor · helps Mia' }, portrait: '🎨',
+    look: { base: 'f_casual', skin: SKIN.fair, hair: '#e8cf80', brows: '#b8963a', hairStyle: 'long', hairStyleColor: '#e8cf80', hairLength: 0.55, shirt: '#c9e4d4', pants: '#7a5a8a', patchwork: true, shirtPatch: ['#c9e4d4', '#f0d8a8', '#d8b8e8'], height: 1.7 },
+    behavior: 'builder', home: 'plot_narnia_floor', offset: [1, -3], radius: 5,
+    lines: [
+      { de: 'Oh, hallo! …Schön, dich zu sehen. Wirklich.', en: 'Oh, hi! …So nice to see you. Really.' },
+      { de: 'Ich helfe Mia beim Floor. Also, ich halt die Schrauben. Und überleg mir, wie das später aussehen soll.', en: 'I\'m helping Mia with the floor. Well, I hold the screws. And think about how it should look later.' },
+      { de: 'Wenn man den Boden nur lang genug anschaut, sieht man Muster. Hier zum Beispiel: Narnia.', en: 'If you look at the floor long enough you see patterns. Here, for example: Narnia.' },
+      { de: 'Ich dachte an Laternen. Kleine. Und Sterne an der Decke. Aber nur, wenn das okay ist…', en: 'I was thinking lanterns. Small ones. And stars on the ceiling. But only if that\'s okay…' },
+      { de: 'Mia hat so viel Energie. Ich sitz daneben und male im Kopf. Das passt ganz gut.', en: 'Mia has so much energy. I sit next to her and paint in my head. It works quite well.' },
+      { de: 'Psst, hör mal. Es ist gerade ganz ruhig auf dem Floor. Das ist selten. Schön, oder?', en: 'Shh, listen. It\'s really quiet on the floor right now. That\'s rare. Nice, right?' },
+    ],
+  },
+  {
     id: 'bruno', name: 'Bruno', role: { de: 'Narnia-Crew', en: 'Narnia crew' }, portrait: '🔨',
     look: { base: 'm_casual', skin: SKIN.fair, hair: '#ecd27a', brows: '#c8a85a', hairCut: [0.95, 0.6, 0.95], shirt: '#c0602a', pants: '#4a5a3a', patchwork: true, height: 1.86 },
     behavior: 'builder', home: 'plot_narnia_floor', offset: [-3, -1], radius: 5,

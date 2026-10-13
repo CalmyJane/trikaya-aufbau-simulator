@@ -892,7 +892,7 @@ export const NPCS = [
   {
     id: 'kobold', name: 'Kobold', role: { de: 'Schabernack & gute Laune', en: 'Mischief & good vibes' }, portrait: '🍀',
     // Marco: small, long hair, green beard – always in a great mood, a cheeky little goblin
-    look: { base: 'm_casual', skin: SKIN.fair, hair: '#6a4a2a', brows: '#5a3e22', hairStyle: 'long', hairStyleColor: '#6a4a2a', hairLength: 0.55, beard: 'full', beardColor: '#3fa83a', shirt: '#8a3a3a', pants: '#2e6b3a', patchwork: true, shirtPatch: ['#8a3a3a', '#c9b24a', '#2e6b3a'], height: 1.52, width: 0.95 },
+    look: { base: 'm_casual', skin: SKIN.fair, hair: '#6a4a2a', brows: '#5a3e22', hairStyle: 'long', hairStyleColor: '#6a4a2a', hairLength: 0.55, hairStreaks: ['#3fa83a', '#57c24a', '#3fa83a'], beard: 'full', beardColor: '#3fa83a', shirt: '#8a3a3a', pants: '#2e6b3a', patchwork: true, shirtPatch: ['#8a3a3a', '#c9b24a', '#2e6b3a'], height: 1.52, width: 0.95 },
     behavior: 'wander', home: 'festival_random', roam: 'festival_random', radius: 14, speed: 2.2,
     lines: [
       { de: 'Hihihi! Na, Großer? Wie ist die Luft da oben?', en: 'Heeheehee! Well, big guy? How\'s the air up there?' },

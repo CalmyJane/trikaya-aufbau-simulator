@@ -53,6 +53,24 @@ export function mat(color, opts = {}) {
   return matCache.get(key);
 }
 
+/** Small floating name tag (pets): a sprite above the animal, readable up close, shrinking away with distance. */
+export function nameTag(text, y = 0.6) {
+  const c = document.createElement('canvas');
+  c.width = 256; c.height = 64;
+  const x = c.getContext('2d');
+  x.font = '600 34px system-ui, sans-serif';
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.lineWidth = 7; x.lineJoin = 'round'; x.strokeStyle = 'rgba(0,0,0,0.75)';
+  x.strokeText(text, 128, 34);
+  x.fillStyle = '#fff'; x.fillText(text, 128, 34);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
+  s.scale.set(0.72, 0.18, 1);
+  s.position.y = y;
+  return s;
+}
+
 export function box(w, h, d, material, x = 0, y = 0, z = 0) {
   const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
   m.position.set(x, y, z);

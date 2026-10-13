@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { heightAt } from '../world/Height.js';
-import { mat, box, cyl } from '../world/Props.js';
+import { mat, box, cyl, nameTag } from '../world/Props.js';
 
 // Dotti: Kobold's dog – small, short brown fur, pointed snout. Very much her own dog: she trots around
 // somewhere near him on the festival ground and now and then runs off to play with the chickens and the cats of the crew base.
@@ -53,6 +53,7 @@ export function addDotti(game) {
   if (!kobold) return null;
   const obj = dog();
   obj.name = 'dotti';
+  obj.add(nameTag('Dotti', 0.66));
   obj.position.copy(kobold.position);
   obj.position.x += 2;
   world.scene.add(obj);

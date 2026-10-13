@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { heightAt } from '../world/Height.js';
-import { mat, box, cyl } from '../world/Props.js';
+import { mat, box, cyl, nameTag } from '../world/Props.js';
 
 // Micka: Ronja's border collie – black with a white blaze, chest, paws and tail tip. She walks at heel and never
 // leaves Ronja's side; only when another animal is right next to the way does she dash over for a quick round of play.
@@ -60,6 +60,7 @@ export function addMicka(game) {
   if (!ronja) return null;
   const obj = collie();
   obj.name = 'micka';
+  obj.add(nameTag('Micka', 0.98));
   obj.position.copy(ronja.position);
   obj.position.x += 0.7;
   world.scene.add(obj);

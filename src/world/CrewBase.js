@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { Assets } from '../core/Assets.js';
 import { CREW_BASE, AREAS, LANDMARKS, PLOTS } from './layout.js';
 import { heightAt } from './Height.js';
-import { mat, box, cyl, corrugated, textPlane, signPost, dixi, fenceRun, beerBench, bauwagen } from './Props.js';
+import { mat, box, cyl, nameTag, corrugated, textPlane, signPost, dixi, fenceRun, beerBench, bauwagen } from './Props.js';
 
 // Crew base (the real crew camp): white site cabins – office, Matze's, Corni's, the workshop,
 // two storage cabins – the Aufenthaltszelt, pickup, generator. Registers named "spots" used by quests.
@@ -144,6 +144,7 @@ export function buildCrewBase(world) {
   const cats = [['blacky', '#17161a', '#e8c93a', 0.85], ['flocke', '#8a8d92', '#5aa84a', 1.15, '#f4f2ec']].map(([name, fur, eyes, pitch, belly], i) => {
     const ct = cat(fur, eyes, belly);
     ct.name = name;
+    ct.add(nameTag(name[0].toUpperCase() + name.slice(1), 0.58));
     ct.position.set(WS_IN[i][0], 0, WS_IN[i][1]);
     base.add(ct);
     const s = roamer(ct, {

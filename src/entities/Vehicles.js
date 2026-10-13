@@ -534,7 +534,9 @@ export class Skateboard extends Vehicle {
     this.name = { de: 'Leocitas\' Skateboard', en: 'Leocitas\' skateboard' };
     this.quiet = true;
     this.standing = true;
-    const b = this.body;
+    // the board itself sits in its own group so it can flip under the rider's feet
+    const b = this.deck = new THREE.Group();
+    this.body.add(b);
     const wood = mat('#c98a4a', { roughness: 0.7 }), grip = mat('#1c1c1c', { roughness: 1 }), steel = mat('#b8bcc2', { metalness: 0.7, roughness: 0.3 });
     b.add(box(0.22, 0.025, 0.62, wood, 0, 0.115, 0));                    // deck
     b.add(box(0.215, 0.006, 0.6, grip, 0, 0.131, 0));                    // grip tape
@@ -550,8 +552,28 @@ export class Skateboard extends Vehicle {
     // Leocitas painted the underside
     b.add(box(0.2, 0.004, 0.3, mat('#9b3d8a', { emissive: '#9b3d8a', emissiveIntensity: 0.25 }), 0, 0.1, 0));
     b.add(box(0.12, 0.004, 0.12, mat('#f0c040', { emissive: '#f0c040', emissiveIntensity: 0.3 }), 0, 0.098, 0));
-    for (const z of [0.22, -0.22]) for (const x of [-0.11, 0.11]) this.wheel(0.035, 0.035, x, 0.035, z);
+    for (const z of [0.22, -0.22]) for (const x of [-0.11, 0.11]) b.add(this.wheel(0.035, 0.035, x, 0.035, z));
     this.seat.position.set(0, 0.135, -0.02);
     this.cargo.position.set(0, 0.9, 0.35);
+  }
+
+  /** Every hop is a trick: a kickflip going straight, a 360 shove-it when popped out of a curve. */
+  update(dt, input) {
+    const wasAir = this.hopY > 0;
+    const moved = super.update(dt, input);
+    const d = this.deck, air = this.hopY > 0;
+    if (air && !wasAir) { this.trick = Math.abs(this.steer) > 0.35 ? 'y' : 'z'; this.trickDir = this.steer < 0 ? -1 : 1; this.trickT = 0; }
+    let lift = 0;
+    if (air) {
+      this.trickT += dt;
+      const k = Math.min(1, this.trickT / (this.o.hop / 8 * 0.92)); // done just before the wheels touch down
+      const e = k * k * (3 - 2 * k);
+      d.rotation.set(0, 0, 0);
+      d.rotation[this.trick] = this.trickDir * e * Math.PI * 2;
+      lift = Math.sin(k * Math.PI);
+      d.position.y = -lift * 0.05; // the board drops away from the feet while it spins
+    } else { d.rotation.set(0, 0, 0); d.position.y = 0; }
+    this.seat.position.y = 0.135 + lift * 0.14; // knees tucked up
+    return moved;
   }
 }

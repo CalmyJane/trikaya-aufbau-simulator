@@ -928,7 +928,8 @@ export const NPCS = [
   {
     id: 'lara_ms', name: 'Lara', role: { de: 'Hilft am Drachen · zum ersten Mal dabei', en: 'Helps at the dragon · first time here' }, portrait: '🌻',
     // dreadlocks, doesn't smoke weed, travelled incredibly far, first time on the crew and thrilled to help
-    look: { base: 'f_casual', skin: SKIN.tan, hair: '#6a4424', brows: '#4a2e18', hairStyle: 'dreads', hairStyleColor: '#8a5a2e', dreadLength: 0.8, beads: true, headband: '#2a8a7a', shirt: '#d9822b', pants: '#3a5a4a', patchwork: true, shirtPatch: ['#d9822b', '#2a8a7a', '#c9b24a'], height: 1.7 },
+    // after photo: fair skin, long dirty-blonde dreads, rust headband, brown top, black shorts, lilac hiking shoes, cord necklace
+    look: { base: 'f_casual', skin: SKIN.fair, hair: '#b8955a', brows: '#9a7a48', hairStyle: 'dreads', hairStyleColor: '#c4a266', dreadLength: 0.82, beads: true, headband: '#c0602a', grin: true, extras: ['pendant'], shirt: '#5a3424', pants: '#1a1a1c', shoes: '#b8a8d8', height: 1.7 },
     behavior: 'scaler', home: 'scale_w2', saw: 'scale_w2', nail: 0.5,
     lines: [
       { de: 'Hi! Ich bin Lara! Ich bin zum allerersten Mal dabei – und ich darf am DRACHEN mithelfen!', en: 'Hi! I\'m Lara! It\'s my very first time – and I get to help with the DRAGON!' },

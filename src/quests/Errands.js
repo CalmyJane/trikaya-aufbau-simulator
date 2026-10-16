@@ -149,6 +149,14 @@ const TRASH_GIVERS = {
   annika: [C('Bevor die Gäste kommen, muss der Müll {place} weg. Drei Säcke, schaffst du das?', 'Before the guests arrive, the rubbish {place} has to go. Three bags, can you do it?'), C('Perfekt. Jetzt sieht\'s fast aus wie geplant.', 'Perfect. Now it almost looks like it was planned.')],
   schwarzhuber: [C('Auf mei Wiesn {place} liegt Müll. Dilettantisch! Klaub des zamm, drei Säck!', 'There\'s rubbish on my meadow {place}. Amateurs! Pick it up, three bags!'), C('Na also. Geht doch, wennst willst.', 'There you go. You can if you want.')],
 };
+const pick = (a) => a[Math.floor(Math.random() * a.length)];
+// the giver comes along and helps (quests with `helpAt`)
+const GO_LINES = [C('Komm, ich geh mit!', 'Come on, I\'m coming with you!'), C('Los, gemeinsam geht\'s schneller!', 'Let\'s go, it\'s faster together!'), C('Ich zeig dir, wo.', 'I\'ll show you where.')];
+const HELP_LINES = [
+  C('Wer bitte isst Pizza mit Glitzer?!', 'Who eats pizza with glitter?!'), C('Noch ein Kronkorken… und noch einer…', 'Another bottle cap… and another…'),
+  C('Ein Sack für mich, einer für dich!', 'A bag for me, one for you!'), C('Igitt. Ich will nicht wissen, was das war.', 'Ew. I don\'t want to know what that was.'),
+  C('Da drüben liegt noch was!', 'There\'s more over there!'), C('Mutter Erde sagt danke.', 'Mother Earth says thanks.'),
+];
 // place names come with their preposition: "Müll {place}" → "Müll an der Bierbank"
 const TRASH_PLACES = [['plot_mainstage', C('an der Mainstage', 'at the mainstage')], ['plot_narnia_floor', C('am Narnia Floor', 'at the Narnia Floor')], ['plot_firespace', C('am Firespace', 'at the Firespace')], ['plot_hammocks', C('im Hängemattenwald', 'in the hammock forest')], ['chill', C('an der Bierbank', 'at the beer bench')], ['plot_entrance', C('am Eingang', 'at the entrance')]];
 
@@ -229,6 +237,7 @@ export class Errands {
   update(dt) {
     const g = this.game, qs = g.quests;
     this.checkDiesel();
+    this.updateHelpers();
     // offers nobody took for a while disappear again
     this.offers = this.offers.filter((o) => {
       if (qs.isActive(o.qid) || qs.isDone(o.qid)) return false;
@@ -352,6 +361,28 @@ export class Errands {
     return this.base(this.newId('trash'), id, C(`Müll ${placeName.de}`, `Rubbish ${placeName.en}`), fill(ask), [
       { type: 'pickup', text: fill(C('Sammle drei Müllsäcke {place} ein', 'Collect three bin bags {place}')), items: ['a', 'b', 'c'].map((k) => ({ item: `err_trash_${k}`, at: placeSpot, search: 14 })) },
       { type: 'talk', npc: id, text: C(`Bring die Säcke zu ${name}`, `Bring the bags to ${name}`), consumes: ['err_trash_a', 'err_trash_b', 'err_trash_c'], dialog: [{ who: id, text: thanks }] },
-    ], 20);
+    ], 20, { helpAt: placeSpot });
+  }
+
+  /**
+   * Favours you do together (quest has `helpAt`): once accepted, the giver walks to the spot and works along there
+   * until the quest is over instead of wandering off – the final "talk" step then happens on site.
+   */
+  updateHelpers() {
+    const g = this.game, qs = g.quests;
+    for (const qid of Object.keys(qs.state.active)) {
+      const q = qs.quests[qid];
+      if (!q?.helpAt) continue;
+      const n = g.npcs.get(q.giver), at = g.world.spots[q.helpAt];
+      if (!n || !at || n.hidden || n.away || n.incident || n.riding || n.knocked || n.party || n.task) continue;
+      const pos = new THREE.Vector3(at.x, 0, at.z);
+      n.task = {
+        phase: 'go', pos: () => pos, arriveDist: 3, speed: 5, anim: 'run', roam: 6, helpQid: qid,
+        arriveLine: C('So, packen wir\'s an!', 'Right, let\'s get to it!'), lines: HELP_LINES,
+      };
+      n.say(pick(GO_LINES), 3.5);
+    }
+    // quest finished, failed or dropped: back to normal
+    for (const n of g.npcs.map.values()) if (n.task?.helpQid && !qs.isActive(n.task.helpQid)) n.task = null;
   }
 }

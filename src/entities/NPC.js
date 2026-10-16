@@ -616,6 +616,17 @@ export class NPC {
       }
       const d = this.root.position.distanceTo(tk.pos());
       if (r === true || d < (tk.arriveDist || 2.2)) { tk.phase = 'work'; tk.t = tk.workTime || 4; this.say(tk.arriveLine || '…', 3); }
+    } else if (tk.phase === 'work' && tk.roam) {
+      // helping out on the spot: stroll between a few points around it, bend down, pick something up, repeat
+      if (tk.lines && (tk.lineT = (tk.lineT ?? 6) - dt) <= 0) { tk.lineT = 11 + Math.random() * 8; if (!this.bubble) this.say(pick(tk.lines), 3.5); }
+      if (tk.spot) {
+        if (this.walkTo(tk.spot, dt, 1.6) !== false || this.position.distanceTo(tk.spot) < 0.6) { tk.spot = null; tk.t = 1.6 + Math.random() * 1.8; }
+      } else if ((tk.t -= dt) > 0) {
+        this.char.play('interact');
+      } else {
+        const c = tk.pos(), a = Math.random() * Math.PI * 2, r = Math.random() * tk.roam;
+        tk.spot = new THREE.Vector3(c.x + Math.cos(a) * r, 0, c.z + Math.sin(a) * r);
+      }
     } else if (tk.phase === 'work') {
       this.char.faceTowards(tk.pos(), dt);
       this.char.play('interact');

@@ -10,6 +10,8 @@ import { getLang } from '../i18n.js';
 //   'spot'     – find the odd one in a grid (the wobbly bolt, the right nut …), opts.rounds times
 //   'crown'    – a ring spins: hit when a free hole passes the top marker, fill opts.holes (speeds up)
 //   'pump'     – pump left/right in turns, keep the pressure in the green until the tank is empty (too wild = splash)
+//   'trench'   – the auger digs by itself, hold / let go to keep it on the sprayed route
+//   'jigsaw'   – a wobbly jigsaw cuts the rounded scale ends into boards, steer it left / right along the pencil line
 // step.minigame may also be an array: the games run one after the other, all must succeed.
 // Every game resolves to true (success) or false (missed / too slow / cancelled). Keyboard + touch.
 
@@ -52,6 +54,7 @@ export class Minigame {
       case 'crown': return this.crown(o);
       case 'pump': return this.pump(o);
       case 'trench': return this.trench(o);
+      case 'jigsaw': return this.jigsaw(o);
       default: return this.timing(o);
     }
   }
@@ -332,6 +335,130 @@ export class Minigame {
       draw();
       raf = requestAnimationFrame(tick);
       const stop = this.listen(el, () => { hold = true; }, () => finish(false), () => { hold = false; });
+    });
+  }
+
+  /**
+   * Dragon scales: boards lie on the sawbuck, the jigsaw runs down the pencil line by itself and rounds one
+   * end of each board (one scallop per board). The saw wobbles – tap / hold left or right (screen halves,
+   * ← → / A D) to keep it on the line. Off the line too long and the board is ruined.
+   */
+  jigsaw({ title, boards = 2, width = 0.15, slack = 2.2, wobble = 0.75 } = {}) {
+    const de = getLang() === 'de';
+    const el = this.frame(title || (de ? 'Schuppen sägen!' : 'Saw the scales!'),
+      de ? 'Links / rechts <b>tippen oder halten</b> (← → / A D): führ die wacklige Stichsäge auf der Bleistiftlinie' : '<b>Tap or hold</b> left / right (← → / A D): keep the wobbly jigsaw on the pencil line',
+      '<canvas class="mg-canvas" width="420" height="230" style="width:100%;display:block;border-radius:10px;background:#5b4a3a"></canvas>'
+      + '<div style="display:flex;gap:10px;margin-top:8px"><div class="mg-btn mg-jl" style="flex:1;text-align:center;padding:8px 0;font-size:20px">◀</div><div class="mg-btn mg-jr" style="flex:1;text-align:center;padding:8px 0;font-size:20px">▶</div></div>'
+      + '<div class="mg-sub"><div class="mg-subfill"></div></div>');
+    const cv = el.querySelector('canvas'), ctx = cv.getContext('2d'), sub = el.querySelector('.mg-subfill');
+    const bl = el.querySelector('.mg-jl'), br = el.querySelector('.mg-jr');
+    const W = cv.width, H = cv.height, AY = H * 0.34, PX = 52, LEAD = 0.7, BOARD = 2.6; // saw line, pixels per unit, lead-in, board length
+    const length = LEAD + boards * BOARD + 0.4;
+    const BL = 0.28, BR = 0.86; // board edges (fraction of the width)
+    // the pencil line: straight in from the board end, then one round scale end per board (cusp where two boards meet)
+    const route = (d) => { const u = d - LEAD; return u <= 0 || u >= boards * BOARD ? 0.66 : 0.66 - 0.26 * Math.pow(Math.sin(Math.PI * ((u % BOARD) / BOARD)), 0.8); };
+    return new Promise((resolve) => {
+      let x = 0.66, v = 0, dist = 0, off = 0, t = 0, last = performance.now(), raf = 0, idle = 0, kl = false, kr = false;
+      const ptr = new Map(); // pointerId → -1 / 1
+      const trail = [];
+      const ph = Math.random() * 6;
+      const t0 = performance.now();
+      const steer = () => { let s = (kl ? -1 : 0) + (kr ? 1 : 0); for (const p of ptr.values()) s += p; return Math.max(-1, Math.min(1, s)); };
+      const finish = this.finisher(el, resolve, () => { cancelAnimationFrame(raf); stop(); });
+      const draw = () => {
+        ctx.clearRect(0, 0, W, H);
+        // sawbuck floor, then the boards scrolling up
+        const yOf = (d) => AY + (d - dist) * PX;
+        for (let b = -1; b <= boards; b++) {
+          const y0 = yOf(LEAD + b * BOARD), y1 = yOf(LEAD + (b + 1) * BOARD);
+          if (y1 < -10 || y0 > H + 10) continue;
+          ctx.fillStyle = b < 0 || b >= boards ? '#b98a55' : ['#d4a86c', '#c99a5c'][(b + 2) % 2];
+          ctx.fillRect(BL * W, y0, (BR - BL) * W, y1 - y0);
+          ctx.strokeStyle = 'rgba(110,70,30,0.35)'; ctx.lineWidth = 1;
+          for (let k = 1; k < 6; k++) { ctx.beginPath(); ctx.moveTo(BL * W + k * 38, y0); ctx.bezierCurveTo(BL * W + k * 38 + 6, y0 + 40, BL * W + k * 38 - 6, y1 - 40, BL * W + k * 38, y1); ctx.stroke(); }
+          ctx.fillStyle = 'rgba(60,35,15,0.6)'; ctx.fillRect(BL * W, y0 - 1, (BR - BL) * W, 2); // seam
+        }
+        // pencil line ahead
+        ctx.strokeStyle = 'rgba(40,40,50,0.85)'; ctx.lineWidth = 2; ctx.setLineDash([7, 5]);
+        ctx.beginPath();
+        for (let y = AY; y <= H + 6; y += 5) { const px = route(dist + (y - AY) / PX) * W; if (y === AY) ctx.moveTo(px, y); else ctx.lineTo(px, y); }
+        ctx.stroke(); ctx.setLineDash([]);
+        // already cut: offcut on the left darkened, kerf as a dark line
+        if (trail.length > 1) {
+          ctx.fillStyle = 'rgba(30,20,10,0.45)';
+          ctx.beginPath(); ctx.moveTo(BL * W, yOf(trail[0][0]));
+          for (const [d, tx] of trail) ctx.lineTo(tx * W, yOf(d));
+          ctx.lineTo(x * W, AY); ctx.lineTo(BL * W, AY); ctx.closePath(); ctx.fill();
+          ctx.strokeStyle = '#2a1a0c'; ctx.lineWidth = 3; ctx.lineJoin = 'round';
+          ctx.beginPath(); trail.forEach(([d, tx], i) => (i ? ctx.lineTo(tx * W, yOf(d)) : ctx.moveTo(tx * W, yOf(d)))); ctx.lineTo(x * W, AY); ctx.stroke();
+        }
+        // the jigsaw: body + handle, tilting with the wobble, red when off the line
+        const on = Math.abs(x - route(dist)) < width / 2;
+        const sx = x * W + Math.sin(t * 55) * 1.2;
+        ctx.save(); ctx.translate(sx, AY); ctx.rotate(v * 0.5);
+        ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(-15, -30, 34, 50);
+        ctx.fillStyle = on ? '#2aa3a0' : '#e05040'; ctx.fillRect(-17, -36, 34, 48);
+        ctx.fillStyle = '#222'; ctx.fillRect(-11, -50, 22, 16); ctx.fillStyle = on ? '#2aa3a0' : '#e05040'; ctx.fillRect(-7, -46, 14, 9);
+        ctx.fillStyle = '#ddd'; ctx.fillRect(-1.5, 10, 3, 9 + Math.sin(t * 60) * 3);
+        ctx.restore();
+        // sawdust
+        ctx.fillStyle = '#f0d9a8';
+        for (let i = 0; i < 7; i++) { const a = t * 11 + i * 0.9; ctx.fillRect(sx + Math.cos(a) * (8 + (i % 3) * 6), AY + 14 + Math.abs(Math.sin(a * 1.3)) * 10, 2, 2); }
+        const s = steer();
+        bl.classList.toggle('good', s < 0); br.classList.toggle('good', s > 0);
+      };
+      const tick = (now) => {
+        const dt = Math.min(0.05, (now - last) / 1000); last = now; t += dt;
+        dist += 1.15 * dt;
+        const shake = (Math.sin(t * 2.3 + ph) * 0.8 + Math.sin(t * 5.1 + ph * 2) * 0.5 + (Math.random() - 0.5) * 1.2) * wobble;
+        v += (steer() * 3.4 + shake) * dt;
+        v *= 1 - 3 * dt;
+        x = Math.min(0.97, Math.max(0.05, x + v * dt));
+        const on = Math.abs(x - route(dist)) < width / 2;
+        if (!on && dist > LEAD * 0.5) off += dt;
+        if (!trail.length || dist - trail[trail.length - 1][0] > 0.05) trail.push([dist, x]);
+        while (trail.length && (dist - trail[0][0]) * PX > AY + 20) trail.shift();
+        sub.style.width = `${Math.min(1, dist / length) * 100}%`;
+        sub.style.background = off > slack * 0.6 ? '#ff7a50' : '';
+        draw();
+        if (off > slack) return finish(false);
+        if (dist >= length) return finish(true);
+        raf = requestAnimationFrame(tick);
+      };
+      const keySide = (code) => (code === 'ArrowLeft' || code === 'KeyA' ? -1 : code === 'ArrowRight' || code === 'KeyD' ? 1 : 0);
+      const down = (e) => {
+        if (e.code === 'Escape') { e.preventDefault(); finish(false); return; }
+        const s = keySide(e.code);
+        if (!s && e.code !== 'KeyE' && e.code !== 'Space') return;
+        e.preventDefault(); e.stopPropagation(); idle = 0;
+        if (e.repeat || !s) return;
+        if (s < 0) kl = true; else kr = true;
+        v += s * 0.18; // a tap nudges
+      };
+      const up = (e) => { const s = keySide(e.code); if (s < 0) kl = false; else if (s > 0) kr = false; };
+      const pdown = (e) => {
+        e.preventDefault(); e.stopPropagation();
+        if (e.target.closest?.('.mg-cancel')) { if (performance.now() - t0 > 1000) finish(false); return; }
+        const s = e.clientX < window.innerWidth / 2 ? -1 : 1;
+        ptr.set(e.pointerId, s); v += s * 0.18; idle = 0;
+      };
+      const pup = (e) => ptr.delete(e.pointerId);
+      const timer = setInterval(() => { if (++idle >= 12) finish(false); }, 1000);
+      window.addEventListener('keydown', down, true);
+      window.addEventListener('keyup', up, true);
+      window.addEventListener('pointerdown', pdown, true);
+      window.addEventListener('pointerup', pup, true);
+      window.addEventListener('pointercancel', pup, true);
+      const stop = () => {
+        clearInterval(timer);
+        window.removeEventListener('keydown', down, true);
+        window.removeEventListener('keyup', up, true);
+        window.removeEventListener('pointerdown', pdown, true);
+        window.removeEventListener('pointerup', pup, true);
+        window.removeEventListener('pointercancel', pup, true);
+      };
+      draw();
+      raf = requestAnimationFrame(tick);
     });
   }
 

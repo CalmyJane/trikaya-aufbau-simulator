@@ -288,7 +288,7 @@ export function buildMainstage() {
   }
 
   // ---------------------------------------------------------------- scale workshop: a gazebo left of the dragon,
-  // logs on a sawbuck, sliced into shingles (Jimmy's realm)
+  // boards on a sawbuck, their ends rounded into shingles with jigsaws (Jimmy's realm)
   const PX = -19.5, PZ = -9.5;
   {
     const W = 4.6, D = 3.6, H = 2.3;
@@ -311,50 +311,50 @@ export function buildMainstage() {
     dust.position.set(PX, 0.03, PZ - 0.2);
     dust.receiveShadow = true;
     g.add(dust);
-    // sawbuck with the log that is being sliced
-    const barkMat = mat('#6a4626'), cutMat = mat('#e2bd86');
+    // sawbuck with a board on it, the jigsaw resting at its rounded end
     const sz = PZ - 0.5;
     for (const x of [-0.75, 0.75]) for (const k of [-1, 1]) {
       g.add(strut(V(PX + x, 0, sz - 0.4 * k), V(PX + x, 1.0, sz + 0.3 * k), 0.04, woodB));
     }
     g.add(strut(V(PX - 0.75, 0.35, sz), V(PX + 0.75, 0.35, sz), 0.03, woodB));
-    const log = cyl(0.2, 0.2, 2.3, barkMat, 9, PX - 0.1, 0.86, sz);
-    log.rotation.z = Math.PI / 2;
-    g.add(log);
-    const cut = cyl(0.19, 0.19, 0.02, cutMat, 9, PX + 1.06, 0.86, sz);
-    cut.rotation.z = Math.PI / 2;
-    g.add(cut);
+    // shingle: a small board with one rounded end (flat in XZ, round end towards +x)
+    const sh = new THREE.Shape();
+    sh.moveTo(-0.22, -0.11); sh.lineTo(0.11, -0.11); sh.absarc(0.11, 0, 0.11, -Math.PI / 2, Math.PI / 2, false); sh.lineTo(-0.22, 0.11); sh.lineTo(-0.22, -0.11);
+    const shingleGeo = new THREE.ExtrudeGeometry(sh, { depth: 0.025, bevelEnabled: false, curveSegments: 8 });
+    shingleGeo.rotateX(-Math.PI / 2);
+    const boardMats = ['#e2bd86', '#d4a86c', '#c8955a'].map((c) => mat(c));
+    g.add(box(2.1, 0.03, 0.32, woodC, PX - 0.05, 1.02, sz));
+    g.add(box(2.1, 0.03, 0.3, woodA, PX - 0.08, 1.05, sz + 0.02));
+    const jig = new THREE.Group();
+    jig.add(box(0.2, 0.09, 0.07, mat('#2aa3a0'), 0, 0.045, 0), box(0.11, 0.05, 0.04, mat('#222'), -0.02, 0.115, 0), box(0.012, 0.06, 0.006, mat('#ddd'), 0.06, -0.02, 0));
+    jig.position.set(PX + 0.85, 1.07, sz);
+    jig.rotation.y = 0.3;
+    g.add(jig);
     colliders.push({ type: 'box', x: PX, z: sz, hw: 1.2, hd: 0.3, rot: 0 });
     // table with freshly cut shingles, more of them stacked on the ground
     const tx = PX + 1.55, tz = PZ + 1.0;
     g.add(box(1.1, 0.06, 0.7, woodC, tx, 0.8, tz));
     for (const [x, z] of [[-0.48, -0.28], [0.48, -0.28], [0.48, 0.28], [-0.48, 0.28]]) g.add(box(0.06, 0.8, 0.06, woodB, tx + x, 0.4, tz + z));
     colliders.push({ type: 'box', x: tx, z: tz, hw: 0.55, hd: 0.35, rot: 0 });
-    const discGeo = new THREE.CylinderGeometry(0.2, 0.2, 0.05, 9);
-    const discMats = ['#e2bd86', '#d4a86c', '#c8955a'].map((c) => [barkMat, mat(c), mat(c)]);
-    const disc = (x, y, z, k) => {
-      const m = new THREE.Mesh(discGeo, discMats[k % 3]);
+    const shingle = (x, y, z, k) => {
+      const m = new THREE.Mesh(shingleGeo, boardMats[k % 3]);
       m.position.set(x, y, z);
       m.rotation.y = k * 1.7;
-      m.scale.set(1, 1, 0.8 + (k % 3) * 0.2);
       m.castShadow = true;
       g.add(m);
     };
-    for (let i = 0; i < 9; i++) disc(tx - 0.3 + (i % 2) * 0.55, 0.86 + Math.floor(i / 2) * 0.055, tz + ((i % 3) - 1) * 0.08, i);
-    for (let i = 0; i < 18; i++) disc(PX - 1.6 + (i % 3) * 0.46, 0.03 + Math.floor(i / 3) * 0.055, PZ + 1.15 + ((i * 7) % 4) * 0.05, i + 3);
-    // log pile next to the gazebo
-    for (let i = 0; i < 6; i++) {
-      const row = i < 3 ? 0 : i < 5 ? 1 : 2;
-      const l = cyl(0.2, 0.2, 2.6, barkMat, 8, PX - 3.4 + (i - [0, 3, 5][row]) * 0.42 + row * 0.21, 0.2 + row * 0.36, PZ - 0.3);
-      l.rotation.x = Math.PI / 2;
-      l.castShadow = true;
-      g.add(l);
+    for (let i = 0; i < 9; i++) shingle(tx - 0.3 + (i % 2) * 0.55, 0.83 + Math.floor(i / 2) * 0.03, tz + ((i % 3) - 1) * 0.08, i);
+    for (let i = 0; i < 18; i++) shingle(PX - 1.6 + (i % 3) * 0.46, 0.01 + Math.floor(i / 3) * 0.03, PZ + 1.15 + ((i * 7) % 4) * 0.05, i + 3);
+    // pile of raw boards next to the gazebo (the shingles get cut from these)
+    for (let i = 0; i < 14; i++) {
+      const row = Math.floor(i / 4), col = i % 4;
+      if (row === 3 && col > 1) break;
+      const b = box(0.3, 0.03, 2.6, [woodA, woodC, woodB][(i * 5) % 3], PX - 3.6 + col * 0.33 + row * 0.08, 0.095 + row * 0.032, PZ - 0.3 + ((i * 3) % 5) * 0.03);
+      b.rotation.y = ((i * 7) % 5 - 2) * 0.015;
+      b.castShadow = true;
+      g.add(b);
     }
-    colliders.push({ type: 'box', x: PX - 2.95, z: PZ - 0.3, hw: 0.75, hd: 1.35, rot: 0 });
-    const ws = signPost('SCHUPPEN', { width: 2.2, height: 1.1, bg: '#2a160a', fg: '#e2bd86' });
-    ws.position.set(PX - 3.3, 0, PZ + 1.9);
-    ws.rotation.y = 0.35;
-    g.add(ws);
+    for (const z of [-1.0, 0, 1.0]) g.add(box(1.5, 0.08, 0.1, woodB, PX - 3.05, 0.04, PZ - 0.3 + z)); // spacer battens under the pile
   }
   // spots (local x, z): where the player saws, where the crew saws, where the shingles get nailed on
   g.userData.spots = {

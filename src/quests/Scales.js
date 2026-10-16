@@ -1,7 +1,7 @@
 import { L } from '../i18n.js';
 
 // The dragon's shingles: the frame stands, the scales go on bit by bit from the ground up.
-// Jimmy's crew saws them in the gazebo left of the dragon and nails them on – slowly. The player can
+// Jimmy's crew cuts them from a pile of boards with jigsaws in the gazebo left of the dragon and nails them on – slowly. The player can
 // saw along there at any time (permanent side job, a little karma), which speeds the dragon up.
 // State: quests.state.flags.scales (0…1) and flags.scalesCut (how many the player has sawn).
 
@@ -49,13 +49,13 @@ export class Scales {
 
   label() { return L(C('🪚 Schuppen sägen', '🪚 Saw scales')); }
 
-  /** The player saws a log into shingles (skill game), a bit of karma, the dragon grows faster. */
+  /** The player rounds board ends into shingles with the jigsaw (skill game), a bit of karma, the dragon grows faster. */
   cut() {
     const g = this.game;
     if (g.minigame.open || g.building) return;
     const log = g.world.spots.scale_log;
     if (log) g.player.root.rotation.y = Math.atan2(log.x - g.player.position.x, log.z - g.player.position.z);
-    g.playMinigame({ minigame: 'mash', minigameOpts: { need: 12, time: 5 }, minigameTitle: C('Schuppen sägen', 'Saw scales'), minigameFail: C('Verkantet! Die Säge klemmt. Nochmal.', 'Jammed! The saw is stuck. Again.') }, () => {
+    g.playMinigame({ minigame: 'jigsaw', minigameTitle: C('Schuppen sägen', 'Saw scales'), minigameFail: C('Verrutscht! Das Brett ist Ausschuss. Nochmal.', 'Slipped! That board is scrap. Again.') }, () => {
       const f = this.flags, was = this.value;
       f.scales = Math.min(1, was + CUT);
       f.scalesCut = (f.scalesCut || 0) + 1;

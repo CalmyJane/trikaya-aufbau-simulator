@@ -1457,7 +1457,7 @@ export class Game {
     this.player.frozen = true;
     // tile / list games are clicked: free the mouse meanwhile (without that counting as Esc → pause)
     const kinds = [].concat(step.minigame).map((m) => (typeof m === 'string' ? m : m?.kind));
-    const free = this.input.locked && kinds.some((k) => ['order', 'match', 'spot'].includes(k));
+    const free = this.input.locked && kinds.some((k) => ['order', 'match', 'spot', 'jigsaw'].includes(k));
     if (free) { this.ignoreUnlock = true; this.input.unlock(); }
     this.minigame.run(step.minigame, { title: L(step.minigameTitle) || L(step.label) || L(step.buildLabel), ...(step.minigameOpts || {}) }).then((ok) => {
       if (free) { if (this.mode === 'play') this.input.lock(); setTimeout(() => (this.ignoreUnlock = false), 150); }

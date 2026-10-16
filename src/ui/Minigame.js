@@ -11,7 +11,7 @@ import { getLang } from '../i18n.js';
 //   'crown'    – a ring spins: hit when a free hole passes the top marker, fill opts.holes (speeds up)
 //   'pump'     – pump left/right in turns, keep the pressure in the green until the tank is empty (too wild = splash)
 //   'trench'   – the auger digs by itself, hold / let go to keep it on the sprayed route
-//   'jigsaw'   – a wobbly jigsaw cuts the rounded scale ends into boards, steer it left / right along the pencil line
+//   'jigsaw'   – a long board slides under the jigsaw, tap when a pencil arc is under the blade (round-ended shingles)
 // step.minigame may also be an array: the games run one after the other, all must succeed.
 // Every game resolves to true (success) or false (missed / too slow / cancelled). Keyboard + touch.
 
@@ -339,126 +339,117 @@ export class Minigame {
   }
 
   /**
-   * Dragon scales: boards lie on the sawbuck, the jigsaw runs down the pencil line by itself and rounds one
-   * end of each board (one scallop per board). The saw wobbles – tap / hold left or right (screen halves,
-   * ← → / A D) to keep it on the line. Off the line too long and the board is ruined.
+   * Dragon scales: a long board slides under the jigsaw, pencil arcs are drawn on it. Tap (E / Space / click /
+   * finger) when an arc is right under the blade – brrrt, the saw runs the arc and a round-ended shingle hops
+   * onto the pile. Off by too much = a crooked one for the scrap box. opts.need of opts.marks must be good.
    */
-  jigsaw({ title, boards = 2, width = 0.15, slack = 2.2, wobble = 0.75 } = {}) {
+  jigsaw({ title, marks = 6, need = 4, zone = 20 } = {}) {
     const de = getLang() === 'de';
     const el = this.frame(title || (de ? 'Schuppen sägen!' : 'Saw the scales!'),
-      de ? 'Links / rechts <b>tippen oder halten</b> (← → / A D): führ die wacklige Stichsäge auf der Bleistiftlinie' : '<b>Tap or hold</b> left / right (← → / A D): keep the wobbly jigsaw on the pencil line',
-      '<canvas class="mg-canvas" width="420" height="230" style="width:100%;display:block;border-radius:10px;background:#5b4a3a"></canvas>'
-      + '<div style="display:flex;gap:10px;margin-top:8px"><div class="mg-btn mg-jl" style="flex:1;text-align:center;padding:8px 0;font-size:20px">◀</div><div class="mg-btn mg-jr" style="flex:1;text-align:center;padding:8px 0;font-size:20px">▶</div></div>'
-      + '<div class="mg-sub"><div class="mg-subfill"></div></div>');
+      de ? 'Tippen / <b>E</b> / Leertaste, wenn ein Bleistiftbogen unter dem Sägeblatt ist' : 'Tap / <b>E</b> / Space when a pencil arc is right under the blade',
+      '<canvas class="mg-canvas" width="420" height="210" style="width:100%;display:block;border-radius:10px;background:#5b4a3a"></canvas><div class="mg-sub"><div class="mg-subfill"></div></div>');
     const cv = el.querySelector('canvas'), ctx = cv.getContext('2d'), sub = el.querySelector('.mg-subfill');
-    const bl = el.querySelector('.mg-jl'), br = el.querySelector('.mg-jr');
-    const W = cv.width, H = cv.height, AY = H * 0.34, PX = 52, LEAD = 0.7, BOARD = 2.6; // saw line, pixels per unit, lead-in, board length
-    const length = LEAD + boards * BOARD + 0.4;
-    const BL = 0.28, BR = 0.86; // board edges (fraction of the width)
-    // the pencil line: straight in from the board end, then one round scale end per board (cusp where two boards meet)
-    const route = (d) => { const u = d - LEAD; return u <= 0 || u >= boards * BOARD ? 0.66 : 0.66 - 0.26 * Math.pow(Math.sin(Math.PI * ((u % BOARD) / BOARD)), 0.8); };
+    const W = cv.width, H = cv.height, SX = 250, BY = 64, BH = 46, GAP = 104, R = BH / 2; // saw x, board top, board height, arc spacing
+    const audio = this.game.audio;
     return new Promise((resolve) => {
-      let x = 0.66, v = 0, dist = 0, off = 0, t = 0, last = performance.now(), raf = 0, idle = 0, kl = false, kr = false;
-      const ptr = new Map(); // pointerId → -1 / 1
-      const trail = [];
-      const ph = Math.random() * 6;
-      const t0 = performance.now();
-      const steer = () => { let s = (kl ? -1 : 0) + (kr ? 1 : 0); for (const p of ptr.values()) s += p; return Math.max(-1, Math.min(1, s)); };
-      const finish = this.finisher(el, resolve, () => { cancelAnimationFrame(raf); stop(); });
+      // arcs in board coordinates (px from the board's start); the board slides left, pos = how far it has moved
+      const arcs = Array.from({ length: marks }, (_, i) => ({ at: 150 + i * GAP, state: 0 })); // 0 open, 1 good, -1 crooked, -2 missed
+      let pos = -SX + 70, speed = 95, good = 0, bad = 0, last = performance.now(), raf = 0, t = 0, buzz = 0, flash = 0, flashOk = true;
+      let cutEnd = 0; // board x where the board now starts (everything left of it is sawn off)
+      const fly = [], pile = [], chips = [];
+      const finish = this.finisher(el, resolve, () => { cancelAnimationFrame(raf); off(); });
+      const shingle = (x, y, rot, s, ok) => {
+        ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(s, s);
+        ctx.fillStyle = ok ? '#d9ad6e' : '#a8814f'; ctx.strokeStyle = 'rgba(70,40,15,0.8)'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(30, -R); ctx.lineTo(-4, -R);
+        if (ok) ctx.arc(-4, 0, R, -Math.PI / 2, Math.PI / 2, true);
+        else { ctx.lineTo(-14, -6); ctx.lineTo(-2, 4); ctx.lineTo(-20, R); }
+        ctx.lineTo(30, R); ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.restore();
+      };
+      const pileY = (n) => H - 24 - n * 7;
       const draw = () => {
         ctx.clearRect(0, 0, W, H);
-        // sawbuck floor, then the boards scrolling up
-        const yOf = (d) => AY + (d - dist) * PX;
-        for (let b = -1; b <= boards; b++) {
-          const y0 = yOf(LEAD + b * BOARD), y1 = yOf(LEAD + (b + 1) * BOARD);
-          if (y1 < -10 || y0 > H + 10) continue;
-          ctx.fillStyle = b < 0 || b >= boards ? '#b98a55' : ['#d4a86c', '#c99a5c'][(b + 2) % 2];
-          ctx.fillRect(BL * W, y0, (BR - BL) * W, y1 - y0);
-          ctx.strokeStyle = 'rgba(110,70,30,0.35)'; ctx.lineWidth = 1;
-          for (let k = 1; k < 6; k++) { ctx.beginPath(); ctx.moveTo(BL * W + k * 38, y0); ctx.bezierCurveTo(BL * W + k * 38 + 6, y0 + 40, BL * W + k * 38 - 6, y1 - 40, BL * W + k * 38, y1); ctx.stroke(); }
-          ctx.fillStyle = 'rgba(60,35,15,0.6)'; ctx.fillRect(BL * W, y0 - 1, (BR - BL) * W, 2); // seam
-        }
-        // pencil line ahead
-        ctx.strokeStyle = 'rgba(40,40,50,0.85)'; ctx.lineWidth = 2; ctx.setLineDash([7, 5]);
+        ctx.fillStyle = '#3e2f22'; ctx.fillRect(0, BY + BH + 6, W, 8); // sawbuck rail
+        // the board (left end rounded once the first arc is sawn)
+        const x0 = Math.max(-60, cutEnd - pos), x1 = W + 40;
+        ctx.fillStyle = '#d4a86c';
         ctx.beginPath();
-        for (let y = AY; y <= H + 6; y += 5) { const px = route(dist + (y - AY) / PX) * W; if (y === AY) ctx.moveTo(px, y); else ctx.lineTo(px, y); }
-        ctx.stroke(); ctx.setLineDash([]);
-        // already cut: offcut on the left darkened, kerf as a dark line
-        if (trail.length > 1) {
-          ctx.fillStyle = 'rgba(30,20,10,0.45)';
-          ctx.beginPath(); ctx.moveTo(BL * W, yOf(trail[0][0]));
-          for (const [d, tx] of trail) ctx.lineTo(tx * W, yOf(d));
-          ctx.lineTo(x * W, AY); ctx.lineTo(BL * W, AY); ctx.closePath(); ctx.fill();
-          ctx.strokeStyle = '#2a1a0c'; ctx.lineWidth = 3; ctx.lineJoin = 'round';
-          ctx.beginPath(); trail.forEach(([d, tx], i) => (i ? ctx.lineTo(tx * W, yOf(d)) : ctx.moveTo(tx * W, yOf(d)))); ctx.lineTo(x * W, AY); ctx.stroke();
+        if (cutEnd > 0) { ctx.moveTo(x1, BY); ctx.lineTo(x0 + R, BY); ctx.arc(x0 + R, BY + R, R, -Math.PI / 2, Math.PI / 2, true); ctx.lineTo(x1, BY + BH); }
+        else { ctx.moveTo(x1, BY); ctx.lineTo(x0, BY); ctx.lineTo(x0, BY + BH); ctx.lineTo(x1, BY + BH); }
+        ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = 'rgba(120,75,35,0.4)'; ctx.lineWidth = 1;
+        for (let k = 1; k < 4; k++) {
+          ctx.beginPath(); ctx.moveTo(x0 + 12, BY + k * 11.5);
+          for (let x = x0 + 12; x < x1; x += 30) ctx.lineTo(x, BY + k * 11.5 + Math.sin((x + pos) * 0.03 + k) * 2);
+          ctx.stroke();
         }
-        // the jigsaw: body + handle, tilting with the wobble, red when off the line
-        const on = Math.abs(x - route(dist)) < width / 2;
-        const sx = x * W + Math.sin(t * 55) * 1.2;
-        ctx.save(); ctx.translate(sx, AY); ctx.rotate(v * 0.5);
-        ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(-15, -30, 34, 50);
-        ctx.fillStyle = on ? '#2aa3a0' : '#e05040'; ctx.fillRect(-17, -36, 34, 48);
-        ctx.fillStyle = '#222'; ctx.fillRect(-11, -50, 22, 16); ctx.fillStyle = on ? '#2aa3a0' : '#e05040'; ctx.fillRect(-7, -46, 14, 9);
-        ctx.fillStyle = '#ddd'; ctx.fillRect(-1.5, 10, 3, 9 + Math.sin(t * 60) * 3);
-        ctx.restore();
-        // sawdust
-        ctx.fillStyle = '#f0d9a8';
-        for (let i = 0; i < 7; i++) { const a = t * 11 + i * 0.9; ctx.fillRect(sx + Math.cos(a) * (8 + (i % 3) * 6), AY + 14 + Math.abs(Math.sin(a * 1.3)) * 10, 2, 2); }
-        const s = steer();
-        bl.classList.toggle('good', s < 0); br.classList.toggle('good', s > 0);
+        // pencil arcs still to be sawn
+        ctx.strokeStyle = 'rgba(30,30,40,0.85)'; ctx.lineWidth = 2; ctx.setLineDash([5, 4]);
+        for (const a of arcs) {
+          const x = a.at - pos;
+          if (a.state || x < -30 || x > W + 30) continue;
+          ctx.beginPath(); ctx.arc(x + R, BY + R, R, Math.PI / 2, Math.PI * 1.5); ctx.stroke();
+        }
+        ctx.setLineDash([]);
+        // the jigsaw + its window (green when an arc is in it)
+        const near = arcs.some((a) => !a.state && Math.abs(a.at - pos - SX) < zone);
+        ctx.fillStyle = near ? 'rgba(90,220,110,0.3)' : 'rgba(255,255,255,0.08)';
+        ctx.fillRect(SX - zone, BY - 6, zone * 2, BH + 12);
+        const jy = BY - 8 + (buzz > 0 ? Math.sin(t * 90) * 2 : 0);
+        ctx.fillStyle = '#2aa3a0'; ctx.fillRect(SX - 20, jy - 34, 40, 30);
+        ctx.fillStyle = '#222'; ctx.fillRect(SX - 14, jy - 48, 28, 14);
+        ctx.fillStyle = '#ddd'; ctx.fillRect(SX - 1.5, jy - 4, 3, BH + 12);
+        // shingles flying and on the piles (good left, scrap right)
+        for (const f of fly) shingle(f.x, f.y, f.r, 0.7, f.ok);
+        for (const p of pile) shingle(p.ok ? 46 + (p.n % 2) * 6 : W - 50, pileY(p.n), p.ok ? -0.08 + (p.n % 3) * 0.05 : 0.4, 0.7, p.ok);
+        ctx.fillStyle = '#f0e2c4'; ctx.font = 'bold 15px sans-serif';
+        ctx.fillText(`🐉 ${good}/${need}`, 14, 24);
+        ctx.fillText(`🗑 ${bad}`, W - 56, 24);
+        ctx.fillStyle = '#f3dfb0';
+        for (const c of chips) ctx.fillRect(c.x, c.y, 3, 3);
+        if (flash > 0) {
+          ctx.fillStyle = flashOk ? `rgba(120,240,130,${flash})` : `rgba(255,110,90,${flash})`; ctx.font = 'bold 22px sans-serif';
+          ctx.fillText(flashOk ? (de ? 'Sauber!' : 'Clean!') : (de ? 'Schief!' : 'Crooked!'), SX - 40, BY + BH + 48);
+        }
+      };
+      const cut = () => {
+        if (buzz > 0) return;
+        let a = null, best = 1e9;
+        for (const c of arcs) { const d = Math.abs(c.at - pos - SX); if (!c.state && d < best) { best = d; a = c; } }
+        if (!a || best > GAP * 0.6) return; // nothing near the blade: ignore the tap
+        const ok = best < zone;
+        a.state = ok ? 1 : -1;
+        const n = pile.filter((p) => p.ok === ok).length + fly.filter((f) => f.ok === ok).length;
+        if (ok) good++; else bad++;
+        buzz = 0.25; flash = 1; flashOk = ok;
+        cutEnd = a.at;
+        audio.tone?.(ok ? 180 : 120, 0.22, { type: 'sawtooth', vol: 0.07 });
+        if (ok) audio.tone?.(660, 0.09, { type: 'triangle', vol: 0.1, delay: 0.24 });
+        fly.push({ x: SX - 40, y: BY + R, vx: ok ? -230 : 120, vy: -240, r: 0, vr: ok ? -4 : 7, ok, n });
+        for (let i = 0; i < 10; i++) chips.push({ x: SX, y: BY + BH, vx: (Math.random() - 0.5) * 160, vy: -Math.random() * 140, life: 0.6 });
       };
       const tick = (now) => {
         const dt = Math.min(0.05, (now - last) / 1000); last = now; t += dt;
-        dist += 1.15 * dt;
-        const shake = (Math.sin(t * 2.3 + ph) * 0.8 + Math.sin(t * 5.1 + ph * 2) * 0.5 + (Math.random() - 0.5) * 1.2) * wobble;
-        v += (steer() * 3.4 + shake) * dt;
-        v *= 1 - 3 * dt;
-        x = Math.min(0.97, Math.max(0.05, x + v * dt));
-        const on = Math.abs(x - route(dist)) < width / 2;
-        if (!on && dist > LEAD * 0.5) off += dt;
-        if (!trail.length || dist - trail[trail.length - 1][0] > 0.05) trail.push([dist, x]);
-        while (trail.length && (dist - trail[0][0]) * PX > AY + 20) trail.shift();
-        sub.style.width = `${Math.min(1, dist / length) * 100}%`;
-        sub.style.background = off > slack * 0.6 ? '#ff7a50' : '';
+        pos += speed * dt;
+        speed += 6 * dt; // a little faster towards the end
+        buzz -= dt; flash = Math.max(0, flash - dt * 1.6);
+        for (const a of arcs) if (!a.state && a.at - pos < SX - GAP * 0.6) { a.state = -2; bad++; } // slid past without a cut
+        for (let i = fly.length - 1; i >= 0; i--) {
+          const f = fly[i]; f.vy += 700 * dt; f.x += f.vx * dt; f.y += f.vy * dt; f.r += f.vr * dt;
+          if (f.ok) f.x = Math.max(f.x, 46); else f.x = Math.min(f.x, W - 50);
+          if (f.vy > 0 && f.y >= pileY(f.n)) { pile.push({ ok: f.ok, n: f.n }); fly.splice(i, 1); }
+        }
+        for (let i = chips.length - 1; i >= 0; i--) { const c = chips[i]; c.vy += 500 * dt; c.x += c.vx * dt; c.y += c.vy * dt; if ((c.life -= dt) <= 0) chips.splice(i, 1); }
+        sub.style.width = `${Math.min(1, good / need) * 100}%`;
         draw();
-        if (off > slack) return finish(false);
-        if (dist >= length) return finish(true);
+        if (!fly.length && good >= need) return finish(true);
+        if (!fly.length && marks - bad < need) return finish(false);
         raf = requestAnimationFrame(tick);
-      };
-      const keySide = (code) => (code === 'ArrowLeft' || code === 'KeyA' ? -1 : code === 'ArrowRight' || code === 'KeyD' ? 1 : 0);
-      const down = (e) => {
-        if (e.code === 'Escape') { e.preventDefault(); finish(false); return; }
-        const s = keySide(e.code);
-        if (!s && e.code !== 'KeyE' && e.code !== 'Space') return;
-        e.preventDefault(); e.stopPropagation(); idle = 0;
-        if (e.repeat || !s) return;
-        if (s < 0) kl = true; else kr = true;
-        v += s * 0.18; // a tap nudges
-      };
-      const up = (e) => { const s = keySide(e.code); if (s < 0) kl = false; else if (s > 0) kr = false; };
-      const pdown = (e) => {
-        e.preventDefault(); e.stopPropagation();
-        if (e.target.closest?.('.mg-cancel')) { if (performance.now() - t0 > 1000) finish(false); return; }
-        const s = e.clientX < window.innerWidth / 2 ? -1 : 1;
-        ptr.set(e.pointerId, s); v += s * 0.18; idle = 0;
-      };
-      const pup = (e) => ptr.delete(e.pointerId);
-      const timer = setInterval(() => { if (++idle >= 12) finish(false); }, 1000);
-      window.addEventListener('keydown', down, true);
-      window.addEventListener('keyup', up, true);
-      window.addEventListener('pointerdown', pdown, true);
-      window.addEventListener('pointerup', pup, true);
-      window.addEventListener('pointercancel', pup, true);
-      const stop = () => {
-        clearInterval(timer);
-        window.removeEventListener('keydown', down, true);
-        window.removeEventListener('keyup', up, true);
-        window.removeEventListener('pointerdown', pdown, true);
-        window.removeEventListener('pointerup', pup, true);
-        window.removeEventListener('pointercancel', pup, true);
       };
       draw();
       raf = requestAnimationFrame(tick);
+      const off = this.listen(el, cut, () => finish(false));
     });
   }
 

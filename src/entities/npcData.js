@@ -931,7 +931,7 @@ export const NPCS = [
       { de: 'Reden ist okay. Sägen ist besser.', en: 'Talking is fine. Sawing is better.' },
       { de: 'Jede Scheibe ist anders. Deswegen sieht er am Ende lebendig aus.', en: 'Every slice is different. That\'s why he looks alive in the end.' },
       { de: 'Lara ist zum ersten Mal dabei. Sägt schon gerader als ich. Sag\'s ihr nicht.', en: 'It\'s Lara\'s first time. Already saws straighter than me. Don\'t tell her.' },
-      { de: 'Niklas trägt die Stämme. Ich hab ihn nie drum gebeten. Er macht\'s einfach.', en: 'Niklas carries the logs. I never asked him to. He just does.' },
+      { de: 'Niklas trägt die Bretter. Ich hab ihn nie drum gebeten. Er macht\'s einfach.', en: 'Niklas carries the boards. I never asked him to. He just does.' },
       { de: 'Corni fragt, wann er fertig ist. …Wenn er fertig ist.', en: 'Corni asks when he\'ll be done. …When he\'s done.' },
       { de: 'Nachts schaut er anders. Ich bleib dann noch ein bisschen.', en: 'He looks different at night. I stay a bit longer then.', night: true },
       { de: 'Pause? …Später. Die Reihe noch.', en: 'Break? …Later. Just this row.' },

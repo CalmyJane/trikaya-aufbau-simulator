@@ -1,10 +1,12 @@
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { mat, box, cyl, strut, signPost } from './Props.js';
 
 // The Trikaya mainstage: a wooden shingle dragon (the frame is already standing) crouching over a DJ stage,
 // surrounded by 6 tall posts. Quests rig steel wires between the posts (setRig) and then
 // hang the sun-shade decoration (buildShadeSails). The shingles go on bit by bit, bottom to top
-// (setScales, src/quests/Scales.js) – they are sawn in the gazebo left of the dragon.
+// (setScales, src/quests/Scales.js) – they are sawn in the gazebo left of the dragon. Until then the dragon is an
+// open batten frame you can see through; the head is built separately and only goes on at the very end.
 
 export const POST_RADIUS = 15;
 export const POST_HEIGHT = 10.5;
@@ -68,6 +70,7 @@ export function buildMainstage() {
   const sh = makeShingles();
   const dark = mat('#2a1a0e', { side: THREE.DoubleSide });
   const V = (x, y, z) => new THREE.Vector3(x, y, z);
+  const frame = makeFrame(); // the wooden batten frame the shingles get nailed onto
 
   // chest vault over the stage (open to the front)
   const vault = (Rx, Ry) => (u, v) => {
@@ -75,14 +78,14 @@ export function buildMainstage() {
     return { p: V(Math.cos(Math.PI * u) * Rx, Math.sin(Math.PI * u) * Ry, z), c: V(0, 0.5, z) };
   };
   sh.surface(vault(6.5, 7.2));
-  g.add(paramMesh(vault(6.25, 6.95), 16, 4, dark));
+  frame.lines(vault(6.25, 6.95), 9, 7);
   g.add(box(13, 7.4, 0.3, dark, 0, 3.7, -18.7)); // back wall behind the DJ
   colliders.push({ type: 'box', x: 0, z: -18.6, hw: 6.6, hd: 1, rot: 0 });
 
   // hunched back / shoulders
   const hood = ellipsoid(V(0, 6.6, -15.5), V(5.4, 3.0, 3.8), 0, 0.58 * Math.PI);
   sh.surface(hood);
-  g.add(paramMesh(ellipsoid(V(0, 6.6, -15.5), V(5.15, 2.8, 3.55)), 16, 10, dark));
+  frame.lines(ellipsoid(V(0, 6.6, -15.5), V(5.15, 2.8, 3.55), 0, 0.62 * Math.PI), 12, 5, { closedU: true });
   for (let z = -13.8; z >= -18.6; z -= 0.8) { // spine spikes
     const y = 6.6 + 3 * Math.sqrt(Math.max(0, 1 - ((z + 15.5) / 3.8) ** 2));
     const s = new THREE.Mesh(new THREE.ConeGeometry(0.22, 1.0, 4), woodC);
@@ -96,7 +99,7 @@ export function buildMainstage() {
   for (const s of [-1, 1]) {
     const arm = new THREE.CatmullRomCurve3([V(s * 4.4, 7.6, -13.4), V(s * 6.4, 5.4, -11.6), V(s * 6.6, 2.6, -10.6), V(s * 6.3, 0, -10.0)]);
     sh.surface(tube(arm, 1.35, 0.85));
-    g.add(paramMesh(tube(arm, 1.2, 0.75), 10, 12, dark));
+    frame.lines(tube(arm, 1.2, 0.75), 7, 6, { closedU: true });
     for (let k = -1; k <= 1; k++) { // claws
       const c = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.6, 4), mat('#e6cf9a'));
       c.position.set(s * 6.3 + k * 0.4, 0.15, -9.0);
@@ -110,12 +113,18 @@ export function buildMainstage() {
   // neck & head (looking out over the crowd, jaws wide open)
   const neck = new THREE.CatmullRomCurve3([V(0, 8.4, -13.8), V(0, 9.4, -12.7), V(0, 10.0, -11.6)]);
   sh.surface(tube(neck, 1.5, 1.1));
-  g.add(paramMesh(tube(neck, 1.35, 0.95), 10, 6, dark));
-  sh.surface(ellipsoid(V(0, 10.2, -11.2), V(1.25, 1.15, 1.35)));
+  frame.lines(tube(neck, 1.35, 0.95), 7, 4, { closedU: true });
+  g.add(frame.build(woodMat('#a87a48')));
+  // the head: built down in the workshop, mounted only once the body is fully shingled (api.setScales)
+  const head = new THREE.Group();
+  head.visible = false;
+  g.add(head);
+  const headSh = makeShingles();
+  headSh.surface(ellipsoid(V(0, 10.2, -11.2), V(1.25, 1.15, 1.35)));
   const skullCore = new THREE.Mesh(new THREE.SphereGeometry(1, 10, 8), woodB);
   skullCore.scale.set(1.15, 1.05, 1.25);
   skullCore.position.set(0, 10.2, -11.2);
-  g.add(skullCore);
+  head.add(skullCore);
   const jawPart = (rt, rb, len, base, ang, material) => {
     const geo = new THREE.CylinderGeometry(rt, rb, len, 4);
     geo.rotateY(Math.PI / 4);
@@ -124,12 +133,12 @@ export function buildMainstage() {
     m.position.copy(base).addScaledVector(d, len / 2);
     m.rotation.x = ang;
     m.castShadow = true;
-    g.add(m);
+    head.add(m);
     return { d, base };
   };
   const upper = jawPart(0.35, 0.85, 2.4, V(0, 10.35, -10.1), Math.PI / 2 - 0.3, woodC);
   const lower = jawPart(0.3, 0.7, 2.1, V(0, 9.65, -10.2), Math.PI / 2 + 0.35, woodA);
-  g.add(box(0.9, 0.5, 1.2, mat('#2a1208'), 0, 9.95, -9.6)); // throat
+  head.add(box(0.9, 0.5, 1.2, mat('#2a1208'), 0, 9.95, -9.6)); // throat
   const toothMat = mat('#f2ead8');
   for (const [jaw, len, r0, r1, dir] of [[upper, 2.4, 0.85, 0.35, -1], [lower, 2.1, 0.7, 0.3, 1]]) {
     const perp = V(0, -jaw.d.z, jaw.d.y).multiplyScalar(-dir); // points into the mouth
@@ -140,7 +149,7 @@ export function buildMainstage() {
         tooth.position.copy(jaw.base).addScaledVector(jaw.d, t).addScaledVector(perp, r * 0.6);
         tooth.position.x = x * r * 0.45;
         if (dir < 0) tooth.rotation.x = Math.PI;
-        g.add(tooth);
+        head.add(tooth);
       }
     }
   }
@@ -150,28 +159,30 @@ export function buildMainstage() {
   for (const s of [-1, 1]) {
     const eye = new THREE.Mesh(new THREE.SphereGeometry(0.17, 8, 6), eyeMat);
     eye.position.set(s * 0.8, 10.65, -10.3);
-    g.add(eye);
+    head.add(eye);
     const horn = new THREE.Mesh(new THREE.ConeGeometry(0.2, 1.8, 6), hornMat);
     horn.position.set(s * 0.75, 11.4, -11.7);
     horn.rotation.set(-0.5, 0, -s * 0.35);
     horn.castShadow = true;
-    g.add(horn);
+    head.add(horn);
     // grey spiky frill behind the jaws
     for (let k = 0; k < 3; k++) {
       const a = V(s * 0.95, 10.9 - k * 0.5, -11.6), b = V(s * 0.9, 10.4 - k * 0.5, -12.3);
       const tip = [V(s * 2.2, 12.2, -11.9), V(s * 2.8, 11.0, -12.0), V(s * 2.3, 9.7, -12.2)][k];
       const geo = new THREE.BufferGeometry().setFromPoints([a, b, tip]);
       geo.computeVertexNormals();
-      g.add(new THREE.Mesh(geo, tarp));
-      g.add(strut(a, tip, 0.05, woodB));
+      head.add(new THREE.Mesh(geo, tarp));
+      head.add(strut(a, tip, 0.05, woodB));
     }
   }
   const crest = new THREE.Mesh(new THREE.ConeGeometry(0.28, 2.6, 4), woodC);
   crest.position.set(0, 12.3, -11.5);
   crest.rotation.x = -0.2;
   crest.castShadow = true;
-  g.add(crest);
+  head.add(crest);
   g.userData.eyeMat = eyeMat;
+  const headScales = headSh.build();
+  head.add(headScales);
   const scales = sh.build();
   g.add(scales);
 
@@ -323,11 +334,10 @@ export function buildMainstage() {
     const shingleGeo = new THREE.ExtrudeGeometry(sh, { depth: 0.025, bevelEnabled: false, curveSegments: 8 });
     shingleGeo.rotateX(-Math.PI / 2);
     const boardMats = ['#e2bd86', '#d4a86c', '#c8955a'].map((c) => mat(c));
-    g.add(box(2.1, 0.03, 0.32, woodC, PX - 0.05, 1.02, sz));
-    g.add(box(2.1, 0.03, 0.3, woodA, PX - 0.08, 1.05, sz + 0.02));
+    for (let k = 0; k < 3; k++) g.add(box(2.6, 0.045, 0.32, [woodC, woodA, woodC][k], PX - 0.05 + (k - 1) * 0.04, 1.03 + k * 0.047, sz + (k - 1) * 0.015));
     const jig = new THREE.Group();
     jig.add(box(0.2, 0.09, 0.07, mat('#2aa3a0'), 0, 0.045, 0), box(0.11, 0.05, 0.04, mat('#222'), -0.02, 0.115, 0), box(0.012, 0.06, 0.006, mat('#ddd'), 0.06, -0.02, 0));
-    jig.position.set(PX + 0.85, 1.07, sz);
+    jig.position.set(PX + 0.85, 1.17, sz);
     jig.rotation.y = 0.3;
     g.add(jig);
     colliders.push({ type: 'box', x: PX, z: sz, hw: 1.2, hd: 0.3, rot: 0 });
@@ -345,6 +355,10 @@ export function buildMainstage() {
     };
     for (let i = 0; i < 9; i++) shingle(tx - 0.3 + (i % 2) * 0.55, 0.83 + Math.floor(i / 2) * 0.03, tz + ((i % 3) - 1) * 0.08, i);
     for (let i = 0; i < 18; i++) shingle(PX - 1.6 + (i % 3) * 0.46, 0.01 + Math.floor(i / 3) * 0.03, PZ + 1.15 + ((i * 7) % 4) * 0.05, i + 3);
+    // long boards waiting to be cut, stacked under the gazebo behind the sawbuck
+    for (let k = 0; k < 6; k++) g.add(box(3.4, 0.045, 0.32, [woodA, woodC, woodB][k % 3], PX + (k % 2 ? 0.06 : -0.04), 0.1 + k * 0.047, PZ - 1.66 + (k % 3 - 1) * 0.02));
+    for (const x of [-1.3, 0, 1.3]) g.add(box(0.08, 0.08, 0.4, woodB, PX + x, 0.04, PZ - 1.66));
+    colliders.push({ type: 'box', x: PX, z: PZ - 1.66, hw: 1.7, hd: 0.18, rot: 0 });
     // pile of raw boards next to the gazebo (the shingles get cut from these)
     for (let i = 0; i < 14; i++) {
       const row = Math.floor(i / 4), col = i % 4;
@@ -379,8 +393,11 @@ export function buildMainstage() {
 
   const api = {
     posts,
-    /** How much of the dragon is covered in shingles (0…1, from the ground up). */
-    setScales(f) { scales.count = Math.round(scales.userData.total * THREE.MathUtils.clamp(f, 0, 1)); },
+    /** How far the dragon is (0…1): the body gets shingled from the ground up, the head goes on at the very end. */
+    setScales(f) {
+      scales.count = Math.round(scales.userData.total * THREE.MathUtils.clamp(f / 0.95, 0, 1));
+      head.visible = f >= 0.999;
+    },
     setPosts(done) { postGroups.forEach((pg, i) => { pg.visible = done.includes(i); }); },
     setRig(done) {
       const set = Array.isArray(done) ? done : [...Array(done || 0).keys()];
@@ -665,7 +682,7 @@ function paramMesh(P, nu, nv, material) {
   return new THREE.Mesh(geo, material);
 }
 
-/** Overlapping oval wood shingles (sawn log slices with bark rim) laid over parametric surfaces – one InstancedMesh. */
+/** Overlapping wood shingles (small boards with one round end, round end pointing down) laid over parametric surfaces – one InstancedMesh. */
 function makeShingles() {
   const list = [];
   const len = (pts) => pts.reduce((s, q, i) => (i ? s + q.distanceTo(pts[i - 1]) : 0), 0);
@@ -694,13 +711,18 @@ function makeShingles() {
       }
     },
     build() {
-      const geo = new THREE.CylinderGeometry(0.5, 0.5, 0.08, 9);
+      const shape = new THREE.Shape();
+      shape.moveTo(-0.5, -0.5); shape.lineTo(0.5, -0.5); shape.lineTo(0.5, 0.05);
+      shape.absarc(0, 0.05, 0.5, 0, Math.PI, false); shape.lineTo(-0.5, -0.5);
+      const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.07, bevelEnabled: false, curveSegments: 5 });
+      geo.rotateX(Math.PI / 2); // shape y (round end) → +z = down the surface, thickness → -y
+      geo.translate(0, 0.035, -0.03);
       const face = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.95, flatShading: true });
-      const bark = new THREE.MeshStandardMaterial({ color: '#6a4626', roughness: 1, flatShading: true });
+      const edge = new THREE.MeshStandardMaterial({ color: '#8a6440', roughness: 1, flatShading: true });
       // lowest first: the dragon gets shingled from the ground up (im.count = how many are on)
       list.forEach((s) => { s.key = s.p.y + Math.random() * 0.9; });
       list.sort((a, b) => a.key - b.key);
-      const im = new THREE.InstancedMesh(geo, [bark, face, face], list.length);
+      const im = new THREE.InstancedMesh(geo, [face, edge], list.length);
       im.userData.total = list.length;
       const cols = ['#e2bd86', '#d4a86c', '#c8955a', '#b98447', '#e8c99a', '#a87440'].map((c) => new THREE.Color(c));
       const m = new THREE.Matrix4(), tilt = new THREE.Matrix4().makeRotationX(-0.3), sc = new THREE.Matrix4();
@@ -720,6 +742,33 @@ function makeShingles() {
       im.castShadow = im.receiveShadow = true;
       im.computeBoundingSphere(); // with all shingles, before any are hidden
       return im;
+    },
+  };
+}
+
+/** Wooden battens along the u and v lines of parametric surfaces, merged into one mesh. */
+function makeFrame() {
+  const geos = [];
+  const line = (pts, r) => geos.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), pts.length * 2, r, 4, false));
+  return {
+    lines(P, nu, nv, { closedU = false, r = 0.07 } = {}) {
+      const S = 16;
+      for (let i = 0; i < nu + (closedU ? 0 : 1); i++) { // battens running along v
+        const u = i / nu, pts = [];
+        for (let k = 0; k <= S; k++) pts.push(P(u, k / S).p);
+        line(pts, r);
+      }
+      for (let j = 0; j <= nv; j++) { // ribs running along u
+        const v = j / nv, pts = [];
+        for (let k = 0; k <= S; k++) pts.push(P(k / S, v).p);
+        if (pts[0].distanceTo(pts[S / 2]) < 0.1) continue; // a pole, no ring there
+        line(pts, r * 1.25);
+      }
+    },
+    build(material) {
+      const m = new THREE.Mesh(mergeGeometries(geos), material);
+      m.castShadow = true;
+      return m;
     },
   };
 }

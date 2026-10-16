@@ -28,6 +28,7 @@ import { Parking } from '../quests/Parking.js';
 import { TrailerRide } from '../quests/Trailer.js';
 import { Minigame } from '../ui/Minigame.js';
 import { Errands } from '../quests/Errands.js';
+import { VehicleTheft } from '../quests/VehicleTheft.js';
 import { NPC } from '../entities/NPC.js';
 import { makeCamper } from '../entities/npcData.js';
 import { CHATS, CAMPER_CHATS } from '../quests/chats.js';
@@ -147,6 +148,7 @@ export class Game {
     this.trailer = new TrailerRide(this);
     this.minigame = new Minigame(this);
     this.errands = new Errands(this);
+    this.theft = new VehicleTheft(this);
     this.npcs.partyLine = () => this.soundbox.partyLine();
     // pre-compile the police car's materials so the arrest doesn't hitch
     await breathe('systems');
@@ -219,6 +221,7 @@ export class Game {
     this.parking?.stop();
     this.trailer?.stop();
     this.errands?.reset();
+    this.theft?.reset();
     this.clearRouteWalkers?.();
     // nobody is still off at the DIY store in a fresh game
     for (const n of this.npcs.all) n.away = false;
@@ -254,7 +257,7 @@ export class Game {
   get registered() { return this.quests.isActive('q0_leo') || this.quests.isDone('q0_leo'); }
 
   // ------------------------------------------------------------------ vehicles (cargo follows you)
-  enterVehicle(v) { this.player.enter(v); this.updateCarried(); this.resetSprint(); }
+  enterVehicle(v) { this.player.enter(v); if (v.chauffeur) this.theft.boarded(); this.updateCarried(); this.resetSprint(); }
   /** The touch sprint toggle would otherwise silently become a boost in the vehicle (and back). */
   resetSprint() {
     this.input.sprintToggle = false;
@@ -264,6 +267,7 @@ export class Game {
     this.resetSprint();
     const v = this.player.vehicle;
     this.player.exit();
+    if (v?.chauffeur) this.theft.leftQuad();
     this.updateCarried();
     this.bikeSys?.onExit(v);
     this.scooterSys?.onExit(v);
@@ -1556,6 +1560,7 @@ export class Game {
         if (d > v.o.radius + 1.6) continue;
         if (v === quad && quad.broken) list.push({ d: d + 0.5, label: t('p.quadBroken'), disabled: true });
         else if (v === radlader && radlader.fuel <= 0) list.push({ d: d + 2, label: t('p.loaderEmpty'), disabled: true });
+        else if (v.chauffeur) list.push({ d: d + 0.5, label: getLang() === 'de' ? `🛵 Hinten aufsteigen (${v.chauffeur.def.name} fährt)` : `🛵 Hop on the back (${v.chauffeur.def.name} drives)`, action: () => this.enterVehicle(v) });
         else list.push({ d: d + 0.5, label: v === quad ? t('p.enterQuad') : t('p.enterLoader'), action: () => this.enterVehicle(v) });
       }
     }
@@ -1815,7 +1820,7 @@ export class Game {
 
     const canMove = playing && !this.ui.dialogOpen;
     const veh = this.player.vehicle;
-    for (const v of Object.values(this.vehicles)) v.update(dt, canMove && veh === v && !this.building ? inp : null);
+    for (const v of Object.values(this.vehicles)) v.update(dt, canMove && veh === v && !this.building ? inp : (veh !== v && v.autopilot) || null);
     if (canMove) this.player.update(dt, this.cam.moveYaw);
     else this.player.char.update(dt);
 
@@ -1844,6 +1849,7 @@ export class Game {
       this.safe(() => this.soundbox.update(dt));
       this.safe(() => this.updateThomas(dt));
       this.safe(() => this.errands.update(dt));
+      this.safe(() => this.theft.update(dt));
       this.safe(() => this.days.update());
       this.safe(() => this.parking.update(dt));
       this.safe(() => this.trailer.update(dt));
@@ -1964,16 +1970,27 @@ export class Game {
   async thompsenTalk(npc) {
     const de = getLang() === 'de';
     const karma = this.quests.state.karma;
+    const taxi = this.theft.canCallTaxi();
     const choice = await this.runDialog(
       [{ who: 'thompsen', text: de ? `HAHAHA! Was brauchst du? Bier? Oder steckt wieder was fest? HAHAHA! (Du hast ✺ ${karma})` : `HAHAHA! What do you need? Beer? Or is something stuck again? HAHAHA! (You have ✺ ${karma})` }],
-      [de ? '🍺 Bier (✺ 5)' : '🍺 Beer (✺ 5)', de ? '🚜 Fahrzeuge zurück in die Base bringen' : '🚜 Bring the vehicles back to the base', de ? 'Nichts, danke.' : 'Nothing, thanks.'],
+      [de ? '🍺 Bier (✺ 5)' : '🍺 Beer (✺ 5)', de ? '🚜 Fahrzeuge zurück in die Base bringen' : '🚜 Bring the vehicles back to the base',
+        ...(taxi ? [de ? '🛵 Kann mich jemand mit dem Quad abholen?' : '🛵 Can someone pick me up with the quad?'] : []), de ? 'Nichts, danke.' : 'Nothing, thanks.'],
       npc,
     );
+    if (taxi && choice === 2) {
+      const n = this.theft.callTaxi();
+      if (n) {
+        await this.reply(npc, de ? `HAHAHA! Zdenko? Nee, der fährt rückwärts. ${n.def.name} holt das Quad und kommt vorbei. Du sitzt hinten! HAHAHA!` : `HAHAHA! Zdenko? Nah, he drives backwards. ${n.def.name} gets the quad and comes by. You sit on the back! HAHAHA!`);
+        this.ui.toast(de ? `🛵 ${n.def.name} bringt dir das Quad – du sitzt hinten und sagst (lenkst), wo's hingeht.` : `🛵 ${n.def.name} is bringing the quad – you sit on the back and steer where to go.`);
+      } else await this.reply(npc, de ? 'Grad ist keiner frei. Alle beim Chai. HAHAHA! Später nochmal.' : 'Nobody free right now. All at the chai tent. HAHAHA! Try later.');
+      return;
+    }
     if (choice === 0) {
       if (this.effects.buy('beer')) await this.reply(npc, de ? 'Prost! HAHAHA!' : 'Cheers! HAHAHA!');
       else await this.reply(npc, de ? 'Kein Karma? HAHAHA! Dann halt Wasser.' : 'No karma? HAHAHA! Water then.');
     } else if (choice === 1) {
       if (this.player.vehicle) this.exitVehicle();
+      this.theft.reset();
       const vs = this.world.vehicleSpots;
       for (const [id, v] of Object.entries(this.vehicles)) if (vs[id]) { v.place(vs[id].pos, vs[id].heading); v.speed = 0; }
       await this.reply(npc, de ? 'Zdenko und ich schieben das! …Zdenko schiebt. Ich lach. HAHAHA!' : 'Zdenko and I will push it! …Zdenko pushes. I laugh. HAHAHA!');

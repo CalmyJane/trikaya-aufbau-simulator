@@ -774,6 +774,18 @@ export const NPCS = [
     ],
   },
   {
+    id: 'ludi', name: 'Ludi', role: { de: 'Strom & Licht (Felix\' Team)', en: 'Power & light (Felix\' team)' }, portrait: '🧢',
+    look: { base: 'm_casual', skin: SKIN.fair, hair: '#b8431f', brows: '#9a3418', hairStyle: 'short', hairStyleColor: '#b8431f', beard: 'full', beardColor: '#b8431f', cap: '#2a5a8a', shirt: '#4a4a3a', pants: '#3a3a4a', shoes: '#2a2018', patchwork: true, shirtPatch: ['#4a4a3a', '#c9b24a', '#2a2a3a'], height: 1.78 },
+    behavior: 'wander', home: 'generator', offset: [3, -2], radius: 5,
+    lines: [
+      { de: 'Ich bin Ludi. Felix\' Team. Ich halte das Kabel, Felix hält den Vortrag.', en: 'I\'m Ludi. Felix\' team. I hold the cable, Felix holds the lecture.' },
+      { de: 'Die Cappy bleibt auf. Auch beim Löten. Auch nachts. Vor allem nachts.', en: 'The cap stays on. Even when soldering. Even at night. Especially at night.' },
+      { de: 'Felix sagt, das Lichtkonzept ist durchdacht. Ich sag: Es leuchtet. Das reicht mir.', en: 'Felix says the lighting concept is well thought out. I say: it glows. That\'s enough for me.' },
+      { de: 'Roter Bart, rote Kabel. Zufall? Ja. Aber ein schöner.', en: 'Red beard, red cables. Coincidence? Yes. But a nice one.' },
+      { de: 'Julez sagt, ich verlege falsch. Felix sagt, Julez verlegt falsch. Ich verleg einfach.', en: 'Julez says I\'m laying it wrong. Felix says Julez lays it wrong. I just lay it.' },
+    ],
+  },
+  {
     id: 'jules', name: 'Jules', role: { de: 'Packt überall mit an', en: 'Lends a hand everywhere' }, portrait: '🤗',
     look: { base: 'm_hoodie', skin: SKIN.light, hair: '#e8cc78', brows: '#c8a85a', hairCut: [0.95, 0.5, 0.95], beard: 'moustache', beardColor: '#dcbc68', shirt: '#2a8a7a', pants: '#5a4a3a', patchwork: true, shirtPatch: ['#2a8a7a', '#e0a030', '#2e6b5e'], height: 1.97, width: 1.08 },
     behavior: 'patrol', route: ['base_yard', 'plot_mainstage', 'generator', 'kitchen', 'plot_chai_lounge', 'plot_forest_dome', 'plot_narnia_floor', 'chill'], speed: 1.8,

@@ -32,8 +32,35 @@ export class Finale {
     g.sceneCam = null;
     for (const n of g.npcs.all) { n.scenePose = null; if (n.gone) { n.gone = false; n.hidden = false; n.root.visible = true; } }
     this.active = false;
+    this.ended = false;
+    this.partying = false;
     g.finale = false;
     document.getElementById('end-screen')?.remove();
+  }
+
+  /** After the end screen: the rain stops, everybody comes back – keep partying on the site. */
+  continueParty() {
+    const g = this.game;
+    if (!this.ended || this.partying) return;
+    this.partying = true;
+    const de = getLang() === 'de';
+    document.getElementById('end-screen')?.remove();
+    g.input.enabled = true;
+    g.sceneCam = null;
+    g.player.frozen = false;
+    g.world.setRain(false);
+    g.world.setNight(0.8, 12); // evening: the lights are on
+    const park = g.world.spots.parking;
+    for (const n of g.npcs.all) {
+      n.scenePose = null;
+      if (!n.gone) continue;
+      // back from the car park, off to their stage again
+      n.gone = false; n.hidden = false; n.root.visible = true; n.task = null;
+      n.root.position.set(park.x + (Math.random() - 0.5) * 8, 0, park.z + (Math.random() - 0.5) * 8);
+      g.world.colliders.resolve(n.root.position, 0.4);
+    }
+    g.npcs.refreshAppear?.(g.quests);
+    g.ui.banner(de ? 'Regen vorbei!' : 'Rain\'s over!', de ? 'Alle kommen zurück' : 'Everybody\'s back', de ? 'Das Festival geht weiter. Feier mit!' : 'The festival goes on. Party on!', 5000);
   }
 
   async run() {
@@ -162,6 +189,7 @@ export class Finale {
     const qs = g.quests.state;
     g.input.unlock();
     g.input.enabled = false;
+    this.ended = true;
     document.getElementById('end-screen')?.remove();
     const el = document.createElement('div');
     el.id = 'end-screen';
@@ -181,13 +209,15 @@ export class Finale {
           <div><span>${de ? 'Getränkemarken gesammelt' : 'Drink tokens collected'}</span><b>${qs.flags.drinkTokens || 0}</b></div>
         </div>
         <div class="end-buttons">
-          <button class="btn primary" id="end-again">${de ? 'Nochmal aufbauen' : 'Build it again'}</button>
+          <button class="btn primary" id="end-party">${de ? 'Weiterfeiern' : 'Keep partying'}</button>
+          <button class="btn" id="end-again">${de ? 'Nochmal aufbauen' : 'Build it again'}</button>
           <button class="btn" id="end-credits">Credits</button>
           <button class="btn" id="end-menu">${de ? 'Zum Menü' : 'Main menu'}</button>
         </div>
       </div>`;
     document.body.appendChild(el);
     const close = () => { el.remove(); g.input.enabled = true; };
+    el.querySelector('#end-party').onclick = () => { this.continueParty(); g.input.lock(); };
     el.querySelector('#end-again').onclick = () => { close(); g.newGame(); };
     el.querySelector('#end-menu').onclick = () => { close(); g.toMenu(); };
     el.querySelector('#end-credits').onclick = () => g.ui.modal(g.creditsHtml());

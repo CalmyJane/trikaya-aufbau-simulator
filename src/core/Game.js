@@ -624,6 +624,7 @@ export class Game {
     this.mode = 'play';
     this.input.enabled = true;
     this.input.lock();
+    this.finaleSys?.continueParty(); // back from the menu after the end screen: no frozen office scene, just keep partying
   }
 
   /** Volunteer list: pick one and a purple beam marks them until the player has been close. */

@@ -117,7 +117,7 @@ export class QuestSystem {
 
   currentStep(qid) {
     const a = this.state.active[qid];
-    return a ? this.quests[qid].steps[a.step] : null;
+    return a ? this.quests[qid]?.steps[a.step] ?? null : null;
   }
 
   /** Active talk steps that target this NPC. */
@@ -138,7 +138,7 @@ export class QuestSystem {
 
   // ------------------------------------------------------------ lifecycle
   accept(qid) {
-    if (this.isActive(qid) || this.isDone(qid)) return;
+    if (this.isActive(qid) || this.isDone(qid) || !this.quests[qid]) return; // e.g. a favour that expired while you were reading the offer
     this.state.active[qid] = { step: 0, picked: [], done: [] };
     this.state.tracked = qid;
     this.emit('started', this.quests[qid]);
@@ -617,6 +617,7 @@ export class QuestSystem {
       if (tm.left <= 0) { tm.left = 0; tm.expired = true; this.emit('timeout', { step: this.currentStep(tm.qid), quest: this.quests[tm.qid], timer: tm }); }
     }
     for (const qid of Object.keys(this.state.active)) {
+      if (!this.quests[qid]) { delete this.state.active[qid]; if (this.state.tracked === qid) this.state.tracked = null; continue; } // orphaned job: drop it
       const st = this.currentStep(qid);
       if (st?.type === 'night' && this.world.night > 0.9) this.advance(qid);
       if (st?.type === 'wait' && !this.game.ui.dialogOpen && this.game.mode === 'play') {

@@ -241,7 +241,7 @@ export class Errands {
     // offers nobody took for a while disappear again
     this.offers = this.offers.filter((o) => {
       if (qs.isActive(o.qid) || qs.isDone(o.qid)) return false;
-      o.t += dt;
+      if (!g.ui.dialogOpen) o.t += dt; // never expire while someone is offering it to you
       if (o.t > 240) { delete qs.quests[o.qid]; g.refreshHUD(); return false; }
       return true;
     });

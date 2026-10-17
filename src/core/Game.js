@@ -1912,7 +1912,7 @@ export class Game {
       const c = this.fly.focus(this._pmapC ||= new THREE.Vector3()); // the spot the drone looks at
       this.ui.drawMinimap(c, Math.atan2(f.x, f.z), Math.atan2(-f.x, -f.z), objectives, visibleNpcs, this.quests, this.vehicles, { ctx: this.ui.pmap, range, mark: this.player.position, arrow: '#ffd27a' });
     }); else this.safe(() => this.ui.drawMinimap(this.player.position, this.headingOf(), this.cam.yaw, objectives, visibleNpcs, this.quests, this.vehicles));
-    this.safe(() => this.ui.overlays(this.npcs.all.filter((n) => !n.hidden), this.camera, this.player.position));
+    this.safe(() => this.ui.overlays(this.npcs.all.filter((n) => !n.hidden), this.camera, this.player.position, this.mode === 'play' && !this.fly.tween && !this.sceneCam));
     this.safe(() => this.music.update(paused ? this.camera.position : this.player.position, this.camera));
 
     this.renderMain();

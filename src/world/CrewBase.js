@@ -481,7 +481,7 @@ export function buildCrewBase(world) {
 
   // vehicle parking (world heading = base rotation + local heading)
   world.vehicleSpots = {
-    quad: { pos: toWorld(0, 12.5), heading: CREW_BASE.rotation + Math.PI / 2 },
+    quad: { pos: toWorld(0, 12.5), heading: CREW_BASE.rotation }, // nose towards the south gate / Enterstraße
     radlader: { pos: toWorld(13.2, -4.5), heading: CREW_BASE.rotation },
   };
 

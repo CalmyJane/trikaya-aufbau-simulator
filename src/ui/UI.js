@@ -399,7 +399,9 @@ export class UI {
   }
 
   // ------------------------------------------------------------ world-space overlays
-  overlays(npcs, camera, playerPos) {
+  overlays(npcs, camera, playerPos, show = true) {
+    if (!show) npcs = []; // camera not at the player (flying in from the menu, drone view): no names/bubbles
+    camera.updateMatrixWorld(); // project with this frame's camera, not the last rendered one (else tags lag behind when looking around)
     const w = window.innerWidth, h = window.innerHeight;
     const v = new THREE.Vector3();
     const seen = new Set();

@@ -119,7 +119,8 @@ function buildChaiTent() {
   add(box(0.5, 0.5, 0.5, mat('#c9a878'), -1.2, 0.25, -1.4), 1);
 
   const sign = signPost('CHAI-LOUNGE', { width: 3.2, height: 0.9, bg: '#5b2c1d', fg: '#ffdca0' });
-  sign.position.set(-5.5, 0, 6.5);
+  sign.position.set(5.5, 0, -6.5); // on the entrance side of the site
+  sign.rotation.y = Math.PI;
   g.add(sign);
 
   const api = {

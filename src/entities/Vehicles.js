@@ -357,6 +357,36 @@ export class Radlader extends Vehicle {
     this.bucket.add(this.loadAnchor);
     for (const [x, z] of [[1.0, 1.0], [-1.0, 1.0], [1.0, -1.3], [-1.0, -1.3]]) this.wheel(0.75, 0.55, x, 0.75, z, '#202020');
     this.seat.position.set(0, 1.78, -0.6);
+    // driver's seat, steering column + wheel, pedals and the arm joystick (hands on the wheel, feet on the pedals)
+    const seatM = mat('#1e1e1e', { roughness: 0.9 });
+    b.add(box(0.62, 0.12, 0.55, seatM, 0, 2.12, -0.62));          // cushion
+    b.add(box(0.62, 0.7, 0.12, seatM, 0, 2.5, -0.93));            // backrest
+    b.add(box(0.12, 0.2, 0.12, dark, 0, 1.98, -0.62));            // seat post
+    b.add(box(1.3, 0.35, 0.25, dark, 0, 2.1, 0.0));               // dashboard
+    const column = cyl(0.04, 0.05, 0.6, dark, 6, 0, 2.35, -0.05);
+    column.rotation.x = 0.6;
+    b.add(column);
+    const tilt = new THREE.Group();
+    tilt.position.set(0, 2.55, -0.18);
+    tilt.rotation.x = 0.6;                                        // top leans away from the driver
+    b.add(tilt);
+    this.wheelSpin = new THREE.Group();
+    tilt.add(this.wheelSpin);
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(0.19, 0.022, 6, 18), mat('#151515', { roughness: 0.8 }));
+    rim.castShadow = true;
+    this.wheelSpin.add(rim);
+    const spoke = box(0.38, 0.03, 0.02, dark, 0, 0, 0);
+    this.wheelSpin.add(spoke);
+    this.wheelSpin.add(box(0.03, 0.19, 0.02, dark, 0, -0.095, 0));
+    this.wheelSpin.add(cyl(0.025, 0.025, 0.05, mat('#f2b319'), 6, 0.13, 0.13, -0.03)); // spinner knob
+    this.grips = [this.anchor(this.wheelSpin, 0.18, 0.02, -0.03), this.anchor(this.wheelSpin, -0.18, 0.02, -0.03)];
+    for (const x of [0.17, -0.17]) b.add(box(0.12, 0.03, 0.2, mat('#555', { metalness: 0.5 }), x, 1.97, -0.1));
+    this.pedals = [this.anchor(b, 0.17, 2.0, -0.12), this.anchor(b, -0.17, 2.0, -0.12)];
+    const stick = cyl(0.02, 0.02, 0.28, dark, 6, -0.42, 2.3, -0.45);
+    stick.rotation.x = 0.2;
+    b.add(stick);
+    b.add(new THREE.Mesh(new THREE.SphereGeometry(0.04, 8, 6), mat('#c0392b')).translateX(-0.42).translateY(2.44).translateZ(-0.42));
+    this.riderLean = 0.06; // sitting upright, a bit of rocking on the meadow
     this.body.remove(this.cargo);
     this.loadAnchor.add(this.cargo);
     this.cargo.position.set(0, 0.05, 0.1);
@@ -373,6 +403,7 @@ export class Radlader extends Vehicle {
     if (input && this.fuel > 0) this.fuel = Math.max(0, this.fuel - m / 3000);
     this.arm.rotation.x += (this.armTarget - this.arm.rotation.x) * Math.min(1, dt * 2.5);
     this.bucket.rotation.x = -this.arm.rotation.x * 0.9; // keep the bucket level
+    this.wheelSpin.rotation.z = -this.steer * 2.4; // steering wheel turns a lot more than the wheels
     if (this.fuel > 0 && input) this.beacon.rotation.y += dt * 8;
     return m;
   }

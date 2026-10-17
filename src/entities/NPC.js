@@ -1007,7 +1007,7 @@ const BEHAVIORS = {
   // Leo: never where you are. Flees when you get close, then teleports somewhere else.
   elusive(n, t, dt, { player, game }) {
     // caught him! (speed, cornering him, pure luck)
-    if (n.toPlayer < 1.7 && game?.registered && !game.ui.dialogOpen) { game.catchLeo(n); return; }
+    if (n.toPlayer < 1.7 && n.state !== 'away' && n.root.visible && game?.registered && !game.ui.dialogOpen) { game.catchLeo(n); return; } // 'away' = invisible until he pops up elsewhere
     if (n.state === 'lurk') {
       n.stateT -= dt;
       if (n.wait > 0) { n.wait -= dt; n.char.play('idle'); } else {

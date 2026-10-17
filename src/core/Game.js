@@ -1519,7 +1519,7 @@ export class Game {
       }
     } else {
       for (const n of this.npcs.all) {
-        if (n.hidden) continue;
+        if (n.hidden || !n.root.visible) continue;
         const d = n.position.distanceTo(p);
         if (d < 3) {
           const mk = this.quests.npcMarker(n.def.id);
@@ -1852,7 +1852,7 @@ export class Game {
     }
 
     if (this.mode === 'map') {
-      this.ui.drawBigMap(this.player.position, this.headingOf(), [...this.quests.trackedObjectives(), ...this.drama.objectives(), ...this.soundbox.objectives()], this.npcs.all.filter((n) => !n.hidden), this.quests, this.quests.state.built, this.vehicles);
+      this.ui.drawBigMap(this.player.position, this.headingOf(), [...this.quests.trackedObjectives(), ...this.drama.objectives(), ...this.soundbox.objectives()], this.npcs.all.filter((n) => !n.hidden && n.root.visible), this.quests, this.quests.state.built, this.vehicles);
       if (this._mapKeyReady && (inp.keys.has('KeyM') || inp.keys.has('Escape'))) { this._mapKeyReady = false; this.closeMap(); }
       if (!inp.keys.has('KeyM') && !inp.keys.has('Escape')) this._mapKeyReady = true;
       this.renderer.render(this.scene, this.camera);
@@ -1972,7 +1972,7 @@ export class Game {
     if (playing) this.safe(() => this.quadBreakdown(dt));
     let objectives = [];
     this.safe(() => { objectives = [...this.quests.trackedObjectives(), ...this.drama.objectives(), ...this.soundbox.objectives()]; });
-    const visibleNpcs = this.npcs.all.filter((n) => !n.hidden);
+    const visibleNpcs = this.npcs.all.filter((n) => !n.hidden && n.root.visible); // e.g. Leo while he's 'away' is only switched invisible
     if (this.mode === 'pause') this.safe(() => {
       // pause: the minimap glides along under the drone camera; the white dot is you
       const f = this.camera.getWorldDirection(this._pmapDir ||= new THREE.Vector3());
@@ -1980,7 +1980,7 @@ export class Game {
       const c = this.fly.focus(this._pmapC ||= new THREE.Vector3()); // the spot the drone looks at
       this.ui.drawMinimap(c, Math.atan2(f.x, f.z), Math.atan2(-f.x, -f.z), objectives, visibleNpcs, this.quests, this.vehicles, { ctx: this.ui.pmap, range, mark: this.player.position, arrow: '#ffd27a' });
     }); else this.safe(() => this.ui.drawMinimap(this.player.position, this.headingOf(), this.cam.yaw, objectives, visibleNpcs, this.quests, this.vehicles));
-    this.safe(() => this.ui.overlays(this.npcs.all.filter((n) => !n.hidden), this.camera, this.player.position, this.mode === 'play' && !this.fly.tween && !this.sceneCam));
+    this.safe(() => this.ui.overlays(visibleNpcs, this.camera, this.player.position, this.mode === 'play' && !this.fly.tween && !this.sceneCam));
     this.safe(() => this.music.update(paused ? this.camera.position : this.player.position, this.camera));
 
     this.renderMain();

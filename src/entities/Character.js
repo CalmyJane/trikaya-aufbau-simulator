@@ -817,10 +817,50 @@ export class Character {
     }
     if (this.ride) this.applyRidePose();
     else if (this.sitting) this.applySitPose();
+    else if (this.petPose) this.applyPetPose(dt);
     else if (this.carrying) this.applyCarryPose();
     else if (this.work) this.applyWorkPose(dt);
     else if (this.armPose) this.applyArmPose();
     else if (this.flowToy) this.applyFlowPose(dt);
+  }
+
+  // ------------------------------------------------------------------ petting an animal
+  /** Squat down next to an animal and stroke it: `target` = a point on its back (world), `along` = its forward direction. */
+  startPet(target, along, dur = 1.6) {
+    this.petPose = { target: target.clone(), along: along.clone().setY(0).normalize(), t: 0, dur, baseY: this.petPose?.baseY ?? this.model.position.y };
+  }
+
+  applyPetPose(dt) {
+    const p = this.petPose;
+    p.t += dt;
+    if (p.t >= p.dur) { this.model.position.y = p.baseY; this.petPose = null; return; }
+    const k = (this.look.height || 1.8) / 1.8;
+    const e = Math.min(1, p.t / 0.3, (p.dur - p.t) / 0.3), ease = e * e * (3 - 2 * e);
+    this.model.position.y = p.baseY - 0.55 * k * ease; // down on the knees…
+    const root = this.root;
+    root.updateMatrixWorld(true);
+    const rq = root.getWorldQuaternion(_q4);
+    const W = (x, y, z) => root.localToWorld(_b1.set(x, y, z));
+    // …upper body bends over the animal
+    const torso = this.bones.Torso;
+    if (torso) {
+      (this._torsoBase ||= new THREE.Quaternion()).copy(torso.quaternion);
+      torso.updateWorldMatrix(true, false);
+      const q = _q1.setFromAxisAngle(_v4.set(1, 0, 0).applyQuaternion(rq), 0.55 * ease);
+      const bw = torso.getWorldQuaternion(_q2), pw = torso.parent.getWorldQuaternion(_q3);
+      torso.quaternion.copy(pw.invert().multiply(q).multiply(bw));
+      (this._torsoSet ||= new THREE.Quaternion()).copy(torso.quaternion);
+    }
+    // feet stay planted, knees point forward
+    const fwd = _b2.set(0, 0, 1).applyQuaternion(rq);
+    this.reachLeg('L', W(0.13 * k, 0.07 * k, -0.02), fwd);
+    this.reachLeg('R', W(-0.13 * k, 0.07 * k, -0.02), fwd);
+    // right hand strokes along the animal's back, left hand rests on the knee
+    const s = Math.sin(p.t * 6.5) * 0.08;
+    const tgt = _v5.copy(p.target).addScaledVector(p.along, s);
+    tgt.y += Math.abs(Math.cos(p.t * 6.5)) * 0.02;
+    this.reachArm('R', tgt.lerp(W(-0.25, 0.9 * k, 0.3), 1 - ease));
+    this.reachArm('L', W(0.16 * k, (1.0 - 0.55 * ease) * k, 0.3));
   }
 
   // ------------------------------------------------------------------ work with tools (instead of the waving 'interact' clip)

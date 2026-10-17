@@ -133,7 +133,7 @@ export class Player {
     const hs = Math.hypot(this.vel.x, this.vel.z);
     if (this.busy > 0) {
       this.busy -= dt;
-      this.char.play('interact', 0.15);
+      this.char.play(this.char.petPose ? 'idle' : 'interact', 0.15); // petting: own squat pose on top of idle
     } else if (this.char.currentName === 'wave' && this.waveTimer > 0) {
       this.waveTimer -= dt;
     } else if (hs > WALK * (this.speedMul || 1) + 0.8) this.char.play('run', 0.15);

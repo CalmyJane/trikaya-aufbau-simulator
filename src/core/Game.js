@@ -1693,8 +1693,20 @@ export class Game {
   /** Crouch down and pet an animal: it stops for a moment, makes its noise, first time each: +1 karma. */
   petAnimal(a, ap) {
     const pl = this.player, de = getLang() === 'de', p = pl.position;
-    pl.root.rotation.y = Math.atan2(ap.x - p.x, ap.z - p.z);
-    pl.work(1.3);
+    // step up close beside it, face it, squat down and stroke its back
+    const bb = new THREE.Box3(); // body only – not the floating name tag
+    a.obj.updateMatrixWorld(true);
+    a.obj.traverse((o) => { if (o.isMesh && o.visible) bb.expandByObject(o, true); });
+    const c = bb.getCenter(new THREE.Vector3());
+    const dx = p.x - c.x, dz = p.z - c.z, dd = Math.hypot(dx, dz) || 1;
+    const close = a.kind === 'chicken' ? 0.42 : 0.5;
+    p.x = c.x + (dx / dd) * close; p.z = c.z + (dz / dd) * close;
+    this.world.colliders.resolve(p, 0.3);
+    pl.root.rotation.y = Math.atan2(c.x - p.x, c.z - p.z);
+    pl.vel?.set(0, 0, 0);
+    pl.work(1.7);
+    const along = new THREE.Vector3(); a.obj.getWorldDirection(along);
+    pl.char.startPet(new THREE.Vector3(c.x, bb.max.y - 0.02, c.z), along, 1.7);
     // the animal turns to you and holds still
     const par = a.obj.parent; // the base animals live inside the (rotated) crew base group
     a.obj.rotation.y = Math.atan2(p.x - ap.x, p.z - ap.z) - (par && par !== this.scene ? par.rotation.y : 0);

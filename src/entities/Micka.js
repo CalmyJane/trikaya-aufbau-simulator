@@ -67,7 +67,7 @@ export function addMicka(game) {
 
   const rand = (a, b) => a + Math.random() * (b - a);
   const tmp = new THREE.Vector3();
-  const s = { obj, mode: 'heel', friend: null, playT: 0, look: rand(4, 9), dir: 1, ang: 0, voice: 5, path: [], plan: 0, wait: 0 };
+  const s = { obj, mode: 'heel', friend: null, playT: 0, look: rand(4, 9), dir: 1, ang: 0, voice: 5, path: [], plan: 0, wait: 0, kind: 'dog', name: 'Micka', petT: 0 };
   const friends = () => (game.dotti ? [...(world.animals || []), game.dotti] : world.animals || []);
 
   world.animated.push((t, dt, playerPos) => {
@@ -87,7 +87,8 @@ export function addMicka(game) {
     const dR = Math.hypot(r.x - p.x, r.z - p.z);
     if (dR > 45) { p.set(r.x + 0.7, 0, r.z); s.mode = 'heel'; s.path = []; } // Ronja was moved somewhere else
 
-    if (s.mode === 'play') {
+    if (s.petT > 0) s.petT -= dt; // being petted: stands still and wags
+    else if (s.mode === 'play') {
       // a quick round around the other animal, hopping – then straight back to Ronja
       s.friend.obj.getWorldPosition(tmp);
       s.ang += s.dir * dt * 3.4;
@@ -132,7 +133,8 @@ export function addMicka(game) {
     u.legs.forEach((l, k) => { l.rotation.x = moving ? Math.sin(t * (run ? 17 : 11) + (k % 3 ? Math.PI : 0)) * 0.65 : 0; });
     u.head.rotation.x = sit ? -0.25 + Math.sin(t * 1.3) * 0.06 : 0; // standing still: looks up at Ronja
     u.tail.rotation.x = s.mode === 'play' ? -0.9 : -1.9;
-    u.tail.rotation.z = Math.sin(t * (s.mode === 'play' ? 15 : sit ? 5 : 3)) * (s.mode === 'play' ? 0.5 : 0.25);
+    u.tail.rotation.z = Math.sin(t * (s.mode === 'play' || s.petT > 0 ? 15 : sit ? 5 : 3)) * (s.mode === 'play' || s.petT > 0 ? 0.5 : 0.25);
+    if (s.petT > 0) { u.head.rotation.x = -0.3; u.tail.rotation.x = -0.9; }
 
     if ((s.voice -= dt) <= 0) {
       s.voice = s.mode === 'play' ? rand(1.5, 3) : rand(25, 60);

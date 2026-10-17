@@ -111,7 +111,7 @@ export class Game {
     this.trigel = new Trigel(this.world);
     this.npcs.game = this;
     this.dotti = addDotti(this); // Kobold's dog
-    addMicka(this); // Ronja's dog, always at heel
+    this.micka = addMicka(this); // Ronja's dog, always at heel
     this.vehicles = { quad: new Quad(this.world), radlader: new Radlader(this.world), bike: new Bike(this.world), scooter: new Scooter(this.world), skate: new Skateboard(this.world) };
     this.bikeSys = new FranziBike(this, this.vehicles.bike);
     this.scooterSys = new FabiScooter(this, this.vehicles.scooter);
@@ -1536,6 +1536,16 @@ export class Game {
           if (!this.trigel.petted) { this.trigel.petted = true; this.quests.state.karma += 1; this.refreshHUD(); }
         } });
       }
+      // animals: Dotti, Micka, the workshop cats, the chickens – crouch down and give them a scratch
+      for (const a of this.pets()) {
+        if (!a.obj.visible) continue;
+        const ap = a.obj.getWorldPosition(this._petV ||= new THREE.Vector3()), d = Math.hypot(ap.x - p.x, ap.z - p.z);
+        if (d > 1.7) continue;
+        const de = getLang() === 'de';
+        const what = a.name || (de ? 'Huhn' : 'chicken');
+        const icon = a.kind === 'dog' ? '🐕' : a.kind === 'cat' ? '🐈' : '🐔';
+        list.push({ d: d + 1.6, label: `${icon} ${de ? `${what} streicheln` : `Pet ${a.name || 'the chicken'}`}`, action: () => this.petAnimal(a, ap) });
+      }
       // sawbuck in the gazebo next to the dragon: saw scales (permanent side job)
       if (this.registered && this.scales.near(p)) list.push({ d: 0.9, label: this.scales.label(), action: () => this.scales.cut() });
       // Franzi's bike & Fabi's e-scooter: ask once, then take it whenever (costs a little karma per ride)
@@ -1678,6 +1688,52 @@ export class Game {
 
   // ------------------------------------------------------------------ loop
   /** Quad / wheel loader horn: people nearby jump out of the way – and are a tiny bit annoyed (−1 karma). */
+  pets() { return [this.dotti, this.micka, ...(this.world.animals || [])].filter(Boolean); }
+
+  /** Crouch down and pet an animal: it stops for a moment, makes its noise, first time each: +1 karma. */
+  petAnimal(a, ap) {
+    const pl = this.player, de = getLang() === 'de', p = pl.position;
+    pl.root.rotation.y = Math.atan2(ap.x - p.x, ap.z - p.z);
+    pl.work(1.3);
+    // the animal turns to you and holds still
+    const par = a.obj.parent; // the base animals live inside the (rotated) crew base group
+    a.obj.rotation.y = Math.atan2(p.x - ap.x, p.z - ap.z) - (par && par !== this.scene ? par.rotation.y : 0);
+    if (a.kind === 'dog') a.petT = 3;
+    else { a.path = []; a.wait = 2.5; }
+    const near = 0.9;
+    if (a.shy) { // Blacky: no way
+      this.audio.meow?.(near, 0.7);
+      this.ui.toast(de ? `${a.name} faucht dich an und ist weg. Nicht persönlich nehmen.` : `${a.name} hisses at you and is gone. Don't take it personally.`);
+      a.wait = 0;
+      return;
+    }
+    if (a.kind === 'dog') this.audio.bark?.(near);
+    else if (a.kind === 'cat') this.audio.meow?.(near, a.pitch || 1);
+    else this.audio.cluck?.(near);
+    const n = a.name;
+    const lines = {
+      dog: [
+        [`${n} wedelt so doll, dass der ganze Hund mitwackelt.`, `${n} wags so hard the whole dog wobbles.`],
+        [`${n} lehnt sich voll in deine Hand. Das ist jetzt deine Aufgabe für die nächsten 10 Minuten.`, `${n} leans right into your hand. That's your job for the next 10 minutes now.`],
+        [`${n} schmeißt sich auf den Rücken. Bauch! Bauch!`, `${n} flops on her back. Belly! Belly!`],
+        [`${n} schleckt dir einmal quer über die Hand. Danke?`, `${n} licks your hand once, all the way across. Thanks?`],
+      ],
+      cat: [
+        [`${n} schnurrt wie ein kleiner Generator.`, `${n} purrs like a tiny generator.`],
+        [`${n} lässt sich zwei Mal streicheln und geht dann. Reicht auch.`, `${n} allows two strokes and then leaves. That'll do.`],
+        [`${n} drückt den Kopf gegen deine Hand. Du bist jetzt offiziell akzeptiert.`, `${n} bumps its head into your hand. You're officially accepted now.`],
+      ],
+      chicken: [
+        ['Das Huhn lässt es sich gefallen. Gackert aber skeptisch.', 'The chicken puts up with it. Clucks sceptically though.'],
+        ['Das Huhn ist überraschend weich. Und überraschend unbeeindruckt.', 'The chicken is surprisingly soft. And surprisingly unimpressed.'],
+        ['Das Huhn pickt dir einmal gegen den Zeh. Barfuß. Danke.', 'The chicken pecks your toe once. Barefoot. Thanks.'],
+      ],
+    }[a.kind];
+    const l = lines[Math.floor(Math.random() * lines.length)];
+    this.ui.toast(de ? l[0] : l[1]);
+    if (!a.petted) { a.petted = true; this.quests.state.karma += 1; this.refreshHUD(); }
+  }
+
   honk(veh) {
     if ((this._hornCD || 0) > this.time) return;
     this._hornCD = this.time + 0.9;

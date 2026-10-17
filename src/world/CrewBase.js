@@ -133,6 +133,7 @@ export function buildCrewBase(world) {
     base.add(ch);
     const s = roamer(ch, { speed: 0.9, free, next: () => nearby(ch.position, 2, 8), pause: () => rand(1, 6) });
     s.voice = rand(1, 6);
+    s.kind = 'chicken';
     chickens.push(s);
   }
 
@@ -164,6 +165,7 @@ export function buildCrewBase(world) {
       pause: () => (inWorkshop(ct.position) ? rand(6, 20) : rand(1, 6)),
     });
     s.voice = rand(4, 12); s.pitch = pitch; s.shy = name === 'blacky';
+    s.kind = 'cat'; s.name = name[0].toUpperCase() + name.slice(1);
     return s;
   });
   world.animals = [...chickens, ...cats]; // Dotti comes over to play with them

@@ -1041,5 +1041,5 @@ export function makeCamper(i, rng = Math.random) {
 /** The player's look — a fresh volunteer: short brown hair, plain blue tee, jeans (restyle him in the planetarium). */
 export const PLAYER_LOOK = {
   base: 'm_casual', skin: SKIN.light, hair: '#4a3020', brows: '#3a2414', hairCut: [0.95, 0.6, 0.95],
-  shirt: '#3d5a73', pants: '#2f3b52', shoes: '#2a2a2a', height: 1.78, width: 0.95,
+  shirt: '#3d5a73', pants: '#2f3b52', height: 1.78, width: 0.95,
 };

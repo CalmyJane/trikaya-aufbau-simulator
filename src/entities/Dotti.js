@@ -60,7 +60,7 @@ export function addDotti(game) {
 
   const rand = (a, b) => a + Math.random() * (b - a);
   const tmp = new THREE.Vector3();
-  const s = { obj, path: [], wait: 1, mode: 'roam', friend: null, playT: 0, dir: 1, ang: 0, voice: 3, speed: 2.6 };
+  const s = { obj, path: [], wait: 1, mode: 'roam', friend: null, playT: 0, dir: 1, ang: 0, voice: 3, speed: 2.6, kind: 'dog', name: 'Dotti', petT: 0 };
 
   const route = (goal) => {
     const nav = world.nav, p = obj.position;
@@ -99,7 +99,8 @@ export function addDotti(game) {
       return false;
     };
 
-    if (s.mode === 'play') {
+    if (s.petT > 0) s.petT -= dt; // being petted: stands still and wags
+    else if (s.mode === 'play') {
       // runs circles around her friend, hopping
       s.friend.obj.getWorldPosition(tmp);
       s.ang += s.dir * dt * 3.2;
@@ -131,7 +132,8 @@ export function addDotti(game) {
     const run = s.mode === 'play' || s.speed > 3;
     u.legs.forEach((l, k) => { l.rotation.x = moving ? Math.sin(t * (run ? 18 : 12) + (k % 3 ? Math.PI : 0)) * 0.7 : 0; });
     u.head.rotation.x = moving ? 0 : 0.5 + Math.sin(t * 6) * 0.08; // sniffing when she stands
-    u.tail.rotation.z = Math.sin(t * (s.mode === 'play' ? 16 : 7)) * 0.5;
+    u.tail.rotation.z = Math.sin(t * (s.mode === 'play' || s.petT > 0 ? 16 : 7)) * 0.5;
+    if (s.petT > 0) u.head.rotation.x = -0.3; // looks up at you
 
     if ((s.voice -= dt) <= 0) {
       s.voice = s.mode === 'play' ? rand(1.5, 4) : rand(8, 22);

@@ -131,30 +131,68 @@ export class Character {
         }
         m.flatShading = true;
         // short haircut: squash the hair piece down onto the scalp
-        if (role === 'hair' && look.hairCut && !Array.isArray(o.material) && !o.userData.cut) {
+        if (role === 'hair' && (look.hairCut || base === 'm_casual') && !Array.isArray(o.material) && !o.userData.cut) {
           o.userData.cut = true;
           o.geometry = o.geometry.clone();
-          o.geometry.computeBoundingBox();
-          const bb = o.geometry.boundingBox;
-          const c = bb.getCenter(new THREE.Vector3());
           const pos = o.geometry.attributes.position;
-          const h = bb.max.y - bb.min.y;
-          if (look.hairCut === 'sidecut') {
-            // shaved sides, volume on top, no tail at the back
-            const backLimit = bb.min.z + (bb.max.z - bb.min.z) * 0.28;
+          // the model's mesh axes aren't the character's: find which local axis points up / forward
+          const e = o.matrixWorld.elements, cols = [0, 1, 2].map((i) => [e[i * 4], e[i * 4 + 1], e[i * 4 + 2]]);
+          const pick = (w) => { let best = 0; for (let i = 1; i < 3; i++) if (Math.abs(cols[i][w]) > Math.abs(cols[best][w])) best = i; return best; };
+          const U = pick(1), F = pick(2), S = 3 - U - F;
+          const su = Math.sign(cols[U][1]) || 1, sf = Math.sign(cols[F][2]) || 1;
+          const v = [0, 0, 0];
+          const get = (i) => { v[0] = pos.getX(i); v[1] = pos.getY(i); v[2] = pos.getZ(i); return [v[U] * su, v[F] * sf, v[S]]; }; // [height, forward, side]
+          const set = (i, hh, ff, ss) => { v[U] = hh * su; v[F] = ff * sf; v[S] = ss; pos.setXYZ(i, v[0], v[1], v[2]); };
+          const lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
+          for (let i = 0; i < pos.count; i++) get(i).forEach((x, j) => { lo[j] = Math.min(lo[j], x); hi[j] = Math.max(hi[j], x); });
+          let h = hi[0] - lo[0];
+          const cf = (lo[1] + hi[1]) / 2, cs = (lo[2] + hi[2]) / 2;
+          if (base === 'm_casual') {
+            // the model's little ponytail sticks straight out backwards like a flap: let it hang down the nape
+            const back = lo[1] + (hi[1] - lo[1]) * 0.25;
             for (let i = 0; i < pos.count; i++) {
-              const t = (pos.getY(i) - bb.min.y) / h;
+              const [hh, ff, ss] = get(i);
+              if (ff >= back) continue;
+              const d = back - ff;
+              set(i, hh - d * 0.9, back - d * 0.35, cs + (ss - cs) * 0.9);
+            }
+            for (let j = 0; j < 3; j++) { lo[j] = Infinity; hi[j] = -Infinity; }
+            for (let i = 0; i < pos.count; i++) get(i).forEach((x, j) => { lo[j] = Math.min(lo[j], x); hi[j] = Math.max(hi[j], x); });
+            h = hi[0] - lo[0];
+          }
+          if (!look.hairCut) {
+            // nothing else to do
+          } else if (look.hairCut === 'sidecut') {
+            // shaved sides, volume on top, no tail at the back
+            const backLimit = lo[1] + (hi[1] - lo[1]) * 0.28;
+            for (let i = 0; i < pos.count; i++) {
+              let [hh, ff, ss] = get(i);
+              const t = (hh - lo[0]) / h;
               const k = t < 0.55 ? 0.72 : t < 0.8 ? 0.72 + (t - 0.55) / 0.25 * 0.28 : 1;
-              let z = pos.getZ(i);
-              if (z < backLimit) z = backLimit + (z - backLimit) * 0.15;
-              pos.setXYZ(i, c.x + (pos.getX(i) - c.x) * k, pos.getY(i), c.z + (z - c.z) * (0.85 + 0.15 * k));
+              if (ff < backLimit) ff = backLimit + (ff - backLimit) * 0.15;
+              set(i, hh, cf + (ff - cf) * (0.85 + 0.15 * k), cs + (ss - cs) * k);
+            }
+          } else if (!look.halfBald) {
+            // trim from below: the crown stays as modelled, everything under the cut line (neck tail,
+            // long sides) is folded up just under it and tucked in – reads as a short cut from every side
+            const [sx, sy, sz] = look.hairCut;
+            const cut = lo[0] + h * Math.min(0.4, 1 - sy); // trimming deeper leaves a tiny toupee on a bald head
+            for (let i = 0; i < pos.count; i++) {
+              const [hh, ff, ss] = get(i);
+              if (hh >= cut) continue;
+              const k = Math.min(1, (cut - hh) / (h * 0.25));
+              const ts = 1 - (1 - sx) * (0.5 + k * 0.5), tf = 1 - (1 - sz) * (0.5 + k * 0.5);
+              set(i, cut - (cut - hh) * 0.12, cf + (ff - cf) * tf, cs + (ss - cs) * ts);
             }
           } else {
+            // receding hairline: the top sinks into the scalp (bald crown & forehead), a ring stays around the back & sides
             const [sx, sy, sz] = look.hairCut;
-            // pivot low in the hair volume so it shrinks towards the head
-            const py = bb.min.y + h * 0.15;
+            const top = lo[0] + h * (0.35 + sy);
             for (let i = 0; i < pos.count; i++) {
-              pos.setXYZ(i, c.x + (pos.getX(i) - c.x) * sx, py + (pos.getY(i) - py) * sy, c.z + (pos.getZ(i) - c.z) * sz);
+              const [hh, ff, ss] = get(i);
+              if (hh <= top) continue;
+              const k = Math.min(1, (hh - top) / (h * 0.15));
+              set(i, top - (hh - top) * 0.3, cf + (ff - cf) * (1 - (1 - sz * 0.85) * k), cs + (ss - cs) * (1 - (1 - sx * 0.85) * k));
             }
           }
           pos.needsUpdate = true;
@@ -200,9 +238,6 @@ export class Character {
   }
 
   addHair(look) {
-    // a squashed short cut leaves the crown bald (a ring of hair) – cover it with a short cap
-    // unless the character really has a receding hairline (Zdenko)
-    if (!look.hairStyle && Array.isArray(look.hairCut) && !look.halfBald) look = { ...look, hairStyle: 'short', hairStyleColor: look.hair };
     if (look.beard && this.bones.Head) this.addBeard(look);
     if (look.elfEars && this.bones.Head) this.addElfEars(look);
     if ((look.sunglasses || look.glasses) && this.bones.Head) this.addSunglasses(look);
@@ -259,33 +294,28 @@ export class Character {
         }
       }
     } else if (style === 'long') {
-      if (!strandGeo) { strandGeo = new THREE.BoxGeometry(1, 1, 1); strandGeo.translate(0, -0.5, 0); }
-      const back = new THREE.Mesh(strandGeo, hm);
-      back.scale.set(r * 2.1, look.hairLength || 0.42, r * 0.7);
-      back.position.set(0, len * 0.75, -r * 0.55);
-      back.castShadow = true;
-      g.add(back);
-      for (const s of [-1, 1]) {
-        const side = new THREE.Mesh(strandGeo, hm);
-        side.scale.set(r * 0.45, (look.hairLength || 0.42) * 0.8, r * 1.2);
-        side.position.set(s * r * 0.95, len * 0.7, -r * 0.1);
-        g.add(side);
-      }
-      const cap = new THREE.Mesh(new THREE.SphereGeometry(r * 1.08, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2), hm);
-      cap.position.set(0, len * 0.55, -r * 0.08);
+      // a rounded curtain around the back & sides (face open), flaring out a little towards the ends
+      const L = look.hairLength || 0.42;
+      const top = len * 0.62, cz = -r * 0.1;
+      const dm = new THREE.MeshStandardMaterial({ color: col, roughness: 1, flatShading: true, side: THREE.DoubleSide });
+      const curtain = new THREE.Mesh(new THREE.CylinderGeometry(r * 1.07, r * 1.3, L, 14, 3, true, Math.PI * 0.3, Math.PI * 1.4), dm);
+      curtain.position.set(0, top - L / 2, cz);
+      curtain.castShadow = true;
+      g.add(curtain);
+      const cap = new THREE.Mesh(new THREE.SphereGeometry(r * 1.08, 12, 7, 0, Math.PI * 2, 0, Math.PI / 2), hm);
+      cap.scale.y = 0.95;
+      cap.position.set(0, len * 0.6, cz);
       g.add(cap);
-      // coloured strands (e.g. blond with pink/blue/purple streaks)
+      // coloured strands (e.g. blond with pink/blue/purple streaks) lying on the curtain
       (look.hairStreaks || []).forEach((c, i, arr) => {
         const sm = new THREE.MeshStandardMaterial({ color: c, roughness: 1, flatShading: true });
-        const x = (i - (arr.length - 1) / 2) * r * 0.62;
-        const st = new THREE.Mesh(strandGeo, sm);
-        st.scale.set(r * 0.13, (look.hairLength || 0.42) * (0.75 + (i % 2) * 0.2), r * 0.1);
-        st.position.set(x, len * 0.76, -r * 0.91);
+        const a = Math.PI + (i - (arr.length - 1) / 2) * 0.55 + (i % 2 ? 0.08 : -0.08);
+        const ln = L * (0.7 + (i % 2) * 0.2);
+        const st = new THREE.Mesh(new THREE.BoxGeometry(r * 0.16, ln, r * 0.06), sm);
+        const rr = r * (1.08 + 0.22 * (ln / 2) / L) + r * 0.04;
+        st.position.set(Math.sin(a) * rr, top - ln / 2, cz + Math.cos(a) * rr);
+        st.rotation.set(Math.cos(a) * -0.12, a, Math.sin(a) * 0.12);
         g.add(st);
-        const sd = new THREE.Mesh(strandGeo, sm);
-        sd.scale.set(r * 0.12, (look.hairLength || 0.42) * 0.7, r * 0.3);
-        sd.position.set((i % 2 ? 1 : -1) * r * 1.2, len * 0.7, -r * 0.1 + i * r * 0.15);
-        g.add(sd);
       });
     } else if (style === 'bun') {
       const bun = new THREE.Mesh(new THREE.SphereGeometry(r * 0.55, 8, 6), hm);

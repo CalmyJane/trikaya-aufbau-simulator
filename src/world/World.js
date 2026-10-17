@@ -507,9 +507,11 @@ export class World {
     for (let i = 0; i < 4; i++) {
       const car = Assets.model('pickup', { length: 5.2 });
       car.position.set(pk.x - 18 + i * 8, 0, pk.z + (i % 2) * 1.5);
+      // footprint from the unrotated model, so the hitbox follows the model's own axes
+      const size = new THREE.Box3().setFromObject(car).getSize(new THREE.Vector3());
       car.rotation.y = Math.PI / 2 + (Math.random() - 0.5) * 0.3;
       this.scene.add(car);
-      this.colliders.addBox(car.position.x, car.position.z, 1.1, 2.6, car.rotation.y - Math.PI / 2, 'car');
+      this.colliders.addBox(car.position.x, car.position.z, size.x / 2 * 0.95, size.z / 2 * 0.95, car.rotation.y, 'car');
     }
     const parkSign = signPost('P  CREW', { width: 1.6, height: 0.8, bg: '#1f5fbf', fg: '#ffffff' });
     parkSign.position.set(pk.x - 26, 0, pk.z + 4);

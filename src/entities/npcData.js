@@ -396,7 +396,7 @@ export const NPCS = [
   },
   {
     id: 'steffi', name: 'Steffi', role: { de: 'Fotos & Chillen', en: 'Photos & chilling' }, portrait: '📷',
-    look: { base: 'f_casual', skin: SKIN.light, hair: '#7a4a2a', brows: '#5a3820', hairStyle: 'long', hairStyleColor: '#7a4a2a', hairLength: 0.5, shirt: '#2a8a7a', pants: '#8a6a4a', patchwork: true, height: 1.68, extras: ['camera'] },
+    look: { base: 'f_casual', skin: SKIN.light, hair: '#d8b46a', brows: '#a8844a', hairStyle: 'long', hairStyleColor: '#d8b46a', hairLength: 0.5, shirt: '#2a8a7a', pants: '#8a6a4a', patchwork: true, height: 1.68, extras: ['camera'] },
     behavior: 'wander', home: 'matze_face', radius: 3,
     lines: [
       { de: 'Ich chill nur kurz vor Matzes Container. Seit ungefähr drei Stunden.', en: 'Just chilling in front of Matze\'s container for a bit. For about three hours now.' },

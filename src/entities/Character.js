@@ -243,6 +243,7 @@ export class Character {
     if ((look.sunglasses || look.glasses) && this.bones.Head) this.addSunglasses(look);
     if (look.vikingHat && this.bones.Head) this.addVikingHat(look);
     if (look.cap && this.bones.Head) this.addCap(look);
+    if (look.pirateHat && this.bones.Head) this.addPirateHat(look);
     if (look.tattoos) this.addTattoos(look);
     if (look.grin && this.bones.Head) this.addGrin(look);
     if (!look.hairStyle && look.bangs && this.bones.Head) look = { ...look, hairStyle: 'model' }; // just the fringe
@@ -548,6 +549,44 @@ export class Character {
       h2.rotation.z = -s * 0.35;
       g.add(h2);
     }
+    this.attachToBone('Head', g);
+  }
+
+  /** Pirate hat (look.pirateHat = cloth colour): black tricorn with a feather and a yellow cloth knotted around the head. */
+  addPirateHat(look) {
+    this.root.updateMatrixWorld(true);
+    const { len } = this.headInfo();
+    const r = len * 0.42;
+    const g = new THREE.Group();
+    const felt = new THREE.MeshStandardMaterial({ color: '#17141a', roughness: 0.95, flatShading: true });
+    const cloth = new THREE.MeshStandardMaterial({ color: look.pirateHat === true ? '#e8c020' : look.pirateHat, roughness: 0.9, flatShading: true });
+    const y0 = len * 0.6;
+    const band = new THREE.Mesh(new THREE.CylinderGeometry(r * 1.22, r * 1.22, r * 0.35, 14), cloth);
+    band.position.y = y0 - r * 0.1;
+    g.add(band);
+    const knot = new THREE.Mesh(new THREE.SphereGeometry(r * 0.22, 6, 5), cloth);
+    knot.position.set(r * 0.5, y0 - r * 0.1, -r * 1.15);
+    g.add(knot);
+    for (const s of [-1, 1]) {
+      const tail = new THREE.Mesh(new THREE.BoxGeometry(r * 0.2, r * 0.7, r * 0.06), cloth);
+      tail.position.set(r * (0.5 + s * 0.16), y0 - r * 0.5, -r * 1.2);
+      tail.rotation.z = s * 0.25;
+      g.add(tail);
+    }
+    const crown = new THREE.Mesh(new THREE.SphereGeometry(r * 1.2, 12, 7, 0, Math.PI * 2, 0, Math.PI / 2), felt);
+    crown.position.y = y0 + r * 0.05;
+    crown.scale.y = 0.8;
+    g.add(crown);
+    // upturned brim as a flattened ring, pinched into a tricorn by three raised corners
+    const brim = new THREE.Mesh(new THREE.CylinderGeometry(r * 1.9, r * 1.6, r * 0.1, 3, 1), felt);
+    brim.position.y = y0 + r * 0.02;
+    brim.rotation.y = Math.PI / 2;
+    g.add(brim);
+    const feather = new THREE.Mesh(new THREE.ConeGeometry(r * 0.22, r * 1.7, 5), new THREE.MeshStandardMaterial({ color: '#d8d2c0', roughness: 0.7, flatShading: true }));
+    feather.position.set(-r * 1.15, y0 + r * 0.85, -r * 0.2);
+    feather.rotation.z = 0.9;
+    feather.rotation.x = -0.3;
+    g.add(feather);
     this.attachToBone('Head', g);
   }
 

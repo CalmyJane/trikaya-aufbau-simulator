@@ -730,6 +730,18 @@ export const NPCS = [
     ],
   },
   {
+    id: 'lutz', name: 'Lutz', role: { de: 'Firespace-Dauergast', en: 'Firespace regular' }, portrait: '🏴‍☠️',
+    look: { base: 'm_casual', skin: SKIN.fair, hair: '#b89a62', brows: '#a88a52', hairStyle: 'long', hairStyleColor: '#b89a62', hairLength: 0.55, beard: 'full', beardColor: '#a98c58', glasses: true, pirateHat: '#e8c020', shirt: '#6a3a2a', pants: '#2a2a32', shoes: '#2a2018', height: 2.05 },
+    behavior: 'wander', home: 'plot_firespace', offset: [5, -3], radius: 6,
+    lines: [
+      { de: 'Ich häng nur kurz am Firespace ab. Seit Mittwoch.', en: 'Just hanging at the firespace for a bit. Since Wednesday.' },
+      { de: 'Kopf einziehen! Ja, ich bin groß. Nein, das Wetter da oben ist nicht anders.', en: 'Duck! Yes, I am tall. No, the weather up here is not different.' },
+      { de: 'Die Feder? Gehört zum Hut. Der Hut gehört zu mir. Ich gehöre zum Feuer.', en: 'The feather? Goes with the hat. The hat goes with me. I go with the fire.' },
+      { de: 'Arrr. Äh. Moin.', en: 'Arrr. Uh. Hey.' },
+      { de: 'Vom Feuer aus sieht man alles. Auch wer nicht arbeitet. Ich sag nix.', en: 'From the fire you see everything. Including who is not working. I am not saying anything.' },
+    ],
+  },
+  {
     id: 'alf', name: 'Alf', role: { de: 'Geschichtenerzähler', en: 'Storyteller' }, portrait: '📖',
     look: { base: 'm_hoodie', skin: SKIN.light, hair: '#1e1610', brows: '#1e1610', hairStyle: 'long', hairStyleColor: '#1e1610', hairLength: 0.5, shirt: '#6a4a8a', pants: '#4a3a2a', patchwork: true, shirtPatch: ['#6a4a8a', '#c0602a', '#2a6a5a'], height: 1.8 },
     behavior: 'wander', home: 'festival_random', roam: 'festival_random', radius: 10,

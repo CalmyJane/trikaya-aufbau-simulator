@@ -549,6 +549,21 @@ export const NPCS = [
     ],
   },
   {
+    id: 'ben', name: 'Ben', role: { de: 'Freund von Luna (hängt gern ab)', en: 'Luna\'s friend (loves hanging out)' }, portrait: '🧑‍🦲',
+    look: { base: 'm_casual', skin: SKIN.light, hair: '#e8c39e', brows: '#8a6a4a', hairCut: [0.9, 0.9, 0.9], shirt: '#2a8a7a', pants: '#5a4a3a', patchwork: true, shirtPatch: ['#2a8a7a', '#e0c050', '#e0e0d0'], height: 1.95 },
+    behavior: 'wander', home: 'plot_mainstage', offset: [-3, 4], radius: 9,
+    lines: [
+      { de: 'Hey! Ich bin Ben. Luna hat gesagt, ich soll nichts anfassen. Ich fasse alles an. Nur kurz!', en: 'Hey! I\'m Ben. Luna told me not to touch anything. I touch everything. Just briefly!' },
+      { de: 'Ich bin eigentlich nur zu Besuch bei Luna. Aber irgendwie hänge ich jetzt überall rum.', en: 'I\'m only visiting Luna really. Somehow I\'m now hanging around everywhere.' },
+      { de: 'Die Glatze? Spart Shampoo, Sonnencreme hab ich dafür doppelt. Läuft.', en: 'The bald head? Saves shampoo. Double the sunscreen though. Works for me.' },
+      { de: 'Ich bin groß, ich seh alles. Zum Beispiel: da hinten fehlt noch ein Zelt. Oder war das ein Busch? Egal!', en: 'I\'m tall, I see everything. Like: there\'s a tent missing back there. Or was that a bush? Whatever!' },
+      { de: 'Luna ist die Beste. Sie kümmert sich um alle. Ich kümmer mich dafür um den Spaß. Fairer Deal.', en: 'Luna is the best. She looks after everyone. I look after the fun. Fair deal.' },
+      { de: 'Fang mich doch! …Okay, ich steh still. Ich hab nur so getan.', en: 'Catch me if you can! …Okay, I\'m standing still. I was just pretending.' },
+      { de: 'Mal bin ich bei Luna, mal bin ich weg. Fragt mich nicht wo. Ich weiß es selbst nicht. Hihi.', en: 'Sometimes I\'m with Luna, sometimes I\'m gone. Don\'t ask where. I don\'t know myself. Hehe.' },
+      { de: 'Kleiner Tipp: Wenn irgendwo laut gelacht wird, bin ich meistens schuld. Oder Andi.', en: 'Tip: if there\'s loud laughter somewhere, it\'s usually my fault. Or Andi\'s.' },
+    ],
+  },
+  {
     id: 'mikey', name: 'Mikey', role: { de: 'Hilft überall ein bisschen', en: 'Helps a bit everywhere' }, portrait: '😎',
     look: { base: 'm_casual', skin: SKIN.light, hair: '#e3c46a', brows: '#b8963a', hairStyle: 'long', hairStyleColor: '#e3c46a', hairLength: 0.2, sunglasses: true, shirt: '#e0e0d0', pants: '#4a5a8a', patchwork: true, shirtPatch: ['#e0e0d0', '#5ad1ff', '#c9b24a'], height: 1.8 },
     behavior: 'patrol', route: ['base_yard', 'kitchen', 'plot_mainstage', 'plot_chai_lounge', 'generator', 'plot_entrance', 'plot_hammocks', 'chill'], speed: 1.9,

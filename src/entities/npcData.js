@@ -46,6 +46,19 @@ export const NPCS = [
     ],
   },
   {
+    id: 'tony', name: 'Tony', role: { de: 'Bau (nervt)', en: 'Construction (annoying)' }, portrait: '😏',
+    look: { base: 'm_hoodie', skin: SKIN.light, hair: '#1a120c', brows: '#1a120c', hairStyle: 'long', hairStyleColor: '#1a120c', hairLength: 0.3, shirt: '#3a4a6a', pants: '#2a2a32', patchwork: true, shirtPatch: ['#3a4a6a', '#6a3a2a', '#2a3a4a'], height: 1.88 },
+    behavior: 'wander', home: 'plot_mainstage', offset: [3, 10], radius: 6,
+    lines: [
+      { de: 'Matze! Matze. Matze, hörst du mich? Matze.', en: 'Matze! Matze. Matze, can you hear me? Matze.' },
+      { de: 'Corni, soll ich mal helfen? Ich helf einfach mal. Ich stell mich daneben und helf.', en: 'Corni, want me to help? I\'ll just help. I\'ll stand next to you and help.' },
+      { de: 'Hey Matze, weißt du, wo der Hammer ist? Nein, nicht der. Der andere. Doch, der.', en: 'Hey Matze, do you know where the hammer is? No, not that one. The other one. Yes, that one.' },
+      { de: 'Corni sagt, ich soll aufhören zu fragen. Ich frag mal nach, ob das stimmt.', en: 'Corni says I should stop asking. I\'ll ask if that\'s true.' },
+      { de: 'Ich nerv nicht. Ich bin… engagiert. Frag Matze. Der sagt das auch. Manchmal. Wenn er mich sieht, rennt er.', en: 'I\'m not annoying. I\'m… engaged. Ask Matze. He says so too. Sometimes. When he sees me, he runs.' },
+      { de: 'Darf ich mal die Wasserwaage halten? Nur kurz. Nur ganz kurz. Matze, gibst du sie mir?', en: 'Can I hold the spirit level? Just briefly. Really briefly. Matze, will you give it to me?' },
+    ],
+  },
+  {
     id: 'matze', name: 'Matze', role: { de: 'Bau (meistens)', en: 'Construction (mostly)' }, portrait: '🤔',
     look: { base: 'm_hoodie', skin: SKIN.fair, hair: '#e3c46a', brows: '#b8963a', shirt: '#2a8a7a', pants: '#8a6a4a', patchwork: true, height: 1.8 },
     behavior: 'wander', home: 'plot_mainstage', offset: [-8, 12], radius: 5,
@@ -241,7 +254,7 @@ export const NPCS = [
       { de: 'Ich hab das Lichtkonzept gemacht. Ja, das ganze.', en: 'I did the lighting concept. Yes, all of it.' },
       { de: 'Hmm. Okay. Kann man so machen. Ist halt falsch.', en: 'Hmm. Okay. You could do it like that. It\'s just wrong.' },
       { de: 'Andi! Das Kabel! Nicht das Bier, das KABEL!', en: 'Andi! The cable! Not the beer, the CABLE!' },
-      { de: 'Julez sagt, mein Lichtkonzept ist falsch. Julez sagt das zu allem. Auch zu Licht.', en: 'Julez says my lighting concept is wrong. Julez says that about everything. Even about light.' },
+      { de: 'Julz sagt, mein Lichtkonzept ist falsch. Julz sagt das zu allem. Auch zu Licht.', en: 'Julz says my lighting concept is wrong. Julz says that about everything. Even about light.' },
     ],
   },
   {
@@ -526,7 +539,7 @@ export const NPCS = [
       { de: 'Starkstrom und Bier vertragen sich super. Sagt keiner. Außer mir.', en: 'High voltage and beer go great together. Says nobody. Except me.' },
       { de: 'Wenn Felix fragt: Ich hab gearbeitet. Den ganzen Tag. Mit Pausen. Mit vielen Pausen.', en: 'If Felix asks: I worked. All day. With breaks. Lots of breaks.' },
       { de: 'Du bist super, weißt du das? Komm, ich erzähl dir einen Witz. …Hab ich vergessen. Hahaha!', en: 'You\'re great, you know that? Come on, I\'ll tell you a joke. …Forgot it. Hahaha!' },
-      { de: 'Julez sagt, ich halte das Bier falsch. Ich halte es genau richtig. Es ist fast leer.', en: 'Julez says I hold my beer wrong. I hold it exactly right. It\'s almost empty.' },
+      { de: 'Julz sagt, ich halte das Bier falsch. Ich halte es genau richtig. Es ist fast leer.', en: 'Julz says I hold my beer wrong. I hold it exactly right. It\'s almost empty.' },
       { de: 'Hicks! …Das war der Generator. Nicht ich. Hihi.', en: 'Hic! …That was the generator. Not me. Hehe.' },
     ],
   },
@@ -786,8 +799,8 @@ export const NPCS = [
     ],
   },
   {
-    id: 'julez', name: 'Julez', role: { de: 'Strom & Licht (weiß es besser)', en: 'Power & light (knows better)' }, portrait: '🧐',
-    look: { base: 'm_casual', skin: SKIN.fair, hair: '#ead07a', brows: '#c8a85a', hairStyle: 'ponytail', hairStyleColor: '#ead07a', hairLength: 0.55, shirt: '#3a3a3a', pants: '#4a5a3a', shoes: '#2a2018', patchwork: true, shirtPatch: ['#3a3a3a', '#c9b24a', '#2a2a3a'], height: 1.62 },
+    id: 'julez', name: 'Julz', role: { de: 'Strom & Licht (weiß es besser)', en: 'Power & light (knows better)' }, portrait: '🧐',
+    look: { base: 'm_casual', skin: SKIN.fair, hair: '#ead07a', brows: '#c8a85a', hairCut: [0.95, 0.45, 0.95], beard: 'moustache', beardColor: '#dcbc68', shirt: '#3a3a3a', pants: '#4a5a3a', shoes: '#2a2018', patchwork: true, shirtPatch: ['#3a3a3a', '#c9b24a', '#2a2a3a'], height: 1.62 },
     behavior: 'wander', home: 'generator', offset: [-3, 2], radius: 5,
     lines: [
       { de: 'Felix, das Kabel liegt falsch. Nein, das andere. Nein, das ANDERE.', en: 'Felix, that cable is wrong. No, the other one. No, the OTHER one.' },
@@ -809,7 +822,7 @@ export const NPCS = [
       { de: 'Die Cappy bleibt auf. Auch beim Löten. Auch nachts. Vor allem nachts.', en: 'The cap stays on. Even when soldering. Even at night. Especially at night.' },
       { de: 'Felix sagt, das Lichtkonzept ist durchdacht. Ich sag: Es leuchtet. Das reicht mir.', en: 'Felix says the lighting concept is well thought out. I say: it glows. That\'s enough for me.' },
       { de: 'Roter Bart, rote Kabel. Zufall? Ja. Aber ein schöner.', en: 'Red beard, red cables. Coincidence? Yes. But a nice one.' },
-      { de: 'Julez sagt, ich verlege falsch. Felix sagt, Julez verlegt falsch. Ich verleg einfach.', en: 'Julez says I\'m laying it wrong. Felix says Julez lays it wrong. I just lay it.' },
+      { de: 'Julz sagt, ich verlege falsch. Felix sagt, Julz verlegt falsch. Ich verleg einfach.', en: 'Julz says I\'m laying it wrong. Felix says Julz lays it wrong. I just lay it.' },
     ],
   },
   {
@@ -820,7 +833,7 @@ export const NPCS = [
       { de: 'Hey! Alles gut bei dir? Wenn du was brauchst, ich bin da.', en: 'Hey! You alright? If you need anything, I\'m here.' },
       { de: 'Komm, ich halt mal kurz fest. Du schraubst.', en: 'Come on, I\'ll hold it. You screw.' },
       { de: 'Das hast du richtig gut gemacht. Ehrlich. Hat nur keiner gesagt.', en: 'You did that really well. Honestly. Nobody said it, that\'s all.' },
-      { de: 'Julez meint das nicht so. …Doch, meint er schon. Aber er mag dich trotzdem.', en: 'Julez doesn\'t mean it like that. …Okay, he does. But he likes you anyway.' },
+      { de: 'Julz meint das nicht so. …Doch, meint er schon. Aber er mag dich trotzdem.', en: 'Julz doesn\'t mean it like that. …Okay, he does. But he likes you anyway.' },
       { de: 'Groß sein hat Vorteile: Ich komm an die Lichterketten. Sag Bescheid.', en: 'Being tall has perks: I can reach the fairy lights. Just say.' },
       { de: 'Der Schnauzer? Den hab ich seit der Grundschule. Fast.', en: 'The moustache? Had it since primary school. Almost.' },
       { de: 'Pause machen ist kein Aufgeben. Setz dich kurz, ich hol dir ein Wasser.', en: 'Taking a break isn\'t giving up. Sit down a sec, I\'ll get you a water.' },

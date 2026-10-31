@@ -1014,10 +1014,10 @@ export const QUESTS = [
     giver: 'corni',
     day: 3,
     requires: ['q8_forestdome'],
-    summary: { de: 'Fabi hat einen Hänger fürs Quad gefunden. Fahr Juli, Julez und Corni vom Crew Camp zum Forest Dome. Über Kabelbrücken langsam, keine Vollbremsung – fallen zwei raus, geht\'s von vorne los.', en: 'Fabi found a trailer for the quad. Drive Juli, Julez and Corni from the crew camp to the Forest Dome. Slow over cable bridges, no emergency stops – if two fall out, you start over.' },
+    summary: { de: 'Fabi hat einen Hänger fürs Quad gefunden. Fahr Juli, Julz und Corni vom Crew Camp zum Forest Dome. Über Kabelbrücken langsam, keine Vollbremsung – fallen zwei raus, geht\'s von vorne los.', en: 'Fabi found a trailer for the quad. Drive Juli, Julz and Corni from the crew camp to the Forest Dome. Slow over cable bridges, no emergency stops – if two fall out, you start over.' },
     offer: [
       { who: 'corni', text: { de: 'Fabi hat im Hühnercontainer einen Hänger gefunden. Fürs Quad! Unter einem Zelt. Unter einem anderen Zelt.', en: 'Fabi found a trailer in the chicken container. For the quad! Under a tent. Under another tent.' } },
-      { who: 'corni', text: { de: 'Juli, Julez und ich müssen rüber zum Forest Dome, Traversen nachziehen. Fährst du uns? Aber vorsichtig, überall liegen Kabelbrücken.', en: 'Juli, Julez and I need to get over to the Forest Dome, tighten the trusses. Will you drive us? But carefully, there are cable bridges everywhere.' } },
+      { who: 'corni', text: { de: 'Juli, Julz und ich müssen rüber zum Forest Dome, Traversen nachziehen. Fährst du uns? Aber vorsichtig, überall liegen Kabelbrücken.', en: 'Juli, Julz and I need to get over to the Forest Dome, tighten the trusses. Will you drive us? But carefully, there are cable bridges everywhere.' } },
     ],
     accept: { de: 'Bitte einsteigen!', en: 'All aboard!' },
     decline: { de: 'Lauft lieber.', en: 'Better walk.' },
@@ -1029,8 +1029,8 @@ export const QUESTS = [
     steps: [
       {
         type: 'trailer', npcs: ['juli', 'julez', 'corni'], meet: 'quad', at: 'plot_forest_dome', radius: 12, maxFalls: 2, obstacles: 7,
-        text: { de: 'Steig aufs Quad und lade Juli, Julez & Corni im Crew Camp in den Hänger', en: 'Get on the quad and load Juli, Julez & Corni into the trailer at the crew camp' },
-        driveText: { de: 'Fahr Juli, Julez & Corni zum Forest Dome, vorsichtig!', en: 'Drive Juli, Julez & Corni to the Forest Dome, carefully!' },
+        text: { de: 'Steig aufs Quad und lade Juli, Julz & Corni im Crew Camp in den Hänger', en: 'Get on the quad and load Juli, Julz & Corni into the trailer at the crew camp' },
+        driveText: { de: 'Fahr Juli, Julz & Corni zum Forest Dome, vorsichtig!', en: 'Drive Juli, Julz & Corni to the Forest Dome, carefully!' },
         toLabel: { de: 'Forest Dome', en: 'Forest Dome' },
         boardLine: { de: 'Alle drin? Alle drin. Fahr los, aber mit Gefühl!', en: 'Everyone in? Everyone in. Go, but gently!' },
         fallLines: {
